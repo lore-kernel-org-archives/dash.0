@@ -1,124 +1,56 @@
-From: Oleg Verych <olecom@flower.upol.cz>
-Subject: Here-document...
-Date: Tue, 30 Oct 2007 05:23:35 +0100
-Message-ID: <20071030042335.GH22435@flower.upol.cz>
-Reply-To: dAsh <dash@vger.kernel.org>
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: fail to expand/assigned subshell output into a local variable
+Date: Thu, 8 Nov 2007 18:07:17 -0400
+Message-ID: <200711081707.17944.vapier@gentoo.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed;
+  boundary="nextPart2327687.IDurtdFves";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from barikada.upol.cz ([158.194.242.200]:34473 "EHLO
-	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751073AbXJ3EIo (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 30 Oct 2007 00:08:44 -0400
-Received: from flower (flower.upol.cz [158.194.64.22])
-	by barikada.upol.cz (Spam Firewall) with ESMTP id D84B4DC7F3
-	for <dash@vger.kernel.org>; Tue, 30 Oct 2007 05:08:40 +0100 (CET)
-Received: from flower (flower.upol.cz [158.194.64.22]) by barikada.upol.cz with ESMTP id HdHDmRhPM7oqTnCx for <dash@vger.kernel.org>; Tue, 30 Oct 2007 05:08:40 +0100 (CET)
-Received: from olecom by flower with local (Exim 4.63)
-	(envelope-from <olecom@flower.upol.cz>)
-	id 1Imidb-0007KY-BR
-	for dash@vger.kernel.org; Tue, 30 Oct 2007 05:23:35 +0100
-Content-Disposition: inline
+Received: from smtp.gentoo.org ([140.211.166.183]:52185 "EHLO smtp.gentoo.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1759203AbXKHWHT (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 8 Nov 2007 17:07:19 -0500
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.gentoo.org (Postfix) with ESMTP id 625AD652EA
+	for <dash@vger.kernel.org>; Thu,  8 Nov 2007 22:07:18 +0000 (UTC)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dAsh <dash@vger.kernel.org>
+To: dash@vger.kernel.org
 
-Wanted to make simple `makeself` analog......
+--nextPart2327687.IDurtdFves
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-____________
-#!/bin/sh -e
-set  -e
-trap 'echo "${0##*/}: Unexpected abort, exiting..."' 0
-umask 377
+this code snippet incorrectly fails under dash:
+$ { local f=$(date); }
+local: 5: 8: bad variable name
+-mike
 
-F="./bina$$"
+--nextPart2327687.IDurtdFves
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
 
-{ dd bs=65536 0<&8 1>"$F" 8<&- 2>&-
-  exec 8<&-
-  chmod u+x "$F"
-  echo 1>&2 "Running binary \`$F'...
-"
-  (exec "$F")
-  trap "{
-echo '
-Exit status: '$?
-test  $? -eq 2 && \
-echo '(Possibly kernel and fallback \`/bin/sh\` couldn'\''t execute this file,
-because it is a broken binary or unspecified/unsupported script.
-File not removed.)
-' # disabled for show || rm -f "$F"
-} 1>&2" 0
-  exit  0
-} 8<<""
-======================
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.7 (GNU/Linux)
 
-If works with payload like:
-_________________
-#!/usr/bin/printf $$Running from file: %s\n
-not used and ran
-=================
-olecom@flower:/tmp$ sh bixelf
-Running binary `./bina13936'...
+iQIVAwUARzOIlUFjO5/oN/WBAQLVdhAAlEB3U8xm4fE5w418Rn5XF20mpQuua6Bv
+Oo7Q7bqJPjk/9W/a+uCjakIj9vGL40iYxxDVsVWbAamVrewevKfSQKii1AE6aIBY
+mDMBJyKOL1tyS5EfEUyYwfA6eqVnJUs/tpvym8vUfsDALEha59VWxCzJTSgybGop
+8yCB+uCHFLVzy+7NMfLj52tg7LrdaN3EWBGQmqQmJqsgEgvwVQF1KDkzg9l7W6rQ
+Xo3KWs9cwy1X1FdirsE4f54uET6FN17C16j0tkgszvphMaRmGHO1aJLjehATegMU
+ACCTRUNvJJ7AmDiw1dBfDvyoF3WThe9oNlbTNwmljedLoJb1buTLk4Kv8LSkkZrB
+pirfj5ndjYiB6raCJcW+8oTfvTMpmiB9ppRypu8r+d3MDE5HeJvcfstj9hQaWWEe
+rGbiSJxYmrZ6uoEfYewleir12OyRUHM07wvjO5c2Vc4W7OIZmZh7151BWwkuMKnW
+o/gsryFOWkqbBZDPWp5KCx3f07E4/V2uIhzADT2r/D1CquuiUzfugCNlBKFk1kHc
+j/Wg/gOM2L9Nro8DNH5gpXGd1zvkgNOloYfpGoNgfcCxP5XA2D6vyiyavYsW1BSD
+Jl9PNrL48O5iEV0fznqxQmpbpfUpQvbe2Cpl4ZZmb7fH2sXiJjWQjf8biJw6kJVd
+ApjZg7H7TtM=
+=sXgm
+-----END PGP SIGNATURE-----
 
-$$Running from file: ./bina13936
-
-Exit status: 0
-olecom@flower:/tmp$
-=================
-
-It fails with binaries due to NUL (and maybe something more) removal.
-
-== Another issues ==
-
-Looking at parser, this piece of code:
-
-#
-    TRACE(("Here document %d\n", n->type));
-    if (! noexpand(wordtext) || (i = strlen(wordtext)) == 0 || i > EOFMARKLEN)
-            synerror("Illegal eof marker for << redirection");
-#
-
-[0] google.com/search?q=here-document+opengroup+2004
-
-In [0] it's stated, that delimiter isn't evaluated (expanded), only
-quoiting must be checked. That if() seems to be completely bogus.
-
-* strlen() == 0 isn't triggered -- empty delimiter is handled by syntax;
-
-* check for max line isn't needed, i think;
-
-* noexpand() checks for special symbols, while [0] says, that `word'
-  must be used as is (with escaping/quotes removed).
-  
-pdksh seems to do so, i.e $WHATEVER can be used and it is not expanded.
-Bash doesn't care also, but i don't know if it expands that.
-
-pdksh doesn't like no delimiter in the end of file with, thus no
-expansion is obvious (but such behavior is bad, i.e. no possibility to
-leave whatever stuff until the EOF):
-
-#
-olecom@flower:/tmp$ pdksh bixelf
-bixelf[27]: here document `$NULL' unclosed
-bixelf: Unexpected abort, exiting...
-olecom@flower:/tmp$
-olecom@flower:/tmp$ bash bixelf
-Running binary `./bina26446'...
-
-$$Running from file: /tmp/bina26446
-
-Exit status: 0
-olecom@flower:/tmp$ sh bixelf
-bixelf: 23: Syntax error: Illegal eof marker for << redirection
-bixelf: Unexpected abort, exiting...
-olecom@flower:/tmp$
-#
-== * ==
-
-Placing binary stuff safely with optimized reading/writing by big
-blocks without parsing, if delimiter is "", are things, that i'd like
-to propose and possibly fix/implement soon.
---
--o--=O`C
- #oo'L O
-<___=E M
+--nextPart2327687.IDurtdFves--
