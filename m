@@ -1,127 +1,128 @@
 From: "Oleg Verych" <olecom@gmail.com>
-Subject: Here-document with quoted delimiter.
-Date: Sun, 11 Nov 2007 21:36:49 +0100
-Message-ID: <8499950a0711111236t54d337d8ld0582795d1d2e4c2@mail.gmail.com>
+Subject: Features.
+Date: Sun, 11 Nov 2007 23:59:40 +0100
+Message-ID: <8499950a0711111459h33921caaxde3111fb2b719fea@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from nf-out-0910.google.com ([64.233.182.189]:19896 "EHLO
+Received: from nf-out-0910.google.com ([64.233.182.188]:56955 "EHLO
 	nf-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756429AbXKKUgv (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 11 Nov 2007 15:36:51 -0500
-Received: by nf-out-0910.google.com with SMTP id g13so932354nfb
-        for <dash@vger.kernel.org>; Sun, 11 Nov 2007 12:36:49 -0800 (PST)
+	with ESMTP id S1755603AbXKKW7m (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 11 Nov 2007 17:59:42 -0500
+Received: by nf-out-0910.google.com with SMTP id g13so953742nfb
+        for <dash@vger.kernel.org>; Sun, 11 Nov 2007 14:59:41 -0800 (PST)
 Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dAsh <dash@vger.kernel.org>
 
-== 11/11/07, Herbert Xu ==
-> On Tue, Oct 30, 2007 at 04:23:35AM +0000, Oleg Verych wrote:
-> >
-> > } 8<<""
-> > ======================
->
-> Actually this (the empty delim) only works with dash by accident.
-> I've tried bash and pdksh and they both terminate on the first
-> empty line which is what you would expect rather than EOF.  The
-> real Korn shell does something completely different.
->
-> I've fixed this in dash to conform to bash/pdksh.
+0. Introduce versioning and feature check.
 
-[]
-> > Placing binary stuff safely with optimized reading/writing by big
-> > blocks without parsing, if delimiter is "", are things, that i'd like
-> > to propose and possibly fix/implement soon.
->
-> Sorry but I can't see how we can get this to work in a meaningful
-> way.
+1. Patterns.
 
-I hope you know what `makeself` is. There is to much scripting and
-external tools used to achieve basic thing: to copying binary data after
-script in the script file to a separate file and to do something with it
-(mainly gunzip/bunzip + run another script). Also it all is written is
-quoted form, which is very unreadable and ugly.
+  1.1 Restore original ash idea about negative pattern matching
+      (DIFFERENCES .9), but with only one `!', as it can be enables in
+      bash.
 
-After making that very simple shell stub (in prev mail), i realized, that
-things can be done very easily.
+  1.2 Make patterns to distinguish files and directories, because
+      searching algorithm already doing this as result of `*/*'
+      expansions, for example.
 
-1) here-doc data is started after first new line of the command, that
-   has `<<' syntax.
+      Sometimes it's better to have a list of files only, without
+      additional `find`. I don't know what syntax to propose,
+      especially if socket/fifo/devnode matching will be requested
+      later. Maybe
 
-There are may be multiple chunks, but let's concentrate on that with
-empty delimiter.
+      mplayer &F*/*         # play files
+      cat !&P*              # output content of not fifos(pipes)
+      ls -l /dev/&Dhd*      # show a bit more info devnodes /dev/hd*
 
-2) As stated in shell description "2.3 Token Recognition", there are
-   two major modes, here-doc and not. It is described, that quoted
-   delimiter yields whole here-data to be a word, that ends with a
-   *line*, consisting with delimiter and `\n'.
+  1.3 To sort output only on request.
+      I see no value in sorting it.
 
-   This means `\n\n', if delimiter is `""'.
+  1.4 To do not output patterns in case of empty match.
+      Quoting is meant to be done for anything, shell can screw up.
+      Thus, i also see no value in saving pattern for programs, that
+      don't expect such ``file names'' anyway.
 
-   But what is special about `""'? It is, that there is no intention from
-   the user to limit data, isn't it? Even `\n\n' is just a side effect of
-   the written standard.
+2. Restore `setvar variable value`. It is better, than to use `eval` to
+   artificially construct and perform assignments of variables with names,
+   which a generated or passed as parameters.
 
-   So, what i propose is basically:
+3. Yet again to kill aliases and all traces of history introduced to ash
+   by BSD guys.
 
-here_doc() {
+4. Here-doc with quoted empty delimiter (`<<""') to be ended with EOF.
 
-if delim = ""
-then
-     io_setup()
-     if fork_shell()
-     then
-          while ! ( eof || fatal_error )
-          do read  in
-             write out
-          done
+5. File descriptors.
 
-          exit
-     fi
-     io_reset()
-     return error
-fi
+   5.1 Opening file descriptors at position (seeking)
 
-# other delim handling
-....
+   # skip 1k while opening
+   read A B C <@"$((1<<10))"/tmp/file.txt
 
-}
+   # seek while copying and closing file descriptor 4
+   cat <&4@4096 4<&-
 
-I.e. just a plain copy of data, thus no problems with `\0' or any other
-parsing/memory management. I don't know even if the Linux VFS can strip
-head of the file, thus preventing stupid copying.
+   # seek in the very beginning, while copying read-only file descriptor 4
+   cat <&4@
 
-(Linux, because it doesn't seem a problem to configure and implement
-kernel-dependent features, so many fancy kernel developers spending much
-more time designing, testing and applying into the kernel mainline.)
+   # seek in the very end beginning, while copying write-only $WO_A (see 5.2)
+   cat >&$WO_A@
 
-#--
-{ dd bs=65536 0<&8 1>"$F" 8<&- 2>&-
-  exec 8<&-
-  chmod u+x "$F"
-  echo 1>&2 "Running binary \`$F'...
-"
-  (exec "$F")
-} 8<<''
-#!/usr/bin/printf $$Running from file: %s\n
-not used and ran
-#--
 
-How `<<-' was described, i see no problem what so ever to implement this
-very simple idea. What is/was so special about leading tabs in 70s-80s?
+   5.2 IMHO making user accessible file descriptors in range of [3-9] is
+       kind of silly, when open() returns lowest available fd number,
+       and shell have no semantics of saying "no, this fd is used already".
 
-Why useful, small and fast functionality must be prevented just because
-it's "not like historical shell was"?
+       Making them in higher and wider region, say in [100-255] is
+       quite reasonable. Making them as special variables, like
+       parameters `$1' are, makes even more sense, thus preventing any
+       potential problems.
 
-==
+   # open /tmp/file.txt and place fd in $RO_A
+   exec RO_A</tmp/file.txt
+   # open, seek /tmp/file.bin and place fd in $RO_B
+   exec RO_B<@1024/tmp/file.bin
 
-OTOH, fixing dash to prevent binary data from being parsed and broken is
-another issue. (2) says, that there's second mode of handling input, and
-that input supposedly not a text (i.e. without `\0'). Dash seem to apply
-same "tokenization" even for here-doc with quoted delimiter.
+   cd /tmp
+   # same, with making clear border in file name
+   exec RO_B<@"1024"file.bin
 
-BTW, "ash silently discards null characters" the original ash man page
-states.
-____
+6. Binary generator. To build more speed and size optimized complete
+   functions, loops, forking daemons etc. With clear and simple
+   shell<->"basic systems programming C language" relation it
+   shouldn't be that hard.
+
+It's not fscking perl. It's how shell have to evolve, instead of ~20
+years of complete crap. There is The Kernel, here we are
+@vger.kernel.org. Now it's time for userspace to do not silently suck
+under the table!
+
+And BTW, i didn't see anything like proposed in pdksh or bash. They
+seem to do other perl stuff instead.
+
+
+== Political/religious ==
+
+
+To restore original AGPL license in sources. Place reference to the
+LICENSE file to all files with small notice, not BSD junk. That BSD
+(and other pieces) must be added in LICENSE file.
+
+To rename back to ash. Mainly because i didn't see that much changes
+since original release by Kenneth Almquist. Quite reverse. Original
+built-in `test` and `expr` were removed, crap, like aliases and
+history, editing was added. Ah, Debian. Debian.....................
+
+--
+_crazy:
+-o--=O`C
+ #oo'L O
+<___=E M
+
+_crazy-,
+-o--=O`C
+ #oo'L O
+<___=E M
