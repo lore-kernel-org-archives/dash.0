@@ -1,46 +1,34 @@
-From: "Oleg Verych" <olecom@gmail.com>
-Subject: Re: Redirections (Re: Features.)
-Date: Mon, 12 Nov 2007 05:12:43 +0100
-Message-ID: <8499950a0711112012l62a4917cu49d9074e58d2fc67@mail.gmail.com>
-References: <8499950a0711111734j5e1862d9k4874a058a59d330f@mail.gmail.com>
+From: Oleg Verych <olecom@flower.upol.cz>
+Subject: select() for file descriptors (Re: Features.)
+Date: Thu, 15 Nov 2007 10:05:04 +0100
+Message-ID: <20071115090504.GF22435@flower.upol.cz>
+References: <8499950a0711111459h33921caaxde3111fb2b719fea@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from nf-out-0910.google.com ([64.233.182.186]:5190 "EHLO
-	nf-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751170AbXKLEMp (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 11 Nov 2007 23:12:45 -0500
-Received: by nf-out-0910.google.com with SMTP id g13so991417nfb
-        for <dash@vger.kernel.org>; Sun, 11 Nov 2007 20:12:44 -0800 (PST)
-In-Reply-To: <8499950a0711111734j5e1862d9k4874a058a59d330f@mail.gmail.com>
+Received: from barikada.upol.cz ([158.194.242.200]:38691 "EHLO
+	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752480AbXKOItl (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 15 Nov 2007 03:49:41 -0500
+Received: from flower (flower.upol.cz [158.194.64.22])
+	by barikada.upol.cz (Spam Firewall) with ESMTP id D27081038E2
+	for <dash@vger.kernel.org>; Thu, 15 Nov 2007 09:49:38 +0100 (CET)
+Received: from flower (flower.upol.cz [158.194.64.22]) by barikada.upol.cz with ESMTP id G2gYroschUsLKfbJ for <dash@vger.kernel.org>; Thu, 15 Nov 2007 09:49:38 +0100 (CET)
+Received: from olecom by flower with local (Exim 4.63)
+	(envelope-from <olecom@flower.upol.cz>)
+	id 1Isaem-00078M-Rm
+	for dash@vger.kernel.org; Thu, 15 Nov 2007 10:05:04 +0100
 Content-Disposition: inline
+In-Reply-To: <8499950a0711111459h33921caaxde3111fb2b719fea@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dAsh <dash@vger.kernel.org>
 
-> > >    5.2 IMHO making user accessible file descriptors in range of [3-9] is
-> > >        kind of silly, when open() returns lowest available fd number,
-> > >        and shell have no semantics of saying "no, this fd is used
-> > already".
-> > >
-> > >        Making them in higher and wider region, say in [100-255] is
-> > >        quite reasonable. Making them as special variables, like
-> > >        parameters `$1' are, makes even more sense, thus preventing any
-> > >        potential problems.
-> > >
-> >
-> > Everyone is using 3-9 though.  I would suggest just moving the lower
-> > limit higher, e.g. 3-99.
+> 5. File descriptors.
+> 
+  5.X select() functionality. I.e. adding blocking/non blocking semantics
+      with timeouts.
 
-I don't know how heavily system() is used. Based on my shell scripting
-experience in Debian, i'd say not that much. And i doubt program(er)s
-care about having their opened fds above suggested by POSIX number 9
-before system().
-
-Of course shell will be blamed, if something non trivial, e.g. opening
-and manipulating of FDs other than STDIO[0-2], is being ran.
-
-Realizing this now, i understand why apt-get/C++ and dpkg/C were so
-unhappy in some places with my scripting (mainly `geloiwa').
+How i could forget that? Anyway, just for record or possible
+discussion, let me place it here.
 ____
