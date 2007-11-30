@@ -1,79 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Eric Sunshine <sunshine@sunshineco.com>
 Subject: Re: Dash quoting bug?
-Date: Fri, 30 Nov 2007 11:23:28 +1100
-Message-ID: <20071130002328.GH23769@gondor.apana.org.au>
-References: <474EBF87.3040103@sunshineco.com>
+Date: Fri, 30 Nov 2007 09:33:31 -0500
+Message-ID: <47501F3B.8030208@sunshineco.com>
+References: <474EBF87.3040103@sunshineco.com> <20071130002328.GH23769@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2751 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1762760AbXK3AXf (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 29 Nov 2007 19:23:35 -0500
-Content-Disposition: inline
-In-Reply-To: <474EBF87.3040103@sunshineco.com>
+Received: from elasmtp-mealy.atl.sa.earthlink.net ([209.86.89.69]:59773 "EHLO
+	elasmtp-mealy.atl.sa.earthlink.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753943AbXK3OeE (ORCPT
+	<rfc822;dash@vger.kernel.org>); Fri, 30 Nov 2007 09:34:04 -0500
+In-Reply-To: <20071130002328.GH23769@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Sunshine <sunshine@sunshineco.com>
-Cc: Andres Freund <andres@anarazel.de>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Thu, Nov 29, 2007 at 08:32:55AM -0500, Eric Sunshine wrote:
->
-> According to the dash manual, within single quotes, all characters are 
-> treated as literals (except single quote), which appears to agree with 
-> POSIX, so the above behavior seems incorrect.
+Herbert Xu wrote:
+> On Thu, Nov 29, 2007 at 08:32:55AM -0500, Eric Sunshine wrote:
+>> According to the dash manual, within single quotes, all characters are 
+>> treated as literals (except single quote), which appears to agree with 
+>> POSIX, so the above behavior seems incorrect.
+> We need a patch for the dash manual :)
+> Unfortunately according to POSIX we must interpret these escape sequences:
+> 12682 SYNOPSIS
+> 12683   echo [string ...]
+> 12695     The following character sequences shall be recognized
+> 12696     within any of the arguments:
+> 12703       \n        Write a <newline>.
 
-We need a patch for the dash manual :)
+Thank you for the response and for pointing out this documentation.
 
-Unfortunately according to POSIX we must interpret these escape sequences:
+> I suggest that you switch over printf for portability.  That is,
+> replace all occurances of
+> 	echo "string"
+> with
+> 	printf "%s\n" "string
 
-12680 NAME
-12681            echo - write arguments to standard output
+Unfortunately, in this case, a portability requirement to older 
+platforms lacking 'printf' negates the viability of such a solution. As 
+it turns out, however, I was able to resolve the issue by eliminating 
+the need to emit backslashes, thus altogether side-stepping the problem.
 
-12682 SYNOPSIS
-12683            echo [string ...]
+-- ES
 
-12684 DESCRIPTION
-12685            The echo utility writes its arguments to standard output, followed by a <newline>. If there are
-12686            no arguments, only the <newline> is written.
-
-12687 OPTIONS
-12688            The echo utility shall not recognize the "- -" argument in the manner specified by Guideline 10
-12689            of the Base Definitions volume of IEEE Std 1003.1-200x, Section 12.2, Utility Syntax Guidelines;
-12690            "- -" shall be recognized as a string operand.
-12691            Implementations shall not support any options.
-
-12692 OPERANDS
-12693            The following operands shall be supported:
-12694            string       A string to be written to standard output. If any operand is -n, it shall be treated as
-12695                         a string, not an option. The following character sequences shall be recognized
-12696                         within any of the arguments:
-12697                         \a        Write an <alert>.
-12698                         \b        Write a <backspace>.
-12699                         \c        Suppress the <newline> that otherwise follows the final argument in the
-12700                                   output. All characters following the '\c' in the arguments shall be
-12701                                   ignored.
-12702                         \f        Write a <form-feed>.
-12703                         \n        Write a <newline>.
-12704                         \r        Write a <carriage-return>.
-12705                         \t        Write a <tab>.
-12706                         \v        Write a <vertical-tab>.
-12707                         \\        Write a backslash character.
-12708                         \0num Write an 8-bit value that is the zero, one, two, or three-digit octal number
-12709                                   num.
-
-I suggest that you switch over printf for portability.  That is, replace
-all occurances of
-
-	echo "string"
-
-with
-
-	printf "%s\n" "string
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
