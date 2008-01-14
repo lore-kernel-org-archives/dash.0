@@ -1,46 +1,43 @@
-From: Eric Sunshine <sunshine@sunshineco.com>
-Subject: Re: Dash quoting bug?
-Date: Fri, 30 Nov 2007 09:33:31 -0500
-Message-ID: <47501F3B.8030208@sunshineco.com>
-References: <474EBF87.3040103@sunshineco.com> <20071130002328.GH23769@gondor.apana.org.au>
+From: Lucas Nussbaum <lucas@lucas-nussbaum.net>
+Subject: output redirections
+Date: Mon, 14 Jan 2008 12:46:04 +0100
+Message-ID: <20080114114604.GA12318@xanadu.blop.info>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from elasmtp-mealy.atl.sa.earthlink.net ([209.86.89.69]:59773 "EHLO
-	elasmtp-mealy.atl.sa.earthlink.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753943AbXK3OeE (ORCPT
-	<rfc822;dash@vger.kernel.org>); Fri, 30 Nov 2007 09:34:04 -0500
-In-Reply-To: <20071130002328.GH23769@gondor.apana.org.au>
+Received: from xanadu.blop.info ([80.248.208.235]:46007 "EHLO xanadu.blop.info"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751167AbYANMNy (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 14 Jan 2008 07:13:54 -0500
+Received: from localhost ([127.0.0.1] helo=xanadu.blop.info)
+	by xanadu.blop.info with smtp (Exim 4.63)
+	(envelope-from <lucas@lucas-nussbaum.net>)
+	id 1JENlJ-0008Au-Tz
+	for dash@vger.kernel.org; Mon, 14 Jan 2008 12:45:54 +0100
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Herbert Xu wrote:
-> On Thu, Nov 29, 2007 at 08:32:55AM -0500, Eric Sunshine wrote:
->> According to the dash manual, within single quotes, all characters are 
->> treated as literals (except single quote), which appears to agree with 
->> POSIX, so the above behavior seems incorrect.
-> We need a patch for the dash manual :)
-> Unfortunately according to POSIX we must interpret these escape sequences:
-> 12682 SYNOPSIS
-> 12683   echo [string ...]
-> 12695     The following character sequences shall be recognized
-> 12696     within any of the arguments:
-> 12703       \n        Write a <newline>.
+Hi,
 
-Thank you for the response and for pointing out this documentation.
+I rebuilt all packages in Debian in a chroot using dash as /bin/sh,
+which uncovered quite a lot of problems in build scripts.
+One of the problems is about output redirection.
 
-> I suggest that you switch over printf for portability.  That is,
-> replace all occurances of
-> 	echo "string"
-> with
-> 	printf "%s\n" "string
+I understand that:
+  command &>/dev/null
+is a bashism. (with dash, it forks a subshell)
 
-Unfortunately, in this case, a portability requirement to older 
-platforms lacking 'printf' negates the viability of such a solution. As 
-it turns out, however, I was able to resolve the issue by eliminating 
-the need to emit backslashes, thus altogether side-stepping the problem.
+the "common" replacement is:
+  command >/dev/null 2>&1
+Which works fine with dash. However, I couldn't find any reference to
+">&1" in the posix standard. Is it really posix-compliant? Shouldn't we
+use instead:
+   command >/dev/null 2>/dev/null
 
--- ES
-
+Thank you,
+-- 
+| Lucas Nussbaum
+| lucas@lucas-nussbaum.net   http://www.lucas-nussbaum.net/ |
+| jabber: lucas@nussbaum.fr             GPG: 1024D/023B3F4F |
