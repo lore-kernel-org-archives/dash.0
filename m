@@ -1,58 +1,56 @@
-From: "Oleg Verych" <olecom@gmail.com>
-Subject: Re: output redirections
-Date: Mon, 14 Jan 2008 18:08:46 +0100
-Message-ID: <8499950a0801140908i426b3d53s4fd76d589d6a1140@mail.gmail.com>
-References: <20080114114604.GA12318@xanadu.blop.info>
+From: Oleg Verych <olecom@flower.upol.cz>
+Subject: nop a syscall (root hole) on 64-bits
+Date: Wed, 26 Mar 2008 15:03:50 +0100
+Message-ID: <20080326140350.GZ24008@flower.upol.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from fk-out-0910.google.com ([209.85.128.190]:54186 "EHLO
-	fk-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752092AbYANRIt (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 14 Jan 2008 12:08:49 -0500
-Received: by fk-out-0910.google.com with SMTP id z23so1266550fkz.5
-        for <dash@vger.kernel.org>; Mon, 14 Jan 2008 09:08:47 -0800 (PST)
-In-Reply-To: <20080114114604.GA12318@xanadu.blop.info>
+Received: from barikada.upol.cz ([158.194.242.200]:47398 "EHLO
+	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751873AbYCZN65 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 26 Mar 2008 09:58:57 -0400
 Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Lucas Nussbaum <lucas@lucas-nussbaum.net>
-Cc: dash@vger.kernel.org
+To: klibc list <klibc@zytor.com>, dash list <dash@vger.kernel.org>
 
-On 1/14/08, Lucas Nussbaum <lucas@lucas-nussbaum.net> wrote:
-> Hi,
->
-> I rebuilt all packages in Debian in a chroot using dash as /bin/sh,
-> which uncovered quite a lot of problems in build scripts.
-> One of the problems is about output redirection.
->
-> I understand that:
->   command &>/dev/null
-> is a bashism. (with dash, it forks a subshell)
->
-> the "common" replacement is:
->   command >/dev/null 2>&1
-> Which works fine with dash. However, I couldn't find any reference to
-> ">&1" in the posix standard. Is it really posix-compliant? Shouldn't we
-> use instead:
->    command >/dev/null 2>/dev/null
+... or buddy userspace.
 
-|2.7.6 Duplicating an Output File Descriptor
-|...If word evaluates to one or more digits, the file descriptor
-denoted by n,...
+patching `sys_vmsplice()' with `ret'.
 
-http://www.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_07_06
+1)# echo -e '\xc3' | dd of=/dev/kmem bs=1 count=1 seek=$((0x`cat
+    /proc/kallsyms|grep sys_vmsplice | awk {'print $1'}`))
 
-It's a very usual practice, btw. But on large scale it's not too flexible
-and very feature-limited. It would be even less flexible, if two file names
-were a must to specify. It's generally one more (quite heavy) open() syscall.
-Check this.
+2)# echo -e '\xc3' | dd of=/dev/kmem bs=1 count=1 seek=$((0x`awk
+    '/sys_vmsplice/ { print $1; }' /proc/kallsyms`))
 
-strace /bin/dash -c 'echo >/dev/null 2>/dev/null'
-strace /bin/dash -c 'echo >/dev/null 2>&1'
 
--- 
--o--=O`C
-  #oo'L O
-<___=E M
+my try:
+
+#
+# printf "\xC3"  |  dd bs=1 count=1 of=/dev/kmem conv=notrunc \
+  seek=$((0x`sed -n '/vmsplice$/{s; .*;;p;q}' /boot/S*p-$(uname -r) | tee /dev/stderr`))
+ffffffff802cc20f
+dd: invalid number `-2144550385'
+#
+# dash -c 'printf "\xC3"  |  dd bs=1 count=1 of=/dev/kmem conv=notrunc \
+  seek=$((0x`sed -n "/vmsplice$/{s; .*;;p;q}" /boot/S*p-$(uname -r) | tee /dev/stderr`))'
+ffffffff802cc20f
+dd: invalid number `-1'
+#
+# printf "\xC3"  |  dd bs=1 count=1 of=/dev/kmem conv=notrunc \
+  seek=$(printf %u 0x`sed -n '/vmsplice$/{s; .*;;p;q}' /boot/S*p-$(uname -r) | tee /dev/stderr`)
+ffffffff802cc20f
+dd: `/dev/kmem': cannot seek
+0+0 records in
+0+0 records out
+0 bytes (0 B) copied, 8.1e-05 seconds, 0.0 kB/s
+#
+# printf "\xC3" | /usr/lib/klibc/bin/dd bs=1 count=1 of=/dev/kmem conv=notrunc \
+  seek=$(printf %u 0x`sed -n '/vmsplice$/{s; .*;;p;q}' /boot/S*p-$(uname -r) | tee /dev/stderr`)
+ffffffff802cc20f
+/usr/lib/klibc/bin/dd: bad operand `seek=18446744071565001231'
+#
+
+Nothing. So, i need to reboot or build a kernel module, oh well...
+______
