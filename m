@@ -1,37 +1,72 @@
-From: Alexey Gladkov <gladkov.alexey@gmail.com>
-Subject: Re: dash race
-Date: Fri, 25 Apr 2008 18:37:31 +0400
-Message-ID: <4811ECAB.5000508@gmail.com>
-References: <4811D0F1.20801@gmail.com> <8499950a0804250645s51ac0ffal9eef8152007facb0@mail.gmail.com>
+From: Oleg Verych <olecom@flower.upol.cz>
+Subject: job control (Re: dash race)
+Date: Fri, 25 Apr 2008 18:17:21 +0200
+Message-ID: <20080425161721.GM24008@flower.upol.cz>
+References: <4811D0F1.20801@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mojo.unsafe.ru ([83.222.2.183]:48810 "EHLO mojo.unsafe.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754969AbYDYOhh (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 25 Apr 2008 10:37:37 -0400
-Received: from dhcp250-148.yandex.ru (dhcp250-148.yandex.ru [87.250.250.148])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mojo.unsafe.ru (Postfix) with ESMTP id B48CE86818C
-	for <dash@vger.kernel.org>; Fri, 25 Apr 2008 18:37:31 +0400 (MSD)
-In-Reply-To: <8499950a0804250645s51ac0ffal9eef8152007facb0@mail.gmail.com>
+Received: from barikada.upol.cz ([158.194.242.200]:38415 "EHLO
+	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756606AbYDYQBn (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 25 Apr 2008 12:01:43 -0400
+Content-Disposition: inline
+In-Reply-To: <4811D0F1.20801@gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
+To: Alexey Gladkov <gladkov.alexey@gmail.com>
 Cc: dash list <dash@vger.kernel.org>
 
-Oleg Verych wrote:
->  Sometimes?
+OK, then.
 
-This bug is not 100% reproducible.
+What script tries to do?
 
->  If not in monitor mode (-m and/or -i), then IMHO jobs are not under
->  control at all.
+> <================================
+> #!/bin/dash
+> trap "echo TRAP" USR1
+> stub() {
+> 	echo ">>> STUB $1" >&2
+> 	sleep $1
+> 	echo "<<< STUB $1" >&2
+> 	kill -USR1 $$
+> }
+> stub 3 &
+> stub 2 &
+> until { echo "###"; wait; } do
+> 	echo "*** $?"
+> done
+> ================================>
 
-Option -m not helped.
+`dash` is forking; inside functions in "background" $$ is parent's pid:
 
--- 
-Rgrds, legion
+olecom@flower:/tmp$ /bin/dash -s << '#'
+stub(){ exec 2>&1
+        echo "STUB $$"
+        sleep $1
+}
+stub 1 & echo $! ; stub 2 & echo $!
+exit
+#
+
+STUB 15418
+15419
+STUB 15418
+15421
+olecom@flower:/tmp$
 
 
+which is kind of strage. Messing with functions especially in background
+isn't a good idea. I wonder what is semantics of functions WRT traps,
+forks, signals, etc..
+
+
+olecom@flower:/tmp$ /bin/dash -c 'fu(){ fu; }; fu'
+Segmentation fault
+olecom@flower:/tmp$ /bin/bash -c 'fu(){ fu; }; fu'
+^C
+olecom@flower:/tmp$
+
+Also, `ps` && `kill` is better implementation of job control. dash's
+interactivity isn't a good one, so what reason is behind shell's job
+control after all?
+____
