@@ -1,56 +1,50 @@
-From: Oleg Verych <olecom@flower.upol.cz>
-Subject: nop a syscall (root hole) on 64-bits
-Date: Wed, 26 Mar 2008 15:03:50 +0100
-Message-ID: <20080326140350.GZ24008@flower.upol.cz>
+From: Alexey Gladkov <gladkov.alexey@gmail.com>
+Subject: dash race
+Date: Fri, 25 Apr 2008 16:39:13 +0400
+Message-ID: <4811D0F1.20801@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from barikada.upol.cz ([158.194.242.200]:47398 "EHLO
-	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751873AbYCZN65 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 26 Mar 2008 09:58:57 -0400
-Content-Disposition: inline
+Received: from mojo.unsafe.ru ([83.222.2.183]:17230 "EHLO mojo.unsafe.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1760277AbYDYNHX (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 25 Apr 2008 09:07:23 -0400
+Received: from dhcp250-148.yandex.ru (dhcp250-148.yandex.ru [87.250.250.148])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mojo.unsafe.ru (Postfix) with ESMTP id 7D2DC86818C
+	for <dash@vger.kernel.org>; Fri, 25 Apr 2008 16:39:13 +0400 (MSD)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: klibc list <klibc@zytor.com>, dash list <dash@vger.kernel.org>
+To: dash list <dash@vger.kernel.org>
 
-... or buddy userspace.
+Greetings!
 
-patching `sys_vmsplice()' with `ret'.
+Sometimes following script is get 99% CPU and will be never
+finished. This happens with dash from git. I can't bisect
+this because 05c1076 has this problem.
 
-1)# echo -e '\xc3' | dd of=/dev/kmem bs=1 count=1 seek=$((0x`cat
-    /proc/kallsyms|grep sys_vmsplice | awk {'print $1'}`))
+<================================
+#!/bin/dash
+trap "echo TRAP" USR1
+stub() {
+	echo ">>> STUB $1" >&2
+	sleep $1
+	echo "<<< STUB $1" >&2
+	kill -USR1 $$
+}
+stub 3 &
+stub 2 &
+until { echo "###"; wait; } do
+	echo "*** $?"
+done
+================================>
 
-2)# echo -e '\xc3' | dd of=/dev/kmem bs=1 count=1 seek=$((0x`awk
-    '/sys_vmsplice/ { print $1; }' /proc/kallsyms`))
+strace:
+12541 wait4(-1, 0xaf87aca0, 0, NULL)    = -1 ECHILD (No child processes)
+12541 wait4(-1, 0xaf87aca0, 0, NULL)    = -1 ECHILD (No child processes)
+12541 wait4(-1, 0xaf87aca0, 0, NULL)    = -1 ECHILD (No child processes)
 
-
-my try:
-
-#
-# printf "\xC3"  |  dd bs=1 count=1 of=/dev/kmem conv=notrunc \
-  seek=$((0x`sed -n '/vmsplice$/{s; .*;;p;q}' /boot/S*p-$(uname -r) | tee /dev/stderr`))
-ffffffff802cc20f
-dd: invalid number `-2144550385'
-#
-# dash -c 'printf "\xC3"  |  dd bs=1 count=1 of=/dev/kmem conv=notrunc \
-  seek=$((0x`sed -n "/vmsplice$/{s; .*;;p;q}" /boot/S*p-$(uname -r) | tee /dev/stderr`))'
-ffffffff802cc20f
-dd: invalid number `-1'
-#
-# printf "\xC3"  |  dd bs=1 count=1 of=/dev/kmem conv=notrunc \
-  seek=$(printf %u 0x`sed -n '/vmsplice$/{s; .*;;p;q}' /boot/S*p-$(uname -r) | tee /dev/stderr`)
-ffffffff802cc20f
-dd: `/dev/kmem': cannot seek
-0+0 records in
-0+0 records out
-0 bytes (0 B) copied, 8.1e-05 seconds, 0.0 kB/s
-#
-# printf "\xC3" | /usr/lib/klibc/bin/dd bs=1 count=1 of=/dev/kmem conv=notrunc \
-  seek=$(printf %u 0x`sed -n '/vmsplice$/{s; .*;;p;q}' /boot/S*p-$(uname -r) | tee /dev/stderr`)
-ffffffff802cc20f
-/usr/lib/klibc/bin/dd: bad operand `seek=18446744071565001231'
-#
-
-Nothing. So, i need to reboot or build a kernel module, oh well...
-______
+-- 
+Rgrds, legion
