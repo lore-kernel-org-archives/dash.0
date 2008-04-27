@@ -1,44 +1,68 @@
-From: Bill Maas <bill@stsx.org>
-Subject: Shell source with relative pathname does not work
-Date: Sun, 27 Apr 2008 09:53:57 +0200
-Message-ID: <1209282837.21826.6.camel@aurora.internal>
+From: Alexey Gladkov <gladkov.alexey@gmail.com>
+Subject: Re: job control (Re: dash race)
+Date: Sun, 27 Apr 2008 15:23:57 +0400
+Message-ID: <4814624D.6010108@gmail.com>
+References: <4811D0F1.20801@gmail.com> <20080425161721.GM24008@flower.upol.cz>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp-vbr14.xs4all.nl ([194.109.24.34]:2251 "EHLO
-	smtp-vbr14.xs4all.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752463AbYD0IAt (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 27 Apr 2008 04:00:49 -0400
-Received: from [192.168.1.6] (stsx.xs4all.nl [213.84.238.115])
-	by smtp-vbr14.xs4all.nl (8.13.8/8.13.8) with ESMTP id m3R7rvaM093527
-	for <dash@vger.kernel.org>; Sun, 27 Apr 2008 09:54:02 +0200 (CEST)
-	(envelope-from bill@stsx.org)
+Received: from mojo.unsafe.ru ([83.222.2.183]:22457 "EHLO mojo.unsafe.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753733AbYD0LYL (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 27 Apr 2008 07:24:11 -0400
+Received: from dhcp250-148.yandex.ru (unknown [83.167.106.12])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mojo.unsafe.ru (Postfix) with ESMTP id CDD05868056
+	for <dash@vger.kernel.org>; Sun, 27 Apr 2008 15:23:55 +0400 (MSD)
+In-Reply-To: <20080425161721.GM24008@flower.upol.cz>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+Cc: dash list <dash@vger.kernel.org>
 
-Hi folks,
+Oleg Verych wrote:
+> What script tries to do?
 
-since I couldn't figure out how to join the Dash mailing list I'm
-posting this message directly to dash@vger.kernel.org , and I just hope
-it will arrive properly.
+This script forking child process and send to parent signals. If you 
+are confused with functions it is possible to replace them by other 
+script (see below).
 
-First my compliments for the excellent work you are doing: I used to
-believe that slowness was just another shell feature.
+> which is kind of strage. Messing with functions especially in background
+> isn't a good idea. I wonder what is semantics of functions WRT traps,
+> forks, signals, etc..
 
-I possibly found a bug in Dash:
+Maybe this is not good idea, but shell specification allow this.
 
-. x.conf
-.: 1: x.conf: not found
+Another example:
 
-The source fails, even though x.conf is definitely there. The following
-variants do succeed:
+<============ parent.sh =================
+#!/bin/dash
+trap "echo TRAP" USR1
+./child.sh 3 $$ &
+./child.sh 2 $$ &
+until { echo "###"; wait; } do
+	echo "*** $?"
+done
+echo "parent end"
+========================================>
 
-. /path/to/x.conf
-. ./x.conf
+<============ child.sh =================
+#!/bin/ash
+echo ">>> STUB $1"
+sleep $1
+echo "<<< STUB $1"
+kill -USR1 $2
+========================================>
 
-Well, that's all. Clear enough I guess. Keep up the good work.
+This example have same problem. The problem not in functions that 
+executed in background. The problem in the 'wait' command.
 
-Bill
+> Also, `ps` && `kill` is better implementation of job control. dash's
+> interactivity isn't a good one, so what reason is behind shell's job
+> control after all?
 
+I don't understand this.
+
+-- 
+Rgrds, legion
