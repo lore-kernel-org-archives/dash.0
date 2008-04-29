@@ -1,27 +1,40 @@
-From: "Oleg Verych" <olecom@gmail.com>
-Subject: NNTP (Re: job control (Re: dash race))
-Date: Tue, 29 Apr 2008 14:26:49 +0200
-Message-ID: <8499950a0804290526m1c7d7910saa5c75f8e55083dc@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: job control (Re: dash race)
+Date: Tue, 29 Apr 2008 22:04:37 +0800
+Message-ID: <E1JqqRh-0005R5-00@gondolin.me.apana.org.au>
+References: <20080427114917.GN24008@flower.upol.cz>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from nf-out-0910.google.com ([64.233.182.189]:48297 "EHLO
-	nf-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751470AbYD2M0v (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 29 Apr 2008 08:26:51 -0400
-Received: by nf-out-0910.google.com with SMTP id d3so11061nfc.21
-        for <dash@vger.kernel.org>; Tue, 29 Apr 2008 05:26:49 -0700 (PDT)
-Content-Disposition: inline
+Received: from rhun.apana.org.au ([64.62.148.172]:42487 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750901AbYD2OEm (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 29 Apr 2008 10:04:42 -0400
+In-Reply-To: <20080427114917.GN24008@flower.upol.cz>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash list <dash@vger.kernel.org>
+To: Oleg Verych <olecom@flower.upol.cz>
+Cc: gladkov.alexey@gmail.com, dash@vger.kernel.org
 
-Hard way back to NNTP. Appreciated!!!
-,--
-|X-Newsgroups: apana.lists.os.linux.dash
-|User-Agent: tin/1.7.4-20040225 ("Benbecula") (UNIX) (Linux/2.6.17-rc4 (i686))
-`--
+Oleg Verych <olecom@flower.upol.cz> wrote:
+> [...]
+>> >Also, `ps` && `kill` is better implementation of job control. dash's
+>> >interactivity isn't a good one, so what reason is behind shell's job
+>> >control after all?
+>> 
+>> I don't understand this.
+> 
+> You don't understand, that `wait` and job control is interactive shell
+> features adopted from Korn Shell?
 
-Or?..
-____
+I use this construct all the time in my scripts so I certainly
+consider this to be a grave bug in dash :)
+
+Unfortunately I'm awfully busy right now but I'll try to reproduce
+it once I get a chance.  If anyone can get me a patch before then
+it'd be much appreciated :)
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
