@@ -1,57 +1,37 @@
-From: "Oleg Verych" <olecom@gmail.com>
-Subject: command modifiers (Re: Changes with provided user's source code transform (Size and performance efficient rewriting of the `dash.test` built-in))
-Date: Thu, 1 May 2008 02:00:41 +0100
-Message-ID: <8499950a0804301800x3577741ex3646035f8350e399@mail.gmail.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: euidaccess() vs non suid /bin/sh (Re: dash test -w oddities)
+Date: Wed, 30 Apr 2008 23:03:58 -0700
+Message-ID: <48195D4E.4020504@zytor.com>
+References: <4818DF03.3090003@nexopia.com> <20080430223853.GQ24008@flower.upol.cz> <20080430230109.GR24008@flower.upol.cz> <4818F829.60601@zytor.com> <20080501001923.GS24008@flower.upol.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from py-out-1112.google.com ([64.233.166.183]:24803 "EHLO
-	py-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751319AbYEABAp (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 30 Apr 2008 21:00:45 -0400
-Received: by py-out-1112.google.com with SMTP id u52so1183028pyb.10
-        for <dash@vger.kernel.org>; Wed, 30 Apr 2008 18:00:42 -0700 (PDT)
-Content-Disposition: inline
+Received: from terminus.zytor.com ([198.137.202.10]:41385 "EHLO
+	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751009AbYEAGEH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 1 May 2008 02:04:07 -0400
+In-Reply-To: <20080501001923.GS24008@flower.upol.cz>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash list <dash@vger.kernel.org>
+To: Oleg Verych <olecom@flower.upol.cz>
+Cc: "H. Peter Anvin (dash list)" <dash@vger.kernel.org>
 
->  == original proposition for -nt -ot (specifying lists of files to check) ==
+Oleg Verych wrote:
+> 
+> Scripts with '#!/bin/sh' cannot be set-uid,
+> 
+> #man system (debian):
+> 
+>        Do  not  use  system()  from a program with set-user-ID or set-group-ID
+>        privileges, because strange values for some environment variables might
+>        be  used  to subvert system integrity.  Use the exec(3) family of func-
+>        tions instead, but not execlp(3) or execvp(3).  system() will  not,  in
+>        fact,  work  properly  from  programs  with set-user-ID or set-group-ID
+>        privileges on systems on which /bin/sh is bash version 2, since bash  2
+>        drops  privileges  on startup.  (Debian uses a modified bash which does
+>        not do this when invoked as sh.)
 
-To list of my failed shell inventions[0], i'd like to add following.
+This is largely considered a bug in bash, at least when invoked as /bin/sh.
 
-[0] ftp://flower.upol.cz/dts/ash0000_var/ideas
-
-`test` or `[` commands show, that static shell parsing rules are not flexible.
-Someone invented `[[`, somebody will invent similar (mis-)behaviour, if `sh`
-will be more popular. Statement: command modifiers.
-
-> `test: $1 = $2` -- don't do IFS spliting on $VARS (just like `[[`)
-
-> `expr, "$1" * "$2"` -- don't expand shell patterns; or just
-> `expr:, $1 * $2 `; options may be included e.g.
->> `test,n "$file" -nt arch/avr32/*` -- don't leave unexpanded patterns
->> `test:,b $file -nt [^a].*` -- pattern is BRE, (ERE, etc, what libc provides)
-(examples are using -nt proposition, but `make` with file-name patterns can
-there as well) etc. (still collecting input)
-
->`/bin/chroot! .`-- don't copy environment
-
-So, shell will be more flexible without compatibility issues. Wired
-commands with similar endings must be quoted in double quotes or placed
-in vars (another way of quotation).
-
-> `$CMD:: $2` -- just invented -- do double parsing of CMD like `eval`. Problem
-with `eval` is, that it doesn't handle infinite (user input) loops in
-provided string.
-String is generated script.
-(see final page of ftp://flower.upol.cz/upload/colorize-linux-build.sh )
-
-etc. Use your imagination and be creative. `perl` didn't provide shell
-after all.
--- 
-sed 'sed && sh + olecom = love' << ''
--o--=O`C
- #oo'L O
-<___=E M
+	-hpa
