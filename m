@@ -1,44 +1,45 @@
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: dash regression against klibc
-Date: Fri, 2 May 2008 12:30:49 +0200
-Message-ID: <20080502103049.GA20741@uranus.ravnborg.org>
-References: <449c10960805011025v675414cco36cb2d6400cc6217@mail.gmail.com> <20080502052530.GA15890@gondor.apana.org.au> <20080502062303.GA16356@gondor.apana.org.au> <20080502075010.GA19721@uranus.ravnborg.org> <20080502095340.GA17407@gondor.apana.org.au>
+From: Oleg Verych <olecom@flower.upol.cz>
+Subject: Re: euidaccess() vs non suid /bin/sh (Re: dash test -w oddities)
+Date: Fri, 2 May 2008 18:48:28 +0200
+Message-ID: <20080502164828.GY24008@flower.upol.cz>
+References: <4818DF03.3090003@nexopia.com> <20080430223853.GQ24008@flower.upol.cz> <20080430230109.GR24008@flower.upol.cz>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:52068 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758053AbYEBKaQ (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 2 May 2008 06:30:16 -0400
+Received: from barikada.upol.cz ([158.194.242.200]:45174 "EHLO
+	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758247AbYEBQ1e (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 2 May 2008 12:27:34 -0400
+Received: from flower (flower.upol.cz [158.194.64.22])
+	by barikada.upol.cz (Spam Firewall) with ESMTP id 74012223075
+	for <dash@vger.kernel.org>; Fri,  2 May 2008 18:27:20 +0200 (CEST)
+Received: from flower (flower.upol.cz [158.194.64.22]) by barikada.upol.cz with ESMTP id OT4TukS57ky28cVf for <dash@vger.kernel.org>; Fri, 02 May 2008 18:27:20 +0200 (CEST)
+Received: from olecom by flower with local (Exim 4.63)
+	(envelope-from <olecom@flower.upol.cz>)
+	id 1JryQu-0002Fw-T5
+	for dash@vger.kernel.org; Fri, 02 May 2008 18:48:28 +0200
 Content-Disposition: inline
-In-Reply-To: <20080502095340.GA17407@gondor.apana.org.au>
+In-Reply-To: <20080430230109.GR24008@flower.upol.cz>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Dan McGee <dan@archlinux.org>, dash@vger.kernel.org
+To: dash list <dash@vger.kernel.org>
 
-On Fri, May 02, 2008 at 05:53:40PM +0800, Herbert Xu wrote:
-> On Fri, May 02, 2008 at 09:50:10AM +0200, Sam Ravnborg wrote:
-> >
-> > > @@ -251,8 +249,13 @@ inline
-> > >  STATIC char *
-> > >  getpwd()
-> > >  {
-> > > +#ifdef _GNU_SOURCE
-> > >  	char *dir = getcwd(0, 0);
-> > >  	return dir ? dir : nullstr;
-> > > +#else
-> > > +	char buf[PATH_MAX];
-> > > +	return getcwd(buf, sizeof(buf)) ? savestr(buf) : nullstr;
-> > > +#endif
-> > >  }
-> > If this patch is correct then we leak memory in the glic extension case.
-> > According to man 3 getcwd the memory is allocated and thus should be freed.
+> I wonder even more why access() syscall isn't a solution, because
+> /bin/sh isn't set-uid by definition.
 > 
-> If we leaked memory in the glibc case then we'd also leak in the
-> other one because savestr is dash's version of strdup.  But we
-> don't because the caller is responsible for freeing it.
+> #/bin/cc glibc/sysdeps/posix/euidaccess.c
 
-OK, thanks for the explanation!
+Also why there's no such syscall, i wouldn't require all uid shuffling,
+isn't it?
 
-	Sam
+#fs/open.c:sys_faccessat()
+
+        old_fsuid = current->fsuid;
+        old_fsgid = current->fsgid;
+        old_cap = current->cap_effective;
+
+        current->fsuid = current->uid;
+        current->fsgid = current->gid;
+
+#end
+____
