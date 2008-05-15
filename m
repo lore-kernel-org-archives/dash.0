@@ -1,94 +1,72 @@
-From: Oleg Verych <olecom@flower.upol.cz>
-Subject: strange `printf` arguments, parsing features (bugs?)
-Date: Wed, 14 May 2008 18:59:31 +0200
-Message-ID: <20080514165931.GB21428@flower.upol.cz>
+From: Romain =?iso-8859-1?Q?Tarti=E8re?=
+	<romain.tartiere@healthgrid.org>
+Subject: Inconsistent parameter expansion
+Date: Thu, 15 May 2008 16:26:02 +0200
+Message-ID: <20080515142601.GA73886@healthgrid203d.healthgrid.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="HcAYCG3uE/tztfnV"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from barikada.upol.cz ([158.194.242.200]:54714 "EHLO
-	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751731AbYENQiP (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 14 May 2008 12:38:15 -0400
-Received: from flower (flower.upol.cz [158.194.64.22])
-	by barikada.upol.cz (Spam Firewall) with ESMTP id 5A65B13CCFA
-	for <dash@vger.kernel.org>; Wed, 14 May 2008 18:37:49 +0200 (CEST)
-Received: from flower (flower.upol.cz [158.194.64.22]) by barikada.upol.cz with ESMTP id g5udMwMEJX5xhUO5 for <dash@vger.kernel.org>; Wed, 14 May 2008 18:37:49 +0200 (CEST)
-Received: from olecom by flower with local (Exim 4.63)
-	(envelope-from <olecom@flower.upol.cz>)
-	id 1JwKKB-0002sh-RO
-	for dash@vger.kernel.org; Wed, 14 May 2008 18:59:31 +0200
+Received: from ccpntc21.in2p3.fr ([134.158.69.181]:54731 "EHLO
+	ccpntc21.in2p3.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755527AbYEOPAN (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 15 May 2008 11:00:13 -0400
 Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash list <dash@vger.kernel.org>
+To: dash@vger.kernel.org
+Cc: Baptiste Grenier <baptiste.grenier@healthgrid.org>
 
-# (1) parameters to `printf`?
 
-olecom@flower:/tmp$ sh -c 'printf "-1"'
-printf: 1: Illegal option -1
+--HcAYCG3uE/tztfnV
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-# (2) parsing features?
+Hello
 
-olecom@flower:/tmp$ sh -c 'echo 1; } echo 2'
-1
-2
-olecom@flower:/tmp$ sh -c '} echo 2'
-sh: Syntax error: "}" unexpected
-olecom@flower:/tmp$ sh -c 'echo 2; }'
-2
-olecom@flower:/tmp$
+When migrating a shell script from Debian to Ubuntu GNU/Linux, I ran
+into trouble with parameter expansion being handled differently between
+bash and dash.
 
-# (3) '\' in `` and in $();
-# what is POSIX "literal meaning" of '\' in `` and what is '\\' then?
-# bash has its own opinion
+The script was originally developed on a FreeBSD box, hence using
+FreeBSD's bourne shell (not bash nor dash) which is POSIX plus some
+extra Berkeley extensions (not the same as bash).  The idea is that the
+shell script was supposed to be POSIX and therefore not supposed to
+fail.
 
-olecom@flower:/tmp$ PS2=''
-olecom@flower:/tmp$ dash -s << '='
-`echo ' \' >&2`
-`echo ' \\' >&2`
-`echo ' \\\' >&2`
-`echo ' \\\\' >&2`
-$(echo ' \' >&2)
-$(echo ' \\' >&2)
-$(echo ' \\\' >&2)
-$(echo ' \\\\' >&2)
-echo --
-$(echo ' \\\\\' >&2)
-`echo  ' \\\\\' >&2`
-=
- \
- \
- \
- \
- \
- \
- \\
- \\
---
- \\\
- \\
-olecom@flower:/tmp$ bash -s << '='
-`echo ' \' >&2`
-`echo ' \\' >&2`
-`echo ' \\\' >&2`
-`echo ' \\\\' >&2`
-$(echo ' \' >&2)
-$(echo ' \\' >&2)
-$(echo ' \\\' >&2)
-$(echo ' \\\\' >&2)
-echo --
-$(echo ' \\\\\' >&2)
-`echo  ' \\\\\' >&2`
-=
- \
- \
- \\
- \\
- \
- \\
- \\\
- \\\\
---
- \\\\\
- \\\
-olecom@flower:/tmp$
+After some investigation, I succeeded in locating the problem.
+
+> $ for L in A B C D; do mkdir $L && touch $L/FILE; done
+> $ echo *
+> A B C D
+> $ echo */FILE
+> A/FILE B/FILE C/FILE D/FILE
+> $ echo *"/FILE"
+> */FILE
+> $=20
+
+I can't figure out why '*/FILE' and '*"/FILE"' are not expanded the same
+way...
+
+Thank you for your lights,
+Romain
+
+--=20
+Romain Tarti=E8re <romain.tartiere@healthgrid.org>     HealthGrid SysAdmin
+pgp: 3BB8 9543 B4F2 3EFA 7478  0BA0 0F8D DB2D B9E4 7019 (ID: 0xB9E47019)
+(plain text =3Dnon-HTML=3D PGP/GPG encrypted/signed e-mail much appreciated)
+
+--HcAYCG3uE/tztfnV
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.9 (FreeBSD)
+
+iEYEARECAAYFAkgsR/kACgkQD43bLbnkcBmLsACg7AOpRkK0gKOPsO/hYjjG89qq
+/SAAoIKUPoVkMDLcaozissnosFdx5794
+=s/d3
+-----END PGP SIGNATURE-----
+
+--HcAYCG3uE/tztfnV--
