@@ -1,64 +1,34 @@
-From: Oleg Verych <olecom@flower.upol.cz>
-Subject: Re: cmd modifiers options: CPU affinity, ASLR, lightweight exec...
-Date: Tue, 20 May 2008 01:39:48 +0200
-Message-ID: <20080519233948.GM21428@flower.upol.cz>
-References: <8499950a0804301800x3577741ex3646035f8350e399@mail.gmail.com> <E1JyET0-0004Zw-0H@flower>
+From: "Rocky Bernstein" <rocky.bernstein@gmail.com>
+Subject: LINENO and PS{1,2,4} ?
+Date: Mon, 23 Jun 2008 15:29:36 -0400
+Message-ID: <6cd6de210806231229x1b30d3f6yb65e989b11c6a95e@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from barikada.upol.cz ([158.194.242.200]:33750 "EHLO
-	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753767AbYESXSU (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 19 May 2008 19:18:20 -0400
-Received: from flower (flower.upol.cz [158.194.64.22])
-	by barikada.upol.cz (Spam Firewall) with ESMTP id 09DCE14A953
-	for <dash@vger.kernel.org>; Tue, 20 May 2008 01:18:00 +0200 (CEST)
-Received: from flower (flower.upol.cz [158.194.64.22]) by barikada.upol.cz with ESMTP id wHbeay8n9mavyO9g for <dash@vger.kernel.org>; Tue, 20 May 2008 01:18:00 +0200 (CEST)
-Received: from olecom by flower with local (Exim 4.63)
-	(envelope-from <olecom@flower.upol.cz>)
-	id 1JyExI-000621-4W
-	for dash@vger.kernel.org; Tue, 20 May 2008 01:39:48 +0200
+Received: from yx-out-2324.google.com ([74.125.44.29]:37331 "EHLO
+	yx-out-2324.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1760652AbYFWT3i (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 23 Jun 2008 15:29:38 -0400
+Received: by yx-out-2324.google.com with SMTP id 31so433900yxl.1
+        for <dash@vger.kernel.org>; Mon, 23 Jun 2008 12:29:37 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <E1JyET0-0004Zw-0H@flower>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash list <dash@vger.kernel.org>
+To: dash@vger.kernel.org
 
-> After today's exercises i'd like to add:
-> 
-> `sed,c` -- set CPU affinity; maybe some free CPU choice is needed also:
-> `sed,c[0]` stick to CPU 0
-> `sed,c[1]` to CPU 1, another form
-> `sed,cpu[1]`
+I have been looking at dash recently and notice in the manual page:
 
-Use cases:
+BUGS: PS1, PS2, and PS4 should be subject to parameter expansion
+before being displayed.
 
-* my buddy, doing his batch calculations; of course, i can say to him,
-  hey there's a sched_setaffinity() thing, see man how to use it, good
-  luck. But small hint about how to run it from the shell is more
-  enduser-friendly, i think.
+Also I notice that there isn't a builtin LINENO which POSIX suggests
+(e.g. http://www.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html)
 
-  Seeing how his `taylor` solver bounces from one CPU to other (with
-  my X/qemu) i'm not happy.
+I've been considering rectifying this. What's the protocol for
+submitting a patch, and/or the likelihood this would get into a
+release assuming the patch is reasonable.
 
-* algothims with easy to parallel uses (like that with `sed`) will be
-  easily configured and tested to run in one particular set up. One
-  main binary, cmd options, some pipe I/O + this shell exec feature.
+Is there currently a schedule for the next release?
 
-> good (i.e. slower) random number generation, obviously flexible
-> run-time configuration of this stuff on exec time will be needed.
-> 
-> `sed,rnd[-]`
-> `sed,r[+]`
-
-`sed,r[++]` -- good randomization
-`set -F[rnd++++]` -- even better (i.e. OK, i can wait)
-
-`set -F[rnd:$(read_ethernet_now)]` -- another choice
-`set -F[rnd:$(read_framebuffer bs=512 seek="$seed")]`
-
-
-This leads us to capabilities support and flexible checking it in `test`
-and setting in `exec`. Don't know about interfaces here, though.
-capset()/capget(), seems not that much.
-____
+Thanks.
