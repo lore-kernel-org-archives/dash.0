@@ -1,120 +1,28 @@
-From: "Mark Mentovai" <mmentovai@gmail.com>
-Subject: Mac OS X support patch
-Date: Fri, 11 Jul 2008 17:20:24 -0400
-Message-ID: <4faa0b8b0807111420o36da862ahd17a4a7d06a781e7@mail.gmail.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: Mac OS X support patch
+Date: Fri, 11 Jul 2008 20:20:39 -0700
+Message-ID: <48782307.8020900@zytor.com>
+References: <4faa0b8b0807111420o36da862ahd17a4a7d06a781e7@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_31005_18902676.1215811225083"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rv-out-0506.google.com ([209.85.198.239]:12776 "EHLO
-	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760974AbYGKVU3 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 11 Jul 2008 17:20:29 -0400
-Received: by rv-out-0506.google.com with SMTP id k40so4557955rvb.1
-        for <dash@vger.kernel.org>; Fri, 11 Jul 2008 14:20:26 -0700 (PDT)
+Received: from terminus.zytor.com ([198.137.202.10]:52245 "EHLO
+	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752496AbYGLDUn (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 11 Jul 2008 23:20:43 -0400
+In-Reply-To: <4faa0b8b0807111420o36da862ahd17a4a7d06a781e7@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Mark Mentovai <mmentovai@gmail.com>
+Cc: dash@vger.kernel.org
 
-------=_Part_31005_18902676.1215811225083
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Mark Mentovai wrote:
+> - open64 is not present although the stat64 family is, separate the
+>   autoconf checks
 
-Hi, Herbert and friends.  I've created a small patch that allows dash
-to be built on Mac OS X.  I'm contributing it here with the hope that
-it's suitable for inclusion in dash.
+This seems like the Wrong Thing anyway; the right thing should be to add 
+whatever option (like -D_FILE_OFFSET_BITS=64 on Linux) to do 
+*everything* using the full-sized offsets.
 
-The changes in this patch are:
-
-- __attribute__((__alias__())) is not supported, add an autoconf check
-- open64 is not present although the stat64 family is, separate the
-  autoconf checks
-- A syntax error had slipped into a non-glibc codepath
-- mkbuiltins had a nonportable mktemp invocation for the case where
-  tempfile is not availalble
-
-Nothing in this patch is actually Mac OS X-specific, so it might aid
-portability to other platforms as well.
-
-Mark
-
-------=_Part_31005_18902676.1215811225083
-Content-Type: application/octet-stream; name=dash.macosx.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fijakmr31
-Content-Disposition: attachment; filename=dash.macosx.patch
-
-ZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZS5hYyBiL2NvbmZpZ3VyZS5hYwppbmRleCA0ZDczOWMyLi5l
-OGQ4OWE1IDEwMDY0NAotLS0gYS9jb25maWd1cmUuYWMKKysrIGIvY29uZmlndXJlLmFjCkBAIC0x
-MywxNiArMTMsMjggQEAgQUNfTVNHX0NIRUNLSU5HKFtmb3IgYnVpbGQgc3lzdGVtIGNvbXBpbGVy
-XSkKIGlmIHRlc3QgIiRjcm9zc19jb21waWxpbmciID0geWVzOyB0aGVuCiAJQ0NfRk9SX0JVSUxE
-PSR7Q0NfRk9SX0JVSUxELWNjfQogZWxzZQogCUNDX0ZPUl9CVUlMRD0ke0NDfQogZmkKIEFDX01T
-R19SRVNVTFQoJHtDQ19GT1JfQlVJTER9KQogQUNfU1VCU1QoQ0NfRk9SX0JVSUxEKQogCitBQ19N
-U0dfQ0hFQ0tJTkcoW2ZvciBfX2F0dHJpYnV0ZV9fKChfX2FsaWFzX18oKSkpXSkKK2Rhc2hfY3Zf
-aGF2ZV9hdHRyaWJ1dGVfYWxpYXM9bm8KK0FDX0xJTktfSUZFTFNFKFtBQ19MQU5HX1BST0dSQU0o
-W3ZvaWQgdCgpIHt9CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2b2lkIGEoKSBf
-X2F0dHJpYnV0ZV9fKChfX2FsaWFzX18oInQiKSkpO10sCisgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFthKCk7XSldLAorICAgICAgICAgICAgICAgW2Rhc2hfY3ZfaGF2ZV9hdHRyaWJ1
-dGVfYWxpYXM9eWVzXSkKK0FDX01TR19SRVNVTFQoJGRhc2hfY3ZfaGF2ZV9hdHRyaWJ1dGVfYWxp
-YXMpCitpZiB0ZXN0ICJ4JGRhc2hfY3ZfaGF2ZV9hdHRyaWJ1dGVfYWxpYXMiID0geHllczsgdGhl
-bgorICBBQ19ERUZJTkUoW0hBVkVfQUxJQVNfQVRUUklCVVRFXSwgMSwKKyAgICAgICAgICAgIFtE
-ZWZpbmUgaWYgX19hdHRyaWJ1dGVfXygoX19hbGlhc19fKCkpKSBpcyBzdXBwb3J0ZWRdKQorZmkK
-KwogQUNfQVJHX0VOQUJMRShzdGF0aWMsIEFTX0hFTFBfU1RSSU5HKC0tZW5hYmxlLXN0YXRpYywg
-XAogCQkJCSAgICAgW0J1aWxkIHN0YXRpY2FsIGxpbmtlZCBwcm9ncmFtXSkpCiBpZiB0ZXN0ICIk
-ZW5hYmxlX3N0YXRpYyIgPSAieWVzIjsgdGhlbgogCWV4cG9ydCBMREZMQUdTPSItc3RhdGljIC1X
-bCwtLWZhdGFsLXdhcm5pbmdzIgogZmkKIAogQUNfQVJHX0VOQUJMRShmbm1hdGNoLCBBU19IRUxQ
-X1NUUklORygtLWVuYWJsZS1mbm1hdGNoLCBcCiAJCQkJICAgICAgW1VzZSBmbm1hdGNoKDMpIGZy
-b20gbGliY10pKQpAQCAtNTQsMTYgKzY2LDE5IEBAIGlmIHRlc3QgIiRhY19jdl9mdW5jX3NpZ25h
-bCIgIT0geWVzOyB0aGVuCiAJCQkJIFtrbGliYyBoYXMgYnNkX3NpZ25hbCBpbnN0ZWFkIG9mIHNp
-Z25hbF0pXSkKIGZpCiAKIGRubCBDaGVjayBmb3Igc3RhdDY0IChkaWV0bGliYy9rbGliYykuCiBB
-Q19DSEVDS19GVU5DKHN0YXQ2NCwsIFsKIAlBQ19ERUZJTkUoZnN0YXQ2NCwgZnN0YXQsIFs2NC1i
-aXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMgMzItYml0XSkKIAlBQ19ERUZJTkUobHN0YXQ2
-NCwgbHN0YXQsIFs2NC1iaXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMgMzItYml0XSkKIAlB
-Q19ERUZJTkUoc3RhdDY0LCBzdGF0LCBbNjQtYml0IG9wZXJhdGlvbnMgYXJlIHRoZSBzYW1lIGFz
-IDMyLWJpdF0pCitdKQorCitBQ19DSEVDS19GVU5DKG9wZW42NCwsIFsKIAlBQ19ERUZJTkUob3Bl
-bjY0LCBvcGVuLCBbNjQtYml0IG9wZXJhdGlvbnMgYXJlIHRoZSBzYW1lIGFzIDMyLWJpdF0pCiBd
-KQogCiBBQ19BUkdfV0lUSChsaWJlZGl0LCBBU19IRUxQX1NUUklORygtLXdpdGgtbGliZWRpdCwg
-W0NvbXBpbGUgd2l0aCBsaWJlZGl0IHN1cHBvcnRdKSkKIHVzZV9saWJlZGl0PQogaWYgdGVzdCAi
-JHdpdGhfbGliZWRpdCIgPSAieWVzIjsgdGhlbgogCUFDX0NIRUNLX0xJQihlZGl0LCBoaXN0b3J5
-X2luaXQsIFsKIAkJQUNfQ0hFQ0tfSEVBREVSKFtoaXN0ZWRpdC5oXSwgW3VzZV9saWJlZGl0PSJ5
-ZXMiXSwKZGlmZiAtLWdpdCBhL3NyYy9jZC5jIGIvc3JjL2NkLmMKaW5kZXggNjI0ODAxZC4uMzc3
-MDY2NCAxMDA2NDQKLS0tIGEvc3JjL2NkLmMKKysrIGIvc3JjL2NkLmMKQEAgLTI1MywxNyArMjUz
-LDE3IEBAIGdldHB3ZCgpCiAjaWZkZWYgX19HTElCQ19fCiAJY2hhciAqZGlyID0gZ2V0Y3dkKDAs
-IDApOwogCiAJaWYgKGRpcikKIAkJcmV0dXJuIGRpcjsKICNlbHNlCiAJY2hhciBidWZbUEFUSF9N
-QVhdOwogCi0JaWYgKGdldGN3ZChidWYsIHNpemVvZihidWYpKQorCWlmIChnZXRjd2QoYnVmLCBz
-aXplb2YoYnVmKSkpCiAJCXJldHVybiBzYXZlc3RyKGJ1Zik7CiAjZW5kaWYKIAogCXNoX3dhcm54
-KCJnZXRjd2QoKSBmYWlsZWQ6ICVzIiwgc3RyZXJyb3IoZXJybm8pKTsKIAlyZXR1cm4gbnVsbHN0
-cjsKIH0KIAogaW50CmRpZmYgLS1naXQgYS9zcmMvZXZhbC5jIGIvc3JjL2V2YWwuYwppbmRleCA3
-NzI5MWI0Li5jN2Q1YjE0IDEwMDY0NAotLS0gYS9zcmMvZXZhbC5jCisrKyBiL3NyYy9ldmFsLmMK
-QEAgLTMyMSwxNyArMzIxLDI2IEBAIGV4ZXhpdDoKIAkJZXhyYWlzZShFWEVYSVQpOwogCX0KIH0K
-IAogCiAjaWYgIWRlZmluZWQoX19hbHBoYV9fKSB8fCAoZGVmaW5lZChfX0dOVUNfXykgJiYgX19H
-TlVDX18gPj0gMykKIFNUQVRJQwogI2VuZGlmCi12b2lkIGV2YWx0cmVlbnIodW5pb24gbm9kZSAq
-LCBpbnQpIF9fYXR0cmlidXRlX18gKChhbGlhcygiZXZhbHRyZWUiKSkpOwordm9pZCBldmFsdHJl
-ZW5yKHVuaW9uIG5vZGUgKm4sIGludCBmbGFncykKKyNpZmRlZiBIQVZFX0FUVFJJQlVURV9BTElB
-UworX19hdHRyaWJ1dGVfXyAoKGFsaWFzKCJldmFsdHJlZSIpKSk7CisjZWxzZQoreworICBldmFs
-dHJlZShuLCBmbGFncyk7CisgIGV4cmFpc2UoRVhFUlJPUik7CisgIC8qIE5PVFJFQUNIRUQgKi8K
-K30KKyNlbmRpZgogCiAKIFNUQVRJQyB2b2lkCiBldmFsbG9vcCh1bmlvbiBub2RlICpuLCBpbnQg
-ZmxhZ3MpCiB7CiAJaW50IHN0YXR1czsKIAogCWxvb3BuZXN0Kys7CmRpZmYgLS1naXQgYS9zcmMv
-am9icy5jIGIvc3JjL2pvYnMuYwppbmRleCA0MGRjOGY2Li5lMWE0ZmNmIDEwMDY0NAotLS0gYS9z
-cmMvam9icy5jCisrKyBiL3NyYy9qb2JzLmMKQEAgLTM1NiwxNyArMzU2LDI0IEBAIGZnY21kKGlu
-dCBhcmdjLCBjaGFyICoqYXJndikKIAkJfQogCQlvdXRzdHIoanAtPnBzLT5jbWQsIG91dCk7CiAJ
-CXNob3dwaXBlKGpwLCBvdXQpOwogCQlyZXR2YWwgPSByZXN0YXJ0am9iKGpwLCBtb2RlKTsKIAl9
-IHdoaWxlICgqYXJndiAmJiAqKythcmd2KTsKIAlyZXR1cm4gcmV0dmFsOwogfQogCi1pbnQgYmdj
-bWQoaW50LCBjaGFyICoqKSBfX2F0dHJpYnV0ZV9fKChfX2FsaWFzX18oImZnY21kIikpKTsKK2lu
-dCBiZ2NtZChpbnQgYXJnYywgY2hhciAqKmFyZ3YpCisjaWZkZWYgSEFWRV9BTElBU19BVFRSSUJV
-VEUKK19fYXR0cmlidXRlX18oKF9fYWxpYXNfXygiZmdjbWQiKSkpOworI2Vsc2UKK3sKKyAgcmV0
-dXJuIGZnY21kKGFyZ2MsIGFyZ3YpOworfQorI2VuZGlmCiAKIAogU1RBVElDIGludAogcmVzdGFy
-dGpvYihzdHJ1Y3Qgam9iICpqcCwgaW50IG1vZGUpCiB7CiAJc3RydWN0IHByb2NzdGF0ICpwczsK
-IAlpbnQgaTsKIAlpbnQgc3RhdHVzOwpkaWZmIC0tZ2l0IGEvc3JjL21rYnVpbHRpbnMgYi9zcmMv
-bWtidWlsdGlucwppbmRleCA5NjBjNjFjLi4zMzc2MDMxIDEwMDY0NAotLS0gYS9zcmMvbWtidWls
-dGlucworKysgYi9zcmMvbWtidWlsdGlucwpAQCAtMzIsMTcgKzMyLDE3IEBACiAjIExJQUJJTElU
-WSwgT1IgVE9SVCAoSU5DTFVESU5HIE5FR0xJR0VOQ0UgT1IgT1RIRVJXSVNFKSBBUklTSU5HIElO
-IEFOWSBXQVkKICMgT1VUIE9GIFRIRSBVU0UgT0YgVEhJUyBTT0ZUV0FSRSwgRVZFTiBJRiBBRFZJ
-U0VEIE9GIFRIRSBQT1NTSUJJTElUWSBPRgogIyBTVUNIIERBTUFHRS4KICMKICMJQCgjKW1rYnVp
-bHRpbnMJOC4yIChCZXJrZWxleSkgNS80Lzk1CiAKIHRlbXBmaWxlPXRlbXBmaWxlCiBpZiAhIHR5
-cGUgdGVtcGZpbGUgPiAvZGV2L251bGwgMj4mMTsgdGhlbgotCXRlbXBmaWxlPW1rdGVtcAorCXRl
-bXBmaWxlPSJta3RlbXAgLXQgdGVtcGZpbGUuWFhYWFhYIgogZmkKIAogdHJhcCAncm0gLWYgJHRl
-bXAgJHRlbXAyJyBFWElUCiB0ZW1wPSQoJHRlbXBmaWxlKQogdGVtcDI9JCgkdGVtcGZpbGUpCiAK
-IGJ1aWx0aW5zPSQxCiAK
-------=_Part_31005_18902676.1215811225083--
+	-hpa
