@@ -1,31 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: restricted dash shell?
-Date: Sun, 13 Jul 2008 19:26:22 +0800
-Message-ID: <E1KHzig-0005Kr-00@gondolin.me.apana.org.au>
-References: <6cd6de210807121843v72403139x52e30b7709957b22@mail.gmail.com>
+Subject: Re: patch to add -l option
+Date: Sun, 13 Jul 2008 22:29:24 +0800
+Message-ID: <20080713142924.GA21282@gondor.apana.org.au>
+References: <18345.55198.110287.693602@gargle.gargle.HOWL>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:41531 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:39377 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752188AbYGML0Y (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 13 Jul 2008 07:26:24 -0400
-In-Reply-To: <6cd6de210807121843v72403139x52e30b7709957b22@mail.gmail.com>
+	with ESMTP id S1751803AbYGMO3b (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 13 Jul 2008 10:29:31 -0400
+Content-Disposition: inline
+In-Reply-To: <18345.55198.110287.693602@gargle.gargle.HOWL>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Rocky Bernstein <rocky.bernstein@gmail.com>
-Cc: dash@vger.kernel.org
+To: Matthias Klose <doko@cs.tu-berlin.de>
+Cc: Eric Chan <chanman_ca@yahoo.com>, dash@vger.kernel.org
 
-Rocky Bernstein <rocky.bernstein@gmail.com> wrote:
-> I notice dash doesn't seem to have a --restricted option like bash or
-> come as a restricted shell like ksh (rksh).
-> 
-> Thought and comments?
+On Wed, Feb 06, 2008 at 04:51:58PM +0100, Matthias Klose wrote:
+Content-Description: message body text
+> LSB-3.1 requires /bin/sh to understand -l option. Patch by Eric.
 
-POSIX rationale says:
-
-	The options associated with a restricted shell (command name rsh
-	and the -r option) were excluded because the standard developers
-	considered that the implied level of security could not be
-	achieved and they did not want to raise false expectations.
+Thank you.  Since -l shouldn't be set by set, I've added this
+patch instead.  The profile part is fixed in a previous patch.
 
 Cheers,
 -- 
@@ -33,3 +30,144 @@ Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+commit b95e608112199964bd1f37f1b48d6604d5c0f47b
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Sun Jul 13 22:27:00 2008 +0800
+
+    [OPTIONS] Added support for -l
+    
+    This patch adds support for the -l option (login shell) as required
+    by the LSB.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/ChangeLog b/ChangeLog
+index 58bed78..89f5c13 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -5,6 +5,7 @@
+ 	* Made t_lex reentrant.
+ 	* Made setinputfd static.
+ 	* Expand ENV before using it.
++	* Added support for -l.
+ 
+ 2008-05-19  Herbert Xu <herbert@gondor.apana.org.au>
+ 
+diff --git a/src/main.c b/src/main.c
+index cf34931..7d07e2d 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -96,6 +96,7 @@ main(int argc, char **argv)
+ 	volatile int state;
+ 	struct jmploc jmploc;
+ 	struct stackmark smark;
++	int login;
+ 
+ #ifdef __GLIBC__
+ 	dash_errno = __errno_location();
+@@ -148,8 +149,8 @@ main(int argc, char **argv)
+ 	rootpid = getpid();
+ 	init();
+ 	setstackmark(&smark);
+-	procargs(argc, argv);
+-	if (argv[0] && argv[0][0] == '-') {
++	login = procargs(argc, argv);
++	if (login) {
+ 		state = 1;
+ 		read_profile("/etc/profile");
+ state1:
+diff --git a/src/options.c b/src/options.c
+index 48c9671..6f381e6 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -106,7 +106,7 @@ const char optletters[NOPTS] = {
+ char optlist[NOPTS];
+ 
+ 
+-STATIC void options(int);
++static int options(int);
+ STATIC void minus_o(char *, int);
+ STATIC void setoption(int, int);
+ STATIC int getopts(char *, char *, char **);
+@@ -116,21 +116,23 @@ STATIC int getopts(char *, char *, char **);
+  * Process the shell command line arguments.
+  */
+ 
+-void
++int
+ procargs(int argc, char **argv)
+ {
+ 	int i;
+ 	const char *xminusc;
+ 	char **xargv;
++	int login;
+ 
+ 	xargv = argv;
++	login = xargv[0] && xargv[0][0] == '-';
+ 	arg0 = xargv[0];
+ 	if (argc > 0)
+ 		xargv++;
+ 	for (i = 0; i < NOPTS; i++)
+ 		optlist[i] = 2;
+ 	argptr = xargv;
+-	options(1);
++	login |= options(1);
+ 	xargv = argptr;
+ 	xminusc = minusc;
+ 	if (*xargv == NULL) {
+@@ -169,6 +171,8 @@ setarg0:
+ 		xargv++;
+ 	}
+ 	optschanged();
++
++	return login;
+ }
+ 
+ 
+@@ -190,12 +194,13 @@ optschanged(void)
+  * to the argument list; we advance it past the options.
+  */
+ 
+-STATIC void
++STATIC int
+ options(int cmdline)
+ {
+ 	char *p;
+ 	int val;
+ 	int c;
++	int login = 0;
+ 
+ 	if (cmdline)
+ 		minusc = NULL;
+@@ -223,6 +228,8 @@ options(int cmdline)
+ 		while ((c = *p++) != '\0') {
+ 			if (c == 'c' && cmdline) {
+ 				minusc = p;	/* command is after shell args*/
++			} else if (c == 'l' && cmdline) {
++				login = 1;
+ 			} else if (c == 'o') {
+ 				minus_o(*argptr, val);
+ 				if (*argptr)
+@@ -232,6 +239,8 @@ options(int cmdline)
+ 			}
+ 		}
+ 	}
++
++	return login;
+ }
+ 
+ STATIC void
+diff --git a/src/options.h b/src/options.h
+index 45bbe5a..975fe33 100644
+--- a/src/options.h
++++ b/src/options.h
+@@ -75,7 +75,7 @@ extern char **argptr;		/* argument list for builtin commands */
+ extern char *optionarg;		/* set by nextopt */
+ extern char *optptr;		/* used by nextopt */
+ 
+-void procargs(int, char **);
++int procargs(int, char **);
+ void optschanged(void);
+ void setparam(char **);
+ void freeparam(volatile struct shparam *);
