@@ -1,37 +1,39 @@
-From: "Mark Mentovai" <mmentovai@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Mac OS X support patch
-Date: Sat, 12 Jul 2008 10:51:27 -0400
-Message-ID: <4faa0b8b0807120751t4aa5d58do48e86a303828d90d@mail.gmail.com>
-References: <4faa0b8b0807111420o36da862ahd17a4a7d06a781e7@mail.gmail.com>
-	 <48782307.8020900@zytor.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Date: Sun, 13 Jul 2008 09:07:23 +0800
+Message-ID: <E1KHq3f-0004Wb-00@gondolin.me.apana.org.au>
+References: <48782307.8020900@zytor.com>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rv-out-0506.google.com ([209.85.198.225]:32404 "EHLO
-	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753330AbYGLOv2 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 12 Jul 2008 10:51:28 -0400
-Received: by rv-out-0506.google.com with SMTP id k40so4831044rvb.1
-        for <dash@vger.kernel.org>; Sat, 12 Jul 2008 07:51:28 -0700 (PDT)
+Received: from rhun.apana.org.au ([64.62.148.172]:51230 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751167AbYGMBHb (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 12 Jul 2008 21:07:31 -0400
 In-Reply-To: <48782307.8020900@zytor.com>
-Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: dash@vger.kernel.org
+Cc: mmentovai@gmail.com, dash@vger.kernel.org
 
-H. Peter Anvin wrote:
+H. Peter Anvin <hpa@zytor.com> wrote:
 > Mark Mentovai wrote:
 >> - open64 is not present although the stat64 family is, separate the
->>  autoconf checks
->
-> This seems like the Wrong Thing anyway; the right thing should be to add
-> whatever option (like -D_FILE_OFFSET_BITS=64 on Linux) to do *everything*
-> using the full-sized offsets.
+>>   autoconf checks
+> 
+> This seems like the Wrong Thing anyway; the right thing should be to add 
+> whatever option (like -D_FILE_OFFSET_BITS=64 on Linux) to do 
+> *everything* using the full-sized offsets.
 
-autoconf provides AC_SYS_LARGEFILE for this, but I don't think it
-should be part of this patch.  Does dash have a bug tracker where this
-can be filed?
+Actually there is a reason for this.  Not all open(2) calls in
+dash need large file support.  For example, doing it on a shell
+script or /dev/null makes no sense.  Only those dealing with user
+files (redirections) need large file support.
 
-Mark
+So that's we need to differentiate between open(2) calls on user
+files as opposed to those for dash itself.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
