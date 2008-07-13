@@ -1,39 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: "H. Peter Anvin" <hpa@zytor.com>
 Subject: Re: Mac OS X support patch
-Date: Sun, 13 Jul 2008 09:07:23 +0800
-Message-ID: <E1KHq3f-0004Wb-00@gondolin.me.apana.org.au>
-References: <48782307.8020900@zytor.com>
+Date: Sat, 12 Jul 2008 18:26:11 -0700
+Message-ID: <487959B3.1030301@zytor.com>
+References: <E1KHq3f-0004Wb-00@gondolin.me.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:51230 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751167AbYGMBHb (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 12 Jul 2008 21:07:31 -0400
-In-Reply-To: <48782307.8020900@zytor.com>
+Received: from terminus.zytor.com ([198.137.202.10]:59026 "EHLO
+	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752524AbYGMB0U (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 12 Jul 2008 21:26:20 -0400
+In-Reply-To: <E1KHq3f-0004Wb-00@gondolin.me.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "H. Peter Anvin" <hpa@zytor.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: mmentovai@gmail.com, dash@vger.kernel.org
 
-H. Peter Anvin <hpa@zytor.com> wrote:
-> Mark Mentovai wrote:
->> - open64 is not present although the stat64 family is, separate the
->>   autoconf checks
+Herbert Xu wrote:
+> H. Peter Anvin <hpa@zytor.com> wrote:
+>> Mark Mentovai wrote:
+>>> - open64 is not present although the stat64 family is, separate the
+>>>   autoconf checks
+>> This seems like the Wrong Thing anyway; the right thing should be to add 
+>> whatever option (like -D_FILE_OFFSET_BITS=64 on Linux) to do 
+>> *everything* using the full-sized offsets.
 > 
-> This seems like the Wrong Thing anyway; the right thing should be to add 
-> whatever option (like -D_FILE_OFFSET_BITS=64 on Linux) to do 
-> *everything* using the full-sized offsets.
+> Actually there is a reason for this.  Not all open(2) calls in
+> dash need large file support.  For example, doing it on a shell
+> script or /dev/null makes no sense.  Only those dealing with user
+> files (redirections) need large file support.
+> 
+> So that's we need to differentiate between open(2) calls on user
+> files as opposed to those for dash itself.
+> 
 
-Actually there is a reason for this.  Not all open(2) calls in
-dash need large file support.  For example, doing it on a shell
-script or /dev/null makes no sense.  Only those dealing with user
-files (redirections) need large file support.
+I'm not sure that that makes sense, however.  Unless you're hauling a 
+*lot* of off_t's around the code, the incremental complexity is hardly 
+worth it.
 
-So that's we need to differentiate between open(2) calls on user
-files as opposed to those for dash itself.
+The *only* reason for the legacy 32-bit off_t mode is because it is an 
+ABI change, it is necessary to prevent application/library interface 
+breakage.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+FWIW, klibc doesn't even implement the LFS64 APIs, nor does it implement 
+the legacy 32-bit off_t mode in any way.
+
+	-hpa
