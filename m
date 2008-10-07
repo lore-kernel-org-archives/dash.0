@@ -1,61 +1,57 @@
-From: maximilian.bernoecker@lrz.tum.de (Maximilian =?iso-8859-1?Q?Bern=F6c?=
-	=?iso-8859-1?Q?ker?=)
-Subject: dash, ash for loop oddity
-Date: Sun, 21 Sep 2008 16:33:59 +0200
-Message-ID: <87myi1r2js.fsf@ID-132527.user.dfncis.de>
+From: Marcin Owsiany <marcin@owsiany.pl>
+Subject: errexit and pipelines
+Date: Tue, 7 Oct 2008 11:44:00 +0100
+Message-ID: <20081007104400.GA3219@beczulka>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mout0.freenet.de ([195.4.92.90]:57697 "EHLO mout0.freenet.de"
+Received: from mail0.vicoop.com ([85.17.210.107]:34399 "EHLO mail.vicoop.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751739AbYIUOeF (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 21 Sep 2008 10:34:05 -0400
-Received: from [195.4.92.25] (helo=15.mx.freenet.de)
-	by mout0.freenet.de with esmtpa (ID agabuga@freenet.de) (port 25) (Exim 4.69 #65)
-	id 1KhQ0h-0006Sl-Ny
-	for dash@vger.kernel.org; Sun, 21 Sep 2008 16:34:03 +0200
-Received: from p5498f82c.dip.t-dialin.net ([84.152.248.44]:50899 helo=linmax.dahoam)
-	by 15.mx.freenet.de with esmtpsa (ID agabuga@freenet.de) (TLSv1:AES256-SHA:256) (port 25) (Exim 4.69 #65)
-	id 1KhQ0h-0007Ns-CV
-	for dash@vger.kernel.org; Sun, 21 Sep 2008 16:34:03 +0200
-Received: from max by linmax.dahoam with local (Exim 4.63)
-	(envelope-from <maximilian.bernoecker@lrz.tum.de>)
-	id 1KhQ0d-0005k1-Eg
-	for dash@vger.kernel.org; Sun, 21 Sep 2008 16:33:59 +0200
+	id S1752653AbYJGLMW (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 7 Oct 2008 07:12:22 -0400
+Received: from localhost (213-155-151-233.customer.teliacarrier.com [213.155.151.233])
+	(Authenticated sender: porridge@sl.owsiany.pl)
+	by mail.vicoop.com (Postfix) with ESMTP id AF1E01E8D5
+	for <dash@vger.kernel.org>; Tue,  7 Oct 2008 12:36:58 +0200 (CEST)
+Received: from mowsiany by localhost with local (Exim 4.67)
+	(envelope-from <marcin@owsiany.pl>)
+	id 1KnA2q-0002JR-GM
+	for dash@vger.kernel.org; Tue, 07 Oct 2008 11:44:00 +0100
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Hi,
+Hello,
 
-according to the grammar
-<http://www.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_10_02>
+I have recently found a problem with _bash_ that is described in the
+following thread in bash-bug mailing list:
+http://groups.google.com/group/gnu.bash.bug/browse_thread/thread/e37f5c7ddcc55eeb/57474f8d2f8efa59
 
-| for_clause       : For name linebreak                            do_group
-|                  | For name linebreak in          sequential_sep do_group
-|                  | For name linebreak in wordlist sequential_sep do_group
-| [...]
-| linebreak        : newline_list
-|                  | /* empty */
+In short, it's about the fact that the following lines make a "set -e"
+script abort:
+ true | false
+ for a in 1; do false; done
+but the following does not:
+ true | for a in 1; do false; done
 
-the following script should be legal:
+I thought that this inconsistency was a bug in bash, but as you can find
+out in the thread, it is the first type of statements that behaves
+incorrectly, according to SUS.
 
-#####
-#!/bin/dash
-for i
-in a b c
-do
-echo $i
-done
-#####
+Dash's manpage defines 'errexit' sematics differently: more like I would
+like it to work. It also works consistently in the above examples.
 
-but it fails with:
+Since I like dash behavior more (makes it easier to write reliable
+scripts), I'm considering switching my program (cruft) to dash. But
+before I do it, can someone please confirm that what is written in the
+manpage and how dash behaves right now is indeed the intended behaviour,
+and will not in forseeable future be changed to match bash's behaviour?
 
-| ./a.sh: 3: Syntax error: "in" unexpected (expecting "do").
-
-bash, zsh and NetBSDs ksh are doing fine while NetBSDs sh, based on ash
-fails, too.
-
-Max
-
-
+regards,
+-- 
+Marcin Owsiany <marcin@owsiany.pl>              http://marcin.owsiany.pl/
+GnuPG: 1024D/60F41216  FE67 DA2D 0ACA FC5E 3F75  D6F6 3A0D 8AA0 60F4 1216
+ 
+"Every program in development at MIT expands until it can read mail."
+                                                              -- Unknown
