@@ -1,48 +1,31 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: errexit and pipelines
-Date: Wed, 08 Oct 2008 22:12:25 +0800
-Message-ID: <E1KnZm5-0002Ih-OB@gondolin.me.apana.org.au>
-References: <20081007104400.GA3219@beczulka>
+From: Sven Mascheck <mascheck@in-ulm.de>
+Subject: historic syntax for loop body
+Date: Wed, 8 Oct 2008 17:28:06 +0200
+Message-ID: <20081008152806.GA23631@lisa.in-ulm.de>
+Reply-To: mascheck@in-ulm.de
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:52453 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754504AbYJHOMa (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 8 Oct 2008 10:12:30 -0400
-In-Reply-To: <20081007104400.GA3219@beczulka>
+Received: from mail.in-ulm.de ([217.10.8.10]:36541 "HELO mail.in-ulm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1751495AbYJHPfF (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 8 Oct 2008 11:35:05 -0400
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Marcin Owsiany <marcin@owsiany.pl>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Marcin Owsiany <marcin@owsiany.pl> wrote:
->
-> I thought that this inconsistency was a bug in bash, but as you can find
-> out in the thread, it is the first type of statements that behaves
-> incorrectly, according to SUS.
+The manpage still documents support for the historic almquist for-loop
+syntax, "do and done may be replaced with { and }".  But it's not
+implemented anymore.
 
-I disagree with Chet on that.  My assessment is that POSIX/SUS
-is ambiguous on this.  It is true that only simple commands can
-lead to the shell exiting.  However, it also explicitly excludes
-pipelines starting with !.  This can be construed as indicating
-that simple commands that are a part of a pipeline not preceded
-with ! can cause an exit.
+I'm curious: when has it been removed?
+(I can't see it in the changelogs, and it seems to have gone between
+ash-0.3.8 and some earlier dash-0.4.x)
 
-Of course dash's current interpretation only includes the last
-component of the pipeline, when not preceded by !.
+Why am I asking?  I was just curious and I stumbled over this because
+AFAIK dash is the only ash variant (well, except busybox) which has it
+removed; I guess simply due to POSIX, and because it had been everything
+but common usage anyway.
 
-> Since I like dash behavior more (makes it easier to write reliable
-> scripts), I'm considering switching my program (cruft) to dash. But
-> before I do it, can someone please confirm that what is written in the
-> manpage and how dash behaves right now is indeed the intended behaviour,
-> and will not in forseeable future be changed to match bash's behaviour?
-
-I make no guarantees on this as SUS is subject to revision.
-However, I also have no plans to change this until such SUS
-clarifies this which probably won't occur for eons.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sven
