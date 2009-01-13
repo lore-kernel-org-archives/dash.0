@@ -1,29 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: look up functions per PATH (%func)
-Date: Wed, 07 Jan 2009 13:44:43 +1100
-Message-ID: <E1LKOPT-0001pM-G1@gondolin.me.apana.org.au>
-References: <20090105165358.GB28083@lisa.in-ulm.de>
+Subject: Re: Mac OS X support patch
+Date: Tue, 13 Jan 2009 15:19:04 +1100
+Message-ID: <20090113041904.GA17830@gondor.apana.org.au>
+References: <4faa0b8b0807111420o36da862ahd17a4a7d06a781e7@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:52981 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:47248 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752919AbZAGCot (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 6 Jan 2009 21:44:49 -0500
-In-Reply-To: <20090105165358.GB28083@lisa.in-ulm.de>
+	with ESMTP id S1751012AbZAMETI (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 12 Jan 2009 23:19:08 -0500
+Content-Disposition: inline
+In-Reply-To: <4faa0b8b0807111420o36da862ahd17a4a7d06a781e7@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: mascheck@in-ulm.de
+To: Mark Mentovai <mmentovai@gmail.com>
 Cc: dash@vger.kernel.org
 
-Sven Mascheck <mascheck@in-ulm.de> wrote:
+On Fri, Jul 11, 2008 at 09:20:24PM +0000, Mark Mentovai wrote:
+> Hi, Herbert and friends.  I've created a small patch that allows dash
+> to be built on Mac OS X.  I'm contributing it here with the hope that
+> it's suitable for inclusion in dash.
+
+Sorry for the late response but please CC me next time on patches.
+
+> The changes in this patch are:
 > 
-> Has anybody ever met scripts making use of this?
+> - __attribute__((__alias__())) is not supported, add an autoconf check
 
-Back in the nineties I had plans to replace some built-ins with
-shell functions using this mechanism, but it never went anywhere.
-There are still functions in the ash source for some standard
-(and some non-standard) built-ins.
+Applied with the exraise changed to abort and formatting fixes.
 
-Cheers,
+> - open64 is not present although the stat64 family is, separate the
+>   autoconf checks
+
+Applied.
+
+> - A syntax error had slipped into a non-glibc codepath
+
+Already fixed.
+
+> - mkbuiltins had a nonportable mktemp invocation for the case where
+>   tempfile is not availalble
+
+Already fixed.
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
