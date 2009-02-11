@@ -1,77 +1,102 @@
 From: Gerrit Pape <pape@smarden.org>
-Subject: [PATCH] [MAN] rename sh to dash, update DESCRIPTION and HISTORY
-Date: Wed, 11 Feb 2009 14:53:03 +0000
-Message-ID: <20090211145303.20815.qmail@24af49ab6270b0.315fe32.mid.smarden.org>
+Subject: [PATCH] [SHELL] execute EXIT trap if the shell is killed through a signal
+Date: Wed, 11 Feb 2009 14:55:08 +0000
+Message-ID: <20090211145509.21298.qmail@bfa063280f4838.315fe32.mid.smarden.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from a.ns.smarden.org ([212.42.242.37]:3274 "HELO a.mx.smarden.org"
+Received: from a.ns.smarden.org ([212.42.242.37]:3831 "HELO a.mx.smarden.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751340AbZBKOxI (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 11 Feb 2009 09:53:08 -0500
+	id S1754852AbZBKOzL (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 11 Feb 2009 09:55:11 -0500
 Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Rename sh to dash in the header and synopsis; remove reference to the
-4.4 BSD release in the description, and replace the history information
-with a reference to NetBSD's ash.
+From: Chris Lamb <chris@chris-lamb.co.uk>
 
-Suggested by jaalto through
- http://bugs.debian.org/499838
+dash used to print the following output when running this test script
+
+ $ dash -c 'trap "echo EXIT trap executed" EXIT; kill -HUP $$'
+ Hangup
+ $
+
+With this commit, it properly executes the EXIT trap defined
+
+ $ dash -c 'trap "echo EXIT trap executed" EXIT; kill -HUP $$'
+ EXIT trap executed
+ $
+
+The missing trap handling was reported by Martin Dickopp through
+ http://bugs.debian.org/390433
+
+Patch is from Chris Lamb.
 
 Signed-off-by: Gerrit Pape <pape@smarden.org>
 ---
- src/dash.1 |   19 ++++++++++---------
- 1 files changed, 10 insertions(+), 9 deletions(-)
+ src/trap.c |   28 +++++++++++++++++++++++-----
+ 1 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/src/dash.1 b/src/dash.1
-index 5a8e2fe..c7771d0 100644
---- a/src/dash.1
-+++ b/src/dash.1
-@@ -34,9 +34,9 @@
- .\"
- .Dd January 19, 2003
- .Os
--.Dt SH 1
-+.Dt DASH 1
- .Sh NAME
--.Nm sh
-+.Nm dash
- .Nd command interpreter (shell)
- .Sh SYNOPSIS
- .Nm
-@@ -93,9 +93,6 @@ but it is not a Korn shell clone (see
- Only features designated by
- .Tn POSIX ,
- plus a few Berkeley extensions, are being incorporated into this shell.
--We expect
--.Tn POSIX
--conformance by the time 4.4 BSD is released.
- This man page is not intended
- to be a tutorial or a complete specification of the shell.
- .Ss Overview
-@@ -2333,11 +2330,15 @@ The process ID of the parent process of the shell.
- .Xr environ 7 ,
- .Xr sysctl 8
- .Sh HISTORY
--A
- .Nm
--command appeared in
--.At v1 .
--It was, however, unmaintainable so we wrote this one.
-+is a POSIX-compliant implementation of /bin/sh that aims to be as small as
-+possible.
-+.Nm
-+is a direct descendant of the NetBSD version of ash (the Almquist SHell),
-+ported to Linux in early 1997.
-+It was renamed to
-+.Nm
-+in 2002.
- .Sh BUGS
- Setuid shell scripts should be avoided at all costs, as they are a
- significant security risk.
+diff --git a/src/trap.c b/src/trap.c
+index 58cd0cc..732fd41 100644
+--- a/src/trap.c
++++ b/src/trap.c
+@@ -67,6 +67,8 @@
+ #define S_HARD_IGN 4		/* signal is ignored permenantly */
+ #define S_RESET 5		/* temporary - to reset a hard ignored sig */
+ 
++#define SIGEXIT 0
++#define DUMMY_ACTION savestr(":")
+ 
+ /* trap handler commands */
+ char *trap[NSIG];
+@@ -97,7 +99,7 @@ trapcmd(int argc, char **argv)
+ {
+ 	char *action;
+ 	char **ap;
+-	int signo;
++	int signo, dummysig;
+ 
+ 	nextopt(nullstr);
+ 	ap = argptr;
+@@ -122,16 +124,32 @@ trapcmd(int argc, char **argv)
+ 			sh_error("%s: bad trap", *ap);
+ 		INTOFF;
+ 		if (action) {
+-			if (action[0] == '-' && action[1] == '\0')
+-				action = NULL;
+-			else
++			if (action[0] == '-' && action[1] == '\0') {
++				if (signo != SIGEXIT && trap[0] != NULL)
++					/* Reset dummy handler */
++					action = DUMMY_ACTION;
++				else
++					action = NULL;
++			} else {
+ 				action = savestr(action);
++			}
++		} else {
++			action = DUMMY_ACTION;
+ 		}
+ 		if (trap[signo])
+ 			ckfree(trap[signo]);
+ 		trap[signo] = action;
+-		if (signo != 0)
++		if (signo == SIGEXIT) {
++			/* Set dummy handlers */
++			for (dummysig = 1 ; dummysig < NSIG ; dummysig++) {
++				if (trap[dummysig] == NULL) {
++					trap[dummysig] = DUMMY_ACTION;
++					setsignal(dummysig);
++				}
++			}
++		} else {
+ 			setsignal(signo);
++		}
+ 		INTON;
+ 		ap++;
+ 	}
 -- 
 1.6.1.2.346.g8600b3.dirty
 
