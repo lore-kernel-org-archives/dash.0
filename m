@@ -1,44 +1,46 @@
-From: "Larson, Timothy E." <TELarson@west.com>
-Subject: RE: Solaris
-Date: Fri, 24 Apr 2009 09:03:11 -0500
-Message-ID: <226316B3E1F749498E28ACA66321D5BA14CBE7BC@oma00cexmbx03.corp.westworlds.com>
-References: <CB5348B152BEC84F9FE88EA7DBB2CD6505AA429E@OMAEXMB02.corp.westworlds.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Dash problem with IFS
+Date: Sat, 2 May 2009 10:01:31 +0800
+Message-ID: <20090502020131.GA19531@gondor.apana.org.au>
+References: <822b241f0905011133l3bcbf9dci4799abc80ec9de99@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail144.messagelabs.com ([216.82.254.51]:34877 "EHLO
-	mail144.messagelabs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757024AbZDXODO convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Fri, 24 Apr 2009 10:03:14 -0400
-Received: from oma100exbh01.corp.westworlds.com (oma-inet-pub2 [216.57.102.249])
-	by linux512.wic.west.com (8.13.1/8.13.1) with ESMTP id n3OE3Cni006783
-	for <dash@vger.kernel.org>; Fri, 24 Apr 2009 10:03:13 -0400
-In-Reply-To: <CB5348B152BEC84F9FE88EA7DBB2CD6505AA429E@OMAEXMB02.corp.westworlds.com>
-Content-Language: en-US
+Received: from rhun.apana.org.au ([64.62.148.172]:54089 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750869AbZEBCBe (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 1 May 2009 22:01:34 -0400
+Content-Disposition: inline
+In-Reply-To: <822b241f0905011133l3bcbf9dci4799abc80ec9de99@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "dash@vger.kernel.org" <dash@vger.kernel.org>
+To: Haibo Xu <haibo.xu@gmail.com>
+Cc: dash@vger.kernel.org
 
-(My apologies if you receive this as a duplicate.  I got a strange error when sending.)
+On Fri, May 01, 2009 at 11:33:08AM -0700, Haibo Xu wrote:
+>
+> > #!/bin/sh
+> >
+> > IFS=$' \t\n'
 
-> I cannot get dash 0.5.4 to build on Solaris.  I've made a couple small
-> patches that may be a step in the right direction.
+IFS is not supposed to interpret escape sequences.  Quoting POSIX
 
-These patches were not committed, so I am now working on 0.5.5.1 and
-carrying them forward.  In addition to the two mentioned, there are an
-additional 10 (or so) patches needed.  Mostly issues that seemed to be
-related to C99 compliance: Solaris 9 doesn't have stdint.h, isblank()
-function, etc.
+1419               IFS                   (Input Field Separators.) A string treated as a list of characters that is used for
+1420                                     field splitting and to split lines into fields with the read command. If IFS is not
+1421                                     set, the shell shall behave as if the value of IFS is <space>, <tab>, and
+1422                                     <newline>; see Section 2.6.5 (on page 2244). Implementations may ignore the |
+1423                                     value of IFS in the environment at the time the shell is invoked, treating IFS as |
+1424                                     if it were not set.                                                                    |
 
-If someone would care to review them, I'll drop them on my server.
+So if you want it to have a tab and newline you need to specify
+them literally, or use something that does interpret escapes,
+like
 
-Thanks,
-Tim
+IFS=$(echo '\n\t $')
 
---
-      Tim Larson        AMT2 Unix Systems Administrator
-          InterCall, a division of West Corporation
-
-Be always sure you are right, then go ahead. - David Crockett
-
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
