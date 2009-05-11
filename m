@@ -1,48 +1,33 @@
-From: Oleg Verych <olecom@gmail.com>
+From: Sven Mascheck <mascheck@in-ulm.de>
 Subject: Re: Dash problem with IFS
-Date: Thu, 7 May 2009 19:01:56 +0300
-Message-ID: <8499950a0905070901o7337acbex451810a8091e81c9@mail.gmail.com>
-References: <822b241f0905011133l3bcbf9dci4799abc80ec9de99@mail.gmail.com>
-	 <20090502020131.GA19531@gondor.apana.org.au>
+Date: Mon, 11 May 2009 15:48:26 +0200
+Message-ID: <20090511134826.GA13308@lisa.in-ulm.de>
+References: <822b241f0905011133l3bcbf9dci4799abc80ec9de99@mail.gmail.com> <20090502020131.GA19531@gondor.apana.org.au> <8499950a0905070901o7337acbex451810a8091e81c9@mail.gmail.com>
+Reply-To: mascheck@in-ulm.de
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-fx0-f158.google.com ([209.85.220.158]:46263 "EHLO
-	mail-fx0-f158.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754421AbZEGQB5 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 7 May 2009 12:01:57 -0400
-Received: by fxm2 with SMTP id 2so880537fxm.37
-        for <dash@vger.kernel.org>; Thu, 07 May 2009 09:01:56 -0700 (PDT)
-In-Reply-To: <20090502020131.GA19531@gondor.apana.org.au>
+Received: from mail.in-ulm.de ([217.10.8.10]:47618 "HELO mail.in-ulm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1754220AbZEKNzI (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 11 May 2009 09:55:08 -0400
+Content-Disposition: inline
+In-Reply-To: <8499950a0905070901o7337acbex451810a8091e81c9@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Haibo Xu <haibo.xu@gmail.com>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
->  So if you want it to have a tab and newline you need to specify
->  them literally, or use something that does interpret escapes,
->  like
+On Thu, May 07, 2009 at 07:01:56PM +0300, Oleg Verych wrote:
 
-newline and tab, because in output substitution trailing '\n's
-(default in any `echo`) are removed.
+> # just newline
+> IFS=`printf '\n+'`; IFS=${IFS%+}
 
->  IFS=$(echo '\n\t $')
+> last example is POSIXly correct ugliness. Bashizm looks better (:
+> 
+> IFS=$'\n'
 
-`echo` isn't a good example due to historical feature-support problems, imho.
+PS: I see the problem distinguishing a tab from a space,
+but everything but a literal newline is bloat
 
-# newline and tab
-IFS=`printf '\n\t'`
-# just newline
-IFS=`printf '\n+'`; IFS=${IFS%+}
-
-last example is POSIXly correct ugliness. Bashizm looks better (:
-
-IFS=$'\n'
-
-where $' ' is one, not "\t is <tab> in $IFS", guys.
--- 
-sed 'sed && sh + olecom = love'  <<  ''
--o--=O`C
- #oo'L O
-<___=E M
+IFS='
+'
