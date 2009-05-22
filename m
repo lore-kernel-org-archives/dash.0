@@ -1,39 +1,53 @@
-From: Oleg Verych <olecom@gmail.com>
-Subject: Re: Dash problem with IFS
-Date: Wed, 13 May 2009 00:15:58 +0300
-Message-ID: <8499950a0905121415y70cf3199k95a4d1d639759c3e@mail.gmail.com>
-References: <822b241f0905011133l3bcbf9dci4799abc80ec9de99@mail.gmail.com>
-	 <20090502020131.GA19531@gondor.apana.org.au>
-	 <8499950a0905070901o7337acbex451810a8091e81c9@mail.gmail.com>
-	 <20090511134826.GA13308@lisa.in-ulm.de>
-	 <8499950a0905111231w2b4cb69fwb1869bef0ebecfb5@mail.gmail.com>
+From: Eitan Adler <eitanadlerlist@gmail.com>
+Subject: dash build errors
+Date: Fri, 22 May 2009 10:06:54 -0400
+Message-ID: <4A16B17E.3080201@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.152]:42904 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752781AbZELVP6 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 12 May 2009 17:15:58 -0400
-Received: by fg-out-1718.google.com with SMTP id 16so83436fgg.17
-        for <dash@vger.kernel.org>; Tue, 12 May 2009 14:15:58 -0700 (PDT)
-In-Reply-To: <8499950a0905111231w2b4cb69fwb1869bef0ebecfb5@mail.gmail.com>
+Received: from mail-gx0-f166.google.com ([209.85.217.166]:44773 "EHLO
+	mail-gx0-f166.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754798AbZEVOFt (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 22 May 2009 10:05:49 -0400
+Received: by gxk10 with SMTP id 10so3194243gxk.13
+        for <dash@vger.kernel.org>; Fri, 22 May 2009 07:05:50 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash list <dash@vger.kernel.org>
+To: dash@vger.kernel.org
 
-On 5/11/09, Oleg Verych <olecom@gmail.com> wrote:
->  >  IFS='
->  >
->  > '
->
->  but this is something, that doesn't look like one new line... (e-mail
->  or web text encodings/filters?)
+When I try to compile dash on FreeBSD 7.2-STABLE i386
+I get the following:
 
-yes, this is web.gmail glasses, sorry.
+$gmake
+gmake  all-recursive
+gmake[1]: Entering directory `/home/variable/dash-0.5.1'
+Making all in src
+gmake[2]: Entering directory `/home/variable/dash-0.5.1/src'
+gmake  all-am
+gmake[3]: Entering directory `/home/variable/dash-0.5.1/src'
+if gcc -DBSD=1 -DSMALL -DSHELL -DGLOB_BROKEN -DFNMATCH_BROKEN
+-DIFS_BROKEN -D__COPYRIGHT\(x\)= -D__RCSID\(x\)= -D_DIAGASSERT\(x\)= -I.
+-I. -I..  -include ../config.h   -g -O2 -Wall -MT exec.o -MD -MP -MF
+".deps/exec.Tpo" \
+          -c -o exec.o `test -f 'exec.c' || echo './'`exec.c; \
+        then mv -f ".deps/exec.Tpo" ".deps/exec.Po"; \
+        else rm -f ".deps/exec.Tpo"; exit 1; \
+        fi
+exec.c: In function 'find_command':
+exec.c:317: error: storage size of 'statb' isn't known
+exec.c:326: warning: implicit declaration of function 'stat64'
+exec.c:317: warning: unused variable 'statb'
+gmake[3]: *** [exec.o] Error 1
+gmake[3]: Leaving directory `/home/variable/dash-0.5.1/src'
+gmake[2]: *** [all] Error 2
+gmake[2]: Leaving directory `/home/variable/dash-0.5.1/src'
+gmake[1]: *** [all-recursive] Error 1
+gmake[1]: Leaving directory `/home/variable/dash-0.5.1'
+gmake: *** [all] Error 2
+
 
 -- 
-sed 'sed && sh + olecom = love'  <<  ''
--o--=O`C
- #oo'L O
-<___=E M
+Eitan Adler
+"Security is increased by designing for the way humans actually behave."
+-Jakob Nielsen
