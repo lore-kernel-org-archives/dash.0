@@ -1,63 +1,44 @@
-From: Jesper Bengtsson <jesper.bengtsson@axis.com>
-Subject: Parameter expansion fails when assigning a local variable
-Date: Mon, 22 Jun 2009 10:13:22 +0200
-Message-ID: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Parameter expansion fails when assigning a local variable
+Date: Mon, 22 Jun 2009 16:57:29 +0800
+Message-ID: <20090622085729.GA22431@gondor.apana.org.au>
+References: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="_002_A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8xmail3seaxisc_"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from krynn.se.axis.com ([193.13.178.10]:38890 "EHLO
-	krynn.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751907AbZFVIpC (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 22 Jun 2009 04:45:02 -0400
-Received: from xmail3.se.axis.com (xmail3.se.axis.com [10.0.5.75])
-	by krynn.se.axis.com (8.14.3/8.14.3/Debian-5) with ESMTP id n5M8DNWV029954
-	for <dash@vger.kernel.org>; Mon, 22 Jun 2009 10:13:23 +0200
-Content-Language: en-US
+Received: from rhun.apana.org.au ([64.62.148.172]:44601 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753620AbZFVI53 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 22 Jun 2009 04:57:29 -0400
+Content-Disposition: inline
+In-Reply-To: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "'dash@vger.kernel.org'" <dash@vger.kernel.org>
+To: Jesper Bengtsson <jesper.bengtsson@axis.com>
+Cc: dash@vger.kernel.org
 
---_002_A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8xmail3seaxisc_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Jesper Bengtsson <jesper.bengtsson@axis.com> wrote:
+> 
+> I've found a problem with expanding $@.
+> If I declare a local variable and assigns the expanded positional parameters:
+>        local v="$@"
+> It fails with something like:
+>        local: 20: \/: bad variable name
 
-Hi,
+This is expected behaviour.  local is just like any other utility
+in how it handled parameters.  So "$@" will have been split before
+it reaches local.  To get what you want, you should use "$*".
+ 
+> I've tried this on dash 0.5.5.1 and 0.5.3 and both fail in the same way.
+> I've also tried on bash and ash (Busybox) and both handles declaration and assignment on one line.
 
-I've found a problem with expanding $@.
-If I declare a local variable and assigns the expanded positional parameter=
-s:
-        local v=3D"$@"
-It fails with something like:
-        local: 20: \/: bad variable name
+Bash and older versions of dash (like the one in Busybox) has a
+hack that disables field splitting for local and certain other
+commands.  This is not guaranteed by POSIX.
 
-If I split declaration and assignment into two lines it will work:
-        local v
-        v=3D"$@"
-
-I've tried this on dash 0.5.5.1 and 0.5.3 and both fail in the same way.
-I've also tried on bash and ash (Busybox) and both handles declaration and =
-assignment on one line.
-
-I'm attaching a small script that shows the problem.
-
-Best regards,
-Jesper Bengtsson
-
---_002_A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8xmail3seaxisc_
-Content-Type: application/octet-stream; name="dash-arg-bug.sh"
-Content-Description: dash-arg-bug.sh
-Content-Disposition: attachment; filename="dash-arg-bug.sh"; size=371;
-	creation-date="Wed, 17 Jun 2009 16:19:24 GMT";
-	modification-date="Wed, 17 Jun 2009 16:19:24 GMT"
-Content-Transfer-Encoding: base64
-
-IyEvYmluL2Rhc2gKCnNldCAtZQojc2V0IC14CiNzZXQgLXYKCmZ1bmMoKSB7Cglsb2NhbCB2PSIk
-QCIJIyB1bmV4cGVjdGVkIGJlaGF2aW91ciA9PSBidWcKCSMgdj0iJEAiCSMgZXhwZWN0ZWQgYmVo
-YXZpb3VyCgkjIGxvY2FsIHYJIyBhbHNvIGV4cGVjdGVkIGJlaGF2aW91ciB3aXRoIGRlY2xhcmF0
-aW9uCgkjIHY9IiRAIgkjIGFuZCBhc2lnbm1lbnQgb24gc2VwYXJhdGUgbGluZXMKCgllY2hvICJm
-dW5jOiB2PSckdicsIFwkMT0nJDEnLCBcJDI9JyQyJywgXCQzPSckMyciID4mMgoKCWVjaG8gIiR2
-Igp9Cgp4eXo9IiAJICAxMjMJIAl4eXoJXFwvIAkiCmVjaG8gImluOiAgJyR4eXonIgphYmM9JChm
-dW5jICR4eXopCmVjaG8gIm91dDogJyRhYmMnIgo=
-
---_002_A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8xmail3seaxisc_--
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
