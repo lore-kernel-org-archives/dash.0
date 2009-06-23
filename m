@@ -1,44 +1,25 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Parameter expansion fails when assigning a local variable
-Date: Mon, 22 Jun 2009 16:57:29 +0800
-Message-ID: <20090622085729.GA22431@gondor.apana.org.au>
-References: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com>
+From: Nikola Vladov <v20-redir@riemann.fmi.uni-sofia.bg>
+Subject: redirect bug
+Date: Tue, 23 Jun 2009 13:06:30 +0300
+Message-ID: <20090623100630.20118.qmail@riemann.fmi.uni-sofia.bg>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:44601 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753620AbZFVI53 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 22 Jun 2009 04:57:29 -0400
+Received: from riemann.fmi.uni-sofia.bg ([62.44.100.74]:4861 "HELO
+	riemann.fmi.uni-sofia.bg" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1752048AbZFWKNv (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 23 Jun 2009 06:13:51 -0400
 Content-Disposition: inline
-In-Reply-To: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jesper Bengtsson <jesper.bengtsson@axis.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Jesper Bengtsson <jesper.bengtsson@axis.com> wrote:
-> 
-> I've found a problem with expanding $@.
-> If I declare a local variable and assigns the expanded positional parameters:
->        local v="$@"
-> It fails with something like:
->        local: 20: \/: bad variable name
+May be this is a bug:
 
-This is expected behaviour.  local is just like any other utility
-in how it handled parameters.  So "$@" will have been split before
-it reaches local.  To get what you want, you should use "$*".
- 
-> I've tried this on dash 0.5.5.1 and 0.5.3 and both fail in the same way.
-> I've also tried on bash and ash (Busybox) and both handles declaration and assignment on one line.
+echo XX > uu
+cat <> uu
 
-Bash and older versions of dash (like the one in Busybox) has a
-hack that disables field splitting for local and certain other
-commands.  This is not guaranteed by POSIX.
+dash truncates file uu.  The open flag O_TRUNC must be removed.
+I'm not 100% shure what POSIX say about: program <> file
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Nikola
