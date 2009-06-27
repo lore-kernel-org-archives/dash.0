@@ -1,104 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: memalloc.c patch
-Date: Sat, 27 Jun 2009 21:32:29 +0800
-Message-ID: <20090627133229.GB23267@gondor.apana.org.au>
-References: <20090522195011.9388.qmail@riemann.fmi.uni-sofia.bg> <20090610050456.GA16563@gondor.apana.org.au> <20090610063335.20442.qmail@riemann.fmi.uni-sofia.bg>
+Subject: Re: memalloc.c patch ( 4*sizeof(void*) )
+Date: Sun, 28 Jun 2009 00:05:07 +0800
+Message-ID: <20090627160507.GA24139@gondor.apana.org.au>
+References: <20090522195011.9388.qmail@riemann.fmi.uni-sofia.bg> <20090610050456.GA16563@gondor.apana.org.au> <20090610063335.20442.qmail@riemann.fmi.uni-sofia.bg> <20090627133229.GB23267@gondor.apana.org.au> <20090627152933.1235.qmail@riemann.fmi.uni-sofia.bg>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:50852 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:41355 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1749667AbZF0Nca (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 27 Jun 2009 09:32:30 -0400
+	with ESMTP id S1753948AbZF0QFH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 27 Jun 2009 12:05:07 -0400
 Content-Disposition: inline
-In-Reply-To: <20090610063335.20442.qmail@riemann.fmi.uni-sofia.bg>
+In-Reply-To: <20090627152933.1235.qmail@riemann.fmi.uni-sofia.bg>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Nikola Vladov <v20-two_dash_patches@riemann.fmi.uni-sofia.bg>
+To: Nikola Vladov <vladov@riemann.fmi.uni-sofia.bg>
 Cc: dash@vger.kernel.org
 
-On Wed, Jun 10, 2009 at 09:33:35AM +0300, Nikola Vladov wrote:
+On Sat, Jun 27, 2009 at 06:29:33PM +0300, Nikola Vladov wrote:
 >
-> diff -urN dash-0.5.5.1_orig/src/memalloc.c dash-0.5.5.1/src/memalloc.c
-> --- dash-0.5.5.1_orig/src/memalloc.c	Wed Jan 14 01:37:13 2009
-> +++ dash-0.5.5.1/src/memalloc.c	Wed Jun 10 09:09:23 2009
-> @@ -97,18 +97,19 @@
->   */
->  
->  /* minimum size of a block */
-> -#define MINSIZE SHELL_ALIGN(504)
-> +/* #define MINSIZE SHELL_ALIGN(504) */
-> +typedef struct { void *next; size_t size; } __alloc_t;
-> +#define MINSIZE (512  -SHELL_ALIGN(sizeof(void*) + sizeof(__alloc_t)))
+> "2" above is too small.  SHELL_ALIGN is 2*sizeof(void *).
+>
+> Then we must have
+>          buf_size + shell_align + malloc_meta_data <= 512.
 
-I'm a little uneasy about this calculation.  This is very much
-dependent on the underlying malloc implementation.  For all we
-know, this could turn out to be better or worse if libc changes
-under us.
+shell_align doesn't add anything if the value is already aligned.
 
-However, I suppose making it slightly smaller can't hurt that
-much.  While if the underlying malloc keeps metadata inline then
-we gain 512 bytes per amlloc.
+> I have tested next and they works OK.
+>    MINSIZE (512  -SHELL_ALIGN(sizeof(void*) * 3))
+>    MINSIZE (512  -sizeof(void*) * 4)
 
-But how about rewriting the above as just
-
-	512 - sizeof(void *) * 2
-
-It would be a lot simpler :)
-
->  struct stack_block {
->  	struct stack_block *prev;
-> -	char space[MINSIZE];
-> +	char space[4];
->  };
->  
-> -struct stack_block stackbase;
-> -struct stack_block *stackp = &stackbase;
-> -char *stacknxt = stackbase.space;
-> -size_t stacknleft = MINSIZE;
-> -char *sstrend = stackbase.space + MINSIZE;
-> +static struct stack_block *stackp = 0;
-> +char *stacknxt = 0;
-> +char *sstrend = 0;
-> +size_t stacknleft = 0;
-
-= 0 is redundant.
-
-I like this rewrite though.  But please split it into a separate
-patch since it is not directly related to the change in MINSIZE.
-
-Remember, one patch, one change.  Oh and please send one patch
-per email :)
+OK, and you've also tested 512 - sizeof(void *) * 2 to make sure
+that it doesn't work? If so we should pick the * 3 variant.
  
-> diff -urN dash-0.5.5.1_orig/src/memalloc.c dash-0.5.5.1/src/memalloc.c
-> --- dash-0.5.5.1_orig/src/memalloc.c	Wed Jan 14 01:37:13 2009
-> +++ dash-0.5.5.1/src/memalloc.c	Wed Jun 10 09:21:21 2009
-> @@ -99,6 +99,12 @@
->  /* minimum size of a block */
->  #define MINSIZE SHELL_ALIGN(504)
->  
-> +#if defined(__dietlibc__) || defined(MALLOC_USES_MMAP_FOR_BIG_BLOCKS)
-> +typedef struct { void *next; size_t size; } __alloc_t;
-> +#include <sys/shm.h>	/* PAGE_SIZE */
-> +#define XXXSIZE (PAGE_SIZE -SHELL_ALIGN(sizeof(void*) + sizeof(__alloc_t)))
-> +#endif
-> +
->  struct stack_block {
->  	struct stack_block *prev;
->  	char space[MINSIZE];
-> @@ -123,6 +129,10 @@
->  		struct stack_block *sp;
->  
->  		blocksize = aligned;
-> +#ifdef XXXSIZE
-> +		if (stackp && blocksize < XXXSIZE)
-> +			blocksize = XXXSIZE;
-> +#endif
->  		if (blocksize < MINSIZE)
->  			blocksize = MINSIZE;
->  		len = sizeof(struct stack_block) - MINSIZE + blocksize;
+> For malloc which uses sbrk (like DL-malloc) the above does not
+> help.  In my opinion in this case we have to use
+> fist 512, sacond 1024, third 2048, all other 4096 chuks.
 
-What defines MALLOC_USES_MMAP_FOR_BIG_BLOCKS?
+Does it hurt though? If not we should just make this unconditional.
+
+PS Please do reply-to-all instead of reply-to-author.
 
 Thanks,
 -- 
