@@ -1,83 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Debian Bug#429251: [PATCH] honor tab as IFS whitespace when
-	splitting fields
-Date: Sun, 28 Jun 2009 12:19:02 +0800
-Message-ID: <20090628041902.GA27613@gondor.apana.org.au>
-References: <200905302233.05407.stefan.potyra@informatik.uni-erlangen.de> <20090610054845.GA17111@gondor.apana.org.au> <200906100953.37597.stefan.potyra@informatik.uni-erlangen.de>
+From: Nikola Vladov <v20-malloctest@riemann.fmi.uni-sofia.bg>
+Subject: malloctests.c
+Date: Sun, 28 Jun 2009 09:11:08 +0300
+Message-ID: <20090628061108.2930.qmail@riemann.fmi.uni-sofia.bg>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:56988 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751015AbZF1ETE (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 28 Jun 2009 00:19:04 -0400
+Received: from riemann.fmi.uni-sofia.bg ([62.44.100.74]:1085 "HELO
+	riemann.fmi.uni-sofia.bg" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1751430AbZF1GRv (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 28 Jun 2009 02:17:51 -0400
 Content-Disposition: inline
-In-Reply-To: <200906100953.37597.stefan.potyra@informatik.uni-erlangen.de>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Stefan Potyra <stefan.potyra@informatik.uni-erlangen.de>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Wed, Jun 10, 2009 at 09:53:34AM +0200, Stefan Potyra wrote:
->
-> Of course, here you are.
+Bellow is a simple program wich test how malloc
+allocates memory.  On my systems glibc malloc starts with 128K RAM
 
-Awesome! The patch looks pretty good in general.  There are just
-a few minor issues that we need to fix.
+[diet -Os ] gcc -Os -Wall -W malloctest.c
+usage:
+	./a.out 1
+	./a.out 4046
+	./a.out 140000
 
-> +static void
-> +readcmd_handle_line(char *line, char **ap)
-> +{
-> +	struct arglist arglist;
-> +	struct strlist *sl;
-> +	char *s, *backup;
-> +
-> +	/* ifsbreakup will fiddle stack region, need a copy */
-> +	s = savestr(line);
+	strace ./a.out 22000  2>&1 | sed -e 1,/ZYX4132/d
+	strace ./a.out 200000 2>&1 | sed -e 1,/ZYX4132/d
 
-savestr calls strdup so it cannot be used safely without disabling
-SIGINT in dash.  sstrdup is the safe alternative.  In fact, if
-you do a grabstackstr first then you only need to dup once.
+In my next post I'll describe why I wrote this program!
+It is designed to be as simple as possible...
 
-> +	/* need yet another copy, so that delimiters aren't lost
-> +	 * in case there are more fields than variables */
-> +	backup = savestr(line);
-> +
-> +	arglist.lastp = &arglist.list;
-> +	recordregion(0, strlen(line), 0);
+Nikola
 
-You can avoid doing strlen if you save the stacknxt and use that
-to compute the length.
+/* -- malloctest.c -- */
+#include <unistd.h>
+#include <stdlib.h>
 
-> +	ifsbreakup(s, &arglist);
-> +	*arglist.lastp = NULL;
-> +	removerecordregions(0);
-> +
-> +	for (sl = arglist.list; sl != NULL; sl = sl->next) {
-> +
-> +		/* remaining fields present, but no variables left. */
-> +		if ((*(ap + 1) == NULL) && (sl->next != NULL)) {
-> +			size_t offset;
-> +			const char *remainder;
-> +
-> +			/* FIXME little bit hacky, assuming that ifsbreakup 
-> +			 * will not modify the length of the string */
+int main(int argc, char *argv[]) {
+  unsigned long u;
+  unsigned char c, *x, *a, *b, buf[3*sizeof(unsigned long)];
 
-Hacky but should be safe.
+  if (argc<2) { u=1; goto ready; }
+  x = (unsigned char *)argv[1];
+  for (u=0; (c=(*x - '0')) < 10; x++) u = u*10 + c;
 
-> +		/* preceeding backslash */
-> +		if (backslash != 0) {
-> +			backslash = 0;
-> +			if (c != '\n') {
-> +				STPUTC(c, p);
+ ready:
+  write(2, "ZYX4132\n", 8);
 
-Need to output CTLESC for ifsbreakup and check for raw CTLESC
-and escape those.  Also need to rmescapes after ifsbreakup for
-each argument.
+  a = sbrk(0);
+  x = malloc(u);
+  if (x) free(x);
+  b = sbrk(0);
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+  u = b-a;
+  *--x = '\n';
+  do { *--x = '0'+u%10; u/=10; } while(u);
+  write(2, x, (buf + sizeof(buf)) -x);
+
+  return 0;
+}
