@@ -1,72 +1,83 @@
-From: Nikola Vladov <v20-malloc@riemann.fmi.uni-sofia.bg>
-Subject: Re: memalloc.c patch ( 3*sizeof(void*) )
-Date: Sat, 27 Jun 2009 19:45:59 +0300
-Message-ID: <20090627164559.1499.qmail@riemann.fmi.uni-sofia.bg>
-References: <20090522195011.9388.qmail@riemann.fmi.uni-sofia.bg> <20090610050456.GA16563@gondor.apana.org.au> <20090610063335.20442.qmail@riemann.fmi.uni-sofia.bg> <20090627133229.GB23267@gondor.apana.org.au> <20090627152933.1235.qmail@riemann.fmi.uni-sofia.bg> <20090627160507.GA24139@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Debian Bug#429251: [PATCH] honor tab as IFS whitespace when
+	splitting fields
+Date: Sun, 28 Jun 2009 12:19:02 +0800
+Message-ID: <20090628041902.GA27613@gondor.apana.org.au>
+References: <200905302233.05407.stefan.potyra@informatik.uni-erlangen.de> <20090610054845.GA17111@gondor.apana.org.au> <200906100953.37597.stefan.potyra@informatik.uni-erlangen.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from riemann.fmi.uni-sofia.bg ([62.44.100.74]:1042 "HELO
-	riemann.fmi.uni-sofia.bg" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1754769AbZF0Qwj (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 27 Jun 2009 12:52:39 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:56988 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751015AbZF1ETE (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 28 Jun 2009 00:19:04 -0400
 Content-Disposition: inline
-In-Reply-To: <20090627160507.GA24139@gondor.apana.org.au>
+In-Reply-To: <200906100953.37597.stefan.potyra@informatik.uni-erlangen.de>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stefan Potyra <stefan.potyra@informatik.uni-erlangen.de>
 Cc: dash@vger.kernel.org
 
-On Sun, Jun 28, 2009 at 00:05:07AM +0800, Herbert Xu wrote:
-> > "2" above is too small.  SHELL_ALIGN is 2*sizeof(void *).
-> >
-> > Then we must have
-> >          buf_size + shell_align + malloc_meta_data <= 512.
-> 
-> shell_align doesn't add anything if the value is already aligned.
+On Wed, Jun 10, 2009 at 09:53:34AM +0200, Stefan Potyra wrote:
+>
+> Of course, here you are.
 
-It's depends.  Next is from stalloc
-	blocksize = aligned;
-		if (blocksize < MINSIZE)
-			blocksize = MINSIZE;
-		len = sizeof(struct stack_block) - MINSIZE + blocksize;
-		      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                  
+Awesome! The patch looks pretty good in general.  There are just
+a few minor issues that we need to fix.
 
-When I speak for shell_align I mean ^^^^ above.
- 
-> > I have tested next and they works OK.
-> >    MINSIZE (512  -SHELL_ALIGN(sizeof(void*) * 3))
-> >    MINSIZE (512  -sizeof(void*) * 4)
-> 
-> OK, and you've also tested 512 - sizeof(void *) * 2 to make sure
-> that it doesn't work? If so we should pick the * 3 variant.
+> +static void
+> +readcmd_handle_line(char *line, char **ap)
+> +{
+> +	struct arglist arglist;
+> +	struct strlist *sl;
+> +	char *s, *backup;
+> +
+> +	/* ifsbreakup will fiddle stack region, need a copy */
+> +	s = savestr(line);
 
-"2" does not work.  "3" works actually good.  I supposes
-that malloc uses 2*sizeof(void*) meta-data.
-SHELL_ALIGN(sizeof(void*) * 3) is 
-16 bytes on i386
-24 bytes on x86_64
-  
-> > For malloc which uses sbrk (like DL-malloc) the above does not
-> > help.  In my opinion in this case we have to use
-> > fist 512, second 1024, third 2048, all other 4096 chuks.
-> 
-> Does it hurt though? If not we should just make this unconditional.
+savestr calls strdup so it cannot be used safely without disabling
+SIGINT in dash.  sstrdup is the safe alternative.  In fact, if
+you do a grabstackstr first then you only need to dup once.
 
-No, it does not hurt.  It can be also default.  My patch
-with XXXSIZE do this only with one "if".  I using it 2-3 months.
- 
-Doubling the chunk is not easy.  It must be a little bellow 
-1024,, 2048, 4096 as described above!  One i386 dash (for test) 
-is available on http://62.44.100.74/vladov/tmp/dash.gz
+> +	/* need yet another copy, so that delimiters aren't lost
+> +	 * in case there are more fields than variables */
+> +	backup = savestr(line);
+> +
+> +	arglist.lastp = &arglist.list;
+> +	recordregion(0, strlen(line), 0);
 
-BTW are there any plans to remove vsnprintf from output.c
-It dash uses only %s, %d, %f, %-20s
-May be I'll write a simple vsnprintf which understands only
-above formats.  
+You can avoid doing strlen if you save the stacknxt and use that
+to compute the length.
 
-> PS Please do reply-to-all instead of reply-to-author.
+> +	ifsbreakup(s, &arglist);
+> +	*arglist.lastp = NULL;
+> +	removerecordregions(0);
+> +
+> +	for (sl = arglist.list; sl != NULL; sl = sl->next) {
+> +
+> +		/* remaining fields present, but no variables left. */
+> +		if ((*(ap + 1) == NULL) && (sl->next != NULL)) {
+> +			size_t offset;
+> +			const char *remainder;
+> +
+> +			/* FIXME little bit hacky, assuming that ifsbreakup 
+> +			 * will not modify the length of the string */
 
-Sorry!
+Hacky but should be safe.
 
-Nikola
+> +		/* preceeding backslash */
+> +		if (backslash != 0) {
+> +			backslash = 0;
+> +			if (c != '\n') {
+> +				STPUTC(c, p);
+
+Need to output CTLESC for ifsbreakup and check for raw CTLESC
+and escape those.  Also need to rmescapes after ifsbreakup for
+each argument.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
