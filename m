@@ -1,61 +1,78 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Parameter expansion fails when assigning a local variable
-Date: Tue, 30 Jun 2009 09:38:07 +0800
-Message-ID: <20090630013807.GA13339@gondor.apana.org.au>
-References: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com> <20090622085729.GA22431@gondor.apana.org.au> <0906282220250.1491@somehost> <20090629004750.GA2019@gondor.apana.org.au> <0906291823520.16266@somehost>
+Subject: Re: redirect bug
+Date: Tue, 30 Jun 2009 15:14:03 +0800
+Message-ID: <20090630071402.GA16526@gondor.apana.org.au>
+References: <20090623100630.20118.qmail@riemann.fmi.uni-sofia.bg>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:49932 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:54255 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751486AbZF3BiH (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 29 Jun 2009 21:38:07 -0400
+	with ESMTP id S1751727AbZF3HOD (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 30 Jun 2009 03:14:03 -0400
 Content-Disposition: inline
-In-Reply-To: <0906291823520.16266@somehost>
+In-Reply-To: <20090623100630.20118.qmail@riemann.fmi.uni-sofia.bg>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>
-Cc: Jesper Bengtsson <jesper.bengtsson@axis.com>, dash@vger.kernel.org
+To: Nikola Vladov <v20-redir@riemann.fmi.uni-sofia.bg>
+Cc: dash@vger.kernel.org
 
-On Mon, Jun 29, 2009 at 07:10:29PM +0200, Cristian Ionescu-Idbohrn wrote:
->
-> Please consider this example script:
+On Tue, Jun 23, 2009 at 10:06:30AM +0000, Nikola Vladov wrote:
+> May be this is a bug:
 > 
-> ---8<---
-> #!/bin/dash
+> echo XX > uu
+> cat <> uu
 > 
-> set -e
-> #set -x
-> 
-> func() {
-> 	local i=0 v xx="$@"
-> 
-> 	for v; do
-> 		i=$(($i + 1))
-> 		echo "func arg. $i: '$v'"
-> 	done
-> 	echo "inside func: NOONE_SHOULD_TOUCH_THIS=$NOONE_SHOULD_TOUCH_THIS"
-> }
-> 
-> NOONE_SHOULD_TOUCH_THIS=protected
-> echo "main, bef. func: NOONE_SHOULD_TOUCH_THIS=$NOONE_SHOULD_TOUCH_THIS"
-> func "$@"
-> echo "main, aft. func: NOONE_SHOULD_TOUCH_THIS=$NOONE_SHOULD_TOUCH_THIS"
-> 
-> exit 0
-> ---8<---
-> 
-> and run the script like this:
-> 
-> 	$ <script path> abc NOONE_SHOULD_TOUCH_THIS=overwritten
-> 
-> Is it the intended behaviour?  Should one be able to overwrite script
-> function variables from command line?
+> dash truncates file uu.  The open flag O_TRUNC must be removed.
+> I'm not 100% shure what POSIX say about: program <> file
 
-As I said, you should be using "$*" instead of "$@" which is
-designed exactly for this purpose and is completely portable.
+Thank you.  I'll add this patch.
 
-Cheers,
+commit d4e757429c4006d7fe731c8ec7c9a3f21b2d23b5
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Jun 30 15:13:28 2009 +0800
+
+    [REDIR] Do not truncate file for FROMTO redirection
+    
+    On Tue, Jun 23, 2009 at 10:06:30AM +0000, Nikola Vladov wrote:
+    > May be this is a bug:
+    >
+    > echo XX > uu
+    > cat <> uu
+    >
+    > dash truncates file uu.  The open flag O_TRUNC must be removed.
+    > I'm not 100% shure what POSIX say about: program <> file
+    
+    Indeed, this is a bug we inherited from NetBSD.  This patch removes
+    the O_TRUNC flag for FROMTO.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/ChangeLog b/ChangeLog
+index e6a1d26..37ea778 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2009-06-30  Herbert Xu <herbert@gondor.apana.org.au>
++
++	* Do not truncate file for FROMTO redirection.
++
+ 2009-06-27  Herbert Xu <herbert@gondor.apana.org.au>
+ 
+ 	* Fix quoted pattern patch breakage.
+diff --git a/src/redir.c b/src/redir.c
+index b01237d..54af96b 100644
+--- a/src/redir.c
++++ b/src/redir.c
+@@ -192,7 +192,7 @@ openredirect(union node *redir)
+ 		break;
+ 	case NFROMTO:
+ 		fname = redir->nfile.expfname;
+-		if ((f = open64(fname, O_RDWR|O_CREAT|O_TRUNC, 0666)) < 0)
++		if ((f = open64(fname, O_RDWR|O_CREAT, 0666)) < 0)
+ 			goto ecreate;
+ 		break;
+ 	case NTO:
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
