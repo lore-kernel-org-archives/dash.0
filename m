@@ -1,72 +1,56 @@
-From: Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>
+From: Oleg Verych <olecom@gmail.com>
 Subject: Re: Parameter expansion fails when assigning a local variable
-Date: Tue, 30 Jun 2009 18:17:50 +0200 (CEST)
-Message-ID: <0906301817190.14361@somehost>
-References: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com> <20090622085729.GA22431@gondor.apana.org.au> <0906282220250.1491@somehost> <20090629004750.GA2019@gondor.apana.org.au> <0906291823520.16266@somehost>
- <20090630013807.GA13339@gondor.apana.org.au>
-Reply-To: Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>
+Date: Wed, 1 Jul 2009 10:42:01 +0300
+Message-ID: <8499950a0907010042l6a9bb4das1c32f4e5c97e5dc@mail.gmail.com>
+References: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com>
+	 <20090622085729.GA22431@gondor.apana.org.au>
+	 <0906282220250.1491@somehost>
+	 <20090629004750.GA2019@gondor.apana.org.au>
+	 <0906291823520.16266@somehost>
+	 <20090630013807.GA13339@gondor.apana.org.au>
+	 <0906301817190.14361@somehost>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from [193.13.178.8] ([193.13.178.8]:39273 "EHLO miranda.se.axis.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754824AbZF3QSY (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 30 Jun 2009 12:18:24 -0400
-In-Reply-To: <20090630013807.GA13339@gondor.apana.org.au>
+Received: from mail-fx0-f218.google.com ([209.85.220.218]:63655 "EHLO
+	mail-fx0-f218.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752864AbZGAHl7 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 1 Jul 2009 03:41:59 -0400
+Received: by fxm18 with SMTP id 18so609587fxm.37
+        for <dash@vger.kernel.org>; Wed, 01 Jul 2009 00:42:01 -0700 (PDT)
+In-Reply-To: <0906301817190.14361@somehost>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jesper Bengtsson <jesper.bengtsson@axis.com>, dash@vger.kernel.org
+To: Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>, Jesper Bengtsson <jesper.bengtsson@axis.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
 
-On Tue, 30 Jun 2009, Herbert Xu wrote:
+Hallo.
 
-> On Mon, Jun 29, 2009 at 07:10:29PM +0200, Cristian Ionescu-Idbohrn wrote:
-> >
-> > Please consider this example script:
-> >
-> > ---8<---
-> > #!/bin/dash
-> >
-> > set -e
-> > #set -x
-> >
-> > func() {
-> > 	local i=0 v xx="$@"
-> >
-> > 	for v; do
-> > 		i=$(($i + 1))
-> > 		echo "func arg. $i: '$v'"
-> > 	done
-> > 	echo "inside func: NOONE_SHOULD_TOUCH_THIS=$NOONE_SHOULD_TOUCH_THIS"
-> > }
-> >
-> > NOONE_SHOULD_TOUCH_THIS=protected
-> > echo "main, bef. func: NOONE_SHOULD_TOUCH_THIS=$NOONE_SHOULD_TOUCH_THIS"
-> > func "$@"
-> > echo "main, aft. func: NOONE_SHOULD_TOUCH_THIS=$NOONE_SHOULD_TOUCH_THIS"
-> >
-> > exit 0
-> > ---8<---
-> >
-> > and run the script like this:
-> >
-> > 	$ <script path> abc NOONE_SHOULD_TOUCH_THIS=overwritten
-> >
-> > Is it the intended behaviour?  Should one be able to overwrite script
-> > function variables from command line?
+2009/6/30, Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>:
+[...]
+> Sure I will.  But that won't make the misfeature go away :(
 >
-> As I said, you should be using "$*" instead of "$@" which is
-> designed exactly for this purpose and is completely portable.
+> And, by the way, I think the bug should probably be classified as a design
+> flaw and a security bug.  Reason is it has undesired side effects which
+> may lead to overwriting unrelated local variables and may have other
+> serious implications.
 
-Sure I will.  But that won't make the misfeature go away :(
+Before you, guys, write such things, you'd better read something heavy
+about /bin/shELL.
 
-And, by the way, I think the bug should probably be classified as a design
-flaw and a security bug.  Reason is it has undesired side effects which
-may lead to overwriting unrelated local variables and may have other
-serious implications.
+Please:
 
+UNIX SHELL Quote Tutorial
+Written by Bruce Barnett
+http://www.grymoire.com/Unix/Quote.html
 
-Cheers,
+Sh - the Bourne Shell
+http://www.grymoire.com/Unix/Sh.html
 
+Thanks.
 -- 
-Cristian
+sed 'sed && sh + olecom = love'  <<  ''
+-o--=O`C
+ #oo'L O
+<___=E M
