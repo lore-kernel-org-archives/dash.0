@@ -1,56 +1,50 @@
-From: Oleg Verych <olecom@gmail.com>
+From: Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>
 Subject: Re: Parameter expansion fails when assigning a local variable
-Date: Wed, 1 Jul 2009 10:42:01 +0300
-Message-ID: <8499950a0907010042l6a9bb4das1c32f4e5c97e5dc@mail.gmail.com>
-References: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com>
-	 <20090622085729.GA22431@gondor.apana.org.au>
-	 <0906282220250.1491@somehost>
-	 <20090629004750.GA2019@gondor.apana.org.au>
-	 <0906291823520.16266@somehost>
-	 <20090630013807.GA13339@gondor.apana.org.au>
-	 <0906301817190.14361@somehost>
+Date: Thu, 2 Jul 2009 18:53:23 +0200 (CEST)
+Message-ID: <0907021846440.25311@somehost>
+References: <A612847CFE53224C91B23E3A5B48BAC73AEC8A9FE8@xmail3.se.axis.com>  <20090622085729.GA22431@gondor.apana.org.au>  <0906282220250.1491@somehost>  <20090629004750.GA2019@gondor.apana.org.au>  <0906291823520.16266@somehost>  <20090630013807.GA13339@gondor.apana.org.au>
+  <0906301817190.14361@somehost> <8499950a0907010042l6a9bb4das1c32f4e5c97e5dc@mail.gmail.com>
+Reply-To: Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-fx0-f218.google.com ([209.85.220.218]:63655 "EHLO
-	mail-fx0-f218.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752864AbZGAHl7 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 1 Jul 2009 03:41:59 -0400
-Received: by fxm18 with SMTP id 18so609587fxm.37
-        for <dash@vger.kernel.org>; Wed, 01 Jul 2009 00:42:01 -0700 (PDT)
-In-Reply-To: <0906301817190.14361@somehost>
+Received: from miranda.se.axis.com ([193.13.178.8]:59972 "EHLO
+	miranda.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751094AbZGBQxW (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 2 Jul 2009 12:53:22 -0400
+Received: from localhost (nelson.se.axis.com [10.2.224.70])
+	by miranda.se.axis.com (8.13.4/8.13.4/Debian-3sarge3) with ESMTP id n62GrNaH031947
+	for <dash@vger.kernel.org>; Thu, 2 Jul 2009 18:53:23 +0200
+In-Reply-To: <8499950a0907010042l6a9bb4das1c32f4e5c97e5dc@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>, Jesper Bengtsson <jesper.bengtsson@axis.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Hallo.
+On Wed, 1 Jul 2009, Oleg Verych wrote:
 
-2009/6/30, Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>:
-[...]
-> Sure I will.  But that won't make the misfeature go away :(
+> Before you, guys, write such things, you'd better read something heavy
+> about /bin/shELL.
 >
-> And, by the way, I think the bug should probably be classified as a design
-> flaw and a security bug.  Reason is it has undesired side effects which
-> may lead to overwriting unrelated local variables and may have other
-> serious implications.
+> Please:
+>
+> UNIX SHELL Quote Tutorial
+> Written by Bruce Barnett
+> http://www.grymoire.com/Unix/Quote.html
+>
+> Sh - the Bourne Shell
+> http://www.grymoire.com/Unix/Sh.html
 
-Before you, guys, write such things, you'd better read something heavy
-about /bin/shELL.
+Is this just good advice (thanks for that, by the way)?
+Any particular part of the tutorial, you, advertise that offers some sort
+of recipe on to how to solve the problem at hand (read it but did not
+find anything relevant referring to this particular dash bug)?
 
-Please:
+> Thanks.
 
-UNIX SHELL Quote Tutorial
-Written by Bruce Barnett
-http://www.grymoire.com/Unix/Quote.html
+You're welcome.
 
-Sh - the Bourne Shell
-http://www.grymoire.com/Unix/Sh.html
 
-Thanks.
+Cheers,
+
 -- 
-sed 'sed && sh + olecom = love'  <<  ''
--o--=O`C
- #oo'L O
-<___=E M
+Cristian
