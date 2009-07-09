@@ -1,44 +1,29 @@
-From: Rick <ellis@spinics.net>
-Subject: Re: lost mail
-Date: Sun, 5 Jul 2009 02:09:35 +0000 (UTC)
-Message-ID: <1246759774.916257@no.spam>
-References: <20090628092839.3485.qmail@riemann.fmi.uni-sofia.bg>
+From: Eric Blake <ebb9@byu.net>
+Subject: LINENO status?
+Date: Thu, 09 Jul 2009 06:40:26 -0600
+Message-ID: <4A55E53A.7020500@byu.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from main.gmane.org ([80.91.229.2]:51280 "EHLO ciao.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753098AbZGECPC (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 4 Jul 2009 22:15:02 -0400
-Received: from root by ciao.gmane.org with local (Exim 4.43)
-	id 1MNHFu-0004ui-Jk
-	for dash@vger.kernel.org; Sun, 05 Jul 2009 02:15:02 +0000
-Received: from spinics.net ([68.183.106.108])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Sun, 05 Jul 2009 02:15:02 +0000
-Received: from ellis by spinics.net with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Sun, 05 Jul 2009 02:15:02 +0000
+Received: from qmta02.emeryville.ca.mail.comcast.net ([76.96.30.24]:52485 "EHLO
+	QMTA02.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1760595AbZGIMga (ORCPT
+	<rfc822;dash@vger.kernel.org>); Thu, 9 Jul 2009 08:36:30 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-In article <20090628092839.3485.qmail@riemann.fmi.uni-sofia.bg>,
-Nikola Vladov  <v20-undelivered@riemann.fmi.uni-sofia.bg> wrote:
+I noticed in the archives a first round patch for adding LINENO support:
+http://www.mail-archive.com/dash@vger.kernel.org/msg00059.html
 
->seems that dashZvger.kernel.org lost mails.
->I sent two times a mail and I don't see it on:
->http://www.mail-archive.com/dash@vger.kernel.org/
+What's holding this up from inclusion?  The lack of LINENO is the biggest
+reason why current autoconf-generated configure scripts prefer other
+shells over dash, even if they are slower, which then forces the user to
+jump through hoops with CONFIG_SHELL to actually experiment with dash
+speed on configure scripts.
 
-Just because mail-archive.com doesn't have the mail doesn't
-mean vger lost it.
+-- 
+Don't work too hard, make some time for fun as well!
 
-From the other side it is here:
->http://www.spinics.net/lists/dash/
->http://www.spinics.net/lists/dash/msg00127.html
-
-Ok, if the mail made it to me, it came through vger. There's no
-other way for it to get here. 
-
---
-http://www.spinics.net/lists/
-
+Eric Blake             ebb9@byu.net
