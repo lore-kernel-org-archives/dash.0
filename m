@@ -1,90 +1,71 @@
-From: Oleg Verych <olecom@gmail.com>
-Subject: script for login shell .profile (Re: Feature request: set -o
-	pipefail)
-Date: Fri, 14 Aug 2009 02:36:15 +0300
-Message-ID: <8499950a0908131636h7e26a3a5t99d810efd282c470@mail.gmail.com>
-References: <8499950a0908131634r66123c6au59d10e8e27eecbe6@mail.gmail.com>
+From: Matthew Burgess <matthew@linuxfromscratch.org>
+Subject: Allow dash to build with i18n version of Coreutils
+Date: Sat, 15 Aug 2009 12:07:16 -0600
+Message-ID: <ae958968e4a4099d81d92479ccde0167@quantum.linuxfromscratch.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed;
+	boundary="=_0633a8adf62aa2c65409646b7da934d4"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.154]:35549 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752055AbZHMXgO (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 13 Aug 2009 19:36:14 -0400
-Received: by fg-out-1718.google.com with SMTP id e12so1064102fga.17
-        for <dash@vger.kernel.org>; Thu, 13 Aug 2009 16:36:15 -0700 (PDT)
-In-Reply-To: <8499950a0908131634r66123c6au59d10e8e27eecbe6@mail.gmail.com>
+Received: from quantum.linuxfromscratch.org ([216.171.237.234]:43999 "EHLO
+	quantum.linuxfromscratch.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751357AbZHOSjZ (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sat, 15 Aug 2009 14:39:25 -0400
+Received: from localhost (quantum.linuxfromscratch.org [216.171.237.234])
+	by quantum.linuxfromscratch.org (Postfix) with ESMTP id F03E314109
+	for <dash@vger.kernel.org>; Sat, 15 Aug 2009 12:07:16 -0600 (MDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash list <dash@vger.kernel.org>
+To: dash@vger.kernel.org
 
-> * ssh+ to have multiple sshd servers as simple as creating
-> sshd_config+$reason files. E.g. to have some loginless dummies for
-> those dudes, who like to f*ck ssh on the Internet.
+--=_0633a8adf62aa2c65409646b7da934d4
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-But even login ssh (on some random port actually) have no regular
-system's account(s), but some random obscure names, where
-$HOME/dot.profile is like below. PAM is a baby :), just plain
-`/bin/sh`.
+Hi,
 
-#!/bin/sh
-# "$HOME/.profile" for secured, nice and wise re-login (f*ck PAMela!)
+My system has Coreutils-7.4 compiled with the i18n patch from
+http://cvs.fedoraproject.org/viewvc/devel/coreutils/coreutils-i18n.patch.
 
-# all signals from controlling tty can kill commands and leave
-# user with an interactive shell; purpose of this script to force
-# authentication of the real user from this "for login" one
+Using this to compile dash, when in an en_GB.UTF-8 locale, I get the following error:
 
-# thus, setting off interactivity (off controlling tty) and setting on
-# error checking (any errors -- logout, works only with `+i')
+if gcc -DHAVE_CONFIG_H -I. -I. -I..  -include ../config.h -DBSD=1 -DSHELL -DIFS_BROKEN  -Wall -g -O2 -MT eval.o -MD -MP -MF ".deps/eval.Tpo" -c -o eval.o eval.c; \
+        then mv -f ".deps/eval.Tpo" ".deps/eval.Po"; else rm -f ".deps/eval.Tpo"; exit 1; fi
+eval.c: In function ‘evalcommand’:
+eval.c:810: error: ‘EXECCMD’ undeclared (first use in this function)
+eval.c:810: error: (Each undeclared identifier is reported only once
+eval.c:810: error: for each function it appears in.)
+eval.c:812: error: ‘COMMANDCMD’ undeclared (first use in this function)
+make[3]: *** [eval.o] Error 1
 
-# "/etc/passwd" can have this file as login shell, $HOME can have only
-# this file, thus making things easier
+This is because the src/mkbuiltins script ends up generating an incomplete
+src/builtins.h file.  This, in turn, is caused by 'sort -u -k 3,3' not
+working correctly.
 
-# BEWARE, that NO login/password information can be written
-# here, because exec-only (no read permission) scripts are not supported.
-# Also make sure, that any other login shell for this account must source
-# this file, thus making all working securely.
+The attached patch fixes/works around things by setting LC_CTYPE=C, thus
+overriding the build environment (in a similar manner to the earlier call to
+'sort' in that same script).
 
-set +i -e
-sleep 02
-umask 027
-cd /
-U=`
-T=50
-P="Enter user name, please ("
-G=$((${#P}+1))
+Regards,
 
-exec 9<&0
-( read U && echo "$U" ) <&9&
-PID=$!
-exec 9<&- 1>&2
+Matt.
+--=_0633a8adf62aa2c65409646b7da934d4
+Content-Transfer-Encoding: base64
+Content-Type: text/x-diff; name="dash-0.5.5.1-sort_utf8-1.patch"
+Content-Disposition: attachment; filename="dash-0.5.5.1-sort_utf8-1.patch"
 
-echo -n "$P$T): "
-trap 'kill -KILL "$PID" 2>&-' 0 INT QUIT
-P=5
-while sleep "0.$P" && test -e "/proc/$PID/exe"
-do
-  T=$(($T-$P))
-    if test "$T" -gt 0
-  then printf "\0337\033[${G}G$T): \0338"
-  else printf "\033[${G}Gtime is out). Bye.
-"
-       exit 73
-    fi
-done`
-echo "Wait, please..."
-sleep 2
-[ "$SSH_ORIGINAL_COMMAND" ] || case "${U:=}" in
-   root|'')
-       exec sleep $((1<<30));;
-   *)  # check and `su` to the supplied login
-       test -d "/home/$U" && chmod 660 `tty` && exec su "$U";;
-esac
-echo "Only interactive shell access is available. No commands, please."
-exit 73 # temporal (obscure) failure, not reached
--- 
-sed 'sed && sh + olecom = love'  <<  ''
--o--=O`C
- #oo'L O
-<___=E M
+U3VibWl0dGVkIGJ5OiBNYXR0IEJ1cmdlc3MgKG1hdHRoZXdfYXRfbGludXhmcm9tc2NyYXRjaF9k
+b3Rfb3JnKQpEYXRlOiAyMDA5LTA4LTE1CkluaXRpYWwgUGFja2FnZSBWZXJzaW9uOiAwLjUuNS4x
+ClVwc3RyZWFtIFN0YXR1czogU3VibWl0dGVkCk9yaWdpbjogTWF0dCBCdXJnZXNzCkRlc2NyaXB0
+aW9uOiBJbiBVVEYtOCBsb2NhbGUncyB3aXRoIGFuIAoKZGlmZiAtTmF1ciBkYXNoLTAuNS41LjEu
+b3JpZy9zcmMvbWtidWlsdGlucyBkYXNoLTAuNS41LjEvc3JjL21rYnVpbHRpbnMKLS0tIGRhc2gt
+MC41LjUuMS5vcmlnL3NyYy9ta2J1aWx0aW5zCTIwMDktMDEtMTMgMjM6Mzc6MTMuMDAwMDAwMDAw
+ICswMDAwCisrKyBkYXNoLTAuNS41LjEvc3JjL21rYnVpbHRpbnMJMjAwOS0wOC0xNSAxNzozMTox
+OS4wMDAwMDAwMDAgKzAwMDAKQEAgLTgzLDcgKzgzLDcgQEAKICAqLwogCiAhCi1zZWQgJ3MvCS1b
+YS16XSovLycgJHRlbXAyIHwgbmwgLXYgMCB8IHNvcnQgLXUgLWsgMywzIHwKK3NlZCAncy8JLVth
+LXpdKi8vJyAkdGVtcDIgfCBubCAtdiAwIHwgTENfQ1RZUEU9QyBzb3J0IC11IC1rIDMsMyB8CiB0
+ciBhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5eiBBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWiB8
+CiAJYXdrICd7CXByaW50ZiAiI2RlZmluZSAlcyAoYnVpbHRpbmNtZCArICVkKVxuIiwgJDMsICQx
+fScKIHByaW50ZiAnXG4jZGVmaW5lIE5VTUJVSUxUSU5TICVkXG4nICQod2MgLWwgPCAkdGVtcDIp
+Cg==
+--=_0633a8adf62aa2c65409646b7da934d4--
+
