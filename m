@@ -1,45 +1,28 @@
-From: Alexey Gladkov <gladkov.alexey@gmail.com>
-Subject: Rergession in readcmd (commit 55c46b7)
-Date: Wed, 26 Aug 2009 22:18:02 +0400
-Message-ID: <4A957C5A.6090901@gmail.com>
+From: "Larson, Timothy E." <TELarson@west.com>
+Subject: newbie dash user question
+Date: Thu, 27 Aug 2009 12:59:55 -0500
+Message-ID: <226316B3E1F749498E28ACA66321D5BA36AEC9B8@oma00cexmbx03.corp.westworlds.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mojo.unsafe.ru ([83.222.2.183]:51397 "EHLO mojo.unsafe.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752439AbZHZSVm (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 26 Aug 2009 14:21:42 -0400
-Received: from localhost.localdomain (unknown [77.91.195.17])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mojo.unsafe.ru (Postfix) with ESMTP id 84495868099
-	for <dash@vger.kernel.org>; Wed, 26 Aug 2009 22:21:41 +0400 (MSD)
+Received: from mail137.messagelabs.com ([216.82.249.19]:41486 "EHLO
+	mail137.messagelabs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751171AbZH0R7z convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Thu, 27 Aug 2009 13:59:55 -0400
+Received: from OMA00CHUB02.corp.westworlds.com (oma-inet-pub2 [216.57.102.249])
+	by linux512.wic.west.com (8.13.1/8.13.1) with ESMTP id n7RHxuGX028215
+	(version=TLSv1/SSLv3 cipher=RC4-MD5 bits=128 verify=FAIL)
+	for <dash@vger.kernel.org>; Thu, 27 Aug 2009 13:59:56 -0400
+Content-Language: en-US
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: "'dash@vger.kernel.org'" <dash@vger.kernel.org>
 
-Greeting!
+Hello...
 
-readcmd put trash in the variables.
+I am curious exactly what makes dash distinct from its predecessor, ash?
 
-Test case:
 
-$ cat /tmp/conf
-Include common.conf
-FullSpeedCPU yes
-
-$ cat /tmp/z.sh
-while read option params; do
-  printf '[%s] [%s]\n' "$option" "$params"
-done < /tmp/conf
-
-Result:
-
-$ dash /tmp/z.sh
-[Include] [common.conf]
-[FullSpeedCPU] [yesFnf]
-
--- 
-Rgrds, legion
-
+Thanks,
+Tim
