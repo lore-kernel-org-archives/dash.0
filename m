@@ -1,28 +1,29 @@
-From: "Larson, Timothy E." <TELarson@west.com>
-Subject: newbie dash user question
-Date: Thu, 27 Aug 2009 12:59:55 -0500
-Message-ID: <226316B3E1F749498E28ACA66321D5BA36AEC9B8@oma00cexmbx03.corp.westworlds.com>
+From: Oleg Verych <olecom@gmail.com>
+Subject: Re: newbie dash user question
+Date: Thu, 27 Aug 2009 22:15:33 +0300
+Message-ID: <8499950a0908271215w21514ea4pe8ca53ef76ba1cf5@mail.gmail.com>
+References: <226316B3E1F749498E28ACA66321D5BA36AEC9B8@oma00cexmbx03.corp.westworlds.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail137.messagelabs.com ([216.82.249.19]:41486 "EHLO
-	mail137.messagelabs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751171AbZH0R7z convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Thu, 27 Aug 2009 13:59:55 -0400
-Received: from OMA00CHUB02.corp.westworlds.com (oma-inet-pub2 [216.57.102.249])
-	by linux512.wic.west.com (8.13.1/8.13.1) with ESMTP id n7RHxuGX028215
-	(version=TLSv1/SSLv3 cipher=RC4-MD5 bits=128 verify=FAIL)
-	for <dash@vger.kernel.org>; Thu, 27 Aug 2009 13:59:56 -0400
-Content-Language: en-US
+Received: from mail-fx0-f217.google.com ([209.85.220.217]:47841 "EHLO
+	mail-fx0-f217.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751318AbZH0TPc (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 27 Aug 2009 15:15:32 -0400
+Received: by fxm17 with SMTP id 17so1140832fxm.37
+        for <dash@vger.kernel.org>; Thu, 27 Aug 2009 12:15:33 -0700 (PDT)
+In-Reply-To: <226316B3E1F749498E28ACA66321D5BA36AEC9B8@oma00cexmbx03.corp.westworlds.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "'dash@vger.kernel.org'" <dash@vger.kernel.org>
+To: "Larson, Timothy E." <TELarson@west.com>
+Cc: "dash@vger.kernel.org" <dash@vger.kernel.org>
 
-Hello...
+> I am curious exactly what makes dash distinct from its predecessor, ash?
 
-I am curious exactly what makes dash distinct from its predecessor, ash?
+http://www.in-ulm.de/~mascheck/
 
-
-Thanks,
-Tim
+-- 
+sed 'sed && sh + olecom = love'  <<  ''
+-o--=O`C
+ #oo'L O
+<___=E M
