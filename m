@@ -1,48 +1,57 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Eric Blake <ebb9@byu.net>
 Subject: Re: bugs in cd
-Date: Mon, 31 Aug 2009 22:56:53 +1000
-Message-ID: <20090831125653.GA8262@gondor.apana.org.au>
-References: <loom.20090714T212706-910@post.gmane.org> <20090831121822.GC7311@gondor.apana.org.au> <4A9BC0BF.30608@byu.net>
+Date: Mon, 31 Aug 2009 14:08:40 +0000 (UTC)
+Message-ID: <loom.20090831T160451-196@post.gmane.org>
+References: <loom.20090714T212706-910@post.gmane.org> <20090831121822.GC7311@gondor.apana.org.au> <4A9BC0BF.30608@byu.net> <20090831125653.GA8262@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48820 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750718AbZHaM4x (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 31 Aug 2009 08:56:53 -0400
-Content-Disposition: inline
-In-Reply-To: <4A9BC0BF.30608@byu.net>
+Received: from lo.gmane.org ([80.91.229.12]:52050 "EHLO lo.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750929AbZHaOJF (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 31 Aug 2009 10:09:05 -0400
+Received: from list by lo.gmane.org with local (Exim 4.50)
+	id 1Mi7ZA-0002JN-F1
+	for dash@vger.kernel.org; Mon, 31 Aug 2009 16:09:04 +0200
+Received: from l3-128-170-36-102.l-3com.com ([128.170.36.102])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Mon, 31 Aug 2009 16:09:04 +0200
+Received: from ebb9 by l3-128-170-36-102.l-3com.com with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Mon, 31 Aug 2009 16:09:04 +0200
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <ebb9@byu.net>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Mon, Aug 31, 2009 at 06:23:27AM -0600, Eric Blake wrote:
->
-> Which version of POSIX are you looking at?  POSIX 2008 added quite a few
-> clarifications about the handling of // that were not listed in POSIX 2001.
+Herbert Xu <herbert <at> gondor.apana.org.au> writes:
+
+> > In other words, if CDPATH is "/", then you should not append any
+> > additional <slash> characters, such that you end up checking for the
+> > existence of "/foo", not "//foo".
 > 
-> http://www.opengroup.org/onlinepubs/9699919799/utilities/cd.html
-> 
-> "5. Starting with the first pathname in the <colon>-separated pathnames of
-> CDPATH (see the ENVIRONMENT VARIABLES section) if the pathname is
-> non-null, test if the concatenation of that pathname, a <slash> character
-> if that pathname did not end with a <slash> character, and the directory
-> operand names a directory."...
-> 
-> In other words, if CDPATH is "/", then you should not append any
-> additional <slash> characters, such that you end up checking for the
-> existence of "/foo", not "//foo".
+> Fair enough.  However, I noticed that they haven't fixed up PATH
+> to do the same thing.
 
-Fair enough.  However, I noticed that they haven't fixed up PATH
-to do the same thing.
+Most likely an unintentional oversight.  But to make sure, I've created a 
+defect report:
 
-Since we use the same function for PATH and CDPATH, I'm not going
-to make any changes until POSIX becomes consistent in this respect.
+http://austingroupbugs.net/view.php?id=139
 
-Cheers,
+https://www.opengroup.org/sophocles/show_mail.tpl?
+CALLER=index.tpl&source=L&listname=austin-group-l&id=12720
+
+[the former link may require free registration with the Austin group Mantis 
+tracker; the latter is the public email summary generated from my edits]
+
+> Since we use the same function for PATH and CDPATH, I'm not going
+> to make any changes until POSIX becomes consistent in this respect.
+
+Fair enough; I'll keep you posted when the Austin group rules on my report.
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Eric Blake
+
+
+
