@@ -1,47 +1,48 @@
-From: Eric Blake <ebb9@byu.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: bugs in cd
-Date: Mon, 31 Aug 2009 06:23:27 -0600
-Message-ID: <4A9BC0BF.30608@byu.net>
-References: <loom.20090714T212706-910@post.gmane.org> <20090831121822.GC7311@gondor.apana.org.au>
+Date: Mon, 31 Aug 2009 22:56:53 +1000
+Message-ID: <20090831125653.GA8262@gondor.apana.org.au>
+References: <loom.20090714T212706-910@post.gmane.org> <20090831121822.GC7311@gondor.apana.org.au> <4A9BC0BF.30608@byu.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from qmta06.emeryville.ca.mail.comcast.net ([76.96.30.56]:52305 "EHLO
-	QMTA06.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752401AbZHaMXM (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 31 Aug 2009 08:23:12 -0400
-In-Reply-To: <20090831121822.GC7311@gondor.apana.org.au>
+Received: from rhun.apana.org.au ([64.62.148.172]:48820 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750718AbZHaM4x (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 31 Aug 2009 08:56:53 -0400
+Content-Disposition: inline
+In-Reply-To: <4A9BC0BF.30608@byu.net>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Blake <ebb9@byu.net>
 Cc: dash@vger.kernel.org
 
-According to Herbert Xu on 8/31/2009 6:18 AM:
-> On Tue, Jul 14, 2009 at 09:39:03PM +0000, Eric Blake wrote:
->> Furthermore, POSIX requires that if the element in CDPATH ends in slash, that 
->> no additional slashes are added while forming the candidate curpath.  In light 
->> of the fact that //home need not be the same directory as /home (and indeed, on 
->> cygwin, they are distinct entities), this is also a bug:
+On Mon, Aug 31, 2009 at 06:23:27AM -0600, Eric Blake wrote:
+>
+> Which version of POSIX are you looking at?  POSIX 2008 added quite a few
+> clarifications about the handling of // that were not listed in POSIX 2001.
 > 
-> Can you quote where POSIX says this?
+> http://www.opengroup.org/onlinepubs/9699919799/utilities/cd.html
+> 
+> "5. Starting with the first pathname in the <colon>-separated pathnames of
+> CDPATH (see the ENVIRONMENT VARIABLES section) if the pathname is
+> non-null, test if the concatenation of that pathname, a <slash> character
+> if that pathname did not end with a <slash> character, and the directory
+> operand names a directory."...
+> 
+> In other words, if CDPATH is "/", then you should not append any
+> additional <slash> characters, such that you end up checking for the
+> existence of "/foo", not "//foo".
 
-Which version of POSIX are you looking at?  POSIX 2008 added quite a few
-clarifications about the handling of // that were not listed in POSIX 2001.
+Fair enough.  However, I noticed that they haven't fixed up PATH
+to do the same thing.
 
-http://www.opengroup.org/onlinepubs/9699919799/utilities/cd.html
+Since we use the same function for PATH and CDPATH, I'm not going
+to make any changes until POSIX becomes consistent in this respect.
 
-"5. Starting with the first pathname in the <colon>-separated pathnames of
-CDPATH (see the ENVIRONMENT VARIABLES section) if the pathname is
-non-null, test if the concatenation of that pathname, a <slash> character
-if that pathname did not end with a <slash> character, and the directory
-operand names a directory."...
-
-In other words, if CDPATH is "/", then you should not append any
-additional <slash> characters, such that you end up checking for the
-existence of "/foo", not "//foo".
-
+Cheers,
 -- 
-Don't work too hard, make some time for fun as well!
-
-Eric Blake             ebb9@byu.net
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
