@@ -1,81 +1,68 @@
-From: Matthew Burgess <matthew@linuxfromscratch.org>
-Subject: Re: Allow dash to build with i18n version of Coreutils
-Date: Tue, 1 Sep 2009 14:27:04 -0600
-Message-ID: <c0670a2697cad20e7e616e7dba2ed2a0@quantum.linuxfromscratch.org>
-References: <20090901031557.GA17361@gondor.apana.org.au>
+From: ZelinskiyIS <ivze@bk.ru>
+Subject: A probem with CTLESC, CTLQUOTEMARK and UTF-8.
+Date: Mon, 07 Sep 2009 11:46:44 +0400
+Message-ID: <4AA4BA64.1080405@bk.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from quantum.linuxfromscratch.org ([216.171.237.234]:55881 "EHLO
-	quantum.linuxfromscratch.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752055AbZIAU10 (ORCPT
-	<rfc822;dash@vger.kernel.org>); Tue, 1 Sep 2009 16:27:26 -0400
-In-Reply-To: <20090901031557.GA17361@gondor.apana.org.au>
+Received: from hosting.cifracom.ru ([195.189.81.50]:57591 "EHLO
+	hosting.cifracom.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751530AbZIGH4e (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 7 Sep 2009 03:56:34 -0400
+Received: from [192.168.1.10] (unknown [10.27.76.12])
+	by hosting.cifracom.ru (Postfix) with ESMTP id F2B0C8B403A
+	for <dash@vger.kernel.org>; Mon,  7 Sep 2009 11:46:13 +0000 (UTC)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Tue, 1 Sep 2009 13:15:57 +1000, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Mon, Aug 31, 2009 at 08:19:24AM -0600, Matthew Burgess wrote:
-> 
-> Oh I see what's going on.  In fact it's sed that's not working for
-> you, not sort.  Let me find a way around that.
+Good day (or night)!
 
-Ah, well spotted.  The following is enough to get the correct output from sed(1):
+I am Ubuntu user, as for Jaunty 9.04 we have dash 0.5.4 installed as th=
+e
+default sh interpreter. Ubuntu uses multibute UTF-8 to represent local
+symbols, these symbols are often to be found in file names.
 
-sed 's/\t-[a-z]*//' $temp2
+I found a bug, when trying to find out why a python script, doing some
+little work of converting music files, would fail on songs with Cyrilli=
+c
+names, containing letters =D1=81,=D1=88,=D0=81. The reason was sh in sy=
+stem(...) call,
+that created files with garbage in names when using "> $file_name"
+redirection when $file_name contained these three letters.
 
-This is with sed-4.2.1 compiled against Glibc-2.10.1.
+=46or example, a sequence =D1=80=D1=81=D1=88=D0=81=D1=8A (byte-by-byte)
+{d1 80 d1 81 d1 88 d0 81 d1 8a}
+is turned into
+{d1 80 d1 d1 d0 d1 8a}. Bytes hex 81 and hex 88 disappear from the file
+name.
 
-Running through 'nl -v 0', I end up with:
+The reason for such behaviour is in expand.c:239-240 for dash 0.5.4. Th=
+e
+lines and bug look similar in dash 0.5.5.1, here the place is
+expand.c:216-217.
 
-     0	.	dotcmd
-     1	:	truecmd
-     2	[	testcmd
-     3	alias	aliascmd
-     4	bg	bgcmd
-     5	break	breakcmd
-     6	cd	cdcmd
-     7	chdir	cdcmd
-     8	command	commandcmd
-     9	continue	breakcmd
-    10	echo	echocmd
-    11	eval	evalcmd
-    12	exec	execcmd
-    13	exit	exitcmd
-    14	export	exportcmd
-    15	false	falsecmd
-    16	fg	fgcmd
-    17	getopts	getoptscmd
-    18	hash	hashcmd
-    19	jobs	jobscmd
-    20	kill	killcmd
-    21	local	localcmd
-    22	printf	printfcmd
-    23	pwd	pwdcmd
-    24	read	readcmd
-    25	readonly	exportcmd
-    26	return	returncmd
-    27	set	setcmd
-    28	shift	shiftcmd
-    29	test	testcmd
-    30	times	timescmd
-    31	trap	trapcmd
-    32	true	truecmd
-    33	type	typecmd
-    34	ulimit	ulimitcmd
-    35	umask	umaskcmd
-    36	unalias	unaliascmd
-    37	unset	unsetcmd
-    38	wait	waitcmd
+The piece of code:
+#######################################################################=
+#
+		if (flag & EXP_REDIR) /*XXX - for now, just remove escapes */
+			rmescapes(p);
+#######################################################################=
+#
+cuts bytes x81 and x88. The behaviour seems to be allways unwanted,
+because according to UTF-8 specifications, x81 and x88 can not represen=
+t
+an individual symbol. Indeed, hex 81 =3D binary 10000001, hex 88 =3D bi=
+nary
+10001000; the upper two bits are 10, what means that the byte is
+data-carrier and must always trail initiating byte (from
+http://en.wikipedia.org/wiki/UTF-8#Description).
 
-That still doesn't help with the sort(1) output though (from coreutils-7.5), which
-still doesn't appear to be honouring LC_COLLATE!  I suspect a bug in our i18n patch
-for Coreutils, which I'll try to take a look at over the next few days.
+The problem, probably, do not occur when using a single-byte KOI8-R
+encoding for Cyrillics, which is default for Debian.
 
-Thanks,
+I have also created a launchpad bug for Ubuntu,
+https://bugs.launchpad.net/ubuntu/+source/dash/+bug/422298.
 
-Matt.
-
+That's it, thanks for attention.
