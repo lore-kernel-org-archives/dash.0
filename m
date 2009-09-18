@@ -1,68 +1,65 @@
-From: ZelinskiyIS <ivze@bk.ru>
-Subject: A probem with CTLESC, CTLQUOTEMARK and UTF-8.
-Date: Mon, 07 Sep 2009 11:46:44 +0400
-Message-ID: <4AA4BA64.1080405@bk.ru>
+From: Eric Blake <ebb9@byu.net>
+Subject: Re: bugs in cd
+Date: Thu, 17 Sep 2009 18:03:23 -0600
+Message-ID: <4AB2CE4B.5070104@byu.net>
+References: <loom.20090714T212706-910@post.gmane.org> <20090831121822.GC7311@gondor.apana.org.au> <4A9BC0BF.30608@byu.net> <20090831125653.GA8262@gondor.apana.org.au> <loom.20090831T160451-196@post.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from hosting.cifracom.ru ([195.189.81.50]:57591 "EHLO
-	hosting.cifracom.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751530AbZIGH4e (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 7 Sep 2009 03:56:34 -0400
-Received: from [192.168.1.10] (unknown [10.27.76.12])
-	by hosting.cifracom.ru (Postfix) with ESMTP id F2B0C8B403A
-	for <dash@vger.kernel.org>; Mon,  7 Sep 2009 11:46:13 +0000 (UTC)
+Received: from qmta12.emeryville.ca.mail.comcast.net ([76.96.27.227]:58172
+	"EHLO QMTA12.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751447AbZIRADM (ORCPT
+	<rfc822;dash@vger.kernel.org>); Thu, 17 Sep 2009 20:03:12 -0400
+In-Reply-To: <loom.20090831T160451-196@post.gmane.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Good day (or night)!
+According to Eric Blake on 8/31/2009 8:08 AM:
+> Herbert Xu <herbert <at> gondor.apana.org.au> writes:
+> 
+>>> In other words, if CDPATH is "/", then you should not append any
+>>> additional <slash> characters, such that you end up checking for the
+>>> existence of "/foo", not "//foo".
+>> Fair enough.  However, I noticed that they haven't fixed up PATH
+>> to do the same thing.
 
-I am Ubuntu user, as for Jaunty 9.04 we have dash 0.5.4 installed as th=
-e
-default sh interpreter. Ubuntu uses multibute UTF-8 to represent local
-symbols, these symbols are often to be found in file names.
+>> Since we use the same function for PATH and CDPATH, I'm not going
+>> to make any changes until POSIX becomes consistent in this respect.
 
-I found a bug, when trying to find out why a python script, doing some
-little work of converting music files, would fail on songs with Cyrilli=
-c
-names, containing letters =D1=81,=D1=88,=D0=81. The reason was sh in sy=
-stem(...) call,
-that created files with garbage in names when using "> $file_name"
-redirection when $file_name contained these three letters.
+> Fair enough; I'll keep you posted when the Austin group rules on my report.
+> http://austingroupbugs.net/view.php?id=139
 
-=46or example, a sequence =D1=80=D1=81=D1=88=D0=81=D1=8A (byte-by-byte)
-{d1 80 d1 81 d1 88 d0 81 d1 8a}
-is turned into
-{d1 80 d1 d1 d0 d1 8a}. Bytes hex 81 and hex 88 disappear from the file
-name.
+The Austin Group has now made their ruling; there is a 30 day clock before
+the interpretation becomes official, but consensus will probably be
+granted to the proposed wording:
 
-The reason for such behaviour is in expand.c:239-240 for dash 0.5.4. Th=
-e
-lines and bug look similar in dash 0.5.5.1, here the place is
-expand.c:216-217.
+> Interpretation response
+> ------------------------
+> The standard states the requirements for PATH
+> and conforming implementations must conform to this. However, concerns
+> have been raised about this which are being referred to the sponsor."
+> 
+> Rationale:
+> -------------
+> This is for consistency with the previous change to CDPATH made in interpretation 1003.1-2001 #199
+> https://www.opengroup.org/austin/interps/uploads/40/15188/AI-199.txt [^]
+> 
+> 
+> Notes to the Editor (not part of this interpretation):
+> -------------------------------------------------------
 
-The piece of code:
-#######################################################################=
-#
-		if (flag & EXP_REDIR) /*XXX - for now, just remove escapes */
-			rmescapes(p);
-#######################################################################=
-#
-cuts bytes x81 and x88. The behaviour seems to be allways unwanted,
-because according to UTF-8 specifications, x81 and x88 can not represen=
-t
-an individual symbol. Indeed, hex 81 =3D binary 10000001, hex 88 =3D bi=
-nary
-10001000; the upper two bits are 10, what means that the byte is
-data-carrier and must always trail initiating byte (from
-http://en.wikipedia.org/wiki/UTF-8#Description).
+> At line 5674, replace the sentence:
+> 
+> When a nonzero-length prefix is applied to this filename, a <slash> shall be inserted between the prefix and the filename.
+> 
+> with:
+> 
+> When a nonzero-length prefix is applied to this filename, a <slash> shall be inserted between the prefix and the filename if the prefix did not end in <slash>.
 
-The problem, probably, do not occur when using a single-byte KOI8-R
-encoding for Cyrillics, which is default for Debian.
 
-I have also created a launchpad bug for Ubuntu,
-https://bugs.launchpad.net/ubuntu/+source/dash/+bug/422298.
+-- 
+Don't work too hard, make some time for fun as well!
 
-That's it, thanks for attention.
+Eric Blake             ebb9@byu.net
