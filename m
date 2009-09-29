@@ -1,52 +1,55 @@
-From: Jim Meyering <jim@meyering.net>
-Subject: Re: [PATCH] don't read-uninitialized for \177 in a here-doc
-Date: Mon, 28 Sep 2009 11:32:32 +0200
-Message-ID: <87ljjzbej3.fsf@meyering.net>
-References: <87r5trbezu.fsf@meyering.net>
+From: Gerrit Pape <pape@smarden.org>
+Subject: [PATCH 1/2] [INPUT] exit 127 if command_file is given but does not exist
+Date: Tue, 29 Sep 2009 11:15:55 +0000
+Message-ID: <20090929111555.19359.qmail@de3d04e6be5ad4.315fe32.mid.smarden.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp3-g21.free.fr ([212.27.42.3]:54493 "EHLO smtp3-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751093AbZI1Jcf (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 28 Sep 2009 05:32:35 -0400
-Received: from smtp3-g21.free.fr (localhost [127.0.0.1])
-	by smtp3-g21.free.fr (Postfix) with ESMTP id 25FEC81816C
-	for <dash@vger.kernel.org>; Mon, 28 Sep 2009 11:32:34 +0200 (CEST)
-Received: from mx.meyering.net (mx.meyering.net [82.230.74.64])
-	by smtp3-g21.free.fr (Postfix) with ESMTP id 428EA818054
-	for <dash@vger.kernel.org>; Mon, 28 Sep 2009 11:32:32 +0200 (CEST)
-In-Reply-To: <87r5trbezu.fsf@meyering.net> (Jim Meyering's message of "Mon, 28
-	Sep 2009 11:22:29 +0200")
+Received: from a.ns.smarden.org ([212.42.242.37]:1125 "HELO a.mx.smarden.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1750908AbZI2LWd (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 29 Sep 2009 07:22:33 -0400
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-Cc: 548493@bugs.debian.org
 
-Jim Meyering wrote:
+This commit makes dash exit with return code 127 instead of 2 if
+started as non-interactive shell with a non-existent command_file
+specified as argument, as documented in
+ http://www.opengroup.org/onlinepubs/009695399/utilities/sh.html#tag_04_128_14
 
-> It was indeed a bug in dash.
-> I tracked it down and wrote the patch below:
->
->>From 53924ce6da7fece91e57b7238e6aa81a4df636a5 Mon Sep 17 00:00:00 2001
-> From: Jim Meyering <meyering@redhat.com>
-> Date: Mon, 28 Sep 2009 11:00:05 +0200
-> Subject: [PATCH] don't read-uninitialized for \177 in a here-doc
->
-> A DEL (0177, dec 127) byte in a here-document would cause dash to
-> access uninitialized memory at the end of one of the syntax.c tables,
-> since those tables are sized to accommodate a maximum index of
-> BASESYNTAX + 126.  Make the generated tables one byte larger.
-> printf ':<<\\E\n\200y\nE'|./dash
+The wrong exit code was reported by Clint Adams through
+ http://bugs.debian.org/548743
 
-More details:
+Signed-off-by: Gerrit Pape <pape@smarden.org>
+---
+ src/input.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-The above command fails as follows on certain systems, but not on others:
+diff --git a/src/input.c b/src/input.c
+index e57ad76..c1e3e54 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -101,6 +101,7 @@ MKINIT struct parsefile basepf;	/* top level input file */
+ MKINIT char basebuf[IBUFSIZ];	/* buffer for top level input file */
+ struct parsefile *parsefile = &basepf;	/* current input file */
+ int whichprompt;		/* 1 == PS1, 2 == PS2 */
++extern int exitstatus;
+ 
+ #ifndef SMALL
+ EditLine *el;			/* cookie for editline package */
+@@ -408,7 +409,9 @@ setinputfile(const char *fname, int flags)
+ 	if ((fd = open(fname, O_RDONLY)) < 0) {
+ 		if (flags & INPUT_NOFILE_OK)
+ 			goto out;
+-		sh_error("Can't open %s", fname);
++		sh_warnx("Can't open %s", fname);
++		exitstatus = 127;
++		exraise(EXEXIT);
+ 	}
+ 	if (fd < 10)
+ 		fd = savefd(fd, fd);
+-- 
+1.6.0.3
 
-    albeniz/sid$ printf ':<<\\E\n\177y\nE'|dash
-    dash: y: not found
-    dash: E: not found
-
-If you want to simulate the failure consistently, simply enlarge
-the sqsyntax table by one and make the last entry anything other
-than CWORD.  Use "11" (CEOF) and it'll evoke the symptoms shown above.
