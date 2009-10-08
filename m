@@ -1,53 +1,58 @@
-From: Gerrit Pape <pape@smarden.org>
-Subject: [PATCH 2/2] [EVAL] don't clear eflag when forking subshell
-Date: Tue, 29 Sep 2009 12:24:42 +0000
-Message-ID: <20090929122442.30272.qmail@6c8f9621008f73.315fe32.mid.smarden.org>
+From: Alexey Gladkov <gladkov.alexey@gmail.com>
+Subject: 'wait' program does not wait
+Date: Thu, 08 Oct 2009 18:18:13 +0400
+Message-ID: <4ACDF4A5.3040501@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from a.ns.smarden.org ([212.42.242.37]:1205 "HELO a.mx.smarden.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1753902AbZI2MYj (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 29 Sep 2009 08:24:39 -0400
-Content-Disposition: inline
+Received: from mojo.unsafe.ru ([83.222.2.183]:52791 "EHLO mojo.unsafe.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754643AbZJHOS4 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 8 Oct 2009 10:18:56 -0400
+Received: from localhost.localdomain (dhcp250-217.yandex.ru [87.250.250.217])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mojo.unsafe.ru (Postfix) with ESMTP id 8E55B86810D
+	for <dash@vger.kernel.org>; Thu,  8 Oct 2009 18:18:15 +0400 (MSD)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: dash list <dash@vger.kernel.org>
 
-According to
- http://www.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_12
-"A subshell environment shall be created as a duplicate of the shell
-environment, except that signal traps set by that shell environment
-shall be set to the default values."
+Greetings!
 
-Currently the eflag is cleared when forking a subshell, e.g.
+'wait' does not wait for all jobs and return a non-zero exit status.
 
-$ dash -c 'set -e ; z=$(false;echo foo) ; echo $z'
-foo
+According dash(1):
 
-With this commit the eflag is preserved for subshells, and dash exits 1
-before echo.
+wait [job]
+Wait for the specified job to complete and return the exit status
+of the last process in the job. If the argument is omitted, wait
+for all jobs to complete and the return an exit status of zero.
 
-The problem was reported by Vincent Lefevre through
- http://bugs.debian.org/514863
+$ cat test.sh
+#!/bin/dash
+func() {
+	sleep $1
+	echo "func($1)"
+}
+func 1 &
+func 2 &
+func 3 &
+wait
 
-Signed-off-by: Gerrit Pape <pape@smarden.org>
----
- src/eval.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+$ dash ./test.sh; echo "after rc=$?"
+func(1)
+after rc=145
+func(2)
+func(3)
 
-diff --git a/src/eval.c b/src/eval.c
-index af3742f..d201054 100644
---- a/src/eval.c
-+++ b/src/eval.c
-@@ -626,7 +626,6 @@ evalbackcmd(union node *n, struct backcmd *result)
- 				dup2(pip[1], 1);
- 				close(pip[1]);
- 			}
--			eflag = 0;
- 			evaltreenr(n, EV_EXIT);
- 			/* NOTREACHED */
- 		}
+$ bash ./test.sh; echo "after rc=$?"
+func(1)
+func(2)
+func(3)
+after rc=0
+
 -- 
-1.6.0.3
+Rgrds, legion
 
