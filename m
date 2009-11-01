@@ -1,58 +1,57 @@
-From: Alexey Gladkov <gladkov.alexey@gmail.com>
-Subject: 'wait' program does not wait
-Date: Thu, 08 Oct 2009 18:18:13 +0400
-Message-ID: <4ACDF4A5.3040501@gmail.com>
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: export + default value parameter expansion -> broken dash parser
+Date: Sun, 1 Nov 2009 16:20:37 -0400
+Message-ID: <200911011520.38362.vapier@gentoo.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed;
+  boundary="nextPart12237683.ZMxPIkcAQZ";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mojo.unsafe.ru ([83.222.2.183]:52791 "EHLO mojo.unsafe.ru"
+Received: from smtp.gentoo.org ([140.211.166.183]:58504 "EHLO smtp.gentoo.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754643AbZJHOS4 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 8 Oct 2009 10:18:56 -0400
-Received: from localhost.localdomain (dhcp250-217.yandex.ru [87.250.250.217])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mojo.unsafe.ru (Postfix) with ESMTP id 8E55B86810D
-	for <dash@vger.kernel.org>; Thu,  8 Oct 2009 18:18:15 +0400 (MSD)
+	id S1753255AbZKAUTn (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 1 Nov 2009 15:19:43 -0500
+Received: from vapier.localnet (localhost [127.0.0.1])
+	by smtp.gentoo.org (Postfix) with ESMTP id CCCBE66D1A
+	for <dash@vger.kernel.org>; Sun,  1 Nov 2009 20:19:46 +0000 (UTC)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash list <dash@vger.kernel.org>
+To: dash@vger.kernel.org
 
-Greetings!
+--nextPart12237683.ZMxPIkcAQZ
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-'wait' does not wait for all jobs and return a non-zero exit status.
+dash is unable to parse:
+unset A; export ${A- -E}
 
-According dash(1):
+results in:
+export: 1: -E: bad variable name
+-mike
 
-wait [job]
-Wait for the specified job to complete and return the exit status
-of the last process in the job. If the argument is omitted, wait
-for all jobs to complete and the return an exit status of zero.
+--nextPart12237683.ZMxPIkcAQZ
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
 
-$ cat test.sh
-#!/bin/dash
-func() {
-	sleep $1
-	echo "func($1)"
-}
-func 1 &
-func 2 &
-func 3 &
-wait
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.13 (GNU/Linux)
 
-$ dash ./test.sh; echo "after rc=$?"
-func(1)
-after rc=145
-func(2)
-func(3)
+iQIcBAABAgAGBQJK7e2WAAoJEEFjO5/oN/WBq+cQAIMzDltQDnjVNBDd/Wi/9W3j
+c7BKIGmF8DA9JH524usPGVvDHKYFBqDc2jv7f79MWsyzpIE2M8PsLHxffyqg3ws7
+CSOie6I7daEtSCJC1Avi2GNLurkPvLyCPmcvMuig6Ok81s9NSVuQY5Is99CsJUFA
+RaYC0U9eC+pLy1pWuqcMwyke/MCSMMeEREvH8dU2lvWZ8kdtzY/PN/vm17Bl4X7k
+XzfgGsAI6ozuO9APzMMkTWdg5wG98E2S+PeC+wCa5e3lUrKGR9iwqiES9c8j0ZyA
+ivU4WuIPEiEhlUs8Ply7HHaCkwZjAKoKryjsJMNsEgRqdTk3ShNt1+CxuX5b4Ym/
+ep3d+rsYf+/VpuAeo0ZbPlpGJU1XTo4T49usnU8ezTxG9Iyt0KPbpctaGO2wwXBH
+PUENHIPxATeYrc8j3hBc/a7kV8Cf3oQX8bqMjAXGP/8kixcYuq+tzH+OlCHP/63R
+DXbGM2CYftaSAH1dimswTTSwo4U53/yN2JpkOGbICnujxMAJRV435G2DU8A+Xg8m
+2CbWYS8a+gJG8qtac32zvngzzqvvu2V0Q2CdzbsFIXdd8TNH872ElOjRuNzLDlW3
+THSUoJapQlF+D551UPfOKN1IZEgh8m4jM558DxvP3svcqF4jAjDIiRlxq4aKKIrx
+BqIzN1/17gc+a1mm32Ru
+=D47s
+-----END PGP SIGNATURE-----
 
-$ bash ./test.sh; echo "after rc=$?"
-func(1)
-func(2)
-func(3)
-after rc=0
-
--- 
-Rgrds, legion
-
+--nextPart12237683.ZMxPIkcAQZ--
