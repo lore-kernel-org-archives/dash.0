@@ -1,38 +1,41 @@
-From: Eitan Adler <eitanadlerlist@gmail.com>
-Subject: patch to get dash to build on FreeBSD
-Date: Sun, 8 Nov 2009 09:33:33 +0200
-Message-ID: <a0777e080911072333o1a336148oee139c2e40041907@mail.gmail.com>
+From: Alexey Gladkov <gladkov.alexey@gmail.com>
+Subject: Re: Rergession in readcmd (commit 55c46b7)
+Date: Wed, 11 Nov 2009 04:19:17 +0300
+Message-ID: <4AFA1115.6000000@gmail.com>
+References: <20090831101232.GA894@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.152]:45516 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751944AbZKHHds (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 8 Nov 2009 02:33:48 -0500
-Received: by fg-out-1718.google.com with SMTP id d23so332316fga.1
-        for <dash@vger.kernel.org>; Sat, 07 Nov 2009 23:33:53 -0800 (PST)
+Received: from mojo.unsafe.ru ([83.222.2.183]:28331 "EHLO mojo.unsafe.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751849AbZKKA0A (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 10 Nov 2009 19:26:00 -0500
+In-Reply-To: <20090831101232.GA894@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org
 
-mksignames.c fails to build on freeBSD.
-If you apply the following patch the shell builds and based on very
-limited testing the dash appears to work.
+31.08.2009 14:12, Herbert Xu wrote:
+>> $ dash /tmp/z.sh
+>> [Include] [common.conf]
+>> [FullSpeedCPU] [yesFnf]
+> 
+> Thanks for the report.  It's an off-by-one error causing the
+> NUL termination to disappear.
 
-diff -urN dash-0.5.5.1/src/mksignames.c dash/src/mksignames.c
---- dash-0.5.5.1/src/mksignames.c	2009-01-14 01:37:13.000000000 +0200
-+++ dash/src/mksignames.c	2009-11-08 09:27:50.000000000 +0200
-@@ -34,7 +34,11 @@
-  */
- #define LASTSIG NSIG-1
+I found another example:
 
--char *signal_names[2 * NSIG + 3];
-+#if defined(__FreeBSD__)
-+	char *signal_names[SIGRTMAX];
-+#else
-+	char *signal_names[2 * NSIG + 3];
-+#endif
+$ tr -d '[:print:]' < /etc/passwd |tr -d '\t\n' |wc -c
+0
 
- #define signal_names_size (sizeof(signal_names)/sizeof(signal_names[0]))
+$ dash -c 'while read o p; do printf "[%s] [%s]\n" "$o" "$p"; done <
+/etc/passwd' |tr -d '[:print:]' |tr -d '[:space:]' |wc -c
+61
 
-Files dash-0.5.5.1/src/mksignames.core and dash/src/mksignames.core differ
+bug is not fixed yet :(
+
+-- 
+Rgrds, legion
+
