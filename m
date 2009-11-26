@@ -1,41 +1,35 @@
-From: Alexey Gladkov <gladkov.alexey@gmail.com>
-Subject: Re: Rergession in readcmd (commit 55c46b7)
-Date: Wed, 11 Nov 2009 04:19:17 +0300
-Message-ID: <4AFA1115.6000000@gmail.com>
-References: <20090831101232.GA894@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: patch to get dash to build on FreeBSD
+Date: Thu, 26 Nov 2009 11:07:44 +0800
+Message-ID: <20091126030744.GA2402@gondor.apana.org.au>
+References: <a0777e080911072333o1a336148oee139c2e40041907@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mojo.unsafe.ru ([83.222.2.183]:28331 "EHLO mojo.unsafe.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751849AbZKKA0A (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 10 Nov 2009 19:26:00 -0500
-In-Reply-To: <20090831101232.GA894@gondor.apana.org.au>
+Received: from rhun.apana.org.au ([64.62.148.172]:39887 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754323AbZKZDHl (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 25 Nov 2009 22:07:41 -0500
+Content-Disposition: inline
+In-Reply-To: <a0777e080911072333o1a336148oee139c2e40041907@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eitan Adler <eitanadlerlist@gmail.com>
 Cc: dash@vger.kernel.org
 
-31.08.2009 14:12, Herbert Xu wrote:
->> $ dash /tmp/z.sh
->> [Include] [common.conf]
->> [FullSpeedCPU] [yesFnf]
-> 
-> Thanks for the report.  It's an off-by-one error causing the
-> NUL termination to disappear.
+Eitan Adler <eitanadlerlist@gmail.com> wrote:
+> mksignames.c fails to build on freeBSD.
+> If you apply the following patch the shell builds and based on very
+> limited testing the dash appears to work.
 
-I found another example:
+Thanks, but I don't think this is enough.  We assume in plenty
+of other places that NSIG is the maximum for signal numbers, e.g.,
+traps.c.  So I think we need to change all those places if this is
+to work on FreeBSD.
 
-$ tr -d '[:print:]' < /etc/passwd |tr -d '\t\n' |wc -c
-0
-
-$ dash -c 'while read o p; do printf "[%s] [%s]\n" "$o" "$p"; done <
-/etc/passwd' |tr -d '[:print:]' |tr -d '[:space:]' |wc -c
-61
-
-bug is not fixed yet :(
-
+Cheers,
 -- 
-Rgrds, legion
-
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
