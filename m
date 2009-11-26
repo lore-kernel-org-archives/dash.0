@@ -1,33 +1,70 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: patch to get dash to build on FreeBSD
-Date: Thu, 26 Nov 2009 11:07:44 +0800
-Message-ID: <20091126030744.GA2402@gondor.apana.org.au>
-References: <a0777e080911072333o1a336148oee139c2e40041907@mail.gmail.com>
+Subject: Re: Rergession in readcmd (commit 55c46b7)
+Date: Thu, 26 Nov 2009 11:54:59 +0800
+Message-ID: <20091126035459.GA11843@gondor.apana.org.au>
+References: <4AFA1115.6000000@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:39887 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:36523 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754323AbZKZDHl (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 25 Nov 2009 22:07:41 -0500
+	with ESMTP id S932331AbZKZDy4 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 25 Nov 2009 22:54:56 -0500
 Content-Disposition: inline
-In-Reply-To: <a0777e080911072333o1a336148oee139c2e40041907@mail.gmail.com>
+In-Reply-To: <4AFA1115.6000000@gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eitan Adler <eitanadlerlist@gmail.com>
+To: Alexey Gladkov <gladkov.alexey@gmail.com>
 Cc: dash@vger.kernel.org
 
-Eitan Adler <eitanadlerlist@gmail.com> wrote:
-> mksignames.c fails to build on freeBSD.
-> If you apply the following patch the shell builds and based on very
-> limited testing the dash appears to work.
+Alexey Gladkov <gladkov.alexey@gmail.com> wrote:
+> 
+> I found another example:
+> 
+> $ tr -d '[:print:]' < /etc/passwd |tr -d '\t\n' |wc -c
+> 0
+> 
+> $ dash -c 'while read o p; do printf "[%s] [%s]\n" "$o" "$p"; done <
+> /etc/passwd' |tr -d '[:print:]' |tr -d '[:space:]' |wc -c
+> 61
+> 
+> bug is not fixed yet :(
 
-Thanks, but I don't think this is enough.  We assume in plenty
-of other places that NSIG is the maximum for signal numbers, e.g.,
-traps.c.  So I think we need to change all those places if this is
-to work on FreeBSD.
+This bug is caused by an off-by-one error in the recordregion
+call in readcmd.  It included the terminating NUL in the region
+which causes ifsbreakup to include the string after it for scanning.
 
-Cheers,
+Setting the correct length fixes the problem.
+
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/ChangeLog b/ChangeLog
+index fabb0e1..7be8e86 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2009-11-26  Herbert Xu <herbert@gondor.apana.org.au>
++
++	Fix off-by-one recordregion in readcmd.
++
+ 2009-09-28  Jim Meyering  <meyering@redhat.com>
+ 
+ 	don't read-uninitialized for \177 in a here-doc
+diff --git a/src/miscbltin.c b/src/miscbltin.c
+index ec9872d..046f2f2 100644
+--- a/src/miscbltin.c
++++ b/src/miscbltin.c
+@@ -84,7 +84,7 @@ readcmd_handle_line(char *line, char **ap, size_t len)
+ 	backup = sstrdup(line);
+ 
+ 	arglist.lastp = &arglist.list;
+-	recordregion(0, len, 0);
++	recordregion(0, len - 1, 0);
+ 	
+ 	ifsbreakup(s, &arglist);
+ 	*arglist.lastp = NULL;
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
