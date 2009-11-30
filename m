@@ -1,40 +1,49 @@
-From: William Immendorf <will.immendorf@gmail.com>
-Subject: Dash fails to compile on UTF-8 with the Coreutils i18n patch
-Date: Sun, 29 Nov 2009 18:54:44 -0600
-Message-ID: <62234dc60911291654k6a4fc375o131af7460db907e4@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Dash fails to compile on UTF-8 with the Coreutils i18n patch
+Date: Mon, 30 Nov 2009 14:36:21 +0800
+Message-ID: <20091130063621.GA9950@gondor.apana.org.au>
+References: <62234dc60911291654k6a4fc375o131af7460db907e4@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ey-out-2122.google.com ([74.125.78.25]:21265 "EHLO
-	ey-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751682AbZK3Ayi (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 29 Nov 2009 19:54:38 -0500
-Received: by ey-out-2122.google.com with SMTP id 4so816781eyf.19
-        for <dash@vger.kernel.org>; Sun, 29 Nov 2009 16:54:44 -0800 (PST)
+Received: from rhun.apana.org.au ([64.62.148.172]:56391 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752281AbZK3GgS (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 30 Nov 2009 01:36:18 -0500
+Content-Disposition: inline
+In-Reply-To: <62234dc60911291654k6a4fc375o131af7460db907e4@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: William Immendorf <will.immendorf@gmail.com>
+Cc: dash@vger.kernel.org
 
-Hello,
+William Immendorf <will.immendorf@gmail.com> wrote:
+> Hello,
+> 
+> I think you might rember this madness if you were around the LFS/BLFS
+> lists and this list:
+> 
+> http://linuxfromscratch.org/pipermail/blfs-support/2009-August/065714.html
+> http://linuxfromscratch.org/pipermail/lfs-dev/2009-August/063125.html
+> http://www.mail-archive.com/dash@vger.kernel.org/msg00151.html
+> 
+> As of now, HEAD still fails with the exact same error!!!!!! The
+> solution: Change all LC_COLLATES to LC_CTYPES in mkbuiltins, and it
+> should work on the affected (Both LFS and Fedora), and on ones that
+> aren't affected. Please, can you dash that fix out for me?
 
-I think you might rember this madness if you were around the LFS/BLFS
-lists and this list:
+Well the fix just papers over the issue.
 
-http://linuxfromscratch.org/pipermail/blfs-support/2009-August/065714.html
-http://linuxfromscratch.org/pipermail/lfs-dev/2009-August/063125.html
-http://www.mail-archive.com/dash@vger.kernel.org/msg00151.html
+If you can reproduce the problem, please
 
-As of now, HEAD still fails with the exact same error!!!!!! The
-solution: Change all LC_COLLATES to LC_CTYPES in mkbuiltins, and it
-should work on the affected (Both LFS and Fedora), and on ones that
-aren't affected. Please, can you dash that fix out for me?
+1) Confirm that setting LC_CTYPES on the sed command only in
+mkbuiltins also fixes the issue;
+2) See if [[:lower:]] instead of [a-z] fixes the problem without
+LC_CTYPES.
 
+Thanks,
 -- 
-William Immendorf
-The ultimate in free computing.
-Messages in plain text, please, no HTML.
-
---------------
-
-"Every nonfree program has a lord, a master --
-and if you use the program, he is your master."  Richard Stallman
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
