@@ -1,43 +1,20 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: parameter expansion and double quotes
-Date: Sat, 16 Jan 2010 23:16:26 +1100
-Message-ID: <20100116121626.GA24920@gondor.apana.org.au>
-References: <20100115202052.GE14452@slt>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: "Alexis Baez" <lesiopnmster34@gmail.com>
+Subject: I have a list of 160k dentists in the US
+Date: 19 Jan 2010 19:40:29 +0100
+Message-ID: <SERVEURsVWDKpzxDPHp00000705@Serveur>
+Reply-To: dontsendemailhere@gmail.com
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57956 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752380Ab0APMQd (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 16 Jan 2010 07:16:33 -0500
-Content-Disposition: inline
-In-Reply-To: <20100115202052.GE14452@slt>
+Received: from cau33-4-82-243-168-192.fbx.proxad.net ([82.243.168.192]:53634
+	"EHLO Serveur" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752746Ab0ASSup (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 19 Jan 2010 13:50:45 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: SamLT <samuel.lethiec@intelunix.fr>
-Cc: dash@vger.kernel.org
+To: darias@usc.edu, dasonol@gmail.com, data@forturi.com
 
-SamLT <samuel.lethiec@intelunix.fr> wrote:
-> 
-> 
-> Hello,
-> 
-> I'm using dash 0.5.5.1, and noticed a strange behaviour:
-> 
-> | $ t=123
-> | $ echo ${t%${t#?}}
-> | 1
-> | $ echo "${t%${t#?}}"
-> | 
-> | $
-> 
-> Is it a bug or something?
+I have many good quality lists at decent prices. Drop me a line here:  Fran.Ambrose@highpowerlists.net
+I'll get you all the details and samples. 
+  
 
-Yes, this looks like a bug.  I'll look into it.
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+By emailing disappear@highpowerlists.net you will have your email taken off
