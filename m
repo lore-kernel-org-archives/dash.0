@@ -1,58 +1,42 @@
-From: Oleg Verych <olecom@gmail.com>
-Subject: Re: Output redirection to block-defined filehandle
-Date: Tue, 9 Feb 2010 14:43:23 +0200
-Message-ID: <8499950a1002090443rd390c4fs33496944a068412e@mail.gmail.com>
-References: <46a038f91001281410g54a000darc5b7c87e9012d53e@mail.gmail.com>
+From: Eric Blake <ebb9@byu.net>
+Subject: test -x should use faccessat, not stat
+Date: Wed, 10 Feb 2010 15:32:30 +0000 (UTC)
+Message-ID: <loom.20100210T162915-629@post.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-bw0-f219.google.com ([209.85.218.219]:36537 "EHLO
-	mail-bw0-f219.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753794Ab0BIMnZ convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Tue, 9 Feb 2010 07:43:25 -0500
-Received: by bwz19 with SMTP id 19so764010bwz.28
-        for <dash@vger.kernel.org>; Tue, 09 Feb 2010 04:43:23 -0800 (PST)
-In-Reply-To: <46a038f91001281410g54a000darc5b7c87e9012d53e@mail.gmail.com>
+Received: from lo.gmane.org ([80.91.229.12]:57859 "EHLO lo.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752464Ab0BJPdA (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 10 Feb 2010 10:33:00 -0500
+Received: from list by lo.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1NfEYk-0000k5-11
+	for dash@vger.kernel.org; Wed, 10 Feb 2010 16:32:58 +0100
+Received: from l3-128-170-36-102.l-3com.com ([128.170.36.102])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Wed, 10 Feb 2010 16:32:58 +0100
+Received: from ebb9 by l3-128-170-36-102.l-3com.com with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Wed, 10 Feb 2010 16:32:58 +0100
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Martin Langhoff <martin.langhoff@gmail.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-2010/1/29 Martin Langhoff <martin.langhoff@gmail.com>:
+This report was originally raised on the cygwin list:
 
-Hallo, Martin.
+http://cygwin.com/ml/cygwin/2010-02/msg00239.html
 
-> The flock binary in modern linuxes (from util-linux-ng) supports
-> flocking a filehandle that is handled by the shell. Combining this
-> with per-code-block filehandles / io redirection, it is an incredibly
-> useful construct to protect a code block with a lock.
->
-> The resulting code looks like this (from man flock on Fedora 11):
->
->      (
->         flock -s 200
->         # ... commands executed under lock ...
->       ) 200>/var/lock/mylockfile
->
-> I am now discovering that this works in bash, but not in dash.
+In short, in the presence of ACLs, dash's implementation of test -r, test -w, 
+and test -x gives incorrect answers, when the current user has permissions to 
+access a file that were granted by ACLs but not by the current stat() 
+permissions.  dash should be using faccessat(,AT_EACCESS) (or 
+eaccess/euidaccess) if available, rather than stat(), to determine whether a 
+file is accessible.
 
-What about implementation of the race-condition protection or locking
-using this scheme:
-* `umask 777` -- lock situation using file to be created
-* `{ echo =E2=80=9Ccreating file using =E2=80=98>=E2=80=99 in a working=
- block=E2=80=9D ; do_the_task ;
-} > lock_file`
-* paralel / concurrent task: `echo =E2=80=9Cchecking file for access us=
-ing
-=E2=80=98>=E2=80=99=E2=80=9D > lock_file && go || echo 'error: access d=
-enied' >&2`
-* `{ mv lock_file || rm lock_file || =E2=80=A6. ; } && chmod 666 lock_f=
-ile` --
-releasing the lock (order matters)
+-- 
+Eric Blake
 
---=20
-sed 'sed && sh + olecom =3D love'  <<  ''
--o--=3DO`C
- #oo'L O
-<___=3DE M
+
