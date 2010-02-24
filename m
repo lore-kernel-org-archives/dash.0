@@ -1,53 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: test -nt/-ot behavior
-Date: Tue, 23 Feb 2010 10:32:41 +0800
-Message-ID: <20100223023241.GA10821@gondor.apana.org.au>
-References: <20100221122100.GA9005@wopr.local.invalid> <20100222065043.GA28401@gondor.apana.org.au> <20100222103353.GA9924@wopr.local.invalid>
+From: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+Subject: Invalid signal used with trap causes dash to abort
+Date: Wed, 24 Feb 2010 11:23:34 +0100
+Message-ID: <A612847CFE53224C91B23E3A5B48BAC73EBD7D0507@xmail3.se.axis.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57534 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752823Ab0BWCco (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 22 Feb 2010 21:32:44 -0500
-Content-Disposition: inline
-In-Reply-To: <20100222103353.GA9924@wopr.local.invalid>
+Received: from krynn.se.axis.com ([193.13.178.10]:37396 "EHLO
+	krynn.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756442Ab0BXKpF convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Wed, 24 Feb 2010 05:45:05 -0500
+Received: from xmail3.se.axis.com (xmail3.se.axis.com [10.0.5.75])
+	by krynn.se.axis.com (8.14.3/8.14.3/Debian-5) with ESMTP id o1OANaVE006551
+	for <dash@vger.kernel.org>; Wed, 24 Feb 2010 11:23:36 +0100
+Content-Language: en-US
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Guido Berhoerster <guido+kernel.org@berhoerster.name>
-Cc: dash@vger.kernel.org
+To: "dash@vger.kernel.org" <dash@vger.kernel.org>
+Cc: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
 
-On Mon, Feb 22, 2010 at 11:33:53AM +0100, Guido Berhoerster wrote:
->
-> It is not doing something "wrong", but my point (and that of the
-> original reporter of
-> http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=558989) is that
-> it is diverging from established behavior in widely used shells
-> such a ksh88, ksh93, bash, pdksh, and GNU userland, as I said
-> this was even fixed in pdksh where it originally came from.  I
-> don't know how many /bin/dash scripts there are which rely on
-> this behavior from test -nt/-ot but it can't be that many and
-> dash has only been called das since 2002.  On the other hand dash
-> is being widely used as /bin/sh, e.g. in Ubuntu, Debian, and
-> hopefully soon openSUSE.
+Hi,
 
-Actually dash has been around since 1997, prior to 2002 it was
-known in Debian as ash.  So this behaviour has been around for
-more than a decade.
- 
-> If dash aims to be a POSIX compliant /bin/sh which is "as small
-> as possible", why does it need test -nt/-ot/-ef at all?  BTW, why
-> did you go with pdksh's test instead of the one coming with ash?
+there seems to be a problem  with the trap implementation in dash
+(tested with 0.5.4 and 0.5.5.1). If I specify a signal which is not 
+supported, the shell unconditionally aborts. E.g., I had expected
+the following to print foo (like bash and zsh do):
 
-While dash does try to be minimal, existing features are not removed
-unless there is a very good reason.
+# dash -c 'trap "echo trap executed" UNKNOWNSIGNAL || echo "foo"'
+trap: 1: UNKNOWNSIGNAL: bad trap
 
-As to your second question, this behaviour is inherited from BSD
-which is where dash came from originally.
+This means I cannot write a construct like the following to take 
+advantage of the ERR signal which is present in some shells:
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+trap "echo ERR trap executed" ERR 2>/dev/null || :
+
+I also checked the POSIX documentation, and quoting from
+http://www.opengroup.org/onlinepubs/009695399/utilities/trap.html
+(exit status): "For both interactive and non-interactive shells, 
+invalid signal names [XSI] [Option Start] or numbers [Option End] 
+shall not be considered a syntax error and do not cause the shell 
+to abort."
+
+Best regards,
+//Peter
+
