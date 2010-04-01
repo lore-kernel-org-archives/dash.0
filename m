@@ -1,25 +1,28 @@
-From: Kim + Alissa <twentythreehundred2300@gmail.com>
-Subject: Nursing Homes - 31,589 Senior Administrators, 11,288 Nursing Directors in over 14,706 Nursing Homes (full contact info no emails)
-Date: Fri, 26 Mar 2010 06:21:15 +0100
-Message-ID: <f6ed7061-1677-4bce-afdf-4e3b9ec25840@AVISIONSERVER.a-vision.local>
-Reply-To: fhdgf63476@gmail.com
+From: Cramer $ Jefferson <gfhebcbey@aol.com>
+Subject: Optometrists - 63,837 records 2,015 emails
+Date: Thu, 1 Apr 2010 09:37:40 +0800
+Message-ID: <18d77778-1bae-444f-9de4-dbe5dbe02801@MAIL.nhd.net.cn>
+Reply-To: <kfjeurufhhj@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Return-path: <dash-owner@vger.kernel.org>
-Received: from 78-27-37-0.dsl.alice.nl ([78.27.37.0]:45384 "EHLO
-	AVISIONSERVER.a-vision.local" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752074Ab0CZF22 (ORCPT
-	<rfc822;dash@vger.kernel.org>); Fri, 26 Mar 2010 01:28:28 -0400
+Received: from [121.9.231.171] ([121.9.231.171]:25147 "EHLO MAIL.nhd.net.cn"
+	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1758585Ab0DABnJ (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 31 Mar 2010 21:43:09 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org, darkmoon3d@hotmail.com, darnold@ofbf.org, daroza@smcl.org
+To: dartmouth.energy.symposium@dartmouth.edu, darshana.shah@xl-events.net, darren@herogames.com
 
-For details, samples and counts on our US listings please
-email me at my other email address  Elton.Heard@discountlistsource.cz.cc
+To get additional details, samples and counts for our USA contact data please
+email me at this address Claudette.Cortez@listmasters.co.cc
 
+we have lots of different lists in many fields and this week is the time to buy with lowered list prices.
   
 
 
 
 
-Forward email to rembox@discountlistsource.cz.cc to purge you from our records
+Forward email to rembox@listmasters.co.cc to purge you from our records
+
+them blank
