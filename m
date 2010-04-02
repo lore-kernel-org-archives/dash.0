@@ -1,28 +1,58 @@
-From: Cramer $ Jefferson <gfhebcbey@aol.com>
-Subject: Optometrists - 63,837 records 2,015 emails
-Date: Thu, 1 Apr 2010 09:37:40 +0800
-Message-ID: <18d77778-1bae-444f-9de4-dbe5dbe02801@MAIL.nhd.net.cn>
-Reply-To: <kfjeurufhhj@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/2] [BUILTIN] respect eventual TMPDIR set
+Date: Fri, 2 Apr 2010 13:03:51 +0800
+Message-ID: <20100402050351.GB28307@gondor.apana.org.au>
+References: <1269213818-23910-1-git-send-email-max@stro.at> <1269213818-23910-2-git-send-email-max@stro.at>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from [121.9.231.171] ([121.9.231.171]:25147 "EHLO MAIL.nhd.net.cn"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1758585Ab0DABnJ (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 31 Mar 2010 21:43:09 -0400
+Received: from helcar.apana.org.au ([209.40.204.226]:36123 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757938Ab0DBFZ3 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 2 Apr 2010 01:25:29 -0400
+Content-Disposition: inline
+In-Reply-To: <1269213818-23910-2-git-send-email-max@stro.at>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dartmouth.energy.symposium@dartmouth.edu, darshana.shah@xl-events.net, darren@herogames.com
+To: maximilian attems <max@stro.at>
+Cc: dash@vger.kernel.org
 
-To get additional details, samples and counts for our USA contact data please
-email me at this address Claudette.Cortez@listmasters.co.cc
+On Mon, Mar 22, 2010 at 12:23:38AM +0100, maximilian attems wrote:
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> while merging upstream dash in klibc,
+> noticed that klibc dash had grown that useful feature.
+> 
+> Signed-off-by: maximilian attems <max@stro.at>
 
-we have lots of different lists in many fields and this week is the time to buy with lowered list prices.
-  
+Patch applied.  BTW, please cc dash@vger.kernel.org on all patch
+submissions.
 
+Thanks,
 
+> ---
+>  src/mkbuiltins |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/src/mkbuiltins b/src/mkbuiltins
+> index 064cb76..e38ce4c 100644
+> --- a/src/mkbuiltins
+> +++ b/src/mkbuiltins
+> @@ -37,7 +37,7 @@
+>  
+>  tempfile=tempfile
+>  if ! type tempfile > /dev/null 2>&1; then
+> -	tempfile='mktemp /tmp/mkbuiltins.XXXXXX'
+> +	tempfile="mktemp ${TMPDIR:-/tmp}/builtin.XXXXXX"
+>  fi
+>  
+>  trap 'rm -f $temp $temp2' EXIT
+> -- 
+> 1.7.0.2
+> 
 
-
-Forward email to rembox@listmasters.co.cc to purge you from our records
-
-them blank
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
