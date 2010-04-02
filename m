@@ -1,85 +1,150 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Invalid signal used with trap causes dash to abort
-Date: Fri, 2 Apr 2010 14:01:20 +0800
-Message-ID: <20100402060119.GE28307@gondor.apana.org.au>
-References: <A612847CFE53224C91B23E3A5B48BAC73EBD7D0507@xmail3.se.axis.com>
+Subject: Re: test -x should use faccessat, not stat
+Date: Fri, 2 Apr 2010 22:03:53 +0800
+Message-ID: <20100402140353.GA31098@gondor.apana.org.au>
+References: <20100214061137.GA9882@gondor.apana.org.au> <4B794CA2.1080707@byu.net> <20100216120413.GA32318@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:59820 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:49657 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755729Ab0DBGBX (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 2 Apr 2010 02:01:23 -0400
+	with ESMTP id S1752918Ab0DBOD6 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 2 Apr 2010 10:03:58 -0400
 Content-Disposition: inline
-In-Reply-To: <A612847CFE53224C91B23E3A5B48BAC73EBD7D0507@xmail3.se.axis.com>
+In-Reply-To: <20100216120413.GA32318@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
-Cc: "dash@vger.kernel.org" <dash@vger.kernel.org>
+To: Eric Blake <ebb9@byu.net>
+Cc: dash@vger.kernel.org
 
-commit 2533d0df20e871da156d80078b79d93c8c02f0ad
+On Tue, Feb 16, 2010 at 08:04:13PM +0800, Herbert Xu wrote:
+> 
+> First of all I completely agree with you that the current dash
+> behaviour is busted.  As to how we should fix it, let me think
+> about this a little more before making a decision.
+
+After much deliberation (alright, I've simply been busy elsewhere :)
+I've committed this patch.
+
+commit 1d68712ba2e439f36874c4ed1e3d9ffec177a06c
 Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri Apr 2 13:59:42 2010 +0800
+Date:   Fri Apr 2 22:02:22 2010 +0800
 
-    [BUILTIN] Make trap signal name/number errors non-fatal.
+    [BUILTIN] Use faccessat if available
     
-    On Wed, Feb 24, 2010 at 10:23:34AM +0000, Peter Kjellerstedt wrote:
-    >
-    > there seems to be a problem  with the trap implementation in dash
-    > (tested with 0.5.4 and 0.5.5.1). If I specify a signal which is not
-    > supported, the shell unconditionally aborts. E.g., I had expected
-    > the following to print foo (like bash and zsh do):
-    >
-    > # dash -c 'trap "echo trap executed" UNKNOWNSIGNAL || echo "foo"'
-    > trap: 1: UNKNOWNSIGNAL: bad trap
-    >
-    > This means I cannot write a construct like the following to take
-    > advantage of the ERR signal which is present in some shells:
-    >
-    > trap "echo ERR trap executed" ERR 2>/dev/null || :
-    >
-    > I also checked the POSIX documentation, and quoting from
-    > http://www.opengroup.org/onlinepubs/009695399/utilities/trap.html
-    > (exit status): "For both interactive and non-interactive shells,
-    > invalid signal names [XSI] [Option Start] or numbers [Option End]
-    > shall not be considered a syntax error and do not cause the shell
-    > to abort."
+    Eric Blake suggested that we should use faccessat so that ACLs
+    and other corner cases are handled correctly.  This patch does
+    exactly that.
     
-    This patch replaces sh_error with a outfmt + return 1 in trapcmd
-    so that these errors are no longer fatal.
+    Note that faccessat doesn't handle ACLs when euid != uid, as
+    this case is currently implemented by glibc instead of the kernel,
+    using code similar to the existing dash test.
     
     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/ChangeLog b/ChangeLog
-index d57ebc1..bc36ab1 100644
+index 7af5070..9f63819 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,7 @@
+@@ -1,5 +1,9 @@
+ 2010-04-02  Herbert Xu <herbert@gondor.apana.org.au>
+ 
++	* Use faccessat if available.
++
 +2010-04-02  Herbert Xu <herbert@gondor.apana.org.au>
 +
-+	* Make trap signal name/number errors non-fatal.
-+
- 2010-04-02  maximilian attems <max@stro.at>
+ 	* Make trap signal name/number errors non-fatal.
+ 	* Release 0.5.6.
  
- 	* Use TMPDIR in mkbuiltins.
-diff --git a/src/trap.c b/src/trap.c
-index 16703b3..3f93c46 100644
---- a/src/trap.c
-+++ b/src/trap.c
-@@ -117,8 +117,10 @@ trapcmd(int argc, char **argv)
- 	else
- 		action = *ap++;
- 	while (*ap) {
--		if ((signo = decode_signal(*ap, 0)) < 0)
--			sh_error("%s: bad trap", *ap);
-+		if ((signo = decode_signal(*ap, 0)) < 0) {
-+			outfmt(out2, "trap: %s: bad trap\n", *ap);
-+			return 1;
-+		}
- 		INTOFF;
- 		if (action) {
- 			if (action[0] == '-' && action[1] == '\0')
+diff --git a/configure.ac b/configure.ac
+index df6e099..c943725 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -46,7 +46,8 @@ dnl Checks for header files.
+ AC_CHECK_HEADERS(alloca.h)
+ 
+ dnl Checks for library functions.
+-AC_CHECK_FUNCS(bsearch getpwnam getrlimit imaxdiv isalpha killpg mempcpy \
++AC_CHECK_FUNCS(bsearch faccessat getpwnam getrlimit imaxdiv isalpha killpg \
++	       mempcpy \
+ 	       sigsetmask stpcpy strchrnul strsignal strtod strtoimax \
+ 	       strtoumax sysconf)
+ 
+diff --git a/src/bltin/test.c b/src/bltin/test.c
+index 8e7077a..7888f38 100644
+--- a/src/bltin/test.c
++++ b/src/bltin/test.c
+@@ -11,6 +11,7 @@
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ 
++#include <fcntl.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -147,8 +148,12 @@ static int isoperand(char **);
+ static int newerf(const char *, const char *);
+ static int olderf(const char *, const char *);
+ static int equalf(const char *, const char *);
++#ifdef HAVE_FACCESSAT
++static int test_file_access(const char *, int);
++#else
+ static int test_st_mode(const struct stat64 *, int);
+ static int bash_group_member(gid_t);
++#endif
+ 
+ static inline intmax_t getn(const char *s)
+ {
+@@ -295,6 +300,14 @@ primary(enum token n)
+ 			return strlen(*t_wp) != 0;
+ 		case FILTT:
+ 			return isatty(getn(*t_wp));
++#ifdef HAVE_FACCESSAT
++		case FILRD:
++			return test_file_access(*t_wp, R_OK);
++		case FILWR:
++			return test_file_access(*t_wp, W_OK);
++		case FILEX:
++			return test_file_access(*t_wp, X_OK);
++#endif
+ 		default:
+ 			return filstat(*t_wp, n);
+ 		}
+@@ -364,12 +377,14 @@ filstat(char *nm, enum token mode)
+ 		return 0;
+ 
+ 	switch (mode) {
++#ifndef HAVE_FACCESSAT
+ 	case FILRD:
+ 		return test_st_mode(&s, R_OK);
+ 	case FILWR:
+ 		return test_st_mode(&s, W_OK);
+ 	case FILEX:
+ 		return test_st_mode(&s, X_OK);
++#endif
+ 	case FILEXIST:
+ 		return 1;
+ 	case FILREG:
+@@ -469,6 +484,12 @@ equalf (const char *f1, const char *f2)
+ 		b1.st_ino == b2.st_ino);
+ }
+ 
++#ifdef HAVE_FACCESSAT
++static int test_file_access(const char *path, int mode)
++{
++	return !faccessat(AT_FDCWD, path, mode, AT_EACCESS);
++}
++#else	/* HAVE_FACCESSAT */
+ /*
+  * Similar to what access(2) does, but uses the effective uid and gid.
+  * Doesn't make the mistake of telling root that any file is executable.
+@@ -519,3 +540,4 @@ bash_group_member(gid_t gid)
+ 
+ 	return (0);
+ }
++#endif	/* HAVE_FACCESSAT */
 
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
