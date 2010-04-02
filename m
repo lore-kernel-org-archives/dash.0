@@ -1,58 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] [BUILTIN] respect eventual TMPDIR set
-Date: Fri, 2 Apr 2010 13:03:51 +0800
-Message-ID: <20100402050351.GB28307@gondor.apana.org.au>
-References: <1269213818-23910-1-git-send-email-max@stro.at> <1269213818-23910-2-git-send-email-max@stro.at>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: y@dual.stro.at
+Subject: [PATCH] [klibc] dash: cd fix getpwd
+Date: Fri,  2 Apr 2010 07:26:26 +0200
+Message-ID: <25483.5319974974$1270186025@news.gmane.org>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:36123 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757938Ab0DBFZ3 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 2 Apr 2010 01:25:29 -0400
-Content-Disposition: inline
-In-Reply-To: <1269213818-23910-2-git-send-email-max@stro.at>
+Received: from baikonur.stro.at ([213.239.196.228]:40977 "EHLO
+	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757938Ab0DBF06 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 2 Apr 2010 01:26:58 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: maximilian attems <max@stro.at>
-Cc: dash@vger.kernel.org
+To: klibc@zytor.com
+Cc: "H. Peter Anvin" <hpa@zytor.com>, dash@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, maximilian attems <max@stro.at>
 
-On Mon, Mar 22, 2010 at 12:23:38AM +0100, maximilian attems wrote:
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> while merging upstream dash in klibc,
-> noticed that klibc dash had grown that useful feature.
-> 
-> Signed-off-by: maximilian attems <max@stro.at>
+From: maximilian attems <max@stro.at>
 
-Patch applied.  BTW, please cc dash@vger.kernel.org on all patch
-submissions.
+On review of klibc dash changes:
+"Hmm, this breaks the non-glibc case. You're now returning a pointer to a
+string on the stack which is illegal." Herbert Xu
 
-Thanks,
+Use upstream dash way.
 
-> ---
->  src/mkbuiltins |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/src/mkbuiltins b/src/mkbuiltins
-> index 064cb76..e38ce4c 100644
-> --- a/src/mkbuiltins
-> +++ b/src/mkbuiltins
-> @@ -37,7 +37,7 @@
->  
->  tempfile=tempfile
->  if ! type tempfile > /dev/null 2>&1; then
-> -	tempfile='mktemp /tmp/mkbuiltins.XXXXXX'
-> +	tempfile="mktemp ${TMPDIR:-/tmp}/builtin.XXXXXX"
->  fi
->  
->  trap 'rm -f $temp $temp2' EXIT
-> -- 
-> 1.7.0.2
-> 
+Signed-off-by: maximilian attems <max@stro.at>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ usr/dash/cd.c |    7 ++++---
+ 1 files changed, 4 insertions(+), 3 deletions(-)
 
+diff --git a/usr/dash/cd.c b/usr/dash/cd.c
+index 8a23110..ba9a1bc 100644
+--- a/usr/dash/cd.c
++++ b/usr/dash/cd.c
+@@ -253,12 +253,13 @@ getpwd()
+ {
+ #ifdef __GLIBC__
+ 	char *dir = getcwd(0, 0);
++	if (dir)
++		return dir;
+ #else
+ 	char buf[PATH_MAX];
+-	char *dir = getcwd(buf, sizeof(buf));
++	if(getcwd(buf, sizeof(buf)))
++		return savestr(buf);
+ #endif
+-	if (dir)
+-		return dir;
+ 	sh_warnx("getcwd() failed: %s", strerror(errno));
+ 	return nullstr;
+ }
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.0.3
+
