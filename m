@@ -1,18 +1,16 @@
-From: y@dual.stro.at
+From: maximilian attems <max@stro.at>
 Subject: [PATCH] [klibc] dash: cd fix getpwd
-Date: Fri,  2 Apr 2010 07:26:26 +0200
-Message-ID: <25483.5319974974$1270186025@news.gmane.org>
+Date: Fri,  2 Apr 2010 07:30:09 +0200
+Message-ID: <1270186209-14582-1-git-send-email-max@stro.at>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:40977 "EHLO
+Received: from baikonur.stro.at ([213.239.196.228]:48024 "EHLO
 	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757938Ab0DBF06 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 2 Apr 2010 01:26:58 -0400
+	with ESMTP id S1753012Ab0DBFaT (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 2 Apr 2010 01:30:19 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: klibc@zytor.com
 Cc: "H. Peter Anvin" <hpa@zytor.com>, dash@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, maximilian attems <max@stro.at>
-
-From: maximilian attems <max@stro.at>
 
 On review of klibc dash changes:
 "Hmm, this breaks the non-glibc case. You're now returning a pointer to a
@@ -23,6 +21,8 @@ Use upstream dash way.
 Signed-off-by: maximilian attems <max@stro.at>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 ---
+sorry for resend, mesed up previous sent.
+
  usr/dash/cd.c |    7 ++++---
  1 files changed, 4 insertions(+), 3 deletions(-)
 
