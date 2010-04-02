@@ -1,67 +1,37 @@
-From: maximilian attems <max@stro.at>
-Subject: Re: (fwd) dash fix for job control off warning
-Date: Fri, 2 Apr 2010 16:47:51 +0200
-Message-ID: <20100402144751.GA32211@baikonur.stro.at>
-References: <20100402143220.GC6199@stro.at> <20100402144220.GB31158@gondor.apana.org.au>
+From: Eric Blake <ebb9@byu.net>
+Subject: Re: test -x should use faccessat, not stat
+Date: Fri, 02 Apr 2010 08:57:59 -0600
+Message-ID: <4BB605F7.8030505@byu.net>
+References: <20100214061137.GA9882@gondor.apana.org.au> <4B794CA2.1080707@byu.net> <20100216120413.GA32318@gondor.apana.org.au> <20100402140353.GA31098@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:40665 "EHLO
-	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751443Ab0DBOzg (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 2 Apr 2010 10:55:36 -0400
-Content-Disposition: inline
-In-Reply-To: <20100402144220.GB31158@gondor.apana.org.au>
+Received: from qmta14.emeryville.ca.mail.comcast.net ([76.96.27.212]:59561
+	"EHLO qmta14.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751443Ab0DBPEA (ORCPT
+	<rfc822;dash@vger.kernel.org>); Fri, 2 Apr 2010 11:04:00 -0400
+In-Reply-To: <20100402140353.GA31098@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, klibc@zytor.com
+Cc: dash@vger.kernel.org
 
-On Fri, Apr 02, 2010 at 10:42:20PM +0800, Herbert Xu wrote:
-> On Fri, Apr 02, 2010 at 04:32:20PM +0200, maximilian attems wrote:
-> >
-> > Pulled this; there seems to be a problem with the new version of da=
-sh
-> > with job control off.  I can't tell if it is just a warning or is a
-> > manifest bug.
-> >=20
-> > The solution is simple:
-> >=20
-> > --- a/usr/dash/jobs.h
-> > +++ b/usr/dash/jobs.h
-> > @@ -105,5 +105,5 @@ int waitforjob(struct job *);
-> >  int stoppedjobs(void);
-> >=20
-> >  #if ! JOBS
-> > -#define setjobctl(on)  /* do nothing */
-> > +#define setjobctl(on) ((void)(on))     /* do nothing */
-> >  #endif
-> >=20
-> > ... to keep the code syntactically valid even when setjobctl() is u=
-sed
-> > as the body of an if statement.
->=20
-> So when exactly is this needed? Can you give an example?
+According to Herbert Xu on 4/2/2010 8:03 AM:
+> After much deliberation (alright, I've simply been busy elsewhere :)
+> I've committed this patch.
+> 
+> commit 1d68712ba2e439f36874c4ed1e3d9ffec177a06c
+>     Note that faccessat doesn't handle ACLs when euid != uid, as
+>     this case is currently implemented by glibc instead of the kernel,
+>     using code similar to the existing dash test.
 
-usr/dash/trap.c: In function `exitshell':
-usr/dash/trap.c:376: warning: suggest braces around empty body in an `i=
-f' statement
+That faccessat bug is only true for current Linux kernels.  Cygwin
+faccessat does the correct thing, even when euid != uid.
 
-exitshell() has:
+Thanks for applying this.
 
-        /*
-         * Disable job control so that whoever had the foreground befor=
-e we
-         * started can get it back.
-         */
-        if (likely(!setjmp(loc.loc)))
-                setjobctl(0);
+-- 
+Don't work too hard, make some time for fun as well!
 
-
-aboves patch fixes this gcc warning for me, but I still see:
-  KLIBCCC usr/dash/trap.o
-usr/dash/trap.c: In function =E2=80=98exitshell=E2=80=99:
-usr/dash/trap.c:352: warning: variable =E2=80=98status=E2=80=99 might b=
-e clobbered by =E2=80=98longjmp=E2=80=99 or =E2=80=98vfork=E2=80=99
-
+Eric Blake             ebb9@byu.net
