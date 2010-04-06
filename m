@@ -1,37 +1,58 @@
-From: Eric Blake <ebb9@byu.net>
-Subject: Re: test -x should use faccessat, not stat
-Date: Fri, 02 Apr 2010 08:57:59 -0600
-Message-ID: <4BB605F7.8030505@byu.net>
-References: <20100214061137.GA9882@gondor.apana.org.au> <4B794CA2.1080707@byu.net> <20100216120413.GA32318@gondor.apana.org.au> <20100402140353.GA31098@gondor.apana.org.au>
+From: maximilian attems <max@stro.at>
+Subject: [patch v2] dash fix for job control off warning
+Date: Wed, 7 Apr 2010 00:19:25 +0200
+Message-ID: <20100406221925.GE7863@stro.at>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from qmta14.emeryville.ca.mail.comcast.net ([76.96.27.212]:59561
-	"EHLO qmta14.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751443Ab0DBPEA (ORCPT
-	<rfc822;dash@vger.kernel.org>); Fri, 2 Apr 2010 11:04:00 -0400
-In-Reply-To: <20100402140353.GA31098@gondor.apana.org.au>
+Received: from baikonur.stro.at ([213.239.196.228]:42382 "EHLO
+	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932085Ab0DGACa (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 6 Apr 2010 20:02:30 -0400
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, klibc@zytor.com
 
-According to Herbert Xu on 4/2/2010 8:03 AM:
-> After much deliberation (alright, I've simply been busy elsewhere :)
-> I've committed this patch.
-> 
-> commit 1d68712ba2e439f36874c4ed1e3d9ffec177a06c
->     Note that faccessat doesn't handle ACLs when euid != uid, as
->     this case is currently implemented by glibc instead of the kernel,
->     using code similar to the existing dash test.
+fix subject and added warning to patch mail,
+thanks for review.
 
-That faccessat bug is only true for current Linux kernels.  Cygwin
-faccessat does the correct thing, even when euid != uid.
+----- Forwarded message from "H. Peter Anvin" <hpa@zytor.com> -----
 
-Thanks for applying this.
+Date: Mon, 29 Mar 2010 15:07:01 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: maximilian attems <max@stro.at>
+Cc: Colin Watson <cjwatson@ubuntu.com>, klibc@zytor.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+Subject: Re: [klibc] dash fix for job control off warning
 
+There seems to be a problem with the new version of dash
+with job control off.  I can't tell if it is just a warning or is a
+manifest bug.
+
+usr/dash/trap.c: In function `exitshell':
+usr/dash/trap.c:376: warning: suggest braces around empty body in an `if' statement
+
+The solution is simple:
+
+--- a/usr/dash/jobs.h
++++ b/usr/dash/jobs.h
+@@ -105,5 +105,5 @@ int waitforjob(struct job *);
+ int stoppedjobs(void);
+
+ #if ! JOBS
+-#define setjobctl(on)  /* do nothing */
++#define setjobctl(on) ((void)(on))     /* do nothing */
+ #endif
+
+... to keep the code syntactically valid even when setjobctl() is used
+as the body of an if statement.
+
+	-hpa
+
+----- End forwarded message -----
 -- 
-Don't work too hard, make some time for fun as well!
+maks
 
-Eric Blake             ebb9@byu.net
