@@ -1,266 +1,125 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/4] [VAR] Replace cmdenviron with localvars
-Date: Wed, 26 May 2010 21:00:34 +1000
-Message-ID: <E1OHELi-0006sy-Nn@gondolin.me.apana.org.au>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: [PATCH 1/4] [VAR] Add localvars nesting
+Date: Wed, 26 May 2010 23:55:33 +0200
+Message-ID: <20100526215533.GA5679@stack.nl>
 References: <20100526105948.GA26352@gondor.apana.org.au>
+ <E1OHELf-0006sP-9S@gondolin.me.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:34517 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752838Ab0EZLAk (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 26 May 2010 07:00:40 -0400
+Received: from relay02.stack.nl ([131.155.140.104]:56445 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752952Ab0EZVzf (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 26 May 2010 17:55:35 -0400
+Content-Disposition: inline
+In-Reply-To: <E1OHELf-0006sP-9S@gondolin.me.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Geoff Clare <gwc@opengroup.org>, dash@vger.kernel.org, pape@smarden.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org, pape@smarden.org
 
-[VAR] Replace cmdenviron with localvars
+On Wed, May 26, 2010 at 09:00:31PM +1000, Herbert Xu wrote:
+> [VAR] Add localvars nesting
 
-This patch replaces the cmdenviron mechanism for temporary command
-variables with the localvars mechanism used by functions.
+> This patch adds localvars nesting infrastructure so we can reuse
+> the localvars mechanism for command evaluation.
 
-This reduces code size, and more importantly, makes the variable
-assignment take effect immediately as required by POSIX.
+localvars could already nest, it's just that this change makes the
+nesting explicit instead of on the C stack.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+Further comments inline.
 
- ChangeLog  |    4 ++++
- src/eval.c |   23 +++++++++--------------
- src/eval.h |    1 -
- src/var.c  |   45 ++++++++++++++++++++-------------------------
- src/var.h  |   15 +++++++++++++--
- 5 files changed, 46 insertions(+), 42 deletions(-)
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
 
-diff --git a/ChangeLog b/ChangeLog
-index 1f7120f..bf1f13c 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,7 @@
-+2010-05-26  Herbert Xu <herbert@gondor.apana.org.au>
-+
-+	* Replace cmdenviron with localvars.
-+
- 2010-05-25  Herbert Xu <herbert@gondor.apana.org.au>
- 
- 	* Fix poplocalvar leak.
-diff --git a/src/eval.c b/src/eval.c
-index 8d2767c..a6981a9 100644
---- a/src/eval.c
-+++ b/src/eval.c
-@@ -77,7 +77,6 @@ static int funcnest;		/* depth of function calls */
- 
- 
- char *commandname;
--struct strlist *cmdenviron;
- int exitstatus;			/* exit status of last command */
- int back_exitstatus;		/* exit status of backquoted command */
- 
-@@ -704,6 +703,7 @@ evalcommand(union node *cmd, int flags)
- 	/* First expand the arguments. */
- 	TRACE(("evalcommand(0x%lx, %d) called\n", (long)cmd, flags));
- 	setstackmark(&smark);
-+	pushlocalvars();
- 	back_exitstatus = 0;
- 
- 	cmdentry.cmdtype = CMDBUILTIN;
-@@ -748,6 +748,8 @@ evalcommand(union node *cmd, int flags)
- 		spp = varlist.lastp;
- 		expandarg(argp, &varlist, EXP_VARTILDE);
- 
-+		mklocal((*spp)->text);
-+
- 		/*
- 		 * Modify the command lookup path, if a PATH= assignment
- 		 * is present
-@@ -835,6 +837,7 @@ bail:
- 			if (forkshell(jp, cmd, FORK_FG) != 0) {
- 				exitstatus = waitforjob(jp);
- 				INTON;
-+				poplocalvars(0);
- 				break;
- 			}
- 			FORCEINTON;
-@@ -844,17 +847,9 @@ bail:
- 		/* NOTREACHED */
- 
- 	case CMDBUILTIN:
--		cmdenviron = varlist.list;
--		if (cmdenviron) {
--			struct strlist *list = cmdenviron;
--			int i = VNOSET;
--			if (spclbltin > 0 || argc == 0) {
--				i = 0;
--				if (execcmd && argc > 1)
--					i = VEXPORT;
--			}
--			listsetvar(list, i);
--		}
-+		poplocalvars(spclbltin > 0 || argc == 0);
-+		if (execcmd && argc > 1)
-+			listsetvar(varlist.list, VEXPORT);
- 		if (evalbltin(cmdentry.u.cmd, argc, argv, flags)) {
- 			int status;
- 			int i;
-@@ -875,7 +870,7 @@ raise:
- 		break;
- 
- 	case CMDFUNCTION:
--		listsetvar(varlist.list, 0);
-+		poplocalvars(1);
- 		if (evalfun(cmdentry.u.func, argc, argv, flags))
- 			goto raise;
- 		break;
-@@ -949,7 +944,7 @@ evalfun(struct funcnode *func, int argc, char **argv, int flags)
- 	shellparam.optoff = -1;
- 	pushlocalvars();
- 	evaltree(&func->n, flags & EV_TESTED);
--	poplocalvars();
-+	poplocalvars(0);
- funcdone:
- 	INTOFF;
- 	funcnest--;
-diff --git a/src/eval.h b/src/eval.h
-index e190b28..ac394e8 100644
---- a/src/eval.h
-+++ b/src/eval.h
-@@ -37,7 +37,6 @@
- extern char *commandname;	/* currently executing command */
- extern int exitstatus;		/* exit status of last command */
- extern int back_exitstatus;	/* exit status of backquoted command */
--extern struct strlist *cmdenviron;  /* environment for builtin command */
- 
- 
- struct backcmd {		/* result of evalbackcmd */
-diff --git a/src/var.c b/src/var.c
-index 12f2f6c..40bd3fd 100644
---- a/src/var.c
-+++ b/src/var.c
-@@ -44,7 +44,6 @@
- #include "output.h"
- #include "expand.h"
- #include "nodes.h"	/* for other headers */
--#include "eval.h"	/* defines cmdenviron */
- #include "exec.h"
- #include "syntax.h"
- #include "options.h"
-@@ -104,7 +103,6 @@ struct var varinit[] = {
- 
- STATIC struct var *vartab[VTABSIZE];
- 
--STATIC void mklocal(char *);
- STATIC struct var **hashvar(const char *);
- STATIC int vpcmp(const void *, const void *);
- STATIC struct var **findvar(struct var **, const char *);
-@@ -147,7 +145,7 @@ INIT {
- 
- RESET {
- 	while (localvar_stack)
--		poplocalvars();
-+		poplocalvars(0);
- }
- #endif
- 
-@@ -339,24 +337,6 @@ intmax_t lookupvarint(const char *name)
- 
- 
- /*
-- * Search the environment of a builtin command.
-- */
--
--char *
--bltinlookup(const char *name)
--{
--	struct strlist *sp;
--
--	for (sp = cmdenviron ; sp ; sp = sp->next) {
--		if (varequal(sp->text, name))
--			return strchrnul(sp->text, '=') + 1;
--	}
--	return lookupvar(name);
--}
--
--
--
--/*
-  * Generate a list of variables satisfying the given conditions.
-  */
- 
-@@ -486,8 +466,7 @@ localcmd(int argc, char **argv)
-  * "-" as a special case.
-  */
- 
--STATIC void
--mklocal(char *name)
-+void mklocal(char *name)
- {
- 	struct localvar *lvp;
- 	struct var **vpp;
-@@ -534,7 +513,7 @@ mklocal(char *name)
-  */
- 
- void
--poplocalvars(void)
-+poplocalvars(int keep)
- {
- 	struct localvar_list *ll;
- 	struct localvar *lvp, *next;
-@@ -551,7 +530,23 @@ poplocalvars(void)
- 		next = lvp->next;
- 		vp = lvp->vp;
- 		TRACE(("poplocalvar %s", vp ? vp->text : "-"));
--		if (vp == NULL) {	/* $- saved */
-+		if (keep) {
-+			int bits = VSTRFIXED;
-+
-+			if (lvp->flags != VUNSET) {
-+				if (vp->text == lvp->text)
-+					bits |= VTEXTFIXED;
-+				else if (!(lvp->flags & (VTEXTFIXED|VSTACK)))
-+					ckfree(lvp->text);
-+			}
-+
-+			vp->flags &= ~bits;
-+			vp->flags |= (lvp->flags & bits);
-+
-+			if ((vp->flags &
-+			     (VEXPORT|VREADONLY|VSTRFIXED|VUNSET)) == VUNSET)
-+				unsetvar(vp->text);
-+		} else if (vp == NULL) {	/* $- saved */
- 			memcpy(optlist, lvp->text, sizeof(optlist));
- 			ckfree(lvp->text);
- 			optschanged();
-diff --git a/src/var.h b/src/var.h
-index 2bb82b1..ef6d583 100644
---- a/src/var.h
-+++ b/src/var.h
-@@ -133,14 +133,14 @@ struct strlist;
- void listsetvar(struct strlist *, int);
- char *lookupvar(const char *);
- intmax_t lookupvarint(const char *);
--char *bltinlookup(const char *);
- char **listvars(int, int, char ***);
- #define environment() listvars(VEXPORT, VUNSET, 0)
- int showvars(const char *, int, int);
- int exportcmd(int, char **);
- int localcmd(int, char **);
-+void mklocal(char *);
- void pushlocalvars(void);
--void poplocalvars(void);
-+void poplocalvars(int);
- int unsetcmd(int, char **);
- void unsetvar(const char *);
- int varcmp(const char *, const char *);
-@@ -148,3 +148,14 @@ int varcmp(const char *, const char *);
- static inline int varequal(const char *a, const char *b) {
- 	return !varcmp(a, b);
- }
-+
-+/*
-+ * Search the environment of a builtin command.
-+ */
-+
-+static inline char *bltinlookup(const char *name)
-+{
-+	return lookupvar(name);
-+}
-+
-+
+>  ChangeLog  |    4 ++++
+>  src/eval.c |    7 ++-----
+>  src/var.c  |   50 ++++++++++++++++++++++++++++++++++++++++++++------
+>  src/var.h  |    1 +
+>  4 files changed, 51 insertions(+), 11 deletions(-)
+
+> diff --git a/ChangeLog b/ChangeLog
+> index ee78154..7285a23 100644
+> --- a/ChangeLog
+> +++ b/ChangeLog
+> @@ -1,3 +1,7 @@
+> +2010-05-24  Herbert Xu <herbert@gondor.apana.org.au>
+> +
+> +	* Add localvars nesting.
+> +
+>  2010-05-03  Gerrit Pape <pape@smarden.org>
+>  
+>  	* Fix command -- crash.
+> diff --git a/src/eval.c b/src/eval.c
+> index 62d9d5d..8d2767c 100644
+> --- a/src/eval.c
+> +++ b/src/eval.c
+> @@ -928,20 +928,17 @@ STATIC int
+>  evalfun(struct funcnode *func, int argc, char **argv, int flags)
+>  {
+>  	volatile struct shparam saveparam;
+> -	struct localvar *volatile savelocalvars;
+>  	struct jmploc *volatile savehandler;
+>  	struct jmploc jmploc;
+>  	int e;
+>  
+>  	saveparam = shellparam;
+> -	savelocalvars = localvars;
+>  	if ((e = setjmp(jmploc.loc))) {
+>  		goto funcdone;
+>  	}
+>  	INTOFF;
+>  	savehandler = handler;
+>  	handler = &jmploc;
+> -	localvars = NULL;
+>  	shellparam.malloc = 0;
+>  	func->count++;
+>  	funcnest++;
+> @@ -950,13 +947,13 @@ evalfun(struct funcnode *func, int argc, char **argv, int flags)
+>  	shellparam.p = argv + 1;
+>  	shellparam.optind = 1;
+>  	shellparam.optoff = -1;
+> +	pushlocalvars();
+>  	evaltree(&func->n, flags & EV_TESTED);
+> +	poplocalvars();
+>  funcdone:
+>  	INTOFF;
+>  	funcnest--;
+>  	freefunc(func);
+> -	poplocalvars();
+> -	localvars = savelocalvars;
+>  	freeparam(&shellparam);
+>  	shellparam = saveparam;
+>  	handler = savehandler;
+
+This change does not do poplocalvars() if the function was exited with
+an error. While this is normally not a problem because the shell exits
+or executes the RESET actions, 'command eval', 'command .' and 'fc' will
+"catch" any errors and continue normally.
+
+Example (with the below "disallow local outside a function" change):
+  dash -c 'f() { unset xyz; ${xyz?}; }; command eval f; local i'
+
+> diff --git a/src/var.c b/src/var.c
+> index 2737fb1..de1a5f5 100644
+> [...]
+> @@ -446,6 +456,9 @@ localcmd(int argc, char **argv)
+>  {
+>  	char *name;
+>  
+> +	if (!localvar_stack)
+> +		sh_error("not in a function");
+> +
+>  	argv = argptr;
+>  	while ((name = *argv++) != NULL) {
+>  		mklocal(name);
+
+This change (failing local outside functions), while a good idea, should
+be mentioned in the commit message/changelog, as it might break certain
+scripts.
+
+(Note that in mksh local is an alias for typeset, which will work
+outside functions.)
+
+-- 
+Jilles Tjoelker
