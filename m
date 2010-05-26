@@ -1,128 +1,191 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/4] [VAR] Move unsetvar functionality into setvareq
-Date: Wed, 26 May 2010 21:00:33 +1000
-Message-ID: <E1OHELh-0006sn-L0@gondolin.me.apana.org.au>
+Subject: [PATCH 1/4] [VAR] Add localvars nesting
+Date: Wed, 26 May 2010 21:00:31 +1000
+Message-ID: <E1OHELf-0006sP-9S@gondolin.me.apana.org.au>
 References: <20100526105948.GA26352@gondor.apana.org.au>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:34515 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:34511 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750727Ab0EZLAj (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 26 May 2010 07:00:39 -0400
+	with ESMTP id S1751547Ab0EZLAk (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 26 May 2010 07:00:40 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Geoff Clare <gwc@opengroup.org>, dash@vger.kernel.org, pape@smarden.org
 
-[VAR] Move unsetvar functionality into setvareq
+[VAR] Add localvars nesting
 
-This patch moves the unsetvar code into setvareq so that we can
-no have a pathological case of an unset variable hanging around
-unless it has a bit pinning it like VEXPORT.
+This patch adds localvars nesting infrastructure so we can reuse
+the localvars mechanism for command evaluation.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- ChangeLog |    1 +
- src/var.c |   54 +++++++++++++++++-------------------------------------
- src/var.h |    2 +-
- 3 files changed, 19 insertions(+), 38 deletions(-)
+ ChangeLog  |    4 ++++
+ src/eval.c |    7 ++-----
+ src/var.c  |   50 ++++++++++++++++++++++++++++++++++++++++++++------
+ src/var.h  |    1 +
+ 4 files changed, 51 insertions(+), 11 deletions(-)
 
 diff --git a/ChangeLog b/ChangeLog
-index f3c7701..1f7120f 100644
+index ee78154..7285a23 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,6 +1,7 @@
- 2010-05-25  Herbert Xu <herbert@gondor.apana.org.au>
+@@ -1,3 +1,7 @@
++2010-05-24  Herbert Xu <herbert@gondor.apana.org.au>
++
++	* Add localvars nesting.
++
+ 2010-05-03  Gerrit Pape <pape@smarden.org>
  
- 	* Fix poplocalvar leak.
-+	* Move unsetvar functionality into setvareq.
+ 	* Fix command -- crash.
+diff --git a/src/eval.c b/src/eval.c
+index 62d9d5d..8d2767c 100644
+--- a/src/eval.c
++++ b/src/eval.c
+@@ -928,20 +928,17 @@ STATIC int
+ evalfun(struct funcnode *func, int argc, char **argv, int flags)
+ {
+ 	volatile struct shparam saveparam;
+-	struct localvar *volatile savelocalvars;
+ 	struct jmploc *volatile savehandler;
+ 	struct jmploc jmploc;
+ 	int e;
  
- 2010-05-24  Herbert Xu <herbert@gondor.apana.org.au>
- 
+ 	saveparam = shellparam;
+-	savelocalvars = localvars;
+ 	if ((e = setjmp(jmploc.loc))) {
+ 		goto funcdone;
+ 	}
+ 	INTOFF;
+ 	savehandler = handler;
+ 	handler = &jmploc;
+-	localvars = NULL;
+ 	shellparam.malloc = 0;
+ 	func->count++;
+ 	funcnest++;
+@@ -950,13 +947,13 @@ evalfun(struct funcnode *func, int argc, char **argv, int flags)
+ 	shellparam.p = argv + 1;
+ 	shellparam.optind = 1;
+ 	shellparam.optoff = -1;
++	pushlocalvars();
+ 	evaltree(&func->n, flags & EV_TESTED);
++	poplocalvars();
+ funcdone:
+ 	INTOFF;
+ 	funcnest--;
+ 	freefunc(func);
+-	poplocalvars();
+-	localvars = savelocalvars;
+ 	freeparam(&shellparam);
+ 	shellparam = saveparam;
+ 	handler = savehandler;
 diff --git a/src/var.c b/src/var.c
-index fc6d367..12f2f6c 100644
+index 2737fb1..de1a5f5 100644
 --- a/src/var.c
 +++ b/src/var.c
-@@ -266,10 +266,22 @@ setvareq(char *s, int flags)
- 		if ((vp->flags & (VTEXTFIXED|VSTACK)) == 0)
- 			ckfree(vp->text);
+@@ -64,7 +64,12 @@
+ #define VTABSIZE 39
  
-+		if (((flags & (VEXPORT|VREADONLY|VSTRFIXED|VUNSET)) |
-+		     (vp->flags & VSTRFIXED)) == VUNSET) {
-+			*vpp = vp->next;
-+			ckfree(vp);
-+out_free:
-+			if ((flags & (VTEXTFIXED|VSTACK|VNOSAVE)) == VNOSAVE)
-+				ckfree(s);
-+			return;
-+		}
+ 
+-struct localvar *localvars;
++struct localvar_list {
++	struct localvar_list *next;
++	struct localvar *lv;
++};
 +
- 		flags |= vp->flags & ~(VTEXTFIXED|VSTACK|VNOSAVE|VUNSET);
- 	} else {
- 		if (flags & VNOSET)
- 			return;
-+		if ((flags & (VEXPORT|VREADONLY|VSTRFIXED|VUNSET)) == VUNSET)
-+			goto out_free;
- 		/* not found */
- 		vp = ckmalloc(sizeof (*vp));
- 		vp->next = *vpp;
-@@ -588,7 +600,6 @@ unsetcmd(int argc, char **argv)
- 	char **ap;
- 	int i;
- 	int flag = 0;
--	int ret = 0;
++MKINIT struct localvar_list *localvar_stack;
  
- 	while ((i = nextopt("vf")) != '\0') {
- 		flag = i;
-@@ -596,15 +607,13 @@ unsetcmd(int argc, char **argv)
+ const char defpathvar[] =
+ 	"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+@@ -139,6 +144,11 @@ INIT {
+ 			p = 0;
+ 	setpwd(p, 0);
+ }
++
++RESET {
++	while (localvar_stack)
++		poplocalvars();
++}
+ #endif
  
- 	for (ap = argptr; *ap ; ap++) {
- 		if (flag != 'f') {
--			i = unsetvar(*ap);
--			ret |= i;
--			if (!(i & 2))
--				continue;
-+			unsetvar(*ap);
-+			continue;
+ 
+@@ -446,6 +456,9 @@ localcmd(int argc, char **argv)
+ {
+ 	char *name;
+ 
++	if (!localvar_stack)
++		sh_error("not in a function");
++
+ 	argv = argptr;
+ 	while ((name = *argv++) != NULL) {
+ 		mklocal(name);
+@@ -497,8 +510,8 @@ mklocal(char *name)
  		}
- 		if (flag != 'v')
- 			unsetfunc(*ap);
  	}
--	return ret & 1;
-+	return 0;
+ 	lvp->vp = vp;
+-	lvp->next = localvars;
+-	localvars = lvp;
++	lvp->next = localvar_stack->lv;
++	localvar_stack->lv = lvp;
+ 	INTON;
+ }
+ 
+@@ -511,11 +524,19 @@ mklocal(char *name)
+ void
+ poplocalvars(void)
+ {
+-	struct localvar *lvp;
++	struct localvar_list *ll;
++	struct localvar *lvp, *next;
+ 	struct var *vp;
+ 
+-	while ((lvp = localvars) != NULL) {
+-		localvars = lvp->next;
++	INTOFF;
++	ll = localvar_stack;
++	localvar_stack = ll->next;
++
++	next = ll->lv;
++	ckfree(ll);
++
++	while ((lvp = next) != NULL) {
++		next = lvp->next;
+ 		vp = lvp->vp;
+ 		TRACE(("poplocalvar %s", vp ? vp->text : "-"));
+ 		if (vp == NULL) {	/* $- saved */
+@@ -534,6 +555,23 @@ poplocalvars(void)
+ 		}
+ 		ckfree(lvp);
+ 	}
++	INTON;
++}
++
++
++/*
++ * Create a new localvar environment.
++ */
++void pushlocalvars(void)
++{
++	struct localvar_list *ll;
++
++	INTOFF;
++	ll = ckmalloc(sizeof(*ll));
++	ll->lv = NULL;
++	ll->next = localvar_stack;
++	localvar_stack = ll;
++	INTON;
  }
  
  
-@@ -612,38 +621,9 @@ unsetcmd(int argc, char **argv)
-  * Unset the specified variable.
-  */
- 
--int
--unsetvar(const char *s)
-+void unsetvar(const char *s)
- {
--	struct var **vpp;
--	struct var *vp;
--	int retval;
--
--	vpp = findvar(hashvar(s), s);
--	vp = *vpp;
--	retval = 2;
--	if (vp) {
--		int flags = vp->flags;
--
--		retval = 1;
--		if (flags & VREADONLY)
--			goto out;
--		if ((flags & VSTRFIXED) == 0) {
--			INTOFF;
--			if ((flags & (VTEXTFIXED|VSTACK)) == 0)
--				ckfree(vp->text);
--			*vpp = vp->next;
--			ckfree(vp);
--			INTON;
--		} else if (!(flags & VUNSET)) {
--			setvar(s, 0, 0);
--			vp->flags &= ~VEXPORT;
--		}
--		retval = 0;
--	}
+diff --git a/src/var.h b/src/var.h
+index e4e2cff..32b0dde 100644
+--- a/src/var.h
++++ b/src/var.h
+@@ -139,6 +139,7 @@ char **listvars(int, int, char ***);
+ int showvars(const char *, int, int);
+ int exportcmd(int, char **);
+ int localcmd(int, char **);
++void pushlocalvars(void);
+ void poplocalvars(void);
+ int unsetcmd(int, char **);
+ int unsetvar(const char *);
