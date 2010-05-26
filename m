@@ -1,42 +1,77 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Assignment with command: export only, or sets variable, too?
-Date: Wed, 26 May 2010 20:59:48 +1000
-Message-ID: <20100526105948.GA26352@gondor.apana.org.au>
-References: <201004052231.28372.j6t@kdbg.org> <201004052257.58768.j6t@kdbg.org> <20100407094356.GA16716@squonk.masqnet> <201004072033.59546.j6t@kdbg.org> <20100408081737.GA8018@squonk.masqnet> <chaz20100408104928.GA3959@yahoo.fr> <20100408111617.GB11737@squonk.masqnet> <20100409033953.GA32629@gondor.apana.org.au> <20100409082602.GA12973@squonk.masqnet>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [PATCH 2/4] [VAR] Fix poplocalvar leak
+Date: Wed, 26 May 2010 21:00:32 +1000
+Message-ID: <E1OHELg-0006sc-H8@gondolin.me.apana.org.au>
+References: <20100526105948.GA26352@gondor.apana.org.au>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:34504 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:34513 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750727Ab0EZK7x (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 26 May 2010 06:59:53 -0400
-Content-Disposition: inline
-In-Reply-To: <20100409082602.GA12973@squonk.masqnet>
+	with ESMTP id S1750727Ab0EZLAi (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 26 May 2010 07:00:38 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Geoff Clare <gwc@opengroup.org>
-Cc: dash@vger.kernel.org, pape@smarden.org
+To: Geoff Clare <gwc@opengroup.org>, dash@vger.kernel.org, pape@smarden.org
 
-On Fri, Apr 09, 2010 at 09:26:02AM +0100, Geoff Clare wrote:
-> Herbert Xu <herbert@gondor.hengli.com.au> wrote, on 09 Apr 2010:
-> >
-> > While we're on this topic, what is the correct output for
-> > 
-> > 	X=a Y=${X=b} Z=$X sh -c 'echo $Z'
-> 
-> My reading of the standard is that this should output "b"
-> (assuming X is unset beforehand).  But, as I mentioned earlier in
-> the thread, this is a strict reading and might not be what was
-> intended.
+[VAR] Fix poplocalvar leak
 
-Thank you for your clarifications.
+When a variable is marked as local, we set VSTRFIXED on its vp
+recored.  However, poplocalvar never clears this flag for variables
+that were unset to begin with.  Thus if you ever made an unset
+variable local, it would get the VSTRFIXED bit and stick around
+forever.
 
-These four patches should help bring dash in-line with the POSIX
-requirements.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ ChangeLog |    4 ++++
+ src/var.c |    8 +++-----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 7285a23..f3c7701 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2010-05-25  Herbert Xu <herbert@gondor.apana.org.au>
++
++	* Fix poplocalvar leak.
++
+ 2010-05-24  Herbert Xu <herbert@gondor.apana.org.au>
+ 
+ 	* Add localvars nesting.
+diff --git a/src/var.c b/src/var.c
+index de1a5f5..fc6d367 100644
+--- a/src/var.c
++++ b/src/var.c
+@@ -543,7 +543,8 @@ poplocalvars(void)
+ 			memcpy(optlist, lvp->text, sizeof(optlist));
+ 			ckfree(lvp->text);
+ 			optschanged();
+-		} else if ((lvp->flags & (VUNSET|VSTRFIXED)) == VUNSET) {
++		} else if (lvp->flags == VUNSET) {
++			vp->flags &= ~(VSTRFIXED|VREADONLY);
+ 			unsetvar(vp->text);
+ 		} else {
+ 			if (vp->func)
+@@ -627,8 +628,6 @@ unsetvar(const char *s)
+ 		retval = 1;
+ 		if (flags & VREADONLY)
+ 			goto out;
+-		if (flags & VUNSET)
+-			goto ok;
+ 		if ((flags & VSTRFIXED) == 0) {
+ 			INTOFF;
+ 			if ((flags & (VTEXTFIXED|VSTACK)) == 0)
+@@ -636,11 +635,10 @@ unsetvar(const char *s)
+ 			*vpp = vp->next;
+ 			ckfree(vp);
+ 			INTON;
+-		} else {
++		} else if (!(flags & VUNSET)) {
+ 			setvar(s, 0, 0);
+ 			vp->flags &= ~VEXPORT;
+ 		}
+-ok:
+ 		retval = 0;
+ 	}
+ 
