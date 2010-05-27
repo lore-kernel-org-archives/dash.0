@@ -1,166 +1,132 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/2] [REDIR] Fix popredir on abnormal exit from built-in
-Date: Thu, 27 May 2010 17:16:18 +1000
-Message-ID: <E1OHXKE-0001oo-64@gondolin.me.apana.org.au>
+Subject: [PATCH 1/2] [REDIR] Move null redirect checks into caller
+Date: Thu, 27 May 2010 17:16:17 +1000
+Message-ID: <E1OHXKD-0001oM-0f@gondolin.me.apana.org.au>
 References: <20100527033437.GA5323@gondor.apana.org.au>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:47300 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:47298 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754971Ab0E0HQV (ORCPT <rfc822;dash@vger.kernel.org>);
+	with ESMTP id S1754752Ab0E0HQV (ORCPT <rfc822;dash@vger.kernel.org>);
 	Thu, 27 May 2010 03:16:21 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Jilles Tjoelker <jilles@stack.nl>, dash@vger.kernel.org, pape@smarden.org
 
-[REDIR] Fix popredir on abnormal exit from built-in
+[REDIR] Move null redirect checks into caller
 
-Just like the poplocalvar problem recently fixed, redirections
-can also be leaked in case of an abnormal exit.  This patch fixes
-it using the same method as poplocalvar, by storing the previous
-redirection state and restoring to that point.
+The null redirect checks were added as an optimisation to avoid
+unnecessary memory allocations.  However, we could avoid this
+completely by simply making the caller avoid making a redirection
+unless it is not null.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
  ChangeLog   |    1 +
- src/eval.c  |    4 ++++
- src/redir.c |   45 ++++++++++++++++++++++++++++++++-------------
- src/redir.h |    3 +++
- 4 files changed, 40 insertions(+), 13 deletions(-)
+ src/eval.c  |    6 ++++--
+ src/redir.c |   14 +-------------
+ 3 files changed, 6 insertions(+), 15 deletions(-)
 
 diff --git a/ChangeLog b/ChangeLog
-index 1fd184b..650899a 100644
+index 4fc35a6..1fd184b 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -3,6 +3,7 @@
+@@ -2,6 +2,7 @@
+ 
  	* Fix poplocalvar on abnormal exit from function.
  	* Do not poplocalvars prematurely on regular utilities.
- 	* Move null redirect checks into caller.
-+	* Fix popredir on abnormal exit from built-in.
++	* Move null redirect checks into caller.
  
  2010-05-26  Herbert Xu <herbert@gondor.apana.org.au>
  
 diff --git a/src/eval.c b/src/eval.c
-index 59bded9..d5c1e6c 100644
+index 337667f..59bded9 100644
 --- a/src/eval.c
 +++ b/src/eval.c
-@@ -219,6 +219,7 @@ evaltree(union node *n, int flags)
- 		goto setstatus;
- 	case NREDIR:
- 		expredir(n->nredir.redirect);
-+		pushredir(n->nredir.redirect);
- 		status = redirectsafe(n->nredir.redirect, REDIR_PUSH);
- 		if (!status) {
+@@ -224,7 +224,8 @@ evaltree(union node *n, int flags)
  			evaltree(n->nredir.n, flags & EV_TESTED);
-@@ -683,6 +684,7 @@ evalcommand(union node *cmd, int flags)
- #endif
- {
- 	struct localvar_list *localvar_stop;
-+	struct redirtab *redir_stop;
- 	struct stackmark smark;
- 	union node *argp;
- 	struct arglist arglist;
-@@ -740,6 +742,7 @@ evalcommand(union node *cmd, int flags)
+ 			status = exitstatus;
+ 		}
+-		popredir(0);
++		if (n->nredir.redirect)
++			popredir(0);
+ 		goto setstatus;
+ 	case NCMD:
+ #ifdef notyet
+@@ -879,7 +880,8 @@ raise:
+ 	}
  
- 	preverrout.fd = 2;
- 	expredir(cmd->ncmd.redirect);
-+	redir_stop = pushredir(cmd->ncmd.redirect);
- 	status = redirectsafe(cmd->ncmd.redirect, REDIR_PUSH|REDIR_SAVEFD2);
- 
- 	path = vpath.text;
-@@ -882,6 +885,7 @@ raise:
  out:
- 	if (cmd->ncmd.redirect)
- 		popredir(execcmd);
-+	unwindredir(redir_stop);
+-	popredir(execcmd);
++	if (cmd->ncmd.redirect)
++		popredir(execcmd);
  	unwindlocalvars(localvar_stop);
  	if (lastarg)
  		/* dsl: I think this is intended to be used to support
 diff --git a/src/redir.c b/src/redir.c
-index 16decfc..b4e49c0 100644
+index 54af96b..16decfc 100644
 --- a/src/redir.c
 +++ b/src/redir.c
-@@ -111,20 +111,12 @@ redirect(union node *redir, int flags)
+@@ -72,12 +72,10 @@ MKINIT
+ struct redirtab {
+ 	struct redirtab *next;
+ 	int renamed[10];
+-	int nullredirs;
+ };
+ 
+ 
+ MKINIT struct redirtab *redirlist;
+-MKINIT int nullredirs;
+ 
+ STATIC int openredirect(union node *);
+ #ifdef notyet
+@@ -113,7 +111,6 @@ redirect(union node *redir, int flags)
  		memory[i] = 0;
  	memory[1] = flags & REDIR_BACKQ;
  #endif
--	if (!redir) {
-+	if (!redir)
+-	nullredirs++;
+ 	if (!redir) {
  		return;
--	}
- 	sv = NULL;
- 	INTOFF;
--	if (likely(flags & REDIR_PUSH)) {
--		struct redirtab *q;
--		q = ckmalloc(sizeof (struct redirtab));
--		q->next = redirlist;
--		redirlist = q;
--		for (i = 0 ; i < 10 ; i++)
--			q->renamed[i] = EMPTY;
--		sv = q;
--	}
-+	if (likely(flags & REDIR_PUSH))
-+		sv = redirlist;
+ 	}
+@@ -124,10 +121,8 @@ redirect(union node *redir, int flags)
+ 		q = ckmalloc(sizeof (struct redirtab));
+ 		q->next = redirlist;
+ 		redirlist = q;
+-		q->nullredirs = nullredirs - 1;
+ 		for (i = 0 ; i < 10 ; i++)
+ 			q->renamed[i] = EMPTY;
+-		nullredirs = 0;
+ 		sv = q;
+ 	}
  	n = redir;
- 	do {
- 		newfd = openredirect(n);
-@@ -373,8 +365,7 @@ RESET {
+@@ -343,8 +338,6 @@ popredir(int drop)
+ 	struct redirtab *rp;
+ 	int i;
+ 
+-	if (--nullredirs >= 0)
+-		return;
+ 	INTOFF;
+ 	rp = redirlist;
+ 	for (i = 0 ; i < 10 ; i++) {
+@@ -364,7 +357,6 @@ popredir(int drop)
+ 		}
+ 	}
+ 	redirlist = rp->next;
+-	nullredirs = rp->nullredirs;
+ 	ckfree(rp);
+ 	INTON;
+ }
+@@ -381,12 +373,8 @@ RESET {
  	/*
  	 * Discard all saved file descriptors.
  	 */
--	while (redirlist)
--		popredir(0);
-+	unwindredir(0);
+-	for (;;) {
+-		nullredirs = 0;
+-		if (!redirlist)
+-			break;
++	while (redirlist)
+ 		popredir(0);
+-	}
  }
  
  #endif
-@@ -485,3 +476,31 @@ redirectsafe(union node *redir, int flags)
- 	RESTOREINT(saveint);
- 	return err;
- }
-+
-+
-+void unwindredir(struct redirtab *stop)
-+{
-+	while (redirlist != stop)
-+		popredir(0);
-+}
-+
-+
-+struct redirtab *pushredir(union node *redir)
-+{
-+	struct redirtab *sv;
-+	struct redirtab *q;
-+	int i;
-+
-+	q = redirlist;
-+	if (!redir)
-+		goto out;
-+
-+	sv = ckmalloc(sizeof (struct redirtab));
-+	sv->next = q;
-+	redirlist = sv;
-+	for (i = 0; i < 10; i++)
-+		sv->renamed[i] = EMPTY;
-+
-+out:
-+	return q;
-+}
-diff --git a/src/redir.h b/src/redir.h
-index d1d160e..8e56995 100644
---- a/src/redir.h
-+++ b/src/redir.h
-@@ -41,10 +41,13 @@
- #endif
- #define REDIR_SAVEFD2 03	/* set preverrout */
- 
-+struct redirtab;
- union node;
- void redirect(union node *, int);
- void popredir(int);
- void clearredir(void);
- int savefd(int, int);
- int redirectsafe(union node *, int);
-+void unwindredir(struct redirtab *stop);
-+struct redirtab *pushredir(union node *redir);
- 
