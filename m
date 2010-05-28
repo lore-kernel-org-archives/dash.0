@@ -1,37 +1,100 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: unexpected parameter expansion
-Date: Thu, 27 May 2010 21:41:47 +1000
-Message-ID: <20100527114147.GA9777@gondor.apana.org.au>
-References: <20100519191928.28202.qmail@10218569f54974.315fe32.mid.smarden.org> <20100519220109.GA81407@stack.nl>
+From: Kris Maglione <maglione.k@gmail.com>
+Subject: Job control bug in revision 3800d4934391b,
+Date: Thu, 27 May 2010 20:21:57 -0400
+Message-ID: <20100527202157.08a1fa53@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:54864 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755064Ab0E0Llt (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 27 May 2010 07:41:49 -0400
-Content-Disposition: inline
-In-Reply-To: <20100519220109.GA81407@stack.nl>
+Received: from mail-pz0-f176.google.com ([209.85.222.176]:52859 "EHLO
+	mail-pz0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753662Ab0E1AWH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 27 May 2010 20:22:07 -0400
+Received: by pzk6 with SMTP id 6so394150pzk.1
+        for <dash@vger.kernel.org>; Thu, 27 May 2010 17:22:06 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Wed, May 19, 2010 at 10:01:10PM +0000, Jilles Tjoelker wrote:
-> 
-> Just for clarification, the open brace is inconsequential here. It does
-> not pair with a close brace (only ${ does). Certain versions of bash and
-> ksh implemented it that way, but it has since been corrected.
-> 
-> > http://www.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02
 
-Yeah I agree that dash should also be fixed here.  However, I've
-run out of time today so this will have to wait until the next time
-I look at dash.
+I'm not sure how to describe this bug, but it's affected one of my
+scripts, and those of several of my users. Basically, we've had loops
+dieing when backgrounded programs exit. This is the simplest test case
+I can come up with:
 
-Cheers,
+#!/bin/dash
+{
+	echo foo
+	sleep 1
+	echo foo
+	echo done>/dev/tty
+} | while read p; do
+	( echo good & ) &
+done
+echo done
+
+
+In versions prior to 3800d4934391b, the output would
+"good\ndone\ndone\ngood" (or some permutation thereof depending on
+system load), but from 3800d4934391b on, it's "good\ndone".
+
+The offending revision:
+
+[JOBS] Fix dowait signal race
+author	Herbert Xu <herbert@gondor.apana.org.au>	
+	Sun, 22 Feb 2009 10:10:01 +0000 (18:10 +0800)
+committer	Herbert Xu <herbert@gondor.apana.org.au>	
+	Sun, 22 Feb 2009 10:10:01 +0000 (18:10 +0800)
+commit	3800d4934391b144fd261a7957aea72ced7d47ea
+tree	40c003ab3063ceab7f3615a623a09d3c610332a0
+parent	6045fe25078345074f027312d106d3fc19df56e5
+[JOBS] Fix dowait signal race
+
+This test program by Alexey Gladkov can cause dash to enter an
+infinite loop in waitcmd.
+
+#!/bin/dash
+trap "echo TRAP" USR1
+stub() {
+echo ">>> STUB $1" >&2
+sleep $1
+echo "<<< STUB $1" >&2
+kill -USR1 $$
+}
+stub 3 &
+stub 2 &
+until { echo "###"; wait; } do
+echo "*** $?"
+done
+
+The problem is that if we get a signal after the wait3 system
+call has returned but before we get to INTON in dowait, then
+we can jump back up to the top and lose the exit status.  So
+if we then wait for the job that has just exited, then it'll
+stay there forever.
+
+I made the original change that caused this bug to fix pretty
+much the same bug but in the opposite direction.  That is, if
+we get a signal after we enter wait3 but before we hit the kernel
+then it too can cause the wait to go on forever (assuming the
+child doesn't exit).
+
+In fact this is pretty much exactly the scenario that you'll
+find in glibc's documentation on pause().  The solution is given
+there too, in the form of sigsuspend, which is the only way to
+do the check and wait atomically.
+
+So this patch fixes Alexey's race without reintroducing the old
+bug by converting the blocking wait3 to a sigsuspend.
+
+In order to do this we need to set a signal handler for SIGCHLD,
+so the code has been modified to always do that.
+
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Kris Maglione
+
+If you want to go somewhere, goto is the best way to get there.
+	--Ken Thompson
+
