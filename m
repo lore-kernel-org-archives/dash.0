@@ -1,51 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [EVAL] with set -e exit the shell if a subshell exits
-	non-zero
-Date: Mon, 28 Jun 2010 17:02:31 +1000
-Message-ID: <20100628070231.GA26558@gondor.apana.org.au>
-References: <20100614095603.27834.qmail@728ec0bb900c60.315fe32.mid.smarden.org>
+Subject: Re: [PATCH] [EVAL] don't clear eflag when forking subshell
+Date: Mon, 28 Jun 2010 17:11:45 +1000
+Message-ID: <20100628071145.GB26558@gondor.apana.org.au>
+References: <20100614095638.28024.qmail@e8dcd834951639.315fe32.mid.smarden.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41305 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:58194 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753591Ab0F1HCe (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 28 Jun 2010 03:02:34 -0400
+	with ESMTP id S1753773Ab0F1HLr (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 28 Jun 2010 03:11:47 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by fornost.hengli.com.au with esmtp (Exim 4.69 #1 (Debian))
-	id 1OT8MS-0005LJ-S3
-	for <dash@vger.kernel.org>; Mon, 28 Jun 2010 17:02:32 +1000
+	id 1OT8VO-0005Qr-85
+	for <dash@vger.kernel.org>; Mon, 28 Jun 2010 17:11:46 +1000
 Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
 	(envelope-from <herbert@gondor.apana.org.au>)
-	id 1OT8MS-0006uw-Jo
-	for dash@vger.kernel.org; Mon, 28 Jun 2010 17:02:32 +1000
+	id 1OT8VO-0006xt-5N
+	for dash@vger.kernel.org; Mon, 28 Jun 2010 17:11:46 +1000
 Content-Disposition: inline
-In-Reply-To: <20100614095603.27834.qmail@728ec0bb900c60.315fe32.mid.smarden.org>
+In-Reply-To: <20100614095638.28024.qmail@e8dcd834951639.315fe32.mid.smarden.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-On Mon, Jun 14, 2010 at 09:56:03AM +0000, Gerrit Pape wrote:
-> Example:
+On Mon, Jun 14, 2010 at 09:56:38AM +0000, Gerrit Pape wrote:
+> According to
+>  http://www.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_12
+> "A subshell environment shall be created as a duplicate of the shell
+> environment, except that signal traps set by that shell environment
+> shall be set to the default values."
 > 
-> $ dash -c 'set -e; (false); echo here'
-> here
+> Currently the eflag is cleared when forking a subshell, e.g.
 > 
-> With this commit, dash exits 1 before echo.
+> $ dash -c 'set -e ; z=$(false;echo foo) ; echo $z'
+> foo
 > 
-> The bug was reported by Stefan Fritsch through
+> With this commit the eflag is preserved for subshells, and dash exits 1
+> before echo.
+> 
+> The problem was reported by Vincent Lefevre through
 >  http://bugs.debian.org/514863
 > 
 > Signed-off-by: Gerrit Pape <pape@smarden.org>
 
-I'm not convinced that this change is necessary.  I've run some
-tests and bash/pdksh both behave like dash, while ksh93 behaves
-in the way you suggest.
-
-Has bash's behaviour changed recently (I'm using an ancient
-version)?
-
-Cheers,
+Patch applied.  Thanks Gerrit!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
