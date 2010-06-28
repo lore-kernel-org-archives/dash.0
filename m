@@ -1,72 +1,108 @@
-From: Malcolm Kay <malcolm.kay@internode.on.net>
-Subject: if then elif then else fi -- Problem report
-Date: Mon, 28 Jun 2010 22:26:21 +0930
-Message-ID: <201006282226.22001.malcolm.kay@internode.on.net>
+From: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH] [EVAL] with set -e exit the shell if a subshell exits
+ non-zero
+Date: Mon, 28 Jun 2010 07:16:38 -0600
+Message-ID: <4C28A0B6.5010305@redhat.com>
+References: <20100614095603.27834.qmail@728ec0bb900c60.315fe32.mid.smarden.org> <20100628070231.GA26558@gondor.apana.org.au> <1006280909240.5913@somehost>
 Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------enigC56CBB59BE201B0AFE67C1FC"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ipmail06.adl6.internode.on.net ([150.101.137.145]:38601 "EHLO
-	ipmail06.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751284Ab0F1NB3 (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 28 Jun 2010 09:01:29 -0400
-Content-Disposition: inline
+Received: from mx1.redhat.com ([209.132.183.28]:44201 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751210Ab0F1NRs (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 28 Jun 2010 09:17:48 -0400
+In-Reply-To: <1006280909240.5913@somehost>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
+Cc: Cristian Ionescu-Idbohrn <cristian.ionescu-idbohrn@axis.com>
 
-I notice that 'dash' fails on many scripts that ran okay with
-the traditional Bourne shell 'sh'.
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigC56CBB59BE201B0AFE67C1FC
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On closer examination I find that it does not conform to any
-of the man pages that I've been able to find for 'dash'.
+On 06/28/2010 01:22 AM, Cristian Ionescu-Idbohrn wrote:
+>> Has bash's behaviour changed recently (I'm using an ancient
+>> version)?
 
-Should I create a problem report? Where should I send it?
+Yes - bash 4.1 tries harder to be compliant with the recent Austin Group
+interpretations (and more like ksh).
 
-The particular version is dash-0.5.5.1 running on
-FreeBSD xi.home 8.0-RELEASE FreeBSD 8.0-RELEASE #0: 
-Sat Nov 21 15:48:17 UTC 2009 
+>=20
+> bash 3.2.39 and 4.0.37 are behaving as dash without the suggested
+> patch.  Still.  What is the correct behaviour?  That should be the
+> essential matter IMO, not what others do.  So, why should this fail:
+>=20
+> 	$ dash -c 'set -e; false; echo here'
+>=20
+> and this succeed?
+>=20
+> 	$ dash -c 'set -e; (false); echo here'
 
-I have a report that the same trouble occurs in the 'dash'
-as shipped with Ubuntu 10.04 Lucid Lynx.
+According to the Austin Group:
+http://austingroupbugs.net/view.php?id=3D52
 
-The problem is that 'dash' bombs out with an empty list in:
+the desired behavior is:
 
-if ...
-then
-  list
-elif ...
-then
-  list
-fi
+Replace the description of -e with:
 
-or in:
+  -e When this option is on, when any command fails (for any of the
+      reasons listed in [xref to 2.8.1] or by returning an exit status
+      greater than zero) the shell immediately shall exit with the
+      following exceptions:
 
-if ...
-then
-  list
-else
-  list
-fi
+      1) The failure of any individual command in a multi-command
+          pipeline shall not cause the shell to exit. Only the
+          failure of the pipeline itself shall be considered.
 
-The latter gives for example:
-  Syntax error: "else" unexpected.
+      2) The -e setting shall be ignored when executing the compound
+          list following the while, until, if, or elif reserved word,
+          a pipeline beginning with the ! reserved word, or any
+          command of an AND-OR list other than the last.
 
-Yet the man pages clearly state that a list consists of zero 
-or more commands --
-<quote>
-Lists -- Generally Speaking
-     A list is a sequence of zero or more commands separated by 
-newlines,
-     semicolons, or ampersands, and optionally terminated by one 
-of these
-     three characters.
-</quote>
+      3) If the exit status of a compound command other than a
+          subshell command was the result of a failure while -e was
+          being ignored, then -e shall not apply to this command.
 
-Should I create a problem report? Where should I send it?
+      This requirement applies to the shell environment and each
+      subshell environment separately. For example, in
 
-Cheers,
+          set -e; (false; echo one) | cat; echo two
 
-Malcolm
+      the false command causes the subshell to exit without executing
+      echo one; however, echo two is executed because the exit status
+      of the pipeline (false; echo one) | cat is zero.
 
+Per these rules, both 'set -e; false; echo here' and 'set -e; (false);
+echo here' are silent in bash 4.1.  The fact that dash is not silent
+when a subshell exits with non-zero status is at odds with the above
+Austin Group ruling.
+
+--=20
+Eric Blake   eblake@redhat.com    +1-801-349-2682
+Libvirt virtualization library http://libvirt.org
+
+
+--------------enigC56CBB59BE201B0AFE67C1FC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Fedora - http://enigmail.mozdev.org/
+
+iQEcBAEBCAAGBQJMKKC7AAoJEKeha0olJ0NqwhMH/R4yNfuXV+1eYjauhY9WeY1M
+vNopkKaPgNGwn9ccs3EcnUPudgPlqqNpOQQ59AzNSiPc4E2PGUd/wQwtAFN0mn+G
+2GYhoJjTK/Yjb29tlyeAqpj/Ep4c37/PC3FWvMWa4rjnjwF5xR/Z7Bh0PaQeItjd
+AmFXsVMc1QBNLA0HbDl473s94461DnDplsJOYZRGC/K9QnKFHhIa2hC6g5EnwcRN
+q/SKy2PbQfZRSRBQKiOuPXwCfVdz7qk7l3/y+Ol7Gs01isasIluBhjHu2cos+bbq
+ekG+y5ztYrTp1GMB5H/FekSuTK1EjRGSIazVvZtjsQiy4JZV0++LwG8qZSX5+j8=
+=eQ/g
+-----END PGP SIGNATURE-----
+
+--------------enigC56CBB59BE201B0AFE67C1FC--
