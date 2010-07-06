@@ -1,189 +1,90 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Fix regression when unsetting variables.
-Date: Tue, 6 Jul 2010 17:42:34 +0800
-Message-ID: <20100706094234.GA15580@gondor.apana.org.au>
-References: <1276655398.16819.26.camel@gemini>
+Subject: Re: [PATCH] [EVAL] with set -e exit the shell if a subshell exits
+	non-zero
+Date: Tue, 6 Jul 2010 17:51:33 +0800
+Message-ID: <20100706095133.GB15580@gondor.apana.org.au>
+References: <20100614095603.27834.qmail@728ec0bb900c60.315fe32.mid.smarden.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41084 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:38390 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753407Ab0GFJmg (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 6 Jul 2010 05:42:36 -0400
+	with ESMTP id S1752970Ab0GFJvj (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 6 Jul 2010 05:51:39 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by fornost.hengli.com.au with esmtp (Exim 4.69 #1 (Debian))
+	id 1OW4oQ-0005uS-EF
+	for <dash@vger.kernel.org>; Tue, 06 Jul 2010 19:51:34 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
+	(envelope-from <herbert@gondor.apana.org.au>)
+	id 1OW4oP-0004BB-WC
+	for dash@vger.kernel.org; Tue, 06 Jul 2010 17:51:34 +0800
 Content-Disposition: inline
-In-Reply-To: <1276655398.16819.26.camel@gemini>
+In-Reply-To: <20100614095603.27834.qmail@728ec0bb900c60.315fe32.mid.smarden.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Brian Koropoff <bkoropoff@gmail.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Wed, Jun 16, 2010 at 02:29:58AM +0000, Brian Koropoff wrote:
-> When removing a variable from its hash chain, assign to the 'next' pointer
-> of the previous link rather than the hash bucket.
+On Mon, Jun 14, 2010 at 09:56:03AM +0000, Gerrit Pape wrote:
+> Example:
+> 
+> $ dash -c 'set -e; (false); echo here'
+> here
+> 
+> With this commit, dash exits 1 before echo.
+> 
+> The bug was reported by Stefan Fritsch through
+>  http://bugs.debian.org/514863
+> 
+> Signed-off-by: Gerrit Pape <pape@smarden.org>
 
-OK I ended up fixing it slightly differently.
+Applied with slight change:
 
-commit cb20b2cd727c892756ff3f144ebf92feb5590562
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Tue Jul 6 17:40:53 2010 +0800
+commit a92255d6fa8b8efb0f9fb093b77ac601fe3e9ede
+Author: Gerrit Pape <pape@smarden.org>
+Date:   Tue Jul 6 17:50:37 2010 +0800
 
-    [VAR] Fix loss of variables when hash collides
+    [EVAL] Check exit for eval NSUBSHELL
     
-    Brian Koropoff reported that the new var patches broke the following
-    script:
+    Example:
     
-    #!/bin/dash
-    GDM_LANG="bar"
-    OPTION="foo"
-    unset GDM_LANG
-    # OPTION has mysteriously become unset
-    echo "$OPTION"
+    $ dash -c 'set -e; (false); echo here'
+    here
     
-    He correctly diagnosed this as a result of removing all variables
-    in the hash chain preceding the one that should be removed in
-    setvareq.
+    With this commit, dash exits 1 before echo.
     
-    He also provided a patch to fix this.
+    The bug was reported by Stefan Fritsch through
+     http://bugs.debian.org/514863
     
-    This patch is based on his but without keeping the original vpp.
-    As a result, we now store new variables at the end of the hash
-    chain instead of the beginning.
-    
-    To make this work, setvareq/setvar now returns the vp pointer
-    modified.  In case they're used to unset a variable the pointer
-    returned is undefined.  This is because mklocal needs it and
-    used to get it by assuming that the new variable always appear
-    at the beginning of the chain.
-    
+    Signed-off-by: Gerrit Pape <pape@smarden.org>
     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/ChangeLog b/ChangeLog
-index e45405c..48436b2 100644
+index 3f5e24c..0e367a6 100644
 --- a/ChangeLog
 +++ b/ChangeLog
 @@ -1,3 +1,7 @@
-+2010-07-06  Herbert Xu <herbert@gondor.apana.org.au>
++2010-07-06  Gerrit Pape <pape@smarden.org>
 +
-+	* Fix loss of variables when hash collides.
++	* Check exit for eval NSUBSHELL.
 +
- 2010-06-28  Gerrit Pape <pape@smarden.org>
+ 2010-07-06  Herbert Xu <herbert@gondor.apana.org.au>
  
- 	* Don't clear eflag in evalbackcmd.
-diff --git a/src/var.c b/src/var.c
-index f456fbd..3efc943 100644
---- a/src/var.c
-+++ b/src/var.c
-@@ -180,13 +180,13 @@ initvar(void)
-  * flags of the variable.  If val is NULL, the variable is unset.
-  */
+ 	* Fix loss of variables when hash collides.
+diff --git a/src/eval.c b/src/eval.c
+index 58739f5..5b8d36b 100644
+--- a/src/eval.c
++++ b/src/eval.c
+@@ -251,7 +251,7 @@ checkexit:
+ 	case NSUBSHELL:
+ 	case NBACKGND:
+ 		evalfn = evalsubshell;
+-		goto calleval;
++		goto checkexit;
+ 	case NPIPE:
+ 		evalfn = evalpipe;
+ 		goto checkexit;
  
--void
--setvar(const char *name, const char *val, int flags)
-+struct var *setvar(const char *name, const char *val, int flags)
- {
- 	char *p, *q;
- 	size_t namelen;
- 	char *nameeq;
- 	size_t vallen;
-+	struct var *vp;
- 
- 	q = endofname(name);
- 	p = strchrnul(q, '=');
-@@ -206,8 +206,10 @@ setvar(const char *name, const char *val, int flags)
- 		p = mempcpy(p, val, vallen);
- 	}
- 	*p = '\0';
--	setvareq(nameeq, flags | VNOSAVE);
-+	vp = setvareq(nameeq, flags | VNOSAVE);
- 	INTON;
-+
-+	return vp;
- }
- 
- /*
-@@ -235,14 +237,14 @@ intmax_t setvarint(const char *name, intmax_t val, int flags)
-  * Called with interrupts off.
-  */
- 
--void
--setvareq(char *s, int flags)
-+struct var *setvareq(char *s, int flags)
- {
- 	struct var *vp, **vpp;
- 
- 	vpp = hashvar(s);
- 	flags |= (VEXPORT & (((unsigned) (1 - aflag)) - 1));
--	vp = *findvar(vpp, s);
-+	vpp = findvar(vpp, s);
-+	vp = *vpp;
- 	if (vp) {
- 		if (vp->flags & VREADONLY) {
- 			const char *n;
-@@ -255,7 +257,7 @@ setvareq(char *s, int flags)
- 		}
- 
- 		if (flags & VNOSET)
--			return;
-+			goto out;
- 
- 		if (vp->func && (flags & VNOFUNC) == 0)
- 			(*vp->func)(strchrnul(s, '=') + 1);
-@@ -270,13 +272,13 @@ setvareq(char *s, int flags)
- out_free:
- 			if ((flags & (VTEXTFIXED|VSTACK|VNOSAVE)) == VNOSAVE)
- 				ckfree(s);
--			return;
-+			goto out;
- 		}
- 
- 		flags |= vp->flags & ~(VTEXTFIXED|VSTACK|VNOSAVE|VUNSET);
- 	} else {
- 		if (flags & VNOSET)
--			return;
-+			goto out;
- 		if ((flags & (VEXPORT|VREADONLY|VSTRFIXED|VUNSET)) == VUNSET)
- 			goto out_free;
- 		/* not found */
-@@ -289,6 +291,9 @@ out_free:
- 		s = savestr(s);
- 	vp->text = s;
- 	vp->flags = flags;
-+
-+out:
-+	return vp;
- }
- 
- 
-@@ -486,10 +491,9 @@ void mklocal(char *name)
- 		eq = strchr(name, '=');
- 		if (vp == NULL) {
- 			if (eq)
--				setvareq(name, VSTRFIXED);
-+				vp = setvareq(name, VSTRFIXED);
- 			else
--				setvar(name, NULL, VSTRFIXED);
--			vp = *vpp;	/* the new variable */
-+				vp = setvar(name, NULL, VSTRFIXED);
- 			lvp->flags = VUNSET;
- 		} else {
- 			lvp->text = vp->text;
-diff --git a/src/var.h b/src/var.h
-index 7e7e505..7aa051f 100644
---- a/src/var.h
-+++ b/src/var.h
-@@ -128,9 +128,9 @@ extern const char defpathvar[];
- #define mpathset()	((vmpath.flags & VUNSET) == 0)
- 
- void initvar(void);
--void setvar(const char *, const char *, int);
-+struct var *setvar(const char *name, const char *val, int flags);
- intmax_t setvarint(const char *, intmax_t, int);
--void setvareq(char *, int);
-+struct var *setvareq(char *s, int flags);
- struct strlist;
- void listsetvar(struct strlist *, int);
- char *lookupvar(const char *);
-
 Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
