@@ -1,92 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [EVAL] with set -e exit the shell if a subshell exits
-	non-zero
-Date: Tue, 6 Jul 2010 17:51:33 +0800
-Message-ID: <20100706095133.GB15580@gondor.apana.org.au>
-References: <20100614095603.27834.qmail@728ec0bb900c60.315fe32.mid.smarden.org>
+From: Sven Mascheck <mascheck@in-ulm.de>
+Subject: Re: if then elif then else fi -- Problem report
+Date: Tue, 6 Jul 2010 22:49:41 +0200
+Message-ID: <20100706204941.GA5913@lisa.in-ulm.de>
+References: <201006282226.22001.malcolm.kay@internode.on.net> <201006291038.31206.malcolm.kay@internode.on.net> <20100704215016.GA27297@lisa.in-ulm.de> <201007061718.54673.malcolm.kay@internode.on.net>
+Reply-To: mascheck@in-ulm.de
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38390 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752970Ab0GFJvj (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 6 Jul 2010 05:51:39 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by fornost.hengli.com.au with esmtp (Exim 4.69 #1 (Debian))
-	id 1OW4oQ-0005uS-EF
-	for <dash@vger.kernel.org>; Tue, 06 Jul 2010 19:51:34 +1000
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
-	(envelope-from <herbert@gondor.apana.org.au>)
-	id 1OW4oP-0004BB-WC
-	for dash@vger.kernel.org; Tue, 06 Jul 2010 17:51:34 +0800
+Received: from mail.in-ulm.de ([217.10.8.10]:47184 "HELO mail.in-ulm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1753541Ab0GFUtn (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 6 Jul 2010 16:49:43 -0400
 Content-Disposition: inline
-In-Reply-To: <20100614095603.27834.qmail@728ec0bb900c60.315fe32.mid.smarden.org>
+In-Reply-To: <201007061718.54673.malcolm.kay@internode.on.net>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-On Mon, Jun 14, 2010 at 09:56:03AM +0000, Gerrit Pape wrote:
-> Example:
-> 
-> $ dash -c 'set -e; (false); echo here'
-> here
-> 
-> With this commit, dash exits 1 before echo.
-> 
-> The bug was reported by Stefan Fritsch through
->  http://bugs.debian.org/514863
-> 
-> Signed-off-by: Gerrit Pape <pape@smarden.org>
+On Tue, Jul 06, 2010 at 05:18:54PM +0930, Malcolm Kay wrote:
 
-Applied with slight change:
+> I recall seeing and even playing with an implementation of 
+> the Almquist shell 'ash' in the mid 1980's but as it was running 
+> on an unimpressive/unsuitable operating system (DRDOS/TOS)
 
-commit a92255d6fa8b8efb0f9fb093b77ac601fe3e9ede
-Author: Gerrit Pape <pape@smarden.org>
-Date:   Tue Jul 6 17:50:37 2010 +0800
+That must have been a different shell, because the Almquist
+shell was introduced '89.
 
-    [EVAL] Check exit for eval NSUBSHELL
-    
-    Example:
-    
-    $ dash -c 'set -e; (false); echo here'
-    here
-    
-    With this commit, dash exits 1 before echo.
-    
-    The bug was reported by Stefan Fritsch through
-     http://bugs.debian.org/514863
-    
-    Signed-off-by: Gerrit Pape <pape@smarden.org>
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Later I picked up a microVAX with Ultrix 4, I still have the 
+> manuals. The man pages reference sh(1) as "the standard Bourne 
+> shell interpreter" and sh5(1) as a "version of the shell from 
+> System V version 2".
 
-diff --git a/ChangeLog b/ChangeLog
-index 3f5e24c..0e367a6 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,7 @@
-+2010-07-06  Gerrit Pape <pape@smarden.org>
-+
-+	* Check exit for eval NSUBSHELL.
-+
- 2010-07-06  Herbert Xu <herbert@gondor.apana.org.au>
- 
- 	* Fix loss of variables when hash collides.
-diff --git a/src/eval.c b/src/eval.c
-index 58739f5..5b8d36b 100644
---- a/src/eval.c
-+++ b/src/eval.c
-@@ -251,7 +251,7 @@ checkexit:
- 	case NSUBSHELL:
- 	case NBACKGND:
- 		evalfn = evalsubshell;
--		goto calleval;
-+		goto checkexit;
- 	case NPIPE:
- 		evalfn = evalpipe;
- 		goto checkexit;
- 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ultrix sh is a variant of the 7th edition shell, the original
+Bourne shell. (Ultrix eventually got somewhat famous for coming
+with such an old variant as /bin/sh, because it had not even
+implemented functions, yet).  Ultrix sh5 is a later variant of
+the same family, which was mainly added because it had functions.
+If you want to have a glance at such relationsships from the
+past: http://www.in-ulm.de/~mascheck/various/
