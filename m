@@ -1,204 +1,34 @@
-From: maximilian attems <max@stro.at>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: dash klibc DEBUG compile trouble
-Date: Thu, 8 Jul 2010 15:17:53 +0200
-Message-ID: <20100708131753.GE9869@baikonur.stro.at>
-References: <20100708084834.GB6829@stro.at> <20100708130401.GA20383@gondor.apana.org.au>
+Date: Thu, 8 Jul 2010 21:51:14 +0800
+Message-ID: <20100708135114.GA20673@gondor.apana.org.au>
+References: <20100708084834.GB6829@stro.at> <20100708130401.GA20383@gondor.apana.org.au> <20100708131753.GE9869@baikonur.stro.at>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:42972 "EHLO
-	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754910Ab0GHNpg (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 8 Jul 2010 09:45:36 -0400
+Received: from helcar.apana.org.au ([209.40.204.226]:53604 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756052Ab0GHNvQ (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 8 Jul 2010 09:51:16 -0400
 Content-Disposition: inline
-In-Reply-To: <20100708130401.GA20383@gondor.apana.org.au>
+In-Reply-To: <20100708131753.GE9869@baikonur.stro.at>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: maximilian attems <max@stro.at>
 Cc: dash@vger.kernel.org, klibc@zytor.com
 
-On Thu, Jul 08, 2010 at 09:04:01PM +0800, Herbert Xu wrote:
-> maximilian attems <max@stro.at> wrote:
-> > on top of the two easy patches I sent I am seeing this one:
-> > usr/dash/exec.c: In function ???find_command???:
-> > usr/dash/exec.c:290: error: storage size of ???statb??? isn???t known
-> > usr/dash/exec.c:299: warning: implicit declaration of function ???stat64???
-> > usr/dash/exec.c:290: warning: unused variable ???statb???
-> > make[2]: *** [usr/dash/exec.o] Error 1
-> > 
-> > 
-> > hmm which include is exec.c missing?
+On Thu, Jul 08, 2010 at 03:17:53PM +0200, maximilian attems wrote:
 > 
-> What does config.h say?
+> It says that the 64 bit operations are the same as the 32 bit ones,
+> that's why I'm confused.
 
-It says that the 64 bit operations are the same as the 32 bit ones,
-that's why I'm confused.
+Ah, klibc must be undefining stat64, which then causes struct
+stat64 to be undeclared.
 
-klibc dash config.h below:
+I'll look into it.
 
-/* config.h.  Generated from config.h.in by configure.  */
-/* config.h.in.  Generated from configure.ac by autoheader.  */
-
-/* Define if __attribute__((__alias__())) is supported */
-#define HAVE_ALIAS_ATTRIBUTE 1
-
-/* Define to 1 if you have the <alloca.h> header file. */
-#define HAVE_ALLOCA_H 1
-
-/* Define to 1 if you have the `bsearch' function. */
-#define HAVE_BSEARCH 1
-
-/* Define to 1 if you have the `faccessat' function. */
-/* #undef HAVE_FACCESSAT */
-
-/* Define to 1 if you have the `fnmatch' function. */
-/* #undef HAVE_FNMATCH */
-
-/* Define to 1 if you have the `getpwnam' function. */
-#define HAVE_GETPWNAM 1
-
-/* Define to 1 if you have the `getrlimit' function. */
-/* #undef HAVE_GETRLIMIT */
-
-/* Define to 1 if you have the `glob' function. */
-/* #undef HAVE_GLOB */
-
-/* Define to 1 if you have the `imaxdiv' function. */
-/* #undef HAVE_IMAXDIV */
-
-/* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
-
-/* Define to 1 if you have the `isalpha' function. */
-#define HAVE_ISALPHA 1
-
-/* Define to 1 if you have the `killpg' function. */
-/* #undef HAVE_KILLPG */
-
-/* Define to 1 if you have the <memory.h> header file. */
-/* #undef HAVE_MEMORY_H */
-
-/* Define to 1 if you have the `mempcpy' function. */
-/* #undef HAVE_MEMPCPY */
-
-/* Define to 1 if you have the `sigsetmask' function. */
-/* #undef HAVE_SIGSETMASK */
-
-/* Define to 1 if you have the <stdint.h> header file. */
-#define HAVE_STDINT_H 1
-
-/* Define to 1 if you have the <stdlib.h> header file. */
-#define HAVE_STDLIB_H 1
-
-/* Define to 1 if you have the `stpcpy' function. */
-/* #undef HAVE_STPCPY */
-
-/* Define to 1 if you have the `strchrnul' function. */
-/* #undef HAVE_STRCHRNUL */
-
-/* Define to 1 if you have the <strings.h> header file. */
-/* #undef HAVE_STRINGS_H */
-
-/* Define to 1 if you have the <string.h> header file. */
-#define HAVE_STRING_H 1
-
-/* Define to 1 if you have the `strsignal' function. */
-#define HAVE_STRSIGNAL 1
-
-/* Define to 1 if you have the `strtod' function. */
-/* #undef HAVE_STRTOD */
-
-/* Define to 1 if you have the `strtoimax' function. */
-#define HAVE_STRTOIMAX 1
-
-/* Define to 1 if you have the `strtoumax' function. */
-#define HAVE_STRTOUMAX 1
-
-/* Define to 1 if you have the `sysconf' function. */
-/* #undef HAVE_SYSCONF */
-
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H 1
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#define HAVE_SYS_TYPES_H 1
-
-/* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 1
-
-/* Name of package */
-#define PACKAGE "dash"
-
-/* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT ""
-
-/* Define to the full name of this package. */
-#define PACKAGE_NAME "dash"
-
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING "dash 0.5.6"
-
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "dash"
-
-/* Define to the home page for this package. */
-#define PACKAGE_URL ""
-
-/* Define to the version of this package. */
-#define PACKAGE_VERSION "0.5.6"
-
-/* Define if you build with -DSMALL */
-#define SMALL 1
-
-/* Define to 1 if you have the ANSI C header files. */
-/* #undef STDC_HEADERS */
-
-/* Enable extensions on AIX 3, Interix.  */
-#ifndef _ALL_SOURCE
-# define _ALL_SOURCE 1
-#endif
-/* Enable GNU extensions on systems that have them.  */
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE 1
-#endif
-/* Enable threading extensions on Solaris.  */
-#ifndef _POSIX_PTHREAD_SEMANTICS
-# define _POSIX_PTHREAD_SEMANTICS 1
-#endif
-/* Enable extensions on HP NonStop.  */
-#ifndef _TANDEM_SOURCE
-# define _TANDEM_SOURCE 1
-#endif
-/* Enable general extensions on Solaris.  */
-#ifndef __EXTENSIONS__
-# define __EXTENSIONS__ 1
-#endif
-
-
-/* Version number of package */
-#define VERSION "0.5.6"
-
-/* Define to 1 if on MINIX. */
-/* #undef _MINIX */
-
-/* Define to 2 if the system does not provide POSIX.1 features except with
-   this defined. */
-/* #undef _POSIX_1_SOURCE */
-
-/* Define to 1 if you need to in order for `stat' and other things to work. */
-/* #undef _POSIX_SOURCE */
-
-/* 64-bit operations are the same as 32-bit */
-#define fstat64 fstat
-
-/* 64-bit operations are the same as 32-bit */
-#define lstat64 lstat
-
-/* 64-bit operations are the same as 32-bit */
-#define open64 open
-
-/* klibc has bsd_signal instead of signal */
-/* #undef signal */
-
-/* 64-bit operations are the same as 32-bit */
-#define stat64 stat
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
