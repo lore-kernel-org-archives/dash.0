@@ -1,38 +1,126 @@
 From: maximilian attems <max@stro.at>
-Subject: Re: dash klibc DEBUG compile trouble
-Date: Thu, 8 Jul 2010 18:20:17 +0200
-Message-ID: <20100708162017.GF9869@baikonur.stro.at>
-References: <20100708084834.GB6829@stro.at> <20100708130401.GA20383@gondor.apana.org.au> <20100708131753.GE9869@baikonur.stro.at> <20100708135114.GA20673@gondor.apana.org.au>
+Subject: dash klibc DEBUG more compile trouble
+Date: Fri, 9 Jul 2010 16:43:30 +0200
+Message-ID: <20100709144330.GA23188@stro.at>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:52561 "EHLO
+Received: from baikonur.stro.at ([213.239.196.228]:39264 "EHLO
 	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751027Ab0GHQ3V (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 8 Jul 2010 12:29:21 -0400
+	with ESMTP id S1757875Ab0GIQlz (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 9 Jul 2010 12:41:55 -0400
 Content-Disposition: inline
-In-Reply-To: <20100708135114.GA20673@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org, klibc@zytor.com
+To: dash@vger.kernel.org, klibc@zytor.com
 
-On Thu, Jul 08, 2010 at 09:51:14PM +0800, Herbert Xu wrote:
-> On Thu, Jul 08, 2010 at 03:17:53PM +0200, maximilian attems wrote:
-> > 
-> > It says that the 64 bit operations are the same as the 32 bit ones,
-> > that's why I'm confused.
-> 
-> Ah, klibc must be undefining stat64, which then causes struct
-> stat64 to be undeclared.
-> 
-> I'll look into it.
+once taken that stat/stat64 appart, histedit appears to be a minefield:
 
-ihmm well seems to be a klibc bug and not a dash trouble:
-~/src/klibc-latest$ egrep stat64 -r usr/klibc/
-usr/klibc/SYSCALLS.def:<!ppc64> int stat64,stat::stat(const char *, struct stat *);
-usr/klibc/SYSCALLS.def:<!ppc64> int lstat64,lstat::lstat(const char *, struct stat *);
-usr/klibc/SYSCALLS.def:<!ppc64> int fstat64,fstat::fstat(int, struct stat *);
+usr/dash/histedit.c:59: error: expected =E2=80=98=3D=E2=80=99, =E2=80=98=
+,=E2=80=99, =E2=80=98;=E2=80=99, =E2=80=98asm=E2=80=99 or =E2=80=98__at=
+tribute__=E2=80=99 before =E2=80=98*=E2=80=99 token
+usr/dash/histedit.c:60: error: expected =E2=80=98=3D=E2=80=99, =E2=80=98=
+,=E2=80=99, =E2=80=98;=E2=80=99, =E2=80=98asm=E2=80=99 or =E2=80=98__at=
+tribute__=E2=80=99 before =E2=80=98*=E2=80=99 token
+usr/dash/histedit.c: In function =E2=80=98histedit=E2=80=99:
+usr/dash/histedit.c:82: error: =E2=80=98hist=E2=80=99 undeclared (first=
+ use in this function)
+usr/dash/histedit.c:82: error: (Each undeclared identifier is reported =
+only once
+usr/dash/histedit.c:82: error: for each function it appears in.)
+usr/dash/histedit.c:87: warning: implicit declaration of function =E2=80=
+=98history_init=E2=80=99
+usr/dash/histedit.c:95: error: =E2=80=98el=E2=80=99 undeclared (first u=
+se in this function)
+usr/dash/histedit.c:111: warning: implicit declaration of function =E2=80=
+=98el_init=E2=80=99
+usr/dash/histedit.c:114: warning: implicit declaration of function =E2=80=
+=98el_set=E2=80=99
+usr/dash/histedit.c:114: error: =E2=80=98EL_HIST=E2=80=99 undeclared (f=
+irst use in this function)
+usr/dash/histedit.c:114: error: =E2=80=98history=E2=80=99 undeclared (f=
+irst use in this function)
+usr/dash/histedit.c:115: error: =E2=80=98EL_PROMPT=E2=80=99 undeclared =
+(first use in this function)
+usr/dash/histedit.c:123: warning: implicit declaration of function =E2=80=
+=98el_end=E2=80=99
+usr/dash/histedit.c:129: error: =E2=80=98EL_EDITOR=E2=80=99 undeclared =
+(first use in this function)
+usr/dash/histedit.c:132: warning: implicit declaration of function =E2=80=
+=98el_source=E2=80=99
+usr/dash/histedit.c:141: warning: implicit declaration of function =E2=80=
+=98history_end=E2=80=99
+usr/dash/histedit.c: In function =E2=80=98sethistsize=E2=80=99:
+usr/dash/histedit.c:153: error: =E2=80=98HistEvent=E2=80=99 undeclared =
+(first use in this function)
+usr/dash/histedit.c:153: error: expected =E2=80=98;=E2=80=99 before =E2=
+=80=98he=E2=80=99
+usr/dash/histedit.c:155: error: =E2=80=98hist=E2=80=99 undeclared (firs=
+t use in this function)
+usr/dash/histedit.c:159: warning: implicit declaration of function =E2=80=
+=98history=E2=80=99
+usr/dash/histedit.c:159: error: =E2=80=98he=E2=80=99 undeclared (first =
+use in this function)
+usr/dash/histedit.c:159: error: =E2=80=98H_SETSIZE=E2=80=99 undeclared =
+(first use in this function)
+usr/dash/histedit.c: In function =E2=80=98setterm=E2=80=99:
+usr/dash/histedit.c:166: error: =E2=80=98el=E2=80=99 undeclared (first =
+use in this function)
+usr/dash/histedit.c:167: error: =E2=80=98EL_TERMINAL=E2=80=99 undeclare=
+d (first use in this function)
+usr/dash/histedit.c: In function =E2=80=98histcmd=E2=80=99:
+usr/dash/histedit.c:182: error: =E2=80=98HistEvent=E2=80=99 undeclared =
+(first use in this function)
+usr/dash/histedit.c:182: error: expected =E2=80=98;=E2=80=99 before =E2=
+=80=98he=E2=80=99
+usr/dash/histedit.c:191: error: =E2=80=98MAXPATHLEN=E2=80=99 undeclared=
+ (first use in this function)
+usr/dash/histedit.c:209: error: =E2=80=98hist=E2=80=99 undeclared (firs=
+t use in this function)
+usr/dash/histedit.c:218: error: =E2=80=98optreset=E2=80=99 undeclared (=
+first use in this function)
+usr/dash/histedit.c:332: error: =E2=80=98H_PREV=E2=80=99 undeclared (fi=
+rst use in this function)
+usr/dash/histedit.c:332: error: =E2=80=98H_NEXT=E2=80=99 undeclared (fi=
+rst use in this function)
+usr/dash/histedit.c:341: warning: implicit declaration of function =E2=80=
+=98mkstemp=E2=80=99
+usr/dash/histedit.c:357: error: =E2=80=98he=E2=80=99 undeclared (first =
+use in this function)
+usr/dash/histedit.c:357: error: =E2=80=98H_FIRST=E2=80=99 undeclared (f=
+irst use in this function)
+usr/dash/histedit.c:358: error: =E2=80=98H_NEXT_EVENT=E2=80=99 undeclar=
+ed (first use in this function)
+usr/dash/histedit.c:380: error: =E2=80=98H_ENTER=E2=80=99 undeclared (f=
+irst use in this function)
+usr/dash/histedit.c:191: warning: unused variable =E2=80=98editfile=E2=80=
+=99
+usr/dash/histedit.c: In function =E2=80=98str_to_event=E2=80=99:
+usr/dash/histedit.c:447: error: =E2=80=98HistEvent=E2=80=99 undeclared =
+(first use in this function)
+usr/dash/histedit.c:447: error: expected =E2=80=98;=E2=80=99 before =E2=
+=80=98he=E2=80=99
+usr/dash/histedit.c:452: error: =E2=80=98hist=E2=80=99 undeclared (firs=
+t use in this function)
+usr/dash/histedit.c:452: error: =E2=80=98he=E2=80=99 undeclared (first =
+use in this function)
+usr/dash/histedit.c:452: error: =E2=80=98H_FIRST=E2=80=99 undeclared (f=
+irst use in this function)
+usr/dash/histedit.c:464: error: =E2=80=98H_NEXT=E2=80=99 undeclared (fi=
+rst use in this function)
+usr/dash/histedit.c:467: error: =E2=80=98H_LAST=E2=80=99 undeclared (fi=
+rst use in this function)
+usr/dash/histedit.c:469: error: =E2=80=98H_NEXT_EVENT=E2=80=99 undeclar=
+ed (first use in this function)
+usr/dash/histedit.c:486: error: =E2=80=98H_PREV_STR=E2=80=99 undeclared=
+ (first use in this function)
+make[2]: *** [usr/dash/histedit.o] Error 1
+make[1]: *** [all] Error 2
+make: *** [klibc] Error 2
 
-
-but no mention in the headers. 
+this happens on top of the 2 patches sent earlier and is easy to
+reproduce:
+git clone git://git.kernel.org/pub/scm/libs/klibc/klibc.git
+make   KLIBCKERNELSRC=3D`pwd`/../linux-2.6 EXTRA_KLIBCCFLAGS=3D"-DDEBUG=
+=3D1"
