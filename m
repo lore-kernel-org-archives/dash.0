@@ -1,39 +1,33 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: No wildcard expansion with redirected filenames
-Date: Sun, 8 Aug 2010 14:15:55 +0200
-Message-ID: <20100808121555.GA83441@stack.nl>
-References: <1281209661.6631.33.camel@alkis>
+From: Alkis Georgopoulos <alkisg@gmail.com>
+Subject: Re: Some utf-8 characters are cut in the middle on redirections
+Date: Sun, 08 Aug 2010 15:42:10 +0300
+Message-ID: <1281271330.1611.4.camel@alkis>
+References: <1281211542.6631.49.camel@alkis>
+	 <20100808122128.GB83441@stack.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:60098 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753723Ab0HHMZ3 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 8 Aug 2010 08:25:29 -0400
-Content-Disposition: inline
-In-Reply-To: <1281209661.6631.33.camel@alkis>
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:39421 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753597Ab0HHMmN (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 8 Aug 2010 08:42:13 -0400
+Received: by fxm14 with SMTP id 14so4564547fxm.19
+        for <dash@vger.kernel.org>; Sun, 08 Aug 2010 05:42:12 -0700 (PDT)
+In-Reply-To: <20100808122128.GB83441@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Alkis Georgopoulos <alkisg@gmail.com>
+To: Jilles Tjoelker <jilles@stack.nl>
 Cc: dash@vger.kernel.org
 
-On Sat, Aug 07, 2010 at 10:34:21PM +0300, Alkis Georgopoulos wrote:
-> Isn't this supposed to work?
+=CE=A3=CF=84=CE=B9=CF=82 08-08-2010, =CE=B7=CE=BC=CE=AD=CF=81=CE=B1 =CE=
+=9A=CF=85=CF=81, =CE=BA=CE=B1=CE=B9 =CF=8E=CF=81=CE=B1 14:21 +0200, =CE=
+=BF/=CE=B7 Jilles Tjoelker
+=CE=AD=CE=B3=CF=81=CE=B1=CF=88=CE=B5:
+> This bug is fixed in git commit f8231aea37e921492fc7fbd972385ab5b90e8=
+627
+> which is not in any dash release yet.
 
-> $ touch file1
-> $ echo 1 > file?
-> $ ls file? 
-> file?  file1
+Thank you, I commented about the fix in Debian bug #532302 and in LP
+#382541.
 
-> I.e. dash actually created a file named 'file?' instead of globbing.
-
-No, this is not supposed to work. POSIX says that a non-interactive
-shell must not generate pathnames for a redirection; an interactive
-shell may do so, provided there is exactly one match.
-
-Dash is primarily meant as a non-interactive shell and wants to be as
-small as possible, and therefore never generates pathnames for a
-redirection.
-
--- 
-Jilles Tjoelker
