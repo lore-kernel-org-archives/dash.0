@@ -1,47 +1,35 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: "fc -l" broken between v0.5.5.1 and v0.5.6
-Date: Sun, 8 Aug 2010 15:17:32 +0200
-Message-ID: <20100808131732.GB83966@stack.nl>
-References: <AANLkTi=7L7EC0xuBF4fqBksFAMAmjEiCc5VgAj75Hg=h@mail.gmail.com>
+From: "Taylan Ulrich B." <taylanbayirli@gmail.com>
+Subject: IFS and read (builtin)
+Date: Mon, 9 Aug 2010 01:13:38 +0200
+Message-ID: <AANLkTi=+AcK+tChFqwbgbE-BOJvzhZMLsOCN-wVNKQGK@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:49460 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753986Ab0HHNRd (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 8 Aug 2010 09:17:33 -0400
-Content-Disposition: inline
-In-Reply-To: <AANLkTi=7L7EC0xuBF4fqBksFAMAmjEiCc5VgAj75Hg=h@mail.gmail.com>
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:39851 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754999Ab0HHXNl (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 8 Aug 2010 19:13:41 -0400
+Received: by wwj40 with SMTP id 40so10986342wwj.1
+        for <dash@vger.kernel.org>; Sun, 08 Aug 2010 16:13:40 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Wez Furlong <kingwez@gmail.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Mon, Jul 26, 2010 at 10:17:43AM -0700, Wez Furlong wrote:
-> When building with libedit, I get the following behavior:
+dash 0.5.6.1
 
-> % ./src/dash -E
-> $ fc -l
-> fc: 1: history number -16 not found (internal error)
-> $
+Try this:
+echo foo:bar | ( IFS=: read foo bar; echo "$foo, $bar" )
 
-> dialling back to v0.5.5.1:
+It should print "foo, bar", but the IFS setting is ignored and we get
+"foo:bar, ".
 
-> % ./src/dash -E
-> $ fc -l
->     1 fc -l
-> $
+It works if you set the IFS globally before using read.
 
-> It's totally invisible to me the cause of this regression, otherwise I
-> would have also included a patch!
+It does NOT seem to be a general issue about builtins not recognizing
+leading name=value settings; for example the following works:
+OLDPWD=foo cd -
 
-> This occurs on both darwin and centos 5.3.
 
-> Let me know if I can provide more information,
-
-Please bisect this to find the commit that introduced the problem. See
-git help bisect  or
-http://www.kernel.org/pub/software/scm/git/docs/git-bisect-lk2009.html .
-
--- 
-Jilles Tjoelker
+On an unrelated note to prevent distraction, the command-grouping in
+my first example is required because:
+http://mywiki.wooledge.org/BashFAQ/024
