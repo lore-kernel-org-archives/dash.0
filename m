@@ -1,42 +1,63 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: How to inherent non-zero exit status using pipe? (dash)
-Date: Thu, 12 Aug 2010 21:15:40 -0400
-Message-ID: <20100813011540.GA21450@gondor.apana.org.au>
-References: <4C62AAF1.4060103@redhat.com>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: [PATCH] [VAR] Fix history (libedit only).
+Date: Fri, 13 Aug 2010 15:52:09 +0200
+Message-ID: <20100813135209.GB73073@stack.nl>
+References: <AANLkTi=7L7EC0xuBF4fqBksFAMAmjEiCc5VgAj75Hg=h@mail.gmail.com>
+ <20100808131732.GB83966@stack.nl>
+ <AANLkTimKQcUa=dpDVoO9TdiH3A5iW1_hJRsOdDE2LB9f@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:33749 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760528Ab0HMBPp (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 12 Aug 2010 21:15:45 -0400
+Received: from relay04.stack.nl ([131.155.140.107]:55822 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S934340Ab0HMNwL (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 13 Aug 2010 09:52:11 -0400
 Content-Disposition: inline
-In-Reply-To: <4C62AAF1.4060103@redhat.com>
+In-Reply-To: <AANLkTimKQcUa=dpDVoO9TdiH3A5iW1_hJRsOdDE2LB9f@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <eblake@redhat.com>
-Cc: pengyu.ut@gmail.com, dash@vger.kernel.org
+To: Wez Furlong <kingwez@gmail.com>
+Cc: dash@vger.kernel.org
 
-Eric Blake <eblake@redhat.com> wrote:
->
-> Generally not possible using only POSIX constructs (bash's 'set -o
-> pipefail' and '${PIPESTATUS[@]}' are extensions).  But what you _can_ do
-> is play with exec to be able to propagate non-zero status from a
-> particular portion of a pipeline through a temporary variable or file:
-> 
-> $ exec 3>&1 # duplicate original stdout
-> $ result=$(
->  exec 4>&1 >&3 3>&- # move cmd subst stdout, and restore original
->  { ./main.sh; echo $? >&4 # run command, and record its status
->  } | head -n 3)
-> $ echo $? # status from head
-> $ echo $result # status from ./main.sh
-> $ exec 3>&-
+Git commit 0df96793ef6aa103df228d7dfe56099b7d721a15 "[SHELL] Add
+preliminary LINENO support" added the LINENO variable in the middle of
+other initialized variables, causing some macros for TERM and HISTSIZE
+to break (both of these are only used if libedit support is compiled in,
+which is not the case by default).
 
-Another way is to use fifos.
+The breakage is the same as can be seen by setting HISTSIZE=0.
 
-Cheers,
+Also add a comment warning about this.
+
+The breakage was reported by Wez Furlong.
+---
+ src/var.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/src/var.c b/src/var.c
+index 3efc943..25c2216 100644
+--- a/src/var.c
++++ b/src/var.c
+@@ -78,6 +78,7 @@ const char defifsvar[] = "IFS= \t\n";
+ const char defifs[] = " \t\n";
+ #endif
+ 
++/* Some macros in var.h depend on the order, add new variables to the end. */
+ struct var varinit[] = {
+ #if ATTY
+ 	{ 0,	VSTRFIXED|VTEXTFIXED|VUNSET,	"ATTY\0",	0 },
+@@ -94,11 +95,11 @@ struct var varinit[] = {
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS2=> ",	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS4=+ ",	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"OPTIND=1",	getoptsreset },
+-	{ 0,	VSTRFIXED|VTEXTFIXED,		"LINENO=1",	0 },
+ #ifndef SMALL
+ 	{ 0,	VSTRFIXED|VTEXTFIXED|VUNSET,	"TERM\0",	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED|VUNSET,	"HISTSIZE\0",	sethistsize },
+ #endif
++	{ 0,	VSTRFIXED|VTEXTFIXED,		"LINENO=1",	0 },
+ };
+ 
+ STATIC struct var *vartab[VTABSIZE];
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.1.1
