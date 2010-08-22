@@ -1,64 +1,75 @@
 From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: trap bug in recent versions of dash
-Date: Mon, 23 Aug 2010 00:32:27 +0200
-Message-ID: <20100822223227.GA49760@stack.nl>
-References: <20100811080616.GA18303@wopr.local.invalid>
- <20100815200551.GA19150@stack.nl>
- <20100816115154.GB11790@wopr.local.invalid>
+Subject: Re: [Partial patch] IFS and read builtin
+Date: Mon, 23 Aug 2010 01:00:03 +0200
+Message-ID: <20100822230003.GB49760@stack.nl>
+References: <4C71A29C.1080609@gigawatt.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:52538 "EHLO mx1.stack.nl"
+Received: from relay02.stack.nl ([131.155.140.104]:53659 "EHLO mx1.stack.nl"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751311Ab0HVWc3 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 22 Aug 2010 18:32:29 -0400
-Received: from turtle.stack.nl (turtle.stack.nl [IPv6:2001:610:1108:5010::132])
-	by mx1.stack.nl (Postfix) with ESMTP id AAB561DD607
-	for <dash@vger.kernel.org>; Mon, 23 Aug 2010 00:32:27 +0200 (CEST)
+	id S1751324Ab0HVXAE (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 22 Aug 2010 19:00:04 -0400
 Content-Disposition: inline
-In-Reply-To: <20100816115154.GB11790@wopr.local.invalid>
+In-Reply-To: <4C71A29C.1080609@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: dash@vger.kernel.org
 
-On Mon, Aug 16, 2010 at 01:52:56PM +0200, Guido Berhoerster wrote:
-> * Jilles Tjoelker <jilles@stack.nl> [2010-08-15 22:05]:
-> > On Wed, Aug 11, 2010 at 10:06:16AM +0200, Guido Berhoerster wrote:
-> > > with the latest git version of dash trap actions are not
-> > > evaluated in the context of a function.
+On Mon, Aug 23, 2010 at 12:20:12AM +0200, Harald van Dijk wrote:
+> Hi, as has been reported already dash currently has a bug where the
+> read builtin ignores the read environment's IFS setting. As a result,
 
-> > I think dotrap()'s return value should be removed or at least ignored.
-> > An "evalskip" (break/continue/return-function/return-file) should never
-> > lead to an immediate exit. I'm not supplying a patch because I am not
-> > entirely sure about the side effects this could have.
+>   echo a:b | { IFS=: read a b; echo $a; }
 
-> OK, I'm not familiar with the source but it'd be nice to have it
-> fixed before the next release since it is a regression breaking
-> scripts.
+> will write out a:b. I tried to see what changed between 0.5.5.1 and
+> 0.5.6, and found that the old code used bltinlookup("IFS"). So, I made
+> the new code also use that. The above example works properly with the
+> attached patch.
 
-If you want to try something, here is a patch. I have verified that the
-only change to the results of FreeBSD sh's testsuite is that the test
-builtins/break2.0 starts working (there are still 51 other broken
-tests). There is no change in output from the posh testsuite (run with
-  -C sh,posix,no-typeset,no-arrays,no-coprocs,no-herestrings,no-history
-).
+This has already been fixed in a totally different way in master. See
+git commits near 95a60b2936e8835963bfb08eadc0edf9dddf0498.
 
-diff --git a/src/eval.c b/src/eval.c
-index d5e5c95..e484bec 100644
---- a/src/eval.c
-+++ b/src/eval.c
-@@ -307,9 +307,9 @@ setstatus:
- 		break;
- 	}
- out:
--	if ((checkexit & exitstatus) ||
--	    (pendingsigs && dotrap()) ||
--	    (flags & EV_EXIT))
-+	if (pendingsigs)
-+		dotrap();
-+	if ((flags & EV_EXIT) || (checkexit & exitstatus))
- 		exraise(EXEXIT);
- }
+> However, testing further, I found that there is bad interaction (even
+> without my patch, where the IFS assignment below should just be
+> ignored) between the code that handles variable assignments, and read.
+> Try this:
+
+>    $ src/dash -c 'printf "a\t\tb\n" | { IFS=$(printf "\t") read a b c; echo "|$a|$b|$c|"; }'
+>    |a||b|
+>    $ src/dash -c 'printf "a\t\tb\n" | { IFS="$(printf "\t")" read a b c; echo "|$a|$b|$c|"; }'
+>    |a|b||
+
+> This happens because expbackq is correctly called without EXP_QUOTED,
+> which makes it call recordregion, which isn't cleared by the time read
+> calls ifsbreakup. I'm not sure how that should be solved, and if there
+> are more cases where it would fail. The simplest way to solve this for
+> read is to call removerecordregions(0) before recordregion(0, len - 1,
+> 0). I have tested that locally, and it works. I am not familiar enough
+> with the code to judge whether the same situation can also happen in
+> other cases that would also need fixing, which is why I have not
+> included that part in the attached patch.
+
+Ick. Your change will probably work, but it remains sneaky action at a
+distance. To reduce complexity, it would be good to implement read's
+splitting without using expand.c. I estimate the extra lines of code
+from importing FreeBSD's code at less than 50. It will also fix an edge
+case with the splitting. The last two lines of FreeBSD's
+builtins/read1.0 test are:
+
+echo " 1 ,2 3,"         | { IFS=', ' read a b c; echo "x${a}x${b}x${c}x"; }
+echo " 1 ,2 3,,"        | { IFS=', ' read a b c; echo "x${a}x${b}x${c}x"; }
+
+These should result in:
+
+x1x2x3x
+x1x2x3,,x
+
+bash and ksh93 agree on this. However, dash master prints:
+
+x1x2x3,x
+x1x2x3,,x
 
 -- 
 Jilles Tjoelker
