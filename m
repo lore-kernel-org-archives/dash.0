@@ -1,118 +1,64 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: [Partial patch] IFS and read builtin
-Date: Mon, 23 Aug 2010 00:20:12 +0200
-Message-ID: <4C71A29C.1080609@gigawatt.nl>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: trap bug in recent versions of dash
+Date: Mon, 23 Aug 2010 00:32:27 +0200
+Message-ID: <20100822223227.GA49760@stack.nl>
+References: <20100811080616.GA18303@wopr.local.invalid>
+ <20100815200551.GA19150@stack.nl>
+ <20100816115154.GB11790@wopr.local.invalid>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------080405030005020402060002"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from cp1107341-a.dbsch1.nb.home.nl ([84.31.115.1]:41725 "EHLO
-	boostbox.lionra.local" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751202Ab0HVWZH (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 22 Aug 2010 18:25:07 -0400
+Received: from relay04.stack.nl ([131.155.140.107]:52538 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751311Ab0HVWc3 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 22 Aug 2010 18:32:29 -0400
+Received: from turtle.stack.nl (turtle.stack.nl [IPv6:2001:610:1108:5010::132])
+	by mx1.stack.nl (Postfix) with ESMTP id AAB561DD607
+	for <dash@vger.kernel.org>; Mon, 23 Aug 2010 00:32:27 +0200 (CEST)
+Content-Disposition: inline
+In-Reply-To: <20100816115154.GB11790@wopr.local.invalid>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------080405030005020402060002
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+On Mon, Aug 16, 2010 at 01:52:56PM +0200, Guido Berhoerster wrote:
+> * Jilles Tjoelker <jilles@stack.nl> [2010-08-15 22:05]:
+> > On Wed, Aug 11, 2010 at 10:06:16AM +0200, Guido Berhoerster wrote:
+> > > with the latest git version of dash trap actions are not
+> > > evaluated in the context of a function.
 
-Hi, as has been reported already dash currently has a bug where the read builtin ignores the read environment's IFS setting. As a result,
+> > I think dotrap()'s return value should be removed or at least ignored.
+> > An "evalskip" (break/continue/return-function/return-file) should never
+> > lead to an immediate exit. I'm not supplying a patch because I am not
+> > entirely sure about the side effects this could have.
 
-  echo a:b | { IFS=: read a b; echo $a; }
+> OK, I'm not familiar with the source but it'd be nice to have it
+> fixed before the next release since it is a regression breaking
+> scripts.
 
-will write out a:b. I tried to see what changed between 0.5.5.1 and 0.5.6, and found that the old code used bltinlookup("IFS"). So, I made the new code also use that. The above example works properly with the attached patch.
+If you want to try something, here is a patch. I have verified that the
+only change to the results of FreeBSD sh's testsuite is that the test
+builtins/break2.0 starts working (there are still 51 other broken
+tests). There is no change in output from the posh testsuite (run with
+  -C sh,posix,no-typeset,no-arrays,no-coprocs,no-herestrings,no-history
+).
 
-However, testing further, I found that there is bad interaction (even without my patch, where the IFS assignment below should just be ignored) between the code that handles variable assignments, and read. Try this:
+diff --git a/src/eval.c b/src/eval.c
+index d5e5c95..e484bec 100644
+--- a/src/eval.c
++++ b/src/eval.c
+@@ -307,9 +307,9 @@ setstatus:
+ 		break;
+ 	}
+ out:
+-	if ((checkexit & exitstatus) ||
+-	    (pendingsigs && dotrap()) ||
+-	    (flags & EV_EXIT))
++	if (pendingsigs)
++		dotrap();
++	if ((flags & EV_EXIT) || (checkexit & exitstatus))
+ 		exraise(EXEXIT);
+ }
 
-   $ src/dash -c 'printf "a\t\tb\n" | { IFS=$(printf "\t") read a b c; echo "|$a|$b|$c|"; }'
-   |a||b|
-   $ src/dash -c 'printf "a\t\tb\n" | { IFS="$(printf "\t")" read a b c; echo "|$a|$b|$c|"; }'
-   |a|b||
-
-This happens because expbackq is correctly called without EXP_QUOTED, which makes it call recordregion, which isn't cleared by the time read calls ifsbreakup. I'm not sure how that should be solved, and if there are more cases where it would fail. The simplest way to solve this for read is to call removerecordregions(0) before recordregion(0, len - 1, 0). I have tested that locally, and it works. I am not familiar enough with the code to judge whether the same situation can also happen in other cases that would also need fixing, which is why I have not included that part in the attached patch.
-
-Cheers,
-Harald
-
-(Re-sent because of local mail problems.)
-
---------------080405030005020402060002
-Content-Type: text/plain;
- name="dash-read-ifs.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="dash-read-ifs.patch"
-
-diff --git a/src/expand.c b/src/expand.c
-index f2f964c..3ba1a38 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -205,7 +205,7 @@ expandarg(union node *arg, struct arglist *arglist, int flag)
- 	 * TODO - EXP_REDIR
- 	 */
- 	if (flag & EXP_FULL) {
--		ifsbreakup(p, &exparg);
-+		ifsbreakup(p, &exparg, 0);
- 		*exparg.lastp = NULL;
- 		exparg.lastp = &exparg.list;
- 		expandmeta(exparg.list, flag);
-@@ -1022,9 +1022,11 @@ recordregion(int start, int end, int nulonly)
-  * Break the argument string into pieces based upon IFS and add the
-  * strings to the argument list.  The regions of the string to be
-  * searched for IFS characters have been stored by recordregion.
-+ * If bltin is set, use bltinlookup to search for IFS in the
-+ * environment of the currently executing built-in command.
-  */
- void
--ifsbreakup(char *string, struct arglist *arglist)
-+ifsbreakup(char *string, struct arglist *arglist, int bltin)
- {
- 	struct ifsregion *ifsp;
- 	struct strlist *sp;
-@@ -1040,7 +1042,13 @@ ifsbreakup(char *string, struct arglist *arglist)
- 	if (ifslastp != NULL) {
- 		ifsspc = 0;
- 		nulonly = 0;
--		realifs = ifsset() ? ifsval() : defifs;
-+		if (!bltin)
-+			realifs = ifsset() ? ifsval() : defifs;
-+		else {
-+			realifs = bltinlookup("IFS");
-+			if (realifs == NULL)
-+				realifs = defifs;
-+		}
- 		ifsp = &ifsfirst;
- 		do {
- 			p = string + ifsp->begoff;
-diff --git a/src/expand.h b/src/expand.h
-index 405af0b..8eb5f07 100644
---- a/src/expand.h
-+++ b/src/expand.h
-@@ -69,7 +69,7 @@ char *_rmescapes(char *, int);
- int casematch(union node *, char *);
- void recordregion(int, int, int);
- void removerecordregions(int); 
--void ifsbreakup(char *, struct arglist *);
-+void ifsbreakup(char *, struct arglist *, int bltin);
- 
- /* From arith.y */
- intmax_t arith(const char *);
-diff --git a/src/miscbltin.c b/src/miscbltin.c
-index 5ab1648..898ab09 100644
---- a/src/miscbltin.c
-+++ b/src/miscbltin.c
-@@ -87,7 +87,7 @@ readcmd_handle_line(char *line, char **ap, size_t len)
- 	arglist.lastp = &arglist.list;
- 	recordregion(0, len - 1, 0);
- 	
--	ifsbreakup(s, &arglist);
-+	ifsbreakup(s, &arglist, 1);
- 	*arglist.lastp = NULL;
- 	removerecordregions(0);
- 
-
-
---------------080405030005020402060002--
+-- 
+Jilles Tjoelker
