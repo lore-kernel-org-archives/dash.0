@@ -1,112 +1,118 @@
-From: Guido Berhoerster <guido+kernel.org@berhoerster.name>
-Subject: Re: trap bug in recent versions of dash
-Date: Mon, 16 Aug 2010 13:52:56 +0200
-Message-ID: <20100816115154.GB11790@wopr.local.invalid>
-References: <20100811080616.GA18303@wopr.local.invalid>
- <20100815200551.GA19150@stack.nl>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: [Partial patch] IFS and read builtin
+Date: Mon, 23 Aug 2010 00:20:12 +0200
+Message-ID: <4C71A29C.1080609@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed;
+ boundary="------------080405030005020402060002"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from multivac.heapoverflow.de ([83.169.16.167]:41250 "EHLO
-	multivac.heapoverflow.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751779Ab0HPLsX (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 16 Aug 2010 07:48:23 -0400
-Content-Disposition: inline
-In-Reply-To: <20100815200551.GA19150@stack.nl>
+Received: from cp1107341-a.dbsch1.nb.home.nl ([84.31.115.1]:41725 "EHLO
+	boostbox.lionra.local" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751202Ab0HVWZH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 22 Aug 2010 18:25:07 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-* Jilles Tjoelker <jilles@stack.nl> [2010-08-15 22:05]:
-> On Wed, Aug 11, 2010 at 10:06:16AM +0200, Guido Berhoerster wrote:
-> > with the latest git version of dash trap actions are not
-> > evaluated in the context of a function.
-> 
-> I think dotrap()'s return value should be removed or at least ignored.
-> An "evalskip" (break/continue/return-function/return-file) should never
-> lead to an immediate exit. I'm not supplying a patch because I am not
-> entirely sure about the side effects this could have.
+This is a multi-part message in MIME format.
+--------------080405030005020402060002
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-OK, I'm not familiar with the source but it'd be nice to have it
-fixed before the next release since it is a regression breaking
-scripts.
+Hi, as has been reported already dash currently has a bug where the read builtin ignores the read environment's IFS setting. As a result,
 
-> > The following script demonstrates the bug:
-> > ----8<----
-> > read_timeout () {
-> >     saved_traps="$(trap)"
-> 
-> This does not work in dash, it always returns an empty string because
-> trap is evaluated in a subshell.
-> 
-> Some other ash variants do not evaluate most command substitutions
-> containing only a single builtin in a subshell, but this was removed in
-> NetBSD sh and dash because such commands can affect the shell in wrong
-> ways (e.g. $(exit 1) causes FreeBSD sh to exit).
+  echo a:b | { IFS=: read a b; echo $a; }
 
-POSIX:2008 lists
+will write out a:b. I tried to see what changed between 0.5.5.1 and 0.5.6, and found that the old code used bltinlookup("IFS"). So, I made the new code also use that. The above example works properly with the attached patch.
 
-save_traps=$(trap)
-...
-eval "$save_traps"
+However, testing further, I found that there is bad interaction (even without my patch, where the IFS assignment below should just be ignored) between the code that handles variable assignments, and read. Try this:
 
-as an example in the specification of the trap special builtin,
-although it somewhat contradicts the description. This goes back
-to at lease the SUSv2 in 1997 and it currently works e.g. in bash
-and ksh93.
+   $ src/dash -c 'printf "a\t\tb\n" | { IFS=$(printf "\t") read a b c; echo "|$a|$b|$c|"; }'
+   |a||b|
+   $ src/dash -c 'printf "a\t\tb\n" | { IFS="$(printf "\t")" read a b c; echo "|$a|$b|$c|"; }'
+   |a|b||
 
-> A recent or proposed POSIX interpretation has said that $(trap) should
-> work, and that this may be done by treating a lone trap command
-> specially or by having trap in a subshell output the parent's traps
-> until a trap has been set in the subshell. To help the former case,
-> stuff like TRAP=trap; y=$($TRAP) is not required to work.
-> 
-> A problem in the script is that it does not handle TERM set to the
-> default action properly, as this is not included in trap's output.
+This happens because expbackq is correctly called without EXP_QUOTED, which makes it call recordregion, which isn't cleared by the time read calls ifsbreakup. I'm not sure how that should be solved, and if there are more cases where it would fail. The simplest way to solve this for read is to call removerecordregions(0) before recordregion(0, len - 1, 0). I have tested that locally, and it works. I am not familiar enough with the code to judge whether the same situation can also happen in other cases that would also need fixing, which is why I have not included that part in the attached patch.
 
-Right, the following interpretation has been approved last year (see
-http://austingroupbugs.net/view.php?id=53):
-"When a subshell is entered, traps that are not being ignored shall
-be set to the default actions, except in the case of a command
-substitution containing only a single trap command, when the traps
-need not be altered. Implementations may check for this case
-using only lexical analysis; for example if `trap` and $( trap -- )
-do not alter the traps in the subshell, cases such as assigning
-var=trap and then using $($var) may still alter them."
-and
-"The trap command with no operands shall write to standard output
-a list of commands associated with each condition. If the command
-is executed in a subshell, the implementation does not perform
-the optional check described above for a command substitution
-containing only a single trap command, and no trap commands with
-operands have been executed since entry to the subshell, the list
-shall contain the commands that were associated with each
-condition immediately before the subshell environment was entered.
-Otherwise, the list shall contain the commands currently
-associated with each condition."
+Cheers,
+Harald
 
-So this IMHO this should be implemented as a special case in dash
-as well.
+(Re-sent because of local mail problems.)
 
-> >     trap 'printf "timed out\n"; eval "${saved_traps}"; return' TERM
-> >     ( sleep $1; kill -TERM $$ ) >/dev/null 2>&1 &
-> 
-> For portability, I recommend braces
->     { sleep $1; kill -TERM $$; } >/dev/null 2>&1 &
-> 
-> Some shells do not treat a background subshell specially and fork twice,
-> which would cause the wrong process to be killed below.
+--------------080405030005020402060002
+Content-Type: text/plain;
+ name="dash-read-ifs.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="dash-read-ifs.patch"
 
-Thanks for the hint.
+diff --git a/src/expand.c b/src/expand.c
+index f2f964c..3ba1a38 100644
+--- a/src/expand.c
++++ b/src/expand.c
+@@ -205,7 +205,7 @@ expandarg(union node *arg, struct arglist *arglist, int flag)
+ 	 * TODO - EXP_REDIR
+ 	 */
+ 	if (flag & EXP_FULL) {
+-		ifsbreakup(p, &exparg);
++		ifsbreakup(p, &exparg, 0);
+ 		*exparg.lastp = NULL;
+ 		exparg.lastp = &exparg.list;
+ 		expandmeta(exparg.list, flag);
+@@ -1022,9 +1022,11 @@ recordregion(int start, int end, int nulonly)
+  * Break the argument string into pieces based upon IFS and add the
+  * strings to the argument list.  The regions of the string to be
+  * searched for IFS characters have been stored by recordregion.
++ * If bltin is set, use bltinlookup to search for IFS in the
++ * environment of the currently executing built-in command.
+  */
+ void
+-ifsbreakup(char *string, struct arglist *arglist)
++ifsbreakup(char *string, struct arglist *arglist, int bltin)
+ {
+ 	struct ifsregion *ifsp;
+ 	struct strlist *sp;
+@@ -1040,7 +1042,13 @@ ifsbreakup(char *string, struct arglist *arglist)
+ 	if (ifslastp != NULL) {
+ 		ifsspc = 0;
+ 		nulonly = 0;
+-		realifs = ifsset() ? ifsval() : defifs;
++		if (!bltin)
++			realifs = ifsset() ? ifsval() : defifs;
++		else {
++			realifs = bltinlookup("IFS");
++			if (realifs == NULL)
++				realifs = defifs;
++		}
+ 		ifsp = &ifsfirst;
+ 		do {
+ 			p = string + ifsp->begoff;
+diff --git a/src/expand.h b/src/expand.h
+index 405af0b..8eb5f07 100644
+--- a/src/expand.h
++++ b/src/expand.h
+@@ -69,7 +69,7 @@ char *_rmescapes(char *, int);
+ int casematch(union node *, char *);
+ void recordregion(int, int, int);
+ void removerecordregions(int); 
+-void ifsbreakup(char *, struct arglist *);
++void ifsbreakup(char *, struct arglist *, int bltin);
+ 
+ /* From arith.y */
+ intmax_t arith(const char *);
+diff --git a/src/miscbltin.c b/src/miscbltin.c
+index 5ab1648..898ab09 100644
+--- a/src/miscbltin.c
++++ b/src/miscbltin.c
+@@ -87,7 +87,7 @@ readcmd_handle_line(char *line, char **ap, size_t len)
+ 	arglist.lastp = &arglist.list;
+ 	recordregion(0, len - 1, 0);
+ 	
+-	ifsbreakup(s, &arglist);
++	ifsbreakup(s, &arglist, 1);
+ 	*arglist.lastp = NULL;
+ 	removerecordregions(0);
+ 
 
-> >     timer_pid=$!
-> >     read $2
-> >     kill $timer_pid 2>/dev/null
-> 
-> eval "${saved_traps}"  is missing here.
 
-Yep, forgot that.
-
--- 
-Guido Berhoerster
+--------------080405030005020402060002--
