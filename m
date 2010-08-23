@@ -1,75 +1,68 @@
-From: Jilles Tjoelker <jilles@stack.nl>
+From: Harald van Dijk <harald@gigawatt.nl>
 Subject: Re: [Partial patch] IFS and read builtin
-Date: Mon, 23 Aug 2010 01:00:03 +0200
-Message-ID: <20100822230003.GB49760@stack.nl>
-References: <4C71A29C.1080609@gigawatt.nl>
+Date: Mon, 23 Aug 2010 02:03:01 +0200
+Message-ID: <4C71BAB5.1030504@gigawatt.nl>
+References: <4C71A29C.1080609@gigawatt.nl> <20100822230003.GB49760@stack.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay02.stack.nl ([131.155.140.104]:53659 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751324Ab0HVXAE (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 22 Aug 2010 19:00:04 -0400
-Content-Disposition: inline
-In-Reply-To: <4C71A29C.1080609@gigawatt.nl>
+Received: from cp1107341-a.dbsch1.nb.home.nl ([84.31.115.1]:45681 "EHLO
+	boostbox.lionra.local" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751031Ab0HWABP (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 22 Aug 2010 20:01:15 -0400
+In-Reply-To: <20100822230003.GB49760@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Mon, Aug 23, 2010 at 12:20:12AM +0200, Harald van Dijk wrote:
-> Hi, as has been reported already dash currently has a bug where the
-> read builtin ignores the read environment's IFS setting. As a result,
+On 23/08/10 01:00, Jilles Tjoelker wrote:
+> On Mon, Aug 23, 2010 at 12:20:12AM +0200, Harald van Dijk wrote:
+>>[...]
+>>   echo a:b | { IFS=: read a b; echo $a; }
+>>[...]
+> 
+> This has already been fixed in a totally different way in master. See
+> git commits near 95a60b2936e8835963bfb08eadc0edf9dddf0498.
 
->   echo a:b | { IFS=: read a b; echo $a; }
+Interesting, thank you for the reference. That commit (from May) does a lot more than fix the read problem, and does not specifically address the read problem at all, which is probably why it has not made it into 0.5.6.1 (from June), and why I had not found it.
 
-> will write out a:b. I tried to see what changed between 0.5.5.1 and
-> 0.5.6, and found that the old code used bltinlookup("IFS"). So, I made
-> the new code also use that. The above example works properly with the
-> attached patch.
+The IFS problem was breaking the build of glibc, and reportedly also causing an unbootable system for someone because of a bad build of libusb, so it was important to fix it somehow for Gentoo. Would you prefer I continue to use a version of the patch I posted, or use the more invasive commits from master?
 
-This has already been fixed in a totally different way in master. See
-git commits near 95a60b2936e8835963bfb08eadc0edf9dddf0498.
+>>    $ src/dash -c 'printf "a\t\tb\n" | { IFS=$(printf "\t") read a b c; echo "|$a|$b|$c|"; }'
+>>    |a||b|
+>>    $ src/dash -c 'printf "a\t\tb\n" | { IFS="$(printf "\t")" read a b c; echo "|$a|$b|$c|"; }'
+>>    |a|b||
+>>[...]
+> Ick. Your change will probably work, but it remains sneaky action at a
+> distance. To reduce complexity, it would be good to implement read's
+> splitting without using expand.c.
 
-> However, testing further, I found that there is bad interaction (even
-> without my patch, where the IFS assignment below should just be
-> ignored) between the code that handles variable assignments, and read.
-> Try this:
+read used to have its own splitting code, but it was changed to use expand.c some time between 0.5.5 and 0.5.6.1. The old splitting code had bugs that expand.c did not have.
 
->    $ src/dash -c 'printf "a\t\tb\n" | { IFS=$(printf "\t") read a b c; echo "|$a|$b|$c|"; }'
->    |a||b|
->    $ src/dash -c 'printf "a\t\tb\n" | { IFS="$(printf "\t")" read a b c; echo "|$a|$b|$c|"; }'
->    |a|b||
+> I estimate the extra lines of code
+> from importing FreeBSD's code at less than 50. It will also fix an edge
+> case with the splitting. The last two lines of FreeBSD's
+> builtins/read1.0 test are:
+> 
+> echo " 1 ,2 3,"         | { IFS=', ' read a b c; echo "x${a}x${b}x${c}x"; }
+> echo " 1 ,2 3,,"        | { IFS=', ' read a b c; echo "x${a}x${b}x${c}x"; }
+> 
+> These should result in:
+> 
+> x1x2x3x
+> x1x2x3,,x
+> 
+> bash and ksh93 agree on this. However, dash master prints:
+> 
+> x1x2x3,x
+> x1x2x3,,x
 
-> This happens because expbackq is correctly called without EXP_QUOTED,
-> which makes it call recordregion, which isn't cleared by the time read
-> calls ifsbreakup. I'm not sure how that should be solved, and if there
-> are more cases where it would fail. The simplest way to solve this for
-> read is to call removerecordregions(0) before recordregion(0, len - 1,
-> 0). I have tested that locally, and it works. I am not familiar enough
-> with the code to judge whether the same situation can also happen in
-> other cases that would also need fixing, which is why I have not
-> included that part in the attached patch.
+This is also what zsh prints. Could you explain why bash and ksh are correct? By my reading, when IFS=', ', then splitting " 1 ,2 3," results in "1", "2", "3", and "". Leading and trailing IFS white space gets ignored, but the trailing , is not white space, so makes the total field count 4. Since there are four fields, a is assigned "1", b is assigned "2", c is assigned "3," which is "3", the separator ",", and the final field "". But I'll be the first to admit I'm far from an expert, and I trust bash to get these things right, I'm just curious why bash is right.
 
-Ick. Your change will probably work, but it remains sneaky action at a
-distance. To reduce complexity, it would be good to implement read's
-splitting without using expand.c. I estimate the extra lines of code
-from importing FreeBSD's code at less than 50. It will also fix an edge
-case with the splitting. The last two lines of FreeBSD's
-builtins/read1.0 test are:
-
-echo " 1 ,2 3,"         | { IFS=', ' read a b c; echo "x${a}x${b}x${c}x"; }
-echo " 1 ,2 3,,"        | { IFS=', ' read a b c; echo "x${a}x${b}x${c}x"; }
-
-These should result in:
-
-x1x2x3x
-x1x2x3,,x
-
-bash and ksh93 agree on this. However, dash master prints:
-
-x1x2x3,x
-x1x2x3,,x
-
--- 
-Jilles Tjoelker
+That said, zsh is consistent here, and dash is not. zsh also makes
+  x=" 1 ,2 3,"
+  IFS=", "
+  set $x
+  echo $#
+print out 4, while dash prints 3 in this case. So either way, something is wrong.
