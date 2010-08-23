@@ -1,73 +1,116 @@
-From: Guido Berhoerster <guido+kernel.org@berhoerster.name>
-Subject: Re: trap bug in recent versions of dash
-Date: Mon, 23 Aug 2010 12:40:48 +0200
-Message-ID: <20100823103617.GA9302@wopr.local.invalid>
-References: <20100811080616.GA18303@wopr.local.invalid>
- <20100815200551.GA19150@stack.nl>
- <20100816115154.GB11790@wopr.local.invalid>
- <20100822223227.GA49760@stack.nl>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: [Partial patch] IFS and read builtin
+Date: Mon, 23 Aug 2010 21:35:10 +0200
+Message-ID: <20100823193510.GA67671@stack.nl>
+References: <4C71A29C.1080609@gigawatt.nl>
+ <20100822230003.GB49760@stack.nl>
+ <4C71BAB5.1030504@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="U+BazGySraz5kW0T"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from multivac.heapoverflow.de ([83.169.16.167]:59377 "EHLO
-	multivac.heapoverflow.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751966Ab0HWKf5 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 23 Aug 2010 06:35:57 -0400
-Received: from wopr.local.invalid (p57BD705D.dip.t-dialin.net [87.189.112.93])
-	by multivac.heapoverflow.de (Postfix) with ESMTPSA id A19F5A3F812C
-	for <dash@vger.kernel.org>; Mon, 23 Aug 2010 12:35:55 +0200 (CEST)
+Received: from relay04.stack.nl ([131.155.140.107]:62364 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753026Ab0HWTfL (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 23 Aug 2010 15:35:11 -0400
 Content-Disposition: inline
-In-Reply-To: <20100822223227.GA49760@stack.nl>
+In-Reply-To: <4C71BAB5.1030504@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: dash@vger.kernel.org
 
+On Mon, Aug 23, 2010 at 02:03:01AM +0200, Harald van Dijk wrote:
+> On 23/08/10 01:00, Jilles Tjoelker wrote:
+> > On Mon, Aug 23, 2010 at 12:20:12AM +0200, Harald van Dijk wrote:
+> >>[...]
+> >>   echo a:b | { IFS=: read a b; echo $a; }
+> >>[...]
+> > 
+> > This has already been fixed in a totally different way in master. See
+> > git commits near 95a60b2936e8835963bfb08eadc0edf9dddf0498.
 
---U+BazGySraz5kW0T
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> Interesting, thank you for the reference. That commit (from May) does
+> a lot more than fix the read problem, and does not specifically
+> address the read problem at all, which is probably why it has not made
+> it into 0.5.6.1 (from June), and why I had not found it.
 
-* Jilles Tjoelker <jilles@stack.nl> [2010-08-23 00:32]:
-> If you want to try something, here is a patch. I have verified that the
-> only change to the results of FreeBSD sh's testsuite is that the test
-> builtins/break2.0 starts working (there are still 51 other broken
-> tests). There is no change in output from the posh testsuite (run with
->   -C sh,posix,no-typeset,no-arrays,no-coprocs,no-herestrings,no-history
-> ).
-> 
-> diff --git a/src/eval.c b/src/eval.c
-> index d5e5c95..e484bec 100644
-> --- a/src/eval.c
-> +++ b/src/eval.c
-> @@ -307,9 +307,9 @@ setstatus:
->  		break;
->  	}
->  out:
-> -	if ((checkexit & exitstatus) ||
-> -	    (pendingsigs && dotrap()) ||
-> -	    (flags & EV_EXIT))
-> +	if (pendingsigs)
-> +		dotrap();
-> +	if ((flags & EV_EXIT) || (checkexit & exitstatus))
->  		exraise(EXEXIT);
->  }
+> The IFS problem was breaking the build of glibc, and reportedly also
+> causing an unbootable system for someone because of a bad build of
+> libusb, so it was important to fix it somehow for Gentoo. Would you
+> prefer I continue to use a version of the patch I posted, or use the
+> more invasive commits from master?
 
-Unfortunately this seems to corrupt variables.
-See the attached test script, after the TERM signal $value
-is not empty anymore but contains garbage.
+I think you should do what you think is best for the stability of your
+product. Because dash releases are not extensively tested, I'd recommend
+a trial build of at least a minimal base system with the new version you
+choose. A particular feature to be wary of is LINENO support, as it will
+cause most configure scripts to accept dash as a usable shell.
 
-Where can I find FreeBSD's sh tests?
+> >>    $ src/dash -c 'printf "a\t\tb\n" | { IFS=$(printf "\t") read a b c; echo "|$a|$b|$c|"; }'
+> >>    |a||b|
+> >>    $ src/dash -c 'printf "a\t\tb\n" | { IFS="$(printf "\t")" read a b c; echo "|$a|$b|$c|"; }'
+> >>    |a|b||
+> >>[...]
+> > Ick. Your change will probably work, but it remains sneaky action at a
+> > distance. To reduce complexity, it would be good to implement read's
+> > splitting without using expand.c.
+
+> read used to have its own splitting code, but it was changed to use
+> expand.c some time between 0.5.5 and 0.5.6.1. The old splitting code
+> had bugs that expand.c did not have.
+
+Right, but it seems better to fix the bugs rather than entangle things
+with expand.c and still leave bugs.
+
+> > I estimate the extra lines of code
+> > from importing FreeBSD's code at less than 50. It will also fix an edge
+> > case with the splitting. The last two lines of FreeBSD's
+> > builtins/read1.0 test are:
+
+> > echo " 1 ,2 3,"         | { IFS=', ' read a b c; echo "x${a}x${b}x${c}x"; }
+> > echo " 1 ,2 3,,"        | { IFS=', ' read a b c; echo "x${a}x${b}x${c}x"; }
+
+> > These should result in:
+
+> > x1x2x3x
+> > x1x2x3,,x
+
+> > bash and ksh93 agree on this. However, dash master prints:
+
+> > x1x2x3,x
+> > x1x2x3,,x
+
+> This is also what zsh prints. Could you explain why bash and ksh are
+> correct? By my reading, when IFS=', ', then splitting " 1 ,2 3,"
+> results in "1", "2", "3", and "". Leading and trailing IFS white space
+> gets ignored, but the trailing , is not white space, so makes the
+> total field count 4. Since there are four fields, a is assigned "1", b
+> is assigned "2", c is assigned "3," which is "3", the separator ",",
+> and the final field "". But I'll be the first to admit I'm far from an
+> expert, and I trust bash to get these things right, I'm just curious
+> why bash is right.
+
+> That said, zsh is consistent here, and dash is not. zsh also makes
+>   x=" 1 ,2 3,"
+>   IFS=", "
+>   set $x
+>   echo $#
+> print out 4, while dash prints 3 in this case. So either way,
+> something is wrong.
+
+I think the important thing is that IFS characters are supposed to be
+field terminators (see POSIX XCU 2.6.5 Field Splitting).
+
+Therefore, in the example " 1 ,2 3," there are three fields, each
+containing one digit, and each variable is assigned one of them.
+
+In the example " 1 ,2 3,," there are four fields, the last being empty.
+Then c is assigned the third field plus the delimiter character and the
+remaining fields and their delimiters except trailing whitespace that is
+in IFS. Hence, both commas end up in c.
+
+Likewise, in your example with normal field splitting, dash is right and
+zsh is wrong.
+
 -- 
-Guido Berhoerster
-
---U+BazGySraz5kW0T
-Content-Type: application/x-shellscript
-Content-Disposition: attachment; filename="timed-read.sh"
-Content-Transfer-Encoding: quoted-printable
-
-#!/bin/sh=0A=0Aread_timeout () {=0A    saved_traps=3D"$(trap)"=0A    trap '=
-printf "timed out\n"; eval "${saved_traps}"; return' TERM=0A    { sleep $1;=
- kill -TERM $$; } >/dev/null 2>&1 &=0A    timer_pid=3D$!=0A    read $2=0A  =
-  kill $timer_pid 2>/dev/null=0A    eval "${saved_traps}"=0A}=0A=0A# exampl=
-e=0Aread_timeout 1 value=0Aprintf "read \"%s\"\n" "${value:=3Ddefault}"=0A
---U+BazGySraz5kW0T--
+Jilles Tjoelker
