@@ -1,43 +1,79 @@
-From: Adam Kellas <Adam.Kellas@gmail.com>
-Subject: dash -n and -v not implemented?
-Date: Mon, 23 Aug 2010 15:47:39 -0400
-Message-ID: <i4uj8q$ah3$1@dough.gmane.org>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: trap bug in recent versions of dash
+Date: Mon, 23 Aug 2010 22:11:07 +0200
+Message-ID: <20100823201107.GB67671@stack.nl>
+References: <20100811080616.GA18303@wopr.local.invalid>
+ <20100815200551.GA19150@stack.nl>
+ <20100816115154.GB11790@wopr.local.invalid>
+ <20100822223227.GA49760@stack.nl>
+ <20100823103617.GA9302@wopr.local.invalid>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from lo.gmane.org ([80.91.229.12]:43614 "EHLO lo.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754600Ab0HWUKF (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 23 Aug 2010 16:10:05 -0400
-Received: from list by lo.gmane.org with local (Exim 4.69)
-	(envelope-from <gcsd-dash@m.gmane.org>)
-	id 1OndLH-0006wO-5m
-	for dash@vger.kernel.org; Mon, 23 Aug 2010 22:10:03 +0200
-Received: from c-76-24-28-236.hsd1.ma.comcast.net ([76.24.28.236])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Mon, 23 Aug 2010 22:10:03 +0200
-Received: from Adam.Kellas by c-76-24-28-236.hsd1.ma.comcast.net with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Mon, 23 Aug 2010 22:10:03 +0200
+Received: from relay04.stack.nl ([131.155.140.107]:51269 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751107Ab0HWULI (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 23 Aug 2010 16:11:08 -0400
+Received: from turtle.stack.nl (turtle.stack.nl [IPv6:2001:610:1108:5010::132])
+	by mx1.stack.nl (Postfix) with ESMTP id 742991DD659
+	for <dash@vger.kernel.org>; Mon, 23 Aug 2010 22:11:07 +0200 (CEST)
+Content-Disposition: inline
+In-Reply-To: <20100823103617.GA9302@wopr.local.invalid>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Am I missing something, or do the -n and -v flags have no effect? The 
-following compares the behavior of bash, ksh, and dash (bash requires an 
-extra flag to suppress startup files):
+On Mon, Aug 23, 2010 at 12:40:48PM +0200, Guido Berhoerster wrote:
+> * Jilles Tjoelker <jilles@stack.nl> [2010-08-23 00:32]:
+> > If you want to try something, here is a patch. I have verified that the
+> > only change to the results of FreeBSD sh's testsuite is that the test
+> > builtins/break2.0 starts working (there are still 51 other broken
+> > tests). There is no change in output from the posh testsuite (run with
+> >   -C sh,posix,no-typeset,no-arrays,no-coprocs,no-herestrings,no-history
+> > ).
 
-% ksh -v -n -c uname
-uname
+> > diff --git a/src/eval.c b/src/eval.c
+> > index d5e5c95..e484bec 100644
+> > --- a/src/eval.c
+> > +++ b/src/eval.c
+> > @@ -307,9 +307,9 @@ setstatus:
+> >  		break;
+> >  	}
+> >  out:
+> > -	if ((checkexit & exitstatus) ||
+> > -	    (pendingsigs && dotrap()) ||
+> > -	    (flags & EV_EXIT))
+> > +	if (pendingsigs)
+> > +		dotrap();
+> > +	if ((flags & EV_EXIT) || (checkexit & exitstatus))
+> >  		exraise(EXEXIT);
+> >  }
 
-% bash --norc -v -n uname
-uname
+> Unfortunately this seems to corrupt variables.
+> See the attached test script, after the TERM signal $value
+> is not empty anymore but contains garbage.
 
-% dash -v -n -c uname
-Linux
+I think this is the same strange bug as Harald van Dijk reported. The
+below gives incorrect output, and quoting the command substitution works
+around the issue:
 
-AK
+dash -c 'printf "a\t\tb\n" | { IFS=$(printf "\t") read a b c; echo "|$a|$b|$c|"; }'
 
+In your script, if I write  read "$2"  instead of  read $2  it works.
 
+> Where can I find FreeBSD's sh tests?
+
+You need the tools/regression/bin/sh directory from the head (cvs: HEAD)
+branch of the FreeBSD src repository. See
+http://www.freebsd.org/developers/cvs.html for access methods. There are
+also unofficial git, hg and other mirrors if you prefer that.
+
+The tests are designed to run under perl's prove(1) tool.
+
+The tests test the first instance of "sh" in the PATH. To test other
+shells, create a symlink named sh in a new directory and add that
+directory in front of your PATH. This is a little clumsy but also
+ensures bash and zsh enable their compatibility modes.
+
+-- 
+Jilles Tjoelker
