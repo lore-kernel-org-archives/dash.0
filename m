@@ -1,192 +1,74 @@
-From: Steve Schnepp <steve.schnepp@gmail.com>
-Subject: Re: read() builtin doesn't read integer value /proc files (but bash's does)
-Date: Sat, 4 Sep 2010 20:20:33 +0200
-Message-ID: <AANLkTi=d_13RCDhJHE_23BXN5Tf2RY_2e3rED7JwtFOK@mail.gmail.com>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: read() builtin doesn't read integer value /proc files (but
+ bash's does)
+Date: Sat, 4 Sep 2010 21:35:04 +0200
+Message-ID: <20100904193504.GA3357@stack.nl>
 References: <AANLkTinTd+29=8EkiTKptoE8nnVphcQ_TW=ezS99LmWw@mail.gmail.com>
- <AANLkTi=ZcNYJKCO_FM0RpJndwAgtzTU_C8J=9BsfmdAk@mail.gmail.com> <20100903212504.GA86276@stack.nl>
+ <AANLkTi=ZcNYJKCO_FM0RpJndwAgtzTU_C8J=9BsfmdAk@mail.gmail.com>
+ <20100903212504.GA86276@stack.nl>
+ <AANLkTi=d_13RCDhJHE_23BXN5Tf2RY_2e3rED7JwtFOK@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary=001636e1ef9dd0ad2e048f731c76
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-vw0-f46.google.com ([209.85.212.46]:57084 "EHLO
-	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751627Ab0IDSVP (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 4 Sep 2010 14:21:15 -0400
-Received: by vws3 with SMTP id 3so2240283vws.19
-        for <dash@vger.kernel.org>; Sat, 04 Sep 2010 11:21:14 -0700 (PDT)
-In-Reply-To: <20100903212504.GA86276@stack.nl>
+Received: from relay04.stack.nl ([131.155.140.107]:52833 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752510Ab0IDTfG (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 4 Sep 2010 15:35:06 -0400
+Content-Disposition: inline
+In-Reply-To: <AANLkTi=d_13RCDhJHE_23BXN5Tf2RY_2e3rED7JwtFOK@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
+To: Steve Schnepp <steve.schnepp@gmail.com>
 Cc: dash@vger.kernel.org, 595063@bugs.debian.org
 
---001636e1ef9dd0ad2e048f731c76
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On Sat, Sep 04, 2010 at 08:20:33PM +0200, Steve Schnepp wrote:
+> 2010/9/3 Jilles Tjoelker <jilles@stack.nl>:
+> > This patch assumes that the file descriptor is discarded afterwards=
+ (its
+> > position does not matter). Therefore the very common construct
+> > =A0while read x; do
+> > =A0 =A0...
+> > =A0done
+> > stops working.
 
-2010/9/3 Jilles Tjoelker <jilles@stack.nl>:
-> This patch assumes that the file descriptor is discarded afterwards (its
-> position does not matter). Therefore the very common construct
-> =C2=A0while read x; do
-> =C2=A0 =C2=A0...
-> =C2=A0done
-> stops working.
+> Ohh.. thanks for that, I didn't see it.
 
-Ohh.. thanks for that, I didn't see it.
+> Actually "while read x" continues to work.
+> But "reopening the file" doesn't as in :
 
-Actually "while read x" continues to work.
-But "reopening the file" doesn't as in :
+> read a b < datafile
+> echo ${a} ${b}
+> read a b < datafile
+> echo ${a} ${b}
 
-read a b < datafile
-echo ${a} ${b}
-read a b < datafile
-echo ${a} ${b}
+You're right, it's even stranger than I expected.
 
-I attached an updated patch that corrects this pb by discarding the
-buffer when opening a new file.
-I also put everything in new files (bufreadcmd.c & .h), in order to
-ease its understanding.
+> I attached an updated patch that corrects this pb by discarding the
+> buffer when opening a new file.
 
---
-Steve Schnepp
-http://blog.pwkf.org/
+This discarding is still bad as it throws away valid data if the open
+file description is shared. This happens if stdin is redirected inside =
+a
+while read... loop.
 
+=46urthermore, I think constructions like
+  read x; cat
+and
+  read x; (read y); read z
+should keep working. This requires that the input's file position be
+synced whenever another process may see it (fork/exit). Due to the
+highly dynamic character of the shell and the common use of fd 0, this
+probably means that you can't do better than syncing after each read
+builtin. (For example, 'read' could be overridden with a function after
+the third line.)
 
->
-> A possible fix is to check first if the input supports seeking. If it
-> does, use the buffering and at the end of the line seek backwards for
-> the number of bytes remaining in the buffer. If it does not, read one
-> byte at a time.
->
-> --
-> Jilles Tjoelker
->
+Another thought:
+  exec 3<&0; read x; read y <&3
+or even
+  sh -c 'read x; read y <&3' 3<&0
+Different file descriptors may refer to the same open file description
+and the shell may not know this.
 
-
---
-Steve Schnepp
-http://blog.pwkf.org/
-
---001636e1ef9dd0ad2e048f731c76
-Content-Type: text/x-patch; charset=US-ASCII; name="dash_readbuf.diff"
-Content-Disposition: attachment; filename="dash_readbuf.diff"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gdorm5cq0
-
-Q29tbW9uIHN1YmRpcmVjdG9yaWVzOiBkYXNoLTAuNS40L3NyYy9ibHRpbiBhbmQgZGFzaC0wLjUu
-NC1wYXRjaGVkL3NyYy9ibHRpbgpkaWZmIC1wdU4gZGFzaC0wLjUuNC9zcmMvYnVmcmVhZGNtZC5j
-IGRhc2gtMC41LjQtcGF0Y2hlZC9zcmMvYnVmcmVhZGNtZC5jCi0tLSBkYXNoLTAuNS40L3NyYy9i
-dWZyZWFkY21kLmMJMTk3MC0wMS0wMSAwMTowMDowMC4wMDAwMDAwMDAgKzAxMDAKKysrIGRhc2gt
-MC41LjQtcGF0Y2hlZC9zcmMvYnVmcmVhZGNtZC5jCTIwMTAtMDktMDQgMTI6MzE6NDYuMDAwMDAw
-MDAwICswMjAwCkBAIC0wLDAgKzEsNTkgQEAKKy8qCisgKiBPZmZlcnMgYSBidWZmZXJlZCByZWFk
-IGJ1aWx0aW4KKyAqLworCisjaW5jbHVkZSA8dW5pc3RkLmg+CisjaW5jbHVkZSA8c3RkbGliLmg+
-CisKKyNpbmNsdWRlICJidWZyZWFkY21kLmgiCisKKyNpZmRlZiBCVUZfUkVBRF9CVUlMVElOX0RJ
-U0FCTEVECitpbnQgZHVwMl93cmFwcGVyKGludCBvbGQsIGludCBuZXcpIHsKKwlyZXR1cm4gZHVw
-MihvbGQsIG5ldyk7Cit9CitpbnQgcmVhZF9zdGRpbl9idWZmZXJyZWQoY2hhciAqYykgeworCXJl
-dHVybiByZWFkKDAsIGJ1ZmZlciwgMSk7Cit9CisjZWxzZSAvLyBCVUZfUkVBRF9CVUlMVElOX0RJ
-U0FCTEVECisKKy8qCisgKiBSZWFkcyBmcm9tIGZkIDAsIHdpdGggYSBDSFVOS19SRUFEX1NJWkUs
-CisgKiBidXQgZW1pdHRpbmcgb25lIGNoYXIgYXQgYSB0aW1lCisgKi8KKyNkZWZpbmUgQ0hVTktf
-UkVBRF9TSVpFIDMyCitzdGF0aWMgY2hhciBidWZmZXJbQ0hVTktfUkVBRF9TSVpFXTsKK3N0YXRp
-YyBpbnQgYnVmZmVyX29mZnNldCA9IDA7CitzdGF0aWMgaW50IGJ1ZmZlcl9sZW4gPSAwOworCitp
-bnQgcmVhZF9zdGRpbl9idWZmZXJyZWQoY2hhciogYykgeworICAgICAgIGlmIChidWZmZXJfbGVu
-ID09IDApIHsKKyAgICAgICAgICAgICAgIC8vIE5vIGNhcmFjdGVyIGxlZnQsIHJlc2V0dGluZyBi
-dWZmZXIgJiByZWFkIHNvbWUgbW9yZQorICAgICAgICAgICAgICAgYnVmZmVyX29mZnNldCA9IDA7
-CisgICAgICAgICAgICAgICBidWZmZXJfbGVuID0gcmVhZCgwLCBidWZmZXIsIENIVU5LX1JFQURf
-U0laRSk7CisKKyAgICAgICAgICAgICAgIGlmIChidWZmZXJfbGVuID09IDApIHsKKyAgICAgICAg
-ICAgICAgICAgICAgICAgLy8gTm90aGluZyB0byByZWFkIGFueW1vcmUKKyAgICAgICAgICAgICAg
-ICAgICAgICAgcmV0dXJuIDA7CisgICAgICAgICAgICAgICB9CisgICAgICAgfQorCisgICAgICAg
-Ly8gU3RpbGwgc29tZSBjaGFyYWN0ZXIgbGVmdAorICAgICAgICpjID0gYnVmZmVyW2J1ZmZlcl9v
-ZmZzZXQrK107CisgICAgICAgYnVmZmVyX2xlbi0tOworCisgICAgICAgcmV0dXJuIDE7Cit9CisK
-K3N0YXRpYyB2b2lkIF9mbHVzaF9yZWFkY21kKGludCBmZCkgeworCWlmIChmZCA9PSAwKSB7IAor
-CQkvLyBGbHVzaCB0aGUgYnVmZmVyLCBkaXNjYXJkaW5nIGl0cyBjb250ZW50CisJCWJ1ZmZlcl9s
-ZW4gPSAwOworCX0KK30KKworLyogSW50ZXJjZXB0IGR1cDIoKSBjYWxscyAqLworaW50IGR1cDJf
-d3JhcHBlcihpbnQgb2xkLCBpbnQgbmV3KSB7CisJX2ZsdXNoX3JlYWRjbWQobmV3KTsKKwlyZXR1
-cm4gZHVwMihvbGQsIG5ldyk7Cit9CisjZW5kaWYgLy8gQlVGX1JFQURfQlVJTFRJTl9ESVNBQkxF
-RApkaWZmIC1wdU4gZGFzaC0wLjUuNC9zcmMvYnVmcmVhZGNtZC5oIGRhc2gtMC41LjQtcGF0Y2hl
-ZC9zcmMvYnVmcmVhZGNtZC5oCi0tLSBkYXNoLTAuNS40L3NyYy9idWZyZWFkY21kLmgJMTk3MC0w
-MS0wMSAwMTowMDowMC4wMDAwMDAwMDAgKzAxMDAKKysrIGRhc2gtMC41LjQtcGF0Y2hlZC9zcmMv
-YnVmcmVhZGNtZC5oCTIwMTAtMDktMDQgMTI6MjM6NTMuMDAwMDAwMDAwICswMjAwCkBAIC0wLDAg
-KzEsMyBAQAorLyogVXNlZCBmb3IgZmx1c2hpbmcgdGhlIHJlYWRjbWQgcmVhZCgpIGJ1ZmZlciAq
-LworaW50IGR1cDJfd3JhcHBlcihpbnQgdG8sIGludCBmcm9tKTsKK2ludCByZWFkX3N0ZGluX2J1
-ZmZlcnJlZChjaGFyICpjKTsKQ29tbW9uIHN1YmRpcmVjdG9yaWVzOiBkYXNoLTAuNS40L3NyYy8u
-ZGVwcyBhbmQgZGFzaC0wLjUuNC1wYXRjaGVkL3NyYy8uZGVwcwpkaWZmIC1wdU4gZGFzaC0wLjUu
-NC9zcmMvZXZhbC5jIGRhc2gtMC41LjQtcGF0Y2hlZC9zcmMvZXZhbC5jCi0tLSBkYXNoLTAuNS40
-L3NyYy9ldmFsLmMJMjAwNy0wNy0xMyAxMDoyNjo0Mi4wMDAwMDAwMDAgKzAyMDAKKysrIGRhc2gt
-MC41LjQtcGF0Y2hlZC9zcmMvZXZhbC5jCTIwMTAtMDktMDQgMTI6MjQ6NTUuMDAwMDAwMDAwICsw
-MjAwCkBAIC02NCw2ICs2NCw4IEBACiAjaW5jbHVkZSAibXloaXN0ZWRpdC5oIgogI2VuZGlmCiAK
-KyNpbmNsdWRlICJidWZyZWFkY21kLmgiCisKIAogLyogZmxhZ3MgaW4gYXJndW1lbnQgdG8gZXZh
-bHRyZWUgKi8KICNkZWZpbmUgRVZfRVhJVCAwMQkJLyogZXhpdCBhZnRlciBldmFsdWF0aW5nIHRy
-ZWUgKi8KQEAgLTU0MywxMSArNTQ1LDEyIEBAIGV2YWxwaXBlKHVuaW9uIG5vZGUgKm4sIGludCBm
-bGFncykKIAkJCQljbG9zZShwaXBbMF0pOwogCQkJfQogCQkJaWYgKHByZXZmZCA+IDApIHsKLQkJ
-CQlkdXAyKHByZXZmZCwgMCk7CisJCQkJZHVwMl93cmFwcGVyKHByZXZmZCwgMCk7CisKIAkJCQlj
-bG9zZShwcmV2ZmQpOwogCQkJfQogCQkJaWYgKHBpcFsxXSA+IDEpIHsKLQkJCQlkdXAyKHBpcFsx
-XSwgMSk7CisJCQkJZHVwMl93cmFwcGVyKHBpcFsxXSwgMSk7CiAJCQkJY2xvc2UocGlwWzFdKTsK
-IAkJCX0KIAkJCWV2YWx0cmVlbnIobHAtPm4sIGZsYWdzKTsKQEAgLTYyNSw3ICs2MjgsNyBAQCBl
-dmFsYmFja2NtZCh1bmlvbiBub2RlICpuLCBzdHJ1Y3QgYmFja2NtCiAJCQlGT1JDRUlOVE9OOwog
-CQkJY2xvc2UocGlwWzBdKTsKIAkJCWlmIChwaXBbMV0gIT0gMSkgewotCQkJCWR1cDIocGlwWzFd
-LCAxKTsKKwkJCQlkdXAyX3dyYXBwZXIocGlwWzFdLCAxKTsKIAkJCQljbG9zZShwaXBbMV0pOwog
-CQkJfQogCQkJZWZsYWcgPSAwOwpkaWZmIC1wdU4gZGFzaC0wLjUuNC9zcmMvTWFrZWZpbGUgZGFz
-aC0wLjUuNC1wYXRjaGVkL3NyYy9NYWtlZmlsZQotLS0gZGFzaC0wLjUuNC9zcmMvTWFrZWZpbGUJ
-MjAxMC0wOS0wNCAxMzowNjowNS4wMDAwMDAwMDAgKzAyMDAKKysrIGRhc2gtMC41LjQtcGF0Y2hl
-ZC9zcmMvTWFrZWZpbGUJMjAxMC0wOS0wNCAxMzowODoyNi4wMDAwMDAwMDAgKzAyMDAKQEAgLTU3
-LDcgKzU3LDcgQEAgYW1fX29iamVjdHNfMSA9IGFsaWFzLiQoT0JKRVhUKSBhcml0aF95eQogCW1p
-c2NibHRpbi4kKE9CSkVYVCkgbXlzdHJpbmcuJChPQkpFWFQpIG9wdGlvbnMuJChPQkpFWFQpIFwK
-IAlwYXJzZXIuJChPQkpFWFQpIHJlZGlyLiQoT0JKRVhUKSBzaG93LiQoT0JKRVhUKSB0cmFwLiQo
-T0JKRVhUKSBcCiAJb3V0cHV0LiQoT0JKRVhUKSBwcmludGYuJChPQkpFWFQpIHN5c3RlbS4kKE9C
-SkVYVCkgXAotCXRlc3QuJChPQkpFWFQpIHRpbWVzLiQoT0JKRVhUKSB2YXIuJChPQkpFWFQpCisJ
-dGVzdC4kKE9CSkVYVCkgdGltZXMuJChPQkpFWFQpIHZhci4kKE9CSkVYVCkgYnVmcmVhZGNtZC4k
-KE9CSkVYVCkKIGFtX2Rhc2hfT0JKRUNUUyA9ICQoYW1fX29iamVjdHNfMSkgYXJpdGguJChPQkpF
-WFQpCiBkYXNoX09CSkVDVFMgPSAkKGFtX2Rhc2hfT0JKRUNUUykKIGRhc2hfREVQRU5ERU5DSUVT
-ID0gYnVpbHRpbnMubyBpbml0Lm8gbm9kZXMubyBzaWduYW1lcy5vIHN5bnRheC5vCkBAIC0xNjks
-MTQgKzE2OSwxNCBAQCBkYXNoX0NGSUxFUyA9IFwKIAlhbGlhcy5jIGFyaXRoX3l5bGV4LmMgY2Qu
-YyBlcnJvci5jIGV2YWwuYyBleGVjLmMgZXhwYW5kLmMgXAogCWhpc3RlZGl0LmMgaW5wdXQuYyBq
-b2JzLmMgbWFpbC5jIG1haW4uYyBtZW1hbGxvYy5jIG1pc2NibHRpbi5jIFwKIAlteXN0cmluZy5j
-IG9wdGlvbnMuYyBwYXJzZXIuYyByZWRpci5jIHNob3cuYyB0cmFwLmMgb3V0cHV0LmMgXAotCWJs
-dGluL3ByaW50Zi5jIHN5c3RlbS5jIGJsdGluL3Rlc3QuYyBibHRpbi90aW1lcy5jIHZhci5jCisJ
-Ymx0aW4vcHJpbnRmLmMgc3lzdGVtLmMgYmx0aW4vdGVzdC5jIGJsdGluL3RpbWVzLmMgdmFyLmMg
-YnVmcmVhZGNtZC5jCiAKIGRhc2hfU09VUkNFUyA9IFwKIAkkKGRhc2hfQ0ZJTEVTKSBhcml0aC55
-IFwKIAlhbGlhcy5oIGJsdGluL2JsdGluLmggY2QuaCBlcnJvci5oIGV2YWwuaCBleGVjLmggZXhw
-YW5kLmggaGV0aW8uaCBcCiAJaW5pdC5oIGlucHV0Lmggam9icy5oIG1hY2hkZXAuaCBtYWlsLmgg
-bWFpbi5oIG1lbWFsbG9jLmggbWlzY2JsdGluLmggXAogCW15aGlzdGVkaXQuaCBteXN0cmluZy5o
-IG9wdGlvbnMuaCBvdXRwdXQuaCBwYXJzZXIuaCByZWRpci5oIHNoZWxsLmggXAotCXNob3cuaCBz
-eXN0ZW0uaCB0cmFwLmggdmFyLmgKKwlzaG93Lmggc3lzdGVtLmggdHJhcC5oIHZhci5oIGJ1ZnJl
-YWRjbWQuaAogCiBkYXNoX0xEQUREID0gYnVpbHRpbnMubyBpbml0Lm8gbm9kZXMubyBzaWduYW1l
-cy5vIHN5bnRheC5vCiBIRUxQRVJTID0gbWtpbml0IG1rc3ludGF4IG1rbm9kZXMgbWtzaWduYW1l
-cwpkaWZmIC1wdU4gZGFzaC0wLjUuNC9zcmMvbWlzY2JsdGluLmMgZGFzaC0wLjUuNC1wYXRjaGVk
-L3NyYy9taXNjYmx0aW4uYwotLS0gZGFzaC0wLjUuNC9zcmMvbWlzY2JsdGluLmMJMjAwNy0wNy0x
-MyAxMDoyNjo0My4wMDAwMDAwMDAgKzAyMDAKKysrIGRhc2gtMC41LjQtcGF0Y2hlZC9zcmMvbWlz
-Y2JsdGluLmMJMjAxMC0wOS0wNCAxMjoyMzoyMS4wMDAwMDAwMDAgKzAyMDAKQEAgLTU1LDE2ICs1
-NSwxNyBAQAogI2luY2x1ZGUgIm1pc2NibHRpbi5oIgogI2luY2x1ZGUgIm15c3RyaW5nLmgiCiAj
-aW5jbHVkZSAibWFpbi5oIgorI2luY2x1ZGUgImJ1ZnJlYWRjbWQuaCIKIAogI3VuZGVmIHJmbGFn
-CiAKIAotCiAvKgogICogVGhlIHJlYWQgYnVpbHRpbi4gIFRoZSAtZSBvcHRpb24gY2F1c2VzIGJh
-Y2tzbGFzaGVzIHRvIGVzY2FwZSB0aGUKICAqIGZvbGxvd2luZyBjaGFyYWN0ZXIuCiAgKgogICog
-VGhpcyB1c2VzIHVuYnVmZmVyZWQgaW5wdXQsIHdoaWNoIG1heSBiZSBhdm9pZGFibGUgaW4gc29t
-ZSBjYXNlcy4KKyAqIFhYWCAtIFVzZXMgX3JlYWRfYnVmZmVycmVkKCkgdGhhdCBjaHVua3MgcmVh
-ZCgpLCBidXQgZW1pdHMgb25lIGNoYXIgYXQgYSB0aW1lCiAgKi8KIAogaW50CkBAIC0xMDQsNyAr
-MTA1LDcgQEAgcmVhZGNtZChpbnQgYXJnYywgY2hhciAqKmFyZ3YpCiAJYmFja3NsYXNoID0gMDsK
-IAlTVEFSVFNUQUNLU1RSKHApOwogCWZvciAoOzspIHsKLQkJaWYgKHJlYWQoMCwgJmMsIDEpICE9
-IDEpIHsKKwkJaWYgKHJlYWRfc3RkaW5fYnVmZmVycmVkKCZjKSAhPSAxKSB7CiAJCQlzdGF0dXMg
-PSAxOwogCQkJYnJlYWs7CiAJCX0KZGlmZiAtcHVOIGRhc2gtMC41LjQvc3JjL21pc2NibHRpbi5o
-IGRhc2gtMC41LjQtcGF0Y2hlZC9zcmMvbWlzY2JsdGluLmgKLS0tIGRhc2gtMC41LjQvc3JjL21p
-c2NibHRpbi5oCTIwMDctMDctMTMgMTA6MjY6NDMuMDAwMDAwMDAwICswMjAwCisrKyBkYXNoLTAu
-NS40LXBhdGNoZWQvc3JjL21pc2NibHRpbi5oCTIwMTAtMDktMDQgMTA6NDY6MDIuMDAwMDAwMDAw
-ICswMjAwCkBAIC0yOSwzICsyOSw2IEBACiBpbnQgcmVhZGNtZChpbnQsIGNoYXIgKiopOwogaW50
-IHVtYXNrY21kKGludCwgY2hhciAqKik7CiBpbnQgdWxpbWl0Y21kKGludCwgY2hhciAqKik7CisK
-Ky8qIFVzZWQgZm9yIGZsdXNoaW5nIHRoZSByZWFkY21kIHJlYWQoKSBidWZmZXIgKi8KK3ZvaWQg
-Zmx1c2hfcmVhZGNtZChpbnQgZmQpOwpkaWZmIC1wdU4gZGFzaC0wLjUuNC9zcmMvcmVkaXIuYyBk
-YXNoLTAuNS40LXBhdGNoZWQvc3JjL3JlZGlyLmMKLS0tIGRhc2gtMC41LjQvc3JjL3JlZGlyLmMJ
-MjAwNy0wNy0xMyAxMDoyNjo0My4wMDAwMDAwMDAgKzAyMDAKKysrIGRhc2gtMC41LjQtcGF0Y2hl
-ZC9zcmMvcmVkaXIuYwkyMDEwLTA5LTA0IDEyOjI1OjQ5LjAwMDAwMDAwMCArMDIwMApAQCAtNTYs
-NiArNTYsOCBAQAogI2luY2x1ZGUgIm1lbWFsbG9jLmgiCiAjaW5jbHVkZSAiZXJyb3IuaCIKIAor
-I2luY2x1ZGUgImJ1ZnJlYWRjbWQuaCIKKwogCiAjZGVmaW5lIFJFQUxMWV9DTE9TRUQgLTMJLyog
-ZmQgdGhhdCB3YXMgY2xvc2VkIGFuZCBzdGlsbCBpcyAqLwogI2RlZmluZSBFTVBUWSAtMgkJLyog
-bWFya3MgYW4gdW51c2VkIHNsb3QgaW4gcmVkaXJ0YWIgKi8KQEAgLTI2NSwxNCArMjY3LDE0IEBA
-IGR1cHJlZGlyZWN0KHJlZGlyLCBmKQogCQkJCW1lbW9yeVtmZF0gPSAxOwogCQkJZWxzZQogI2Vu
-ZGlmCi0JCQkJaWYgKGR1cDIoZiwgZmQpIDwgMCkgeworCQkJCWlmIChkdXAyX3dyYXBwZXIoZiwg
-ZmQpIDwgMCkgewogCQkJCQllcnIgPSBlcnJubzsKIAkJCQkJZ290byBlcnI7CiAJCQkJfQogCQkJ
-cmV0dXJuOwogCQl9CiAJCWYgPSBmZDsKLQl9IGVsc2UgaWYgKGR1cDIoZiwgZmQpIDwgMCkKKwl9
-IGVsc2UgaWYgKGR1cDJfd3JhcHBlcihmLCBmZCkgPCAwKQogCQllcnIgPSBlcnJubzsKIAogCWNs
-b3NlKGYpOwpAQCAtMzU0LDcgKzM1Niw3IEBAIHBvcHJlZGlyKGludCBkcm9wKQogCQkJYnJlYWs7
-CiAJCWRlZmF1bHQ6CiAJCQlpZiAoIWRyb3ApCi0JCQkJZHVwMihycC0+cmVuYW1lZFtpXSwgaSk7
-CisJCQkJZHVwMl93cmFwcGVyKHJwLT5yZW5hbWVkW2ldLCBpKTsKIAkJCWNsb3NlKHJwLT5yZW5h
-bWVkW2ldKTsKIAkJCWJyZWFrOwogCQl9Cg==
---001636e1ef9dd0ad2e048f731c76--
+--=20
+Jilles Tjoelker
