@@ -1,74 +1,55 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: read() builtin doesn't read integer value /proc files (but
- bash's does)
-Date: Sat, 4 Sep 2010 21:35:04 +0200
-Message-ID: <20100904193504.GA3357@stack.nl>
-References: <AANLkTinTd+29=8EkiTKptoE8nnVphcQ_TW=ezS99LmWw@mail.gmail.com>
- <AANLkTi=ZcNYJKCO_FM0RpJndwAgtzTU_C8J=9BsfmdAk@mail.gmail.com>
- <20100903212504.GA86276@stack.nl>
- <AANLkTi=d_13RCDhJHE_23BXN5Tf2RY_2e3rED7JwtFOK@mail.gmail.com>
+From: Alexey Zinovyev <alzinovyev@gmail.com>
+Subject: [PATCH] fix UTF-8 issues in read() builtin
+Date: Wed, 8 Sep 2010 01:26:15 +0400
+Message-ID: <20100907212615.GA28796@3arch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: multipart/mixed; boundary="bg08WKrSYDhXBjb5"
+Content-Transfer-Encoding: 8bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:52833 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752510Ab0IDTfG (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 4 Sep 2010 15:35:06 -0400
+Received: from mail-ew0-f46.google.com ([209.85.215.46]:57735 "EHLO
+	mail-ew0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757478Ab0IGVZZ (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 7 Sep 2010 17:25:25 -0400
+Received: by ewy23 with SMTP id 23so2645430ewy.19
+        for <dash@vger.kernel.org>; Tue, 07 Sep 2010 14:25:24 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <AANLkTi=d_13RCDhJHE_23BXN5Tf2RY_2e3rED7JwtFOK@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Steve Schnepp <steve.schnepp@gmail.com>
-Cc: dash@vger.kernel.org, 595063@bugs.debian.org
+To: dash@vger.kernel.org
 
-On Sat, Sep 04, 2010 at 08:20:33PM +0200, Steve Schnepp wrote:
-> 2010/9/3 Jilles Tjoelker <jilles@stack.nl>:
-> > This patch assumes that the file descriptor is discarded afterwards=
- (its
-> > position does not matter). Therefore the very common construct
-> > =A0while read x; do
-> > =A0 =A0...
-> > =A0done
-> > stops working.
 
-> Ohh.. thanks for that, I didn't see it.
+--bg08WKrSYDhXBjb5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-> Actually "while read x" continues to work.
-> But "reopening the file" doesn't as in :
+Hello, I think there is a bug in read() builtin.
 
-> read a b < datafile
-> echo ${a} ${b}
-> read a b < datafile
-> echo ${a} ${b}
+$ cat test
+echo 'ρ'|while read i; do echo $i; done
+$ dash test
 
-You're right, it's even stranger than I expected.
+$ bash test
+ρ
 
-> I attached an updated patch that corrects this pb by discarding the
-> buffer when opening a new file.
+Same with some japanese symbols.
+Looks like dash strips 0x81 byte. 
 
-This discarding is still bad as it throws away valid data if the open
-file description is shared. This happens if stdin is redirected inside =
-a
-while read... loop.
+--bg08WKrSYDhXBjb5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="dash-read-fix.patch"
 
-=46urthermore, I think constructions like
-  read x; cat
-and
-  read x; (read y); read z
-should keep working. This requires that the input's file position be
-synced whenever another process may see it (fork/exit). Due to the
-highly dynamic character of the shell and the common use of fd 0, this
-probably means that you can't do better than syncing after each read
-builtin. (For example, 'read' could be overridden with a function after
-the third line.)
+diff --git a/src/miscbltin.c b/src/miscbltin.c
+index 5ab1648..f8c5655 100644
+--- a/src/miscbltin.c
++++ b/src/miscbltin.c
+@@ -101,7 +101,6 @@ readcmd_handle_line(char *line, char **ap, size_t len)
+ 			 * will not modify the length of the string */
+ 			offset = sl->text - s;
+ 			remainder = backup + offset;
+-			rmescapes(remainder);
+ 			setvar(*ap, remainder, 0);
+ 
+ 			return;
 
-Another thought:
-  exec 3<&0; read x; read y <&3
-or even
-  sh -c 'read x; read y <&3' 3<&0
-Different file descriptors may refer to the same open file description
-and the shell may not know this.
-
---=20
-Jilles Tjoelker
+--bg08WKrSYDhXBjb5--
