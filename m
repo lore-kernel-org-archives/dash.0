@@ -1,92 +1,37 @@
-From: Philipp Weis <pweis@pweis.com>
-Subject: [PATCH] [MAN] Document optional open parenthesis for case patterns.
-Date: Tue, 7 Sep 2010 22:42:19 -0400
-Message-ID: <20100908024219.GA3283@zaphod.pweis.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] [VAR] Fix history (libedit only).
+Date: Wed, 8 Sep 2010 16:17:49 +0800
+Message-ID: <20100908081749.GA15336@gondor.apana.org.au>
+References: <AANLkTi=7L7EC0xuBF4fqBksFAMAmjEiCc5VgAj75Hg=h@mail.gmail.com> <20100808131732.GB83966@stack.nl> <AANLkTimKQcUa=dpDVoO9TdiH3A5iW1_hJRsOdDE2LB9f@mail.gmail.com> <20100813135209.GB73073@stack.nl>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WhfpMioaduB5tiZL"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from arthur.pweis.com ([87.106.5.233]:34631 "EHLO arthur.pweis.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751143Ab0IHDBl (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 7 Sep 2010 23:01:41 -0400
-Received: from zaphod (authenticated)
-	by arthur.pweis.com with esmtps (Exim 4.63 #1 (Debian))
-	id 1OtAcA-0001QM-BN
-	for <dash@vger.kernel.org>; Wed, 08 Sep 2010 02:42:22 +0000
-Received: from pweis by zaphod with local (Exim 4.72 #1 (Debian))
-	id 1OtAc8-0005NK-1i
-	for <dash@vger.kernel.org>; Tue, 07 Sep 2010 22:42:20 -0400
+Received: from helcar.apana.org.au ([209.40.204.226]:57609 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758426Ab0IHIRz (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 8 Sep 2010 04:17:55 -0400
 Content-Disposition: inline
+In-Reply-To: <20100813135209.GB73073@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Jilles Tjoelker <jilles@stack.nl>
+Cc: Wez Furlong <kingwez@gmail.com>, dash@vger.kernel.org
 
+On Fri, Aug 13, 2010 at 01:52:09PM +0000, Jilles Tjoelker wrote:
+> Git commit 0df96793ef6aa103df228d7dfe56099b7d721a15 "[SHELL] Add
+> preliminary LINENO support" added the LINENO variable in the middle of
+> other initialized variables, causing some macros for TERM and HISTSIZE
+> to break (both of these are only used if libedit support is compiled in,
+> which is not the case by default).
+> 
+> The breakage is the same as can be seen by setting HISTSIZE=0.
+> 
+> Also add a comment warning about this.
+> 
+> The breakage was reported by Wez Furlong.
 
---WhfpMioaduB5tiZL
-Content-Type: multipart/mixed; boundary="gBBFr7Ir9EOA20Yy"
-Content-Disposition: inline
-
-
---gBBFr7Ir9EOA20Yy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi,
-
-while inspecting some dash scripts on my system, I was surprised to
-see that some of them use an open parenthesis at the beginning of case
-patterns while that's not mentioned in the manpage. Dash currently is
-fine with and without that parenthesis (parser.c:413). The attached
-patch documents this feature.
-
-Philipp
-
-
-
---gBBFr7Ir9EOA20Yy
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="dash-case-parenthesis.patch"
-
-diff --git a/src/dash.1 b/src/dash.1
-index c7771d0..ddeb52b 100644
---- a/src/dash.1
-+++ b/src/dash.1
-@@ -663,7 +663,7 @@ These are implemented as builtin commands.
- The syntax of the case command is
- .Bd -literal -offset indent
- case word in
--pattern) list ;;
-+[(]pattern) list ;;
- \&...
- esac
- .Ed
-@@ -673,6 +673,11 @@ The pattern can actually be one or more patterns (see
- described later), separated by
- .Dq \*(Ba
- characters.
-+The
-+.Do
-+(
-+.Dc
-+character before the pattern is optional.
- .Ss Grouping Commands Together
- Commands may be grouped by writing either
- .Pp
-
---gBBFr7Ir9EOA20Yy--
-
---WhfpMioaduB5tiZL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iEYEARECAAYFAkyG+AYACgkQzxf2HvbDMkk/zwCfZ+4x1xXVuzoRHt+WgVabgvF5
-3jkAn3FIduUbXFRl3FnCXKtcHH8G8vvn
-=aOmA
------END PGP SIGNATURE-----
-
---WhfpMioaduB5tiZL--
+Patch applied.  Thanks Jilles!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
