@@ -1,52 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [Partial patch] IFS and read builtin
-Date: Wed, 8 Sep 2010 19:53:24 +0800
-Message-ID: <20100908115324.GA17029@gondor.apana.org.au>
-References: <4C71A29C.1080609@gigawatt.nl>
+Date: Wed, 8 Sep 2010 20:08:49 +0800
+Message-ID: <20100908120849.GA17121@gondor.apana.org.au>
+References: <4C71A29C.1080609@gigawatt.nl> <20100908115324.GA17029@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:44124 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:53084 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752741Ab0IHLx0 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 8 Sep 2010 07:53:26 -0400
+	with ESMTP id S1751610Ab0IHMIv (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 8 Sep 2010 08:08:51 -0400
 Content-Disposition: inline
-In-Reply-To: <4C71A29C.1080609@gigawatt.nl>
+In-Reply-To: <20100908115324.GA17029@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Harald van Dijk <harald@gigawatt.nl>
 Cc: dash@vger.kernel.org
 
-Harald van Dijk <harald@gigawatt.nl> wrote:
-> [-- text/plain, encoding 7bit, charset: ISO-8859-1, 20 lines --]
+On Wed, Sep 08, 2010 at 07:53:24PM +0800, Herbert Xu wrote:
 > 
-> Hi, as has been reported already dash currently has a bug where the read builtin ignores the read environment's IFS setting. As a result,
+> commit 5c7042771753d5a968b2b7263cf9f4e02fa3820e
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Wed Sep 8 19:51:10 2010 +0800
 > 
->  echo a:b | { IFS=: read a b; echo $a; }
-> 
-> will write out a:b. I tried to see what changed between 0.5.5.1 and 0.5.6, and found that the old code used bltinlookup("IFS"). So, I made the new code also use that. The above example works properly with the attached patch.
+>     [EXPAND] Fix ifsfirst/ifslastp leak
 
-This problem should be fixed in the main trunk.  I will make a
-new release soon.
+Slight update, should also call ifsfree instead of removerecordregion
+in read(1).
 
-> However, testing further, I found that there is bad interaction (even without my patch, where the IFS assignment below should just be ignored) between the code that handles variable assignments, and read. Try this:
-> 
->   $ src/dash -c 'printf "a\t\tb\n" | { IFS=$(printf "\t") read a b c; echo "|$a|$b|$c|"; }'
->   |a||b|
->   $ src/dash -c 'printf "a\t\tb\n" | { IFS="$(printf "\t")" read a b c; echo "|$a|$b|$c|"; }'
->   |a|b||
-> 
-> This happens because expbackq is correctly called without EXP_QUOTED, which makes it call recordregion, which isn't cleared by the time read calls ifsbreakup. I'm not sure how that should be solved, and if there are more cases where it would fail. The simplest way to solve this for read is to call removerecordregions(0) before recordregion(0, len - 1, 0). I have tested that locally, and it works. I am not familiar enough with the code to judge whether the same situation can also happen in other cases that would also need fixing, which is why I have not included that part in the attached patch.
-
-Thanks for catching this.
-
-This is the result of ifslastp leaking out of expandarg which isn't
-supposed to happen.  The following patch should fix it plus a real
-memory leak that occurs if we bail before hitting ifsfree.
-
-commit 5c7042771753d5a968b2b7263cf9f4e02fa3820e
+commit f42e443bb511ed3224f09b4fcf0772438ebdbbfa
 Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Wed Sep 8 19:51:10 2010 +0800
+Date:   Wed Sep 8 20:07:26 2010 +0800
 
     [EXPAND] Fix ifsfirst/ifslastp leak
     
@@ -172,6 +156,19 @@ index 405af0b..4251a4a 100644
  
  /* From arith.y */
  intmax_t arith(const char *);
+diff --git a/src/miscbltin.c b/src/miscbltin.c
+index 5ab1648..c42a01c 100644
+--- a/src/miscbltin.c
++++ b/src/miscbltin.c
+@@ -89,7 +89,7 @@ readcmd_handle_line(char *line, char **ap, size_t len)
+ 	
+ 	ifsbreakup(s, &arglist);
+ 	*arglist.lastp = NULL;
+-	removerecordregions(0);
++	ifsfree();
+ 
+ 	for (sl = arglist.list; sl; sl = sl->next) {
+ 		/* remaining fields present, but no variables left. */
 
 Cheers,
 -- 
