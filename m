@@ -1,37 +1,50 @@
-From: Sven Mascheck <mascheck@in-ulm.de>
-Subject: Re: [PATCH] [MAN] Document optional open parenthesis for case
-	patterns.
-Date: Sat, 11 Sep 2010 01:52:02 +0200
-Message-ID: <20100910235202.GE16906@lisa.in-ulm.de>
-References: <20100908024219.GA3283@zaphod.pweis.com>
-Reply-To: mascheck@in-ulm.de
+From: =?iso-8859-1?Q?Lo=EFc?= Minier <lool@dooz.org>
+Subject: exit-ing in a trap handler uses the wrong exit code
+Date: Sat, 25 Sep 2010 13:59:00 +0200
+Message-ID: <20100925115900.GA9732@bee.dooz.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.in-ulm.de ([217.10.8.10]:37730 "HELO mail.in-ulm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1755038Ab0IJX6p (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 10 Sep 2010 19:58:45 -0400
+Received: from duck.dooz.org ([194.146.227.125]:33364 "EHLO duck.dooz.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750722Ab0IYMRo (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 25 Sep 2010 08:17:44 -0400
+Received: from bee.dooz.org (serris.dooz.org [88.166.229.232])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by duck.dooz.org (Postfix) with ESMTP id C92DEC809C
+	for <dash@vger.kernel.org>; Sat, 25 Sep 2010 13:59:04 +0200 (CEST)
 Content-Disposition: inline
-In-Reply-To: <20100908024219.GA3283@zaphod.pweis.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-On Tue, Sep 07, 2010 at 10:42:19PM -0400, Philipp Weis wrote:
+        Hi there
 
-> while inspecting some dash scripts on my system, I was surprised to
-> see that some of them use an open parenthesis at the beginning of cas=
-e
-> patterns while that's not mentioned in the manpage. Dash currently is
-> fine with and without that parenthesis (parser.c:413).
+ qemu's configure uses a trap handler which calls exit; configure would
+ call exit 1, but with the trap handler in place the configure script
+ would return with exit 0.
 
-BTW, This feature is a workaround:
-Without the left paren, several shells=B9 are confused with "case"
-inside $( ), because now the parens are not "balanced" anymore.
-Although dash doesn't need this (in fact any ash variant),
-it was added ('99) for reasons of script portability.
-Another benefit is easy searching for matching parens in editors.
+ dash -c 'trap "sh -c \"exit 4\"; exit" 0 1 2 3 9 11 13 15;exit 3'; ech=
+o $?
+ 4
 
-=B9 bash pre-4, ksh88, pdksh-variants
+ Blue Swirl on the qemu-devel list points out that according to POSIX
+ this should be 3:
+ http://www.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.htm=
+l#tag_18_21
+
+ bash and zsh get this right:
+ bash -c 'trap "sh -c \"exit 4\"; exit" 0 1 2 3 9 11 13 15;exit 3'; ech=
+o $?
+ 3
+
+ I've logged https://bugs.launchpad.net/ubuntu/+source/dash/+bug/647450
+ to track this as I'm seeing this with the Ubuntu version of dash.
+
+   Cheers,
+
+NB: Not subscribed to the list, please Cc: me on replies
+--=20
+Lo=EFc Minier
