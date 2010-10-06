@@ -1,91 +1,90 @@
 From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH] [OPTIONS] Use exit status 127 when the script to run does
- not exist
-Date: Wed, 6 Oct 2010 05:04:20 -0500
-Message-ID: <20101006100420.GA361@burratino>
+Subject: [PATCH] [INPUT] Catch attempts to run a directory as a script
+Date: Wed, 6 Oct 2010 05:08:04 -0500
+Message-ID: <20101006100804.GB361@burratino>
 References: <20100605160651.GA60028@stack.nl>
  <20100614095451.26362.qmail@43559bb7971308.315fe32.mid.smarden.org>
  <20100628065326.GA25667@gondor.apana.org.au>
+ <20101006100420.GA361@burratino>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:61047 "EHLO
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:54606 "EHLO
 	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755093Ab0JFKHq (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 6 Oct 2010 06:07:46 -0400
-Received: by iwn5 with SMTP id 5so9553188iwn.19
-        for <dash@vger.kernel.org>; Wed, 06 Oct 2010 03:07:46 -0700 (PDT)
+	with ESMTP id S1750963Ab0JFKLZ (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 6 Oct 2010 06:11:25 -0400
+Received: by iwn5 with SMTP id 5so9556747iwn.19
+        for <dash@vger.kernel.org>; Wed, 06 Oct 2010 03:11:24 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20100628065326.GA25667@gondor.apana.org.au>
+In-Reply-To: <20101006100420.GA361@burratino>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Gerrit Pape <pape@smarden.org>, dash@vger.kernel.org, "Krzysztof A. Sobiecki" <sobkas@gmail.com>
+Cc: Gerrit Pape <pape@smarden.org>, dash@vger.kernel.org, "Krzysztof A. Sobiecki" <sobkas@gmail.com>, Jari Aalto <jari.aalto@cante.net>
 
-Currently dash uses exit status 2 to report failure to run a
-script named on the command line that does not exist:
+open() succeeds, though read() fails later, when a pathname
+passed as argv[0] on the command line points to a directory,
+which somehow results in dash thinking everything is okay:
 
- $ sh nonexistent
- sh: Can't open nonexistent
+ $ sh dir/
  $ echo $?
- 2
+ 0
 
-According to SUSv3 and SUSv4[1], the exit code should be 127.
+But POSIX makes it clear enough that in "sh command_file",
+command_file is supposed to be a file, not a directory.  So
+diagnose this with an error message and exit with status 2.
 
-So check errno when opening a command_file during argument
-processing and exit(127) when it is ENOENT.  This check is in the
-argument processing code to avoid collateral damage to code paths
-that read scripts (such as the dot builtin).  Other errors (such
-as EACCESS) while opening the command_file will still result in
-an exit code of 2.
-
-[1] http://www.opengroup.org/onlinepubs/9699919799/utilities/sh.html#tag_20_117_14
-
-Reported-by: Clint Adams <schizo@debian.org>
-Fixes: http://bugs.debian.org/548743
+Reported-by: Jari Aalto <jari.aalto@cante.net>
+Fixes: http://bugs.debian.org/548687
 Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
 ---
-Herbert Xu wrote:
+Applies on top of the previous patch, which is based on
+master.
 
-> This is wrong.  You're creating exactly the problem that Jilles
-> was talking about where dot(1) is returning 127.  This code should
-> be moved to procargs, which runs only for the "sh script" case.
+Thanks to Gerrit and Krzysztof for your help so far.
 
-Makes sense.  How does this look?
+ src/input.c |   21 ++++++++++++++++++++-
+ 1 files changed, 20 insertions(+), 1 deletions(-)
 
-It still ignores attempts to run "sh directory"; see the next
-patch for that.
-
- src/options.c |    9 ++++++++-
- 1 files changed, 8 insertions(+), 1 deletions(-)
-
-diff --git a/src/options.c b/src/options.c
-index 6f381e6..5667b68 100644
---- a/src/options.c
-+++ b/src/options.c
-@@ -37,6 +37,7 @@
- #include <stdlib.h>
+diff --git a/src/input.c b/src/input.c
+index e57ad76..d68d441 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -395,6 +395,19 @@ popstring(void)
+ }
  
- #include "shell.h"
-+#include "main.h"
- #define DEFINE_OPTIONS
- #include "options.h"
- #undef DEFINE_OPTIONS
-@@ -156,7 +157,13 @@ procargs(int argc, char **argv)
- 		if (*xargv)
- 			goto setarg0;
- 	} else if (!sflag) {
--		setinputfile(*xargv, 0);
-+		if (setinputfile(*xargv, INPUT_NOFILE_OK) < 0) {
-+			if (errno == ENOENT) {
-+				exitstatus = 127;
-+				exerror(EXEXIT, "Can't open %s", *xargv);
-+			}
-+			sh_error("Can't open %s", *xargv);
-+		}
- setarg0:
- 		arg0 = *xargv++;
- 		commandname = arg0;
++/*
++ * Is fd a directory file descriptor?
++ */
++
++static int
++isdir(const char *fname, int fd)
++{
++	struct stat64 statb;
++	if (fstat64(fd, &statb) < 0)
++		sh_error("Can't stat %s", fname);
++	return S_ISDIR(statb.st_mode);
++}
++
+ /*
+  * Set the input to take input from a file.  If push is set, push the
+  * old input onto the stack first.
+  */
+@@ -405,7 +418,13 @@ setinputfile(const char *fname, int flags)
+ 	int fd;
+ 
+ 	INTOFF;
+-	if ((fd = open(fname, O_RDONLY)) < 0) {
++	fd = open(fname, O_RDONLY);
++	if (isdir(fname, fd)) {
++		close(fd);
++		fd = -1;
++		errno = EISDIR;
++	}
++	if (fd < 0) {
+ 		if (flags & INPUT_NOFILE_OK)
+ 			goto out;
+ 		sh_error("Can't open %s", fname);
 -- 
 1.7.2.3
 
