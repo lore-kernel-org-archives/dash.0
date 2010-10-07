@@ -1,7 +1,7 @@
 From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH 0/3] Fix exit status for 'exec nonexistent' and 'exec .'
-Date: Wed, 6 Oct 2010 20:02:41 -0500
-Message-ID: <20101007010241.GB1276@burratino>
+Subject: [PATCH 1/3] [EXCEPTIONS] Stop documenting EXSHELLPROC
+Date: Wed, 6 Oct 2010 20:03:47 -0500
+Message-ID: <20101007010347.GC1276@burratino>
 References: <20100605160651.GA60028@stack.nl>
  <20100614095451.26362.qmail@43559bb7971308.315fe32.mid.smarden.org>
  <20100628065326.GA25667@gondor.apana.org.au>
@@ -10,83 +10,80 @@ References: <20100605160651.GA60028@stack.nl>
  <20101006102930.GA6573@gondor.apana.org.au>
  <20101006105531.GB475@burratino>
  <4CAC68FD.4040602@redhat.com>
+ <20101007010241.GB1276@burratino>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-gy0-f174.google.com ([209.85.160.174]:58084 "EHLO
-	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753299Ab0JGBGE (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 6 Oct 2010 21:06:04 -0400
-Received: by gye5 with SMTP id 5so75822gye.19
-        for <dash@vger.kernel.org>; Wed, 06 Oct 2010 18:06:03 -0700 (PDT)
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:44720 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753299Ab0JGBGy (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 6 Oct 2010 21:06:54 -0400
+Received: by ywh1 with SMTP id 1so76707ywh.19
+        for <dash@vger.kernel.org>; Wed, 06 Oct 2010 18:06:53 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <4CAC68FD.4040602@redhat.com>
+In-Reply-To: <20101007010241.GB1276@burratino>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Eric Blake <eblake@redhat.com>
 Cc: Herbert Xu <herbert@gondor.hengli.com.au>, Gerrit Pape <pape@smarden.org>, dash@vger.kernel.org, "Krzysztof A. Sobiecki" <sobkas@gmail.com>, Jari Aalto <jari.aalto@cante.net>
 
-Eric Blake wrote:
+At some point between ash 0.3.5-11.0.1 and ash 0.3.8-37, Debian
+ash stopped using the EXSHELLPROC exception to handle shell
+scripts without a magic number.
 
-> Additionally, the standard REQUIRES that 'sh -c "exec /"' shall fail
-> with status 126:
-> 
-> http://www.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#exec
-> "If command is found, but it is not an executable utility, the exit
-> status shall be 126."
-> 
-> Right now, dash gets this wrong:
-> 
-> dash -c 'exec .'; echo $?
-> exec: 1: /: Permission denied
-> 2
-> 
-> And since you already have the code in dash to detect failure to
-> 'exec' a directory, you should be able to reuse that code when
-> detecting failure to run a directory as a script, as in 'dash .'.
+Remove all remaining references to it to avoid confusion.
 
-Summary:
-
-   Command		Status	Expected status
-1) exec .		2	126
-2) exec nonexistent	2	127
-3) sh .			0	126
-4) sh nonexistent	2	127
-
-(1) and (2) seem to be regressions from about 5 years ago.
-Reverting the problematic patch fixes it for me; see below.
-
-(3) is not clearly documented in the standard, and there is
-some disagreement between shells on how to handle it[1].  The
-current behavior seems fine to me.
-
-(4) is a clear bug, well documented in the EXIT STATUS section
-of the description of sh in the "Utilities" chapter.  See
-http://thread.gmane.org/gmane.comp.shells.dash/291/focus=390
-for a patch[2].
-
-Thoughts?
-Jonathan Nieder (3):
-  [EXCEPTIONS] Stop documenting EXSHELLPROC
-  Revert "Eliminated global exerrno."
-  [EXCEPTIONS] Eliminate global exerrno
-
+Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
+---
  src/TOUR    |   11 +----------
  src/error.h |    5 ++---
- src/eval.c  |    8 ++++----
- 3 files changed, 7 insertions(+), 17 deletions(-)
+ 2 files changed, 3 insertions(+), 13 deletions(-)
 
-[1]
-$ bash .; echo $?
-.: .: is a directory
-126
-$ ksh93 .; echo $?
-ksh93: .: cannot open [Is a directory]
-126
-$ pdksh .; echo $?
-0
+diff --git a/src/TOUR b/src/TOUR
+index 4baac62..056e79b 100644
+--- a/src/TOUR
++++ b/src/TOUR
+@@ -43,10 +43,6 @@ C source files for entries looking like:
+                            back to the main command loop */
+         }
+ 
+-        SHELLPROC {
+-              x = 3;    /* executed when the shell runs a shell procedure */
+-        }
+-
+ It pulls this code out into routines which are when particular
+ events occur.  The intent is to improve modularity by isolating
+ the information about which modules need to be explicitly
+@@ -79,12 +75,7 @@ EXCEPTIONS:  Code for dealing with exceptions appears in
+ exceptions.c.  The C language doesn't include exception handling,
+ so I implement it using setjmp and longjmp.  The global variable
+ exception contains the type of exception.  EXERROR is raised by
+-calling error.  EXINT is an interrupt.  EXSHELLPROC is an excep-
+-tion which is raised when a shell procedure is invoked.  The pur-
+-pose of EXSHELLPROC is to perform the cleanup actions associated
+-with other exceptions.  After these cleanup actions, the shell
+-can interpret a shell procedure itself without exec'ing a new
+-copy of the shell.
++calling error.  EXINT is an interrupt.
+ 
+ INTERRUPTS:  In an interactive shell, an interrupt will cause an
+ EXINT exception to return to the main command loop.  (Exception:
+diff --git a/src/error.h b/src/error.h
+index 3162e15..15ccbe3 100644
+--- a/src/error.h
++++ b/src/error.h
+@@ -66,9 +66,8 @@ extern int exception;
+ /* exceptions */
+ #define EXINT 0		/* SIGINT received */
+ #define EXERROR 1	/* a generic error */
+-#define EXSHELLPROC 2	/* execute a shell procedure */
+-#define EXEXEC 3	/* command execution failed */
+-#define EXEXIT 4	/* exit the shell */
++#define EXEXEC 2	/* command execution failed */
++#define EXEXIT 3	/* exit the shell */
+ 
+ 
+ /*
+-- 
+1.7.2.3
 
-[2] Unfortunately this does not share code with the fix to (1)
-and (2) as Eric hoped.  Why?  The system calls involved are
-different: the exec builtin uses execve(), while 'sh <script>'
-uses open() and read().
