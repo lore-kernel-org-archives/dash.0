@@ -1,76 +1,75 @@
 From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: [PATCH 2/3] Revert "Eliminated global exerrno."
-Date: Thu, 7 Oct 2010 16:34:10 -0500
-Message-ID: <20101007213410.GA13464@burratino>
-References: <20101006100804.GB361@burratino>
- <20101006102930.GA6573@gondor.apana.org.au>
- <20101006105531.GB475@burratino>
- <4CAC68FD.4040602@redhat.com>
- <20101007010241.GB1276@burratino>
- <20101007010458.GD1276@burratino>
- <20101007025649.GA14649@gondor.apana.org.au>
- <20101007033518.GB2285@burratino>
- <20101007041406.GA15529@gondor.apana.org.au>
- <20101007043715.GA15658@gondor.apana.org.au>
+Subject: Re: [Partial patch] IFS and read builtin
+Date: Sat, 16 Oct 2010 14:15:48 -0500
+Message-ID: <20101016191548.GA10626@burratino>
+References: <4C71A29C.1080609@gigawatt.nl>
+ <20100908115324.GA17029@gondor.apana.org.au>
+ <20100908120849.GA17121@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-qy0-f174.google.com ([209.85.216.174]:52357 "EHLO
-	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750972Ab0JGVhd (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 7 Oct 2010 17:37:33 -0400
-Received: by qyk29 with SMTP id 29so605665qyk.19
-        for <dash@vger.kernel.org>; Thu, 07 Oct 2010 14:37:32 -0700 (PDT)
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:42021 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753832Ab0JPTTW (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 16 Oct 2010 15:19:22 -0400
+Received: by yxm8 with SMTP id 8so836032yxm.19
+        for <dash@vger.kernel.org>; Sat, 16 Oct 2010 12:19:21 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20101007043715.GA15658@gondor.apana.org.au>
+In-Reply-To: <20100908120849.GA17121@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Blake <eblake@redhat.com>, Gerrit Pape <pape@smarden.org>, dash@vger.kernel.org, "Krzysztof A. Sobiecki" <sobkas@gmail.com>, Jari Aalto <jari.aalto@cante.net>
+Cc: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
+
+Hi Herbert,
 
 Herbert Xu wrote:
 
-> 	sh -c 'trap "exec nosuchfile" EXIT; exit 3'; echo $?
-> 
-> This makes dash exit with 127 instead of 3 as it does now.
-> 
-> AFAIK the wording of POSIX is such that we should return 3, however,
-> it does seem that every other shell exits with 127.
+> commit f42e443bb511ed3224f09b4fcf0772438ebdbbfa
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Wed Sep 8 20:07:26 2010 +0800
+>=20
+>     [EXPAND] Fix ifsfirst/ifslastp leak
+>    =20
+>     As it stands expandarg may return with a non-NULL ifslastp which
+>     then confuses any subsequent ifsbreakup user that doesn't clear
+>     it directly.
+>    =20
+>     What's worse, if we get interrupted before we hit ifsfree in
+>     expandarg we will leak memory.
+>    =20
+>     This patch fixes this by always calling ifsfree in expandarg
+>     thus ensuring that ifslastp is always NULL on the normal path.
+>     It also adds an ifsfree call to the RESET path to ensure that
+>     memory isn't leaked.
 
-On 'exec':
+I was experiencing weird symptoms with a local test script (for another
+program):
 
- "If exec is specified with command, it shall replace the shell with
- command without creating a new process."		(1)
+	$ sh -x t5523-push-upstream.sh -i -v
+	[...]
+	+ test_terminal git push -u upstream master
+	+ die
+	+ code=3D2
+	+ test -n
+	+ echo FATAL: Unexpected exit with code 2
+	FATAL: Unexpected exit with code 2
+	+ exit 1
+	$ cat trash\ directory.t5523-push-upstream/err
+	+ test_declared_prereq TTY
+	+ return 1
+	+ test_declared_prereq TTYREDIR
+	+ return :T=EF=BF=BD    D=EF=BF=BD      \=EF=BF=BD      K=EF=BF=BD    =
+  l=EF=BF=BD      M=EF=BF=BD      1 =EF=BF=BD     D=EF=BF=BD      \=EF=BF=
+=BD      K=EF=BF=BD      l=EF=BF=BD      M=EF=BF=BD      1 1
+	return: 1: Illegal number: :T=EF=BF=BD  D=EF=BF=BD      \=EF=BF=BD    =
+  K=EF=BF=BD      l=EF=BF=BD      M=EF=BF=BD      1
 
- "If command is specified, exec shall not return to the shell; rather,
- the exit status of the process shall be the exit status of the program
- implementing command, which overlaid the shell. If command is not
- found, the exit status shall be 127. If command is found, but it is
- not an executable utility, the exit status shall be 126. If a
- redirection error occurs (see Consequences of Shell Errors ), the
- shell shall exit with a value in the range 1-125. Otherwise, exec
- shall return a zero exit status."			(2)
+The strange text there is supposed to be 127, I think, and it is not
+supposed to be redirected to err.
 
-On 'exit':
+Bisects to f42e443bb.  Reverting it avoids the problem.  Any ideas
+before I investigate further?
 
- "...
- A trap on EXIT shall be executed before the shell terminates, except
- when the exit utility is invoked in that trap itself, in which case
- the shell shall exit immediately."			(3)
-
- "The exit status [of the exit utility -jrn] shall be n, if specified.
- Otherwise, the value shall be the exit value of the last command
- executed, or zero if no command was executed. When exit is executed in
- a trap action, the last command is considered to be the command that
- executed immediately preceding the trap action."	(4)
-
-The passage (3) seems to mean that "exit" triggers an EXIT trap
-(except, to avoid having to deal with recursion, when the "exit"
-occurs within an EXIT trap).  Then the exec builtin is invoked,
-resulting (according to (2)) in an exit(127) without returning to the
-shell.
-
-So I think the proposed behavior fits the spec.
-
-Regards,
 Jonathan
