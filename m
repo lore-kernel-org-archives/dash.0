@@ -1,70 +1,96 @@
-From: Eric Blake <eblake@redhat.com>
-Subject: bug with <&- under ulimit -n
-Date: Wed, 27 Oct 2010 15:33:41 -0600
-Message-ID: <4CC89AB5.3050207@redhat.com>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: bug with <&- under ulimit -n
+Date: Thu, 28 Oct 2010 00:50:49 +0200
+Message-ID: <20101027225048.GC72761@stack.nl>
+References: <4CC89AB5.3050207@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------enig6C38B24AF1C426D42B62160D"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:3020 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757236Ab0J0Vdp (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 27 Oct 2010 17:33:45 -0400
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com (int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	by mx1.redhat.com (8.13.8/8.13.8) with ESMTP id o9RLXjof016051
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
-	for <dash@vger.kernel.org>; Wed, 27 Oct 2010 17:33:45 -0400
-Received: from [10.3.113.124] (ovpn-113-124.phx2.redhat.com [10.3.113.124])
-	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP id o9RLXi7U008345
-	for <dash@vger.kernel.org>; Wed, 27 Oct 2010 17:33:45 -0400
+Received: from relay04.stack.nl ([131.155.140.107]:61864 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751402Ab0J0Wuu (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 27 Oct 2010 18:50:50 -0400
+Content-Disposition: inline
+In-Reply-To: <4CC89AB5.3050207@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Eric Blake <eblake@redhat.com>
+Cc: dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig6C38B24AF1C426D42B62160D
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On Wed, Oct 27, 2010 at 03:33:41PM -0600, Eric Blake wrote:
+> Dash does not behave well when under artificial fd pressure due to
+> ulimit -n.  It insists on copying a to-be-closed fd to another fd
+> greater than 10, then complains when the dup fails, rather than just
+> flat-out closing the fd in the first place.  Compare this with ksh93
 
-Dash does not behave well when under artificial fd pressure due to
-ulimit -n.  It insists on copying a to-be-closed fd to another fd
-greater than 10, then complains when the dup fails, rather than just
-flat-out closing the fd in the first place.  Compare this with ksh93
+> $ ksh -c 'ulimit -n 10; : <&-'; echo $?
+> 0
+> $ dash -c 'ulimit -n 11; : <&-'; echo $?
+> 0
+> $ dash -c 'ulimit -n 10; : <&-'; echo $?
+> dash: 0: Invalid argument
+> 2
 
-$ ksh -c 'ulimit -n 10; : <&-'; echo $?
-0
-$ dash -c 'ulimit -n 11; : <&-'; echo $?
-0
-$ dash -c 'ulimit -n 10; : <&-'; echo $?
-dash: 0: Invalid argument
-2
+> See this thread on the bug-tar list for more details:
+> http://thread.gmane.org/gmane.comp.gnu.tar.bugs/4010/focus=4020
 
-See this thread on the bug-tar list for more details:
-http://thread.gmane.org/gmane.comp.gnu.tar.bugs/4010/focus=3D4020
+Summary: use 'exec' to close the file descriptors before setting ulimit
+-n ridiculously low instead of relying on redirections to work in such a
+restricted environment.
 
---=20
-Eric Blake   eblake@redhat.com    +1-801-349-2682
-Libvirt virtualization library http://libvirt.org
+By the way, there is also a bug in some ash versions that fails when
+closing an fd (via <&- or >&-) that is not open, except if the
+redirection is for 'exec' or an external program.
 
+However, some of the gory details are below.
 
---------------enig6C38B24AF1C426D42B62160D
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+fcntl(F_DUPFD) fails with [EINVAL] if arg (the minimum for the new file
+descriptor) exceeds the ulimit. The FreeBSD kernel, at least, checks
+this before checking if the existing file descriptor is open. Therefore
+any redirection attempt that must allow for the possibility of restoring
+the old open file requires a ulimit -n of at least 11.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Fedora - http://enigmail.mozdev.org/
+That the ksh93 example works is due to ksh93 being very clever (too
+clever for its own good, sometimes, if you ask me). It thinks that it
+has no need to save the old open file if this is the last command and
+there are no trap handlers.
 
-iQEcBAEBCAAGBQJMyJq1AAoJEKeha0olJ0NqwAUIAJtfXTnjP0w3qU7KBMHYPoUl
-lG4WgeCFQa+3s6O5XvXPdCs18NzO1NoVN3+j7c3WhwWUMqTjKzymGKDe6jD+/5Z4
-XZha+7VZml/F/Qh0FICNn/NSAesCUDqWS30ILlCW6eLG9IQXEN86NzI1AIu8p3lr
-tQp2HqGHFFKHGMhdcP7KNZvF6qAqCanEaquDlmeXBX/IM9haHqADyhjVj2/0DmYd
-fYM4zLb95betM45l7vC2G1oVWWnNE7MCU1XyFQnoqWB3bkg1ThPMNboJlkoaILif
-3UkPmgCTFJ+Cgs4CFLqZBatsTstmzn9pQbfTec2bYTDoNhF0Eo4Y1ipTxDiW9rs=
-=8Rig
------END PGP SIGNATURE-----
+So the following fail (on a FreeBSD 8 kernel):
 
---------------enig6C38B24AF1C426D42B62160D--
+$ ksh93 -c 'ulimit -n 10; : <&-; :'; echo $?
+ksh93[1]: open file limit exceeded [Invalid argument]
+1
+$ ksh93 -c 'trap "echo hi" EXIT; ulimit -n 10; : <&-'; echo $?
+ksh93[1]: open file limit exceeded [Invalid argument]
+hi
+1
+
+Where the cleverness fails is when that last command sets a trap handler
+itself:
+
+$ ksh93 -c ':; trap "echo hi" EXIT >/dev/null'
+$
+
+The other shells I tried correctly print "hi".
+
+A further difference between shells is that some shells perform
+redirections for a simple command before looking at what kind of command
+it is, therefore always saving the old open files, while others postpone
+this until after looking what kind of command it is, not saving the old
+open files for external programs because the open happens in the child
+process (potentially also for 'exec').
+
+The former behaviour is shown by most kinds of Korn shell and dash. The
+latter behaviour is shown by the Bourne shell, most other ash
+derivatives, bash and zsh.
+
+A command like
+  (ulimit -n 10; /bin/foo 3<&- 4<&-; :)
+will only work in a shell that uses the latter behaviour.
+
+I consider both behaviours valid and shell script that depends on either
+of them broken. They both have historical basis and their own advantages
+and disadvantages.
+
+-- 
+Jilles Tjoelker
