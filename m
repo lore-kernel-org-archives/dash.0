@@ -1,47 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: bug with <&- under ulimit -n
-Date: Wed, 27 Oct 2010 22:11:36 -0400
-Message-ID: <20101028021136.GA26347@gondor.apana.org.au>
-References: <20101027225048.GC72761@stack.nl>
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: [BUG?] here documents, command substitution, and the { keyword
+Date: Sat, 6 Nov 2010 21:21:21 -0500
+Message-ID: <20101107022121.GA22719@burratino>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38995 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932602Ab0J1CLn (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 27 Oct 2010 22:11:43 -0400
+Received: from mail-gy0-f174.google.com ([209.85.160.174]:52415 "EHLO
+	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752498Ab0KGCVd (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 6 Nov 2010 22:21:33 -0400
+Received: by gyh4 with SMTP id 4so2838804gyh.19
+        for <dash@vger.kernel.org>; Sat, 06 Nov 2010 19:21:32 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20101027225048.GC72761@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: eblake@redhat.com, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Jilles Tjoelker <jilles@stack.nl> wrote:
-> On Wed, Oct 27, 2010 at 03:33:41PM -0600, Eric Blake wrote:
->> Dash does not behave well when under artificial fd pressure due to
->> ulimit -n.  It insists on copying a to-be-closed fd to another fd
->> greater than 10, then complains when the dup fails, rather than just
->> flat-out closing the fd in the first place.  Compare this with ksh93
-> 
->> $ ksh -c 'ulimit -n 10; : <&-'; echo $?
->> 0
->> $ dash -c 'ulimit -n 11; : <&-'; echo $?
->> 0
->> $ dash -c 'ulimit -n 10; : <&-'; echo $?
->> dash: 0: Invalid argument
->> 2
-> 
->> See this thread on the bug-tar list for more details:
->> http://thread.gmane.org/gmane.comp.gnu.tar.bugs/4010/focus=4020
-> 
-> Summary: use 'exec' to close the file descriptors before setting ulimit
-> -n ridiculously low instead of relying on redirections to work in such a
-> restricted environment.
+Hi,
 
-Thanks for the excellent analysis Jilles! I agree with you on
-all counts :)
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Just ran into some strange behavior:
+
+$ cat test.sh
+#!/bin/sh
+echo hello >greeting
+cat <<EOF &&
+$(cat greeting)
+EOF
+{
+	echo $?
+	cat greeting
+} >/dev/null
+
+
+$ sh test.sh
+hello
+test.sh: 7: {: not found
+127
+hello
+test.sh: 10: Syntax error: "}" unexpected
+
+bash, mksh, pdksh, and ksh93 all print hello as expected.  The problem
+is reproducible with all versions of dash in the git repo.
+
+Ideas?
+Jonathan
