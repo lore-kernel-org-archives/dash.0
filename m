@@ -1,121 +1,54 @@
-From: Eric Blake <eblake@redhat.com>
+From: Jilles Tjoelker <jilles@stack.nl>
 Subject: Re: static vs. dynamic scoping
-Date: Wed, 10 Nov 2010 08:13:47 -0700
-Message-ID: <4CDAB6AB.5080004@redhat.com>
-References: <4CD9C280.60007@redhat.com> <4CDA6301.1010703@gmail.com>
+Date: Wed, 10 Nov 2010 22:01:30 +0100
+Message-ID: <20101110210130.GA17871@stack.nl>
+References: <AANLkTi=CURDu8AVnAsT4esOBi5-xw8th5ix501jX0fRJ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------enig531E2BE5FC63412F320BBEA7"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:17817 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756482Ab0KJPNs (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 10 Nov 2010 10:13:48 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com (int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	by mx1.redhat.com (8.13.8/8.13.8) with ESMTP id oAAFDmom007106
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
-	for <dash@vger.kernel.org>; Wed, 10 Nov 2010 10:13:48 -0500
-Received: from [10.3.113.96] (ovpn-113-96.phx2.redhat.com [10.3.113.96])
-	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP id oAAFDlst002697
-	for <dash@vger.kernel.org>; Wed, 10 Nov 2010 10:13:47 -0500
-In-Reply-To: <4CDA6301.1010703@gmail.com>
+Received: from relay02.stack.nl ([131.155.140.104]:61803 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1756349Ab0KJVBc (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 10 Nov 2010 16:01:32 -0500
+Content-Disposition: inline
+In-Reply-To: <AANLkTi=CURDu8AVnAsT4esOBi5-xw8th5ix501jX0fRJ@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: =?utf-8?B?0L7Qu9GM0LPQsCDQutGA0YvQttCw0L3QvtCy0YHQutCw0Y8=?= <olga.kryzhanovska@gmail.com>
+Cc: dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig531E2BE5FC63412F320BBEA7
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Nov 10, 2010 at 03:15:59PM +0100, =D0=BE=D0=BB=D1=8C=D0=B3=D0=B0=
+ =D0=BA=D1=80=D1=8B=D0=B6=D0=B0=D0=BD=D0=BE=D0=B2=D1=81=D0=BA=D0=B0=D1=8F=
+ wrote:
+> Eric Blake wrote:
+> > Or should dash switch entirely to static scoping (my gut feel is th=
+at
+> > static scoping may be more efficient to implement, which fits in li=
+ne
+> > with dash's desire to be as lean as possible)?
 
-[redirecting back to the list, so others can benefit]
+> static scoping is much more efficient. Think about accessing a global
+> variable in a deep function call stack, e.g. 20 functions deep. With
+> dynamic scoping you have to look up the list of local variables for
+> each function *first* before looking at the global variables. In my
+> example this means 20 look ups. Each further function adds another
+> look up.
+> For static scoping you just look at the local variables of the
+> *current* function and then look up the global ones. This is faster
+> and much more efficient.
 
-On 11/10/2010 02:16 AM, Marc Herbert wrote:
-> Le 09/11/2010 21:52, Eric Blake a =C3=A9crit :
->> I'm trying to standardize the notion of local variables for the next
->> revision of POSIX, but before I can do so, I need some feedback on two=
+That's not how dash implements it, though. The local builtin saves the
+value and attributes of the variable and they are restored upon return.
+There is just one table of variables to search (two in older versions
+and other ash versions, the additional one storing variable assignments
+for regular builtins like IFS=3D read x; these were converted to the lo=
+cal
+mechanism recently).
 
->> general aspects:
->> [...]
->> Here's a sample shell script that illustrates the difference between t=
-he
->> two scoping methods.
->=20
-> Hi Eric,
->=20
->   I found your sample script quite confusing. To make your point, does
-> this script really need to:
-> - use unquoted language keywords as string values?
-
-No; I could have used other strings.
-
-> - use deprecated "typeset" instead of declare?
-
-Yes - the current Austin Group thoughts are to standardize 'typeset' and
-NOT 'local', since 'typeset' can be used with arguments outside of
-functions, and more existing shells provide 'typeset' than 'local' (dash
-being the odd one out) or 'declare'.  Shells can continue to provide
-'local' as a synonym for the most basic use of typeset.
-
-> - use the not (or less?) standard "function" keyword?
-
-Yes - ksh93 ONLY supports function-local scoping when using the function
-keyword, rather than when using POSIX functions (although David Korn
-agreed that if POSIX standardizes function-local scoping, he'd make the
-next build of ksh support it in POSIX functions).
-
-So, here's the example again, with those points addressed:
-
-# Demonstrate ksh local scoping is static - requires ksh's 'function'
-
-$ ksh -c 'function f1 { typeset a=3Dtemp; f2; echo "in f1: $a"; };
-function f2 { echo "in f2: $a"; a=3Dchanged; }; a=3Dglobal; f1; echo "top=
-
-level: $a"'
-in f2: global
-in f1: temp
-top level: changed
-
-# Demonstrate that with POSIX functions, ksh has global scoping
-
-$ ksh -c 'f1 () { typeset a=3Dtemp; f2; echo "in f1: $a"; }; f2 () { echo=
-
-"in f2: $a"; a=3Dchanged; }; a=3Dglobal; f1; echo "top level: $a"'in f2: =
-temp
-in f1: changed
-top level: changed
-
-# Demonstrate that dash local scoping is currently dynamic
-
-$ dash -c 'f1 () { local a=3Dtemp; f2; echo "in f1: $a"; }; f2 () { echo
-"in f2: $a"; a=3Dchanged; }; a=3Dglobal; f1; echo "top level: $a"'
-in f2: temp
-in f1: changed
-top level: global
+The real efficiency benefit of static scoping comes when disallowing
+access to locals when the name is not known at compile time: at run
+time, the names of the locals are not necessary.
 
 --=20
-Eric Blake   eblake@redhat.com    +1-801-349-2682
-Libvirt virtualization library http://libvirt.org
-
-
---------------enig531E2BE5FC63412F320BBEA7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Fedora - http://enigmail.mozdev.org/
-
-iQEcBAEBCAAGBQJM2rarAAoJEKeha0olJ0NqFO0H/RCo7oreqkaS58hk18n7e2pC
-LImoPgT03V/SvwsfZc2tRbbuoX+I51icfGNKGPN1CckDMidGFD9x1/JMBd3eRk+v
-rBnGSEpo8BEUfQJSGCz/sJdUE6kkxocmTQ0l6eKVYW5baDEY2V+OuTAVrwTyuYhs
-FW8JmWEUyzjUvjdSlwWDd6TZkP0O0GKJ+9xFqxMTwp1gxpjL2JozazI9gAX2JqMl
-+1ICAUDH88n8t9LULSdkj1pQ+tEQTHqLhbUvqxB8Dux8ZeNcO2L7dRYDau2y+by+
-hBwkO3eMwAYL77KfpsrlIFaYX+6T+FXof3fbiaMJcVYxhPFw+ntPJ+SesXUemCU=
-=VxHN
------END PGP SIGNATURE-----
-
---------------enig531E2BE5FC63412F320BBEA7--
+Jilles Tjoelker
