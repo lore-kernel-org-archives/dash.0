@@ -1,50 +1,54 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Quoted closing brace in variable default expansion
-Date: Sat, 13 Nov 2010 17:27:15 +0059
-Message-ID: <4CDEBC7B.5050805@gigawatt.nl>
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: Re: Quoted closing brace in variable default expansion
+Date: Sat, 13 Nov 2010 10:41:47 -0600
+Message-ID: <20101113164147.GB5535@burratino>
+References: <4CDEBC7B.5050805@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from 541F7301.cm-5-8b.dynamic.ziggo.nl ([84.31.115.1]:35739 "HELO
-	boostbox.lionra.local" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with SMTP id S1755364Ab0KMQ0P (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 13 Nov 2010 11:26:15 -0500
+Received: from mail-gy0-f174.google.com ([209.85.160.174]:45035 "EHLO
+	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752985Ab0KMQmS (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 13 Nov 2010 11:42:18 -0500
+Received: by gyh4 with SMTP id 4so2389354gyh.19
+        for <dash@vger.kernel.org>; Sat, 13 Nov 2010 08:42:18 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <4CDEBC7B.5050805@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: dash@vger.kernel.org
 
-Hi all,
+Hi Herald,
 
-It's probably best to start with the example:
+Harald van Dijk wrote:
 
-   $ bash -c 'echo "${x:-"}"}"'
-   }
-   $ ksh -c 'echo "${x:-"}"}"'
-   }
-   $ dash -c 'echo "${x:-"}"}"'
-   dash: 1: Syntax error: Unterminated quoted string
-   $ busybox sh -c 'echo "${x:-"}"}"'
-   sh: syntax error: unterminated quoted string
+>   $ ksh -c 'echo "${x:-"}"}"'
+>   }
+>   $ dash -c 'echo "${x:-"}"}"'
+>   dash: 1: Syntax error: Unterminated quoted string
+>   $ busybox sh -c 'echo "${x:-"}"}"'
+>   sh: syntax error: unterminated quoted string
+> 
+> It looks like dash and other ash derivatives stop the expansion with
+> the first }, instead of the first unquoted }. I'm getting confused
+> trying to figure out whether this is a bug in dash or in the script
+> relying on it.
 
-It looks like dash and other ash derivatives stop the expansion with the 
-first }, instead of the first unquoted }. I'm getting confused trying to 
-figure out whether this is a bug in dash or in the script relying on it.
+The answer depends on how portable the script is meant to be.  If
+the goal is to be portable to shells implementing future versions of
+the POSIX standard, there seems to be have been an interpretation[1]
+approved for the next major revision:
 
-A slightly modified example:
+ http://austingroupbugs.net/view.php?id=221
+ note #399
 
-   $ dash -c 'echo "${x-"_{x}_"}"'
-   dash: 1: Syntax error: Unterminated quoted string
-   $ dash -c 'echo ${x-"_{x}_"}'
-   _{x_}
+which would make the example nonconformant because there are an odd
+number of unescaped double-quotes before the first unescaped closing
+brace.
 
-I don't understand how the last line works. The } is printed after the 
-_, so the } that is printed must be the final }, and the } directly 
-following the x stops the variable default. But this would lead to two 
-double quote characters which have no way of matching up, yet no syntax 
-error is given.
+See http://thread.gmane.org/gmane.comp.shells.dash/262/focus=263 for
+a nice summary (thanks, Jilles!).
 
-Could you clarify?
-
-Cheers,
-Harald
+Hope that helps,
+Jonathan
