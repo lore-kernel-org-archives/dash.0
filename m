@@ -1,82 +1,34 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: dash "set -e" breaks "trap INT"
-Date: Sat, 13 Nov 2010 22:05:54 +0100
-Message-ID: <20101113210554.GA86425@stack.nl>
-References: <AANLkTimrXpDb5z1d4PC3M=8hyN-Ob7sVb1ngF-JTem4g@mail.gmail.com>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: static vs. dynamic scoping
+Date: Sun, 14 Nov 2010 00:21:51 +0059
+Message-ID: <4CDF1DA7.9000109@gigawatt.nl>
+References: <4CD9C50D.5010305@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:56385 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753675Ab0KMVF5 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 13 Nov 2010 16:05:57 -0500
-Content-Disposition: inline
-In-Reply-To: <AANLkTimrXpDb5z1d4PC3M=8hyN-Ob7sVb1ngF-JTem4g@mail.gmail.com>
+Received: from 541F7301.cm-5-8b.dynamic.ziggo.nl ([84.31.115.1]:43005 "HELO
+	boostbox.lionra.local" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with SMTP id S1752736Ab0KMXUt (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 13 Nov 2010 18:20:49 -0500
+In-Reply-To: <4CD9C50D.5010305@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Dan Muresan <danmbox@gmail.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
+Cc: Eric Blake <eblake@redhat.com>
 
-On Wed, Nov 10, 2010 at 03:49:19PM +0200, Dan Muresan wrote:
-> I've submitted a bug regarding trap + "set -e" on Ubuntu Launchpad
-> [1], but that's probably not the best place to talk about the issue.
+On 09/11/10 23:02, Eric Blake wrote:
+> 2. User aspect:
+>    Is anyone aware of a script that intentionally uses the full power of
+> dynamic scoping available through 'local' which would break if scoping
+> switched to static?
 
-> I'm using dash 0.5.5.1-3ubuntu2 from Ubuntu Lucid on an x86 machine.
-> With "set -e", only the first command in an INT trap handler gets
-> executed -- UNLESS that first command is a call to a function that
-> returns 0. Here's an example of the problem:
-
-> --- 8-x ---
-
-> #!/bin/sh
-> set -e
-> 
-> trap 'hnd' INT
-> trap 'echo EXIT' EXIT
-> 
-> zero() {
->   return 0;
-> }
-> 
-> hnd() {
->   #zero
->   echo "Ignored 1"; echo "Ignored 2"
->   sleep 1
->   echo Back
-> }
-> 
-> for i in 3 2 1; do
->     echo "$i"
->     sleep 1 # || true
-> done
-> 
-> echo OUT
-
-> --- 8-x ---
-
-> If we uncomment either the call to zero, or the || true check, the
-> entire handler gets executed. A set +e inside the handler makes no
-> difference.
-
-> My workaround at the moment is to trap both INT and EXIT (I'm not
-> going to rely on the "zero" bit of magic). I suppose this workaround
-> will unfortunately have to stick around for a while -- even if this
-> bug gets fixed, scripts can't assume they are running on the latest
-> version of dash.
-
-> [1] https://bugs.launchpad.net/ubuntu/+source/dash/+bug/673119
-
-I can reproduce this with v0.5.5.1 but not with v0.5.6 or master, so
-apparently it has been fixed.
-
-The exit after the INT trap has been executed also occurs in all other
-shells I tried (newer dash, FreeBSD sh, mksh, true Bourne shell), except
-ksh93 which does not execute the INT trap at all, only the EXIT trap.
-The cause is that sleep also gets the SIGINT and terminates on it, which
-can be seen by removing  set -e  and adding  echo rc=$?  after sleep.
-
-ksh93 has a sleep builtin, but this has no effect on above. Behaviour
-remains the same with /bin/sleep.
-
--- 
-Jilles Tjoelker
+FWIW, some scripts use "local IFS" to reset IFS to a sane value, and 
+have the shell take care of restoring it afterwards. This works with 
+ksh's typeset, but because of the static scoping only so long as no 
+other shell functions get called, or those other shell functions also 
+take the effort to handle IFS correctly. In the scripts I have been able 
+to find, other shell functions do get called, but they themselves set 
+IFS too. Still, it may be worth keeping in mind, if only to serve as one 
+of the few examples of when dynamic scoping would have been slightly 
+more useful.
