@@ -1,34 +1,80 @@
-From: Harald van Dijk <harald@gigawatt.nl>
+From: Jilles Tjoelker <jilles@stack.nl>
 Subject: Re: Quoted closing brace in variable default expansion
-Date: Sat, 13 Nov 2010 18:28:41 +0059
-Message-ID: <4CDECAE1.9010607@gigawatt.nl>
-References: <4CDEBC7B.5050805@gigawatt.nl> <20101113164147.GB5535@burratino>
+Date: Sat, 13 Nov 2010 18:51:53 +0100
+Message-ID: <20101113175153.GC79975@stack.nl>
+References: <4CDEBC7B.5050805@gigawatt.nl>
+ <20101113164147.GB5535@burratino>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from 541F7301.cm-5-8b.dynamic.ziggo.nl ([84.31.115.1]:43320 "HELO
-	boostbox.lionra.local" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with SMTP id S1754988Ab0KMR1k (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 13 Nov 2010 12:27:40 -0500
+Received: from relay04.stack.nl ([131.155.140.107]:64655 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1755994Ab0KMRvz (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 13 Nov 2010 12:51:55 -0500
+Content-Disposition: inline
 In-Reply-To: <20101113164147.GB5535@burratino>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
-Cc: Jonathan Nieder <jrnieder@gmail.com>
+To: Jonathan Nieder <jrnieder@gmail.com>
+Cc: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
 
-On 13/11/10 17:41, Jonathan Nieder wrote:
+On Sat, Nov 13, 2010 at 10:41:47AM -0600, Jonathan Nieder wrote:
 > Harald van Dijk wrote:
->>    $ dash -c 'echo "${x:-"}"}"'
->>    dash: 1: Syntax error: Unterminated quoted string
->
->   http://austingroupbugs.net/view.php?id=221
->   note #399
 
-Thanks, that helps to clarify. Unfortunately, the valid alternative 
-given there:
+> >   $ ksh -c 'echo "${x:-"}"}"'
+> >   }
+> >   $ dash -c 'echo "${x:-"}"}"'
+> >   dash: 1: Syntax error: Unterminated quoted string
+> >   $ busybox sh -c 'echo "${x:-"}"}"'
+> >   sh: syntax error: unterminated quoted string
 
-   sh -c 'echo "${x:-\}}"'
+> > It looks like dash and other ash derivatives stop the expansion with
+> > the first }, instead of the first unquoted }. I'm getting confused
+> > trying to figure out whether this is a bug in dash or in the script
+> > relying on it.
 
-seemingly incorrectly prints \} with dash and with bash, so that is a 
-non-option at this time for me.
+> The answer depends on how portable the script is meant to be.  If
+> the goal is to be portable to shells implementing future versions of
+> the POSIX standard, there seems to be have been an interpretation[1]
+> approved for the next major revision:
+
+>  http://austingroupbugs.net/view.php?id=221
+>  note #399
+
+> which would make the example nonconformant because there are an odd
+> number of unescaped double-quotes before the first unescaped closing
+> brace.
+
+Correct.
+
+> See http://thread.gmane.org/gmane.comp.shells.dash/262/focus=263 for
+> a nice summary (thanks, Jilles!).
+
+Note that I have changed FreeBSD 9 sh since I wrote that. To preserve
+sanity in expand.c, a substitution now ends with the same quoting level
+as it started. Closing braces that do not conform to this are taken
+literally. Making the parole configure script do what the author
+expected was a bonus.
+
+The change was needed to implement word splitting in WORD in ${v+WORD}.
+For that, expand.c needs to know the quoted state of any character
+of a word in ${v+-word}. Like NetBSD sh and dash have done, I added a
+new magic character CTLQUOTEEND that shows the end of the quoted part
+and interpreted CTLQUOTEMARK as the start. If I now have something like
+  ${v-abc${vv-def"ghi}jkl"}
+I would have to pass through the fact that the quotes were opened in
+${vv-def"ghi} to the outer substitution, and I did not want that. The
+change avoids it.
+
+FreeBSD 9 sh is now very close to ksh93 in treatment of POSIX
+substitutions and I am happy with this. (One of the deliberate
+differences is that the above incorrect construct is flagged as an error
+(missing '}') while ksh93 treats it as an incomplete command.)
+
+As for the portable alternative, split up the command. Either put the
+'}'-containing thing in a variable and use that as alternative or use an
+explicit conditional. The Autoconf documentation has more information,
+for example.
+
+-- 
+Jilles Tjoelker
