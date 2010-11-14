@@ -1,70 +1,34 @@
-From: =?KOI8-R?B?z8zYx8Egy9LZ1sHOz9fTy8HR?= <olga.kryzhanovska@gmail.com>
+From: Harald van Dijk <harald@gigawatt.nl>
 Subject: Re: static vs. dynamic scoping
-Date: Sun, 14 Nov 2010 00:54:28 +0100
-Message-ID: <AANLkTimm=WL8xw7UxyaBVVzFUKxboCndc-Kv64OaZeQX@mail.gmail.com>
-References: <4CD9C50D.5010305@redhat.com>
-	<4CDF1DA7.9000109@gigawatt.nl>
+Date: Sun, 14 Nov 2010 01:09:55 +0059
+Message-ID: <4CDF28EB.3080709@gigawatt.nl>
+References: <4CD9C50D.5010305@redhat.com>	<4CDF1DA7.9000109@gigawatt.nl> <AANLkTimm=WL8xw7UxyaBVVzFUKxboCndc-Kv64OaZeQX@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:34342 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752834Ab0KMXy3 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 13 Nov 2010 18:54:29 -0500
-Received: by iwn10 with SMTP id 10so5098811iwn.19
-        for <dash@vger.kernel.org>; Sat, 13 Nov 2010 15:54:28 -0800 (PST)
-In-Reply-To: <4CDF1DA7.9000109@gigawatt.nl>
+Received: from 541F7301.cm-5-8b.dynamic.ziggo.nl ([84.31.115.1]:32960 "HELO
+	boostbox.lionra.local" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with SMTP id S1754395Ab0KNAIw (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 13 Nov 2010 19:08:52 -0500
+In-Reply-To: <AANLkTimm=WL8xw7UxyaBVVzFUKxboCndc-Kv64OaZeQX@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org, Eric Blake <eblake@redhat.com>
+To: dash@vger.kernel.org
+Cc: =?UTF-8?B?0L7Qu9GM0LPQsCDQutGA0YvQttCw0L3QvtCy0YHQutCw0Y8=?= <olga.kryzhanovska@gmail.com>, Eric Blake <eblake@redhat.com>
 
-How is dynamic scoping in this case 'more useful'? Imagine function a
-written by author A and function b written by author B, both loaded
-into an application and each of them working independently, bound
-together by an api spec.
-Now function a uses typeset IFS="X" to set the field separator to "X"
-via a local variable IFS. If function b now uses "read foo1 foo2 foo3"
-to read a line of a database the concept of dynamic scoping *BITES*.
-Suddenly function b no longer works as author B intended it. Lots of
-surprise, lots of raised eyebrows by an unwanted interaction.
-Static scoping is in this case much *SAFER* because IFS is reset in
-function b to the (global) default.
+On 14/11/10 00:54, =D0=BE=D0=BB=D1=8C=D0=B3=D0=B0 =D0=BA=D1=80=D1=8B=D0=
+=B6=D0=B0=D0=BD=D0=BE=D0=B2=D1=81=D0=BA=D0=B0=D1=8F wrote:
+> Now function a uses typeset IFS=3D"X" to set the field separator to "=
+X"
+> via a local variable IFS. If function b now uses "read foo1 foo2 foo3=
+"
+> to read a line of a database the concept of dynamic scoping *BITES*.
 
-The issue isn't new but the issues with dynamic scoping are one major
-factor why there are so few shell function libraries: It is just hard
-to write such a library without running afoul dynamic scoping.
-
-Olga
-
-On Sun, Nov 14, 2010 at 12:22 AM, Harald van Dijk <harald@gigawatt.nl> wrote:
-> On 09/11/10 23:02, Eric Blake wrote:
->>
->> 2. User aspect:
->>   Is anyone aware of a script that intentionally uses the full power of
->> dynamic scoping available through 'local' which would break if scoping
->> switched to static?
->
-> FWIW, some scripts use "local IFS" to reset IFS to a sane value, and have
-> the shell take care of restoring it afterwards. This works with ksh's
-> typeset, but because of the static scoping only so long as no other shell
-> functions get called, or those other shell functions also take the effort to
-> handle IFS correctly. In the scripts I have been able to find, other shell
-> functions do get called, but they themselves set IFS too. Still, it may be
-> worth keeping in mind, if only to serve as one of the few examples of when
-> dynamic scoping would have been slightly more useful.
-> --
-> To unsubscribe from this list: send the line "unsubscribe dash" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-
-
--- 
-      ,   _                                    _   ,
-     { \/`o;====-    Olga Kryzhanovska   -====;o`\/ }
-.----'-/`-/     olga.kryzhanovska@gmail.com   \-`\-'----.
- `'-..-| /       http://twitter.com/fleyta     \ |-..-'`
-      /\/\     Solaris/BSD//C/C++ programmer   /\/\
-      `--`                                      `--`
+The way I had seen "local IFS" used is to sanitise IFS -- to reset IFS=20
+to the default value, when IFS was set to, for example, : before the=20
+function was called, and the function wants to split on whitespace. In=20
+that case, you don't want b to get IFS=3D:. Both forms are used, and in=
+=20
+your form, I agree, static scoping is more useful.
