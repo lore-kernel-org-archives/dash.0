@@ -1,114 +1,90 @@
-From: Cedric Blancher <cedric.blancher@googlemail.com>
+From: Eric Blake <eblake@redhat.com>
 Subject: Re: static vs. dynamic scoping
-Date: Mon, 15 Nov 2010 22:11:24 +0100
-Message-ID: <AANLkTinMbDZdL0LEt4Xq1SbFT_xWHoKJt9QNhw6Yk+u_@mail.gmail.com>
-References: <4CD9C280.60007@redhat.com>
-	<4CDA6301.1010703@gmail.com>
-	<4CDAB6AB.5080004@redhat.com>
+Date: Mon, 15 Nov 2010 14:45:07 -0700
+Message-ID: <4CE1A9E3.6080008@redhat.com>
+References: <4CD9C280.60007@redhat.com>	<4CDA6301.1010703@gmail.com>	<4CDAB6AB.5080004@redhat.com> <AANLkTinMbDZdL0LEt4Xq1SbFT_xWHoKJt9QNhw6Yk+u_@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------enig5767CD57478EDBFA908E6397"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:57959 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753894Ab0KOVL0 convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 15 Nov 2010 16:11:26 -0500
-Received: by gxk23 with SMTP id 23so3229580gxk.19
-        for <dash@vger.kernel.org>; Mon, 15 Nov 2010 13:11:25 -0800 (PST)
-In-Reply-To: <4CDAB6AB.5080004@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:33402 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758442Ab0KOVpK (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 15 Nov 2010 16:45:10 -0500
+In-Reply-To: <AANLkTinMbDZdL0LEt4Xq1SbFT_xWHoKJt9QNhw6Yk+u_@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <eblake@redhat.com>
+To: Cedric Blancher <cedric.blancher@googlemail.com>
 Cc: dash@vger.kernel.org
 
-On 10 November 2010 16:13, Eric Blake <eblake@redhat.com> wrote:
-> [redirecting back to the list, so others can benefit]
->
-> On 11/10/2010 02:16 AM, Marc Herbert wrote:
->> Le 09/11/2010 21:52, Eric Blake a =E9crit :
->>> I'm trying to standardize the notion of local variables for the nex=
-t
->>> revision of POSIX, but before I can do so, I need some feedback on =
-two
->>> general aspects:
->>> [...]
->>> Here's a sample shell script that illustrates the difference betwee=
-n the
->>> two scoping methods.
->>
->> Hi Eric,
->>
->>   I found your sample script quite confusing. To make your point, do=
-es
->> this script really need to:
->> - use unquoted language keywords as string values?
->
-> No; I could have used other strings.
->
->> - use deprecated "typeset" instead of declare?
->
-> Yes - the current Austin Group thoughts are to standardize 'typeset' =
-and
-> NOT 'local', since 'typeset' can be used with arguments outside of
-> functions, and more existing shells provide 'typeset' than 'local' (d=
-ash
-> being the odd one out) or 'declare'.  Shells can continue to provide
-> 'local' as a synonym for the most basic use of typeset.
->
->> - use the not (or less?) standard "function" keyword?
->
-> Yes - ksh93 ONLY supports function-local scoping when using the funct=
-ion
-> keyword, rather than when using POSIX functions (although David Korn
-> agreed that if POSIX standardizes function-local scoping, he'd make t=
-he
-> next build of ksh support it in POSIX functions).
->
-> So, here's the example again, with those points addressed:
->
-> # Demonstrate ksh local scoping is static - requires ksh's 'function'
->
-> $ ksh -c 'function f1 { typeset a=3Dtemp; f2; echo "in f1: $a"; };
-> function f2 { echo "in f2: $a"; a=3Dchanged; }; a=3Dglobal; f1; echo =
-"top
-> level: $a"'
-> in f2: global
-> in f1: temp
-> top level: changed
->
-> # Demonstrate that with POSIX functions, ksh has global scoping
->
-> $ ksh -c 'f1 () { typeset a=3Dtemp; f2; echo "in f1: $a"; }; f2 () { =
-echo
-> "in f2: $a"; a=3Dchanged; }; a=3Dglobal; f1; echo "top level: $a"'in =
-f2: temp
-> in f1: changed
-> top level: changed
->
-> # Demonstrate that dash local scoping is currently dynamic
->
-> $ dash -c 'f1 () { local a=3Dtemp; f2; echo "in f1: $a"; }; f2 () { e=
-cho
-> "in f2: $a"; a=3Dchanged; }; a=3Dglobal; f1; echo "top level: $a"'
-> in f2: temp
-> in f1: changed
-> top level: global
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig5767CD57478EDBFA908E6397
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Why is the debate static-vs-dynamic scoping coming up again? People
-like Ken Thompson, who wrote the very first UNIX shell, Douglas
-McIlroy, inventor of the UNIX pipelines and many others of the fathers
-of UNIX have criticized the concept of dynamic scoping in ksh88
-loudly, in USENIX meetings and elsewhere. Even David Korn admitted
-that it was a grave design error and corrected it for the next major
-version of the korn shell, which became ksh93.
+On 11/15/2010 02:11 PM, Cedric Blancher wrote:
+>=20
+> Why is the debate static-vs-dynamic scoping coming up again?
 
-With this background I doubt any proposal for dynamic scoping will
-make it into the next POSIX standard. It's simply not considered a
-sane design for a modern computer language anymore and bash's
-emulation of ksh88's dynamic scoping can hardly be used as precedent
-in Austin Group proposals after ksh88 itself was abandoned in 1992.
+Because before 'typeset' can be standardized in POSIX, we have to get
+consensus from all the shell implementers that they will agree to
+implement static scoping.
 
-Ced
+For ksh, the question is moot - ksh93 already does static only.
+
+For dash, the question is valid - the current dash implementation is
+dynamic only, but given that switching to static only could probably be
+made more efficient, and dash values efficiency, it's a reasonable goal.
+
+For bash and zsh, which currently are dynamic only, the problem stems
+that there are now a number of shell script libraries for these two
+shells that have exploited dynamic scoping, and which would break if we
+aren't careful to standardize something that can still allow dynamic
+scoping as an extension.  In other words, this was a probe of the
+various shell implementers to figure out how easily static scoping can
+be added on after the fact to a dynamic scoping implementation, so that
+the shell could conform to a future POSIX revision that mandates static
+and permits dynamic as an extension.
+
+> With this background I doubt any proposal for dynamic scoping will
+> make it into the next POSIX standard.
+
+There's no desire for dynamic scoping in POSIX; David Korn has already
+made that point clear on the Austin Group mailing list.  Rather, there
+is a desire for minimal effort for complying with a new POSIX
+requirement of static scoping on shells that currently lack it, as well
+as backwards compatibility for shells that wish to continue to provide
+dynamic scoping as an extension to the standard.
+
+My take of the Austin Group list discussion is that the next revision of
+the standard is most likely to have consensus if it just mandates
+'typeset' for static scoping, and leaves 'local' as an implementation
+extension for dynamic scoping.  Please, chime in on the Austin Group
+conversation if you have something useful to add.
+
 --=20
-Cedric Blancher <cedric.blancher@googlemail.com>
-Institute Pasteur
+Eric Blake   eblake@redhat.com    +1-801-349-2682
+Libvirt virtualization library http://libvirt.org
+
+
+--------------enig5767CD57478EDBFA908E6397
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Fedora - http://enigmail.mozdev.org/
+
+iQEcBAEBCAAGBQJM4anjAAoJEKeha0olJ0Nqmy0H/0cz2cZoOeKGjEuLEJisEbEt
+m+pEJZuvnFVdYwl5VttSIhyqAGCQuE4QiMdjz6x36hcSAbgPDri8KxQ37aDnz3nN
+RyOWYfaaz6E9d2sSYjm2+R8gdAxGNeYPfXHL0bpFaPS+1wG+qcWyVD+hA61p1flt
+r9sMXdtg61heeFHac9EU427kKc8ww9ZRmvkTvDH8GhqG1SljpuzCRTgMvztP4EC9
+pCGTPAON7p9KBtKXR4CiWTRLW5nieM4UPSPkD44xtEO3JR0ITb6UPy/twwUHnka5
+iz16POnqb9bSP0kG7/b2C34auJQr8NNjcaOhV7CjcXINce+hNyuSIpaOSLq0WeQ=
+=xwUI
+-----END PGP SIGNATURE-----
+
+--------------enig5767CD57478EDBFA908E6397--
