@@ -1,34 +1,114 @@
-From: Harald van Dijk <harald@gigawatt.nl>
+From: Cedric Blancher <cedric.blancher@googlemail.com>
 Subject: Re: static vs. dynamic scoping
-Date: Sun, 14 Nov 2010 01:09:55 +0059
-Message-ID: <4CDF28EB.3080709@gigawatt.nl>
-References: <4CD9C50D.5010305@redhat.com>	<4CDF1DA7.9000109@gigawatt.nl> <AANLkTimm=WL8xw7UxyaBVVzFUKxboCndc-Kv64OaZeQX@mail.gmail.com>
+Date: Mon, 15 Nov 2010 22:11:24 +0100
+Message-ID: <AANLkTinMbDZdL0LEt4Xq1SbFT_xWHoKJt9QNhw6Yk+u_@mail.gmail.com>
+References: <4CD9C280.60007@redhat.com>
+	<4CDA6301.1010703@gmail.com>
+	<4CDAB6AB.5080004@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
-	format=flowed
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from 541F7301.cm-5-8b.dynamic.ziggo.nl ([84.31.115.1]:32960 "HELO
-	boostbox.lionra.local" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with SMTP id S1754395Ab0KNAIw (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 13 Nov 2010 19:08:52 -0500
-In-Reply-To: <AANLkTimm=WL8xw7UxyaBVVzFUKxboCndc-Kv64OaZeQX@mail.gmail.com>
+Received: from mail-gx0-f174.google.com ([209.85.161.174]:57959 "EHLO
+	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753894Ab0KOVL0 convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Mon, 15 Nov 2010 16:11:26 -0500
+Received: by gxk23 with SMTP id 23so3229580gxk.19
+        for <dash@vger.kernel.org>; Mon, 15 Nov 2010 13:11:25 -0800 (PST)
+In-Reply-To: <4CDAB6AB.5080004@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
-Cc: =?UTF-8?B?0L7Qu9GM0LPQsCDQutGA0YvQttCw0L3QvtCy0YHQutCw0Y8=?= <olga.kryzhanovska@gmail.com>, Eric Blake <eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: dash@vger.kernel.org
 
-On 14/11/10 00:54, =D0=BE=D0=BB=D1=8C=D0=B3=D0=B0 =D0=BA=D1=80=D1=8B=D0=
-=B6=D0=B0=D0=BD=D0=BE=D0=B2=D1=81=D0=BA=D0=B0=D1=8F wrote:
-> Now function a uses typeset IFS=3D"X" to set the field separator to "=
-X"
-> via a local variable IFS. If function b now uses "read foo1 foo2 foo3=
-"
-> to read a line of a database the concept of dynamic scoping *BITES*.
+On 10 November 2010 16:13, Eric Blake <eblake@redhat.com> wrote:
+> [redirecting back to the list, so others can benefit]
+>
+> On 11/10/2010 02:16 AM, Marc Herbert wrote:
+>> Le 09/11/2010 21:52, Eric Blake a =E9crit :
+>>> I'm trying to standardize the notion of local variables for the nex=
+t
+>>> revision of POSIX, but before I can do so, I need some feedback on =
+two
+>>> general aspects:
+>>> [...]
+>>> Here's a sample shell script that illustrates the difference betwee=
+n the
+>>> two scoping methods.
+>>
+>> Hi Eric,
+>>
+>>   I found your sample script quite confusing. To make your point, do=
+es
+>> this script really need to:
+>> - use unquoted language keywords as string values?
+>
+> No; I could have used other strings.
+>
+>> - use deprecated "typeset" instead of declare?
+>
+> Yes - the current Austin Group thoughts are to standardize 'typeset' =
+and
+> NOT 'local', since 'typeset' can be used with arguments outside of
+> functions, and more existing shells provide 'typeset' than 'local' (d=
+ash
+> being the odd one out) or 'declare'.  Shells can continue to provide
+> 'local' as a synonym for the most basic use of typeset.
+>
+>> - use the not (or less?) standard "function" keyword?
+>
+> Yes - ksh93 ONLY supports function-local scoping when using the funct=
+ion
+> keyword, rather than when using POSIX functions (although David Korn
+> agreed that if POSIX standardizes function-local scoping, he'd make t=
+he
+> next build of ksh support it in POSIX functions).
+>
+> So, here's the example again, with those points addressed:
+>
+> # Demonstrate ksh local scoping is static - requires ksh's 'function'
+>
+> $ ksh -c 'function f1 { typeset a=3Dtemp; f2; echo "in f1: $a"; };
+> function f2 { echo "in f2: $a"; a=3Dchanged; }; a=3Dglobal; f1; echo =
+"top
+> level: $a"'
+> in f2: global
+> in f1: temp
+> top level: changed
+>
+> # Demonstrate that with POSIX functions, ksh has global scoping
+>
+> $ ksh -c 'f1 () { typeset a=3Dtemp; f2; echo "in f1: $a"; }; f2 () { =
+echo
+> "in f2: $a"; a=3Dchanged; }; a=3Dglobal; f1; echo "top level: $a"'in =
+f2: temp
+> in f1: changed
+> top level: changed
+>
+> # Demonstrate that dash local scoping is currently dynamic
+>
+> $ dash -c 'f1 () { local a=3Dtemp; f2; echo "in f1: $a"; }; f2 () { e=
+cho
+> "in f2: $a"; a=3Dchanged; }; a=3Dglobal; f1; echo "top level: $a"'
+> in f2: temp
+> in f1: changed
+> top level: global
 
-The way I had seen "local IFS" used is to sanitise IFS -- to reset IFS=20
-to the default value, when IFS was set to, for example, : before the=20
-function was called, and the function wants to split on whitespace. In=20
-that case, you don't want b to get IFS=3D:. Both forms are used, and in=
-=20
-your form, I agree, static scoping is more useful.
+Why is the debate static-vs-dynamic scoping coming up again? People
+like Ken Thompson, who wrote the very first UNIX shell, Douglas
+McIlroy, inventor of the UNIX pipelines and many others of the fathers
+of UNIX have criticized the concept of dynamic scoping in ksh88
+loudly, in USENIX meetings and elsewhere. Even David Korn admitted
+that it was a grave design error and corrected it for the next major
+version of the korn shell, which became ksh93.
+
+With this background I doubt any proposal for dynamic scoping will
+make it into the next POSIX standard. It's simply not considered a
+sane design for a modern computer language anymore and bash's
+emulation of ksh88's dynamic scoping can hardly be used as precedent
+in Austin Group proposals after ksh88 itself was abandoned in 1992.
+
+Ced
+--=20
+Cedric Blancher <cedric.blancher@googlemail.com>
+Institute Pasteur
