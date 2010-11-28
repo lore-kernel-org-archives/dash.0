@@ -1,55 +1,34 @@
-From: Guido Berhoerster <guido+kernel.org@berhoerster.name>
-Subject: Re: trap bug in recent versions of dash
-Date: Sun, 28 Nov 2010 09:50:54 +0100
-Message-ID: <20101128085054.GA6935@wopr.local.invalid>
-References: <20100811080616.GA18303@wopr.local.invalid>
- <20101128071906.GA8818@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] [MAN] Document optional open parenthesis for case
+	patterns.
+Date: Sun, 28 Nov 2010 19:40:38 +0800
+Message-ID: <20101128114038.GD8818@gondor.apana.org.au>
+References: <20100908024219.GA3283@zaphod.pweis.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from multivac.heapoverflow.de ([83.169.16.167]:39113 "EHLO
-	multivac.heapoverflow.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751760Ab0K1I47 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 28 Nov 2010 03:56:59 -0500
+Received: from helcar.apana.org.au ([209.40.204.226]:44708 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751999Ab0K1Lkl (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 28 Nov 2010 06:40:41 -0500
 Content-Disposition: inline
-In-Reply-To: <20101128071906.GA8818@gondor.apana.org.au>
+In-Reply-To: <20100908024219.GA3283@zaphod.pweis.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Philipp Weis <pweis@pweis.com>
 Cc: dash@vger.kernel.org
 
-* Herbert Xu <herbert@gondor.apana.org.au> [2010-11-28 08:55]:
-> On Wed, Aug 11, 2010 at 08:06:16AM +0000, Guido Berhoerster wrote:
-> > Hello,
-> > 
-> > with the latest git version of dash trap actions are not
-> > evaluated in the context of a function.
-> > 
-> > The following script demonstrates the bug:
-> > ----8<----
-> > read_timeout () {
-> >     saved_traps="$(trap)"
-> >     trap 'printf "timed out\n"; eval "${saved_traps}"; return' TERM
-> >     ( sleep $1; kill -TERM $$ ) >/dev/null 2>&1 &
-> >     timer_pid=$!
-> >     read $2
-> >     kill $timer_pid 2>/dev/null
-> > }
-> > 
-> > read_timeout 5 value
-> > printf "read \"%s\"\n" "${value:=default}"
-> > 
-> > ---->8----
-> > The return statement in the trap inside the read_timeout function
-> > does not return from the function but rather exits the script.
-> > 
-> > With dash 0.5.5.1 it works as expected.
+On Wed, Sep 08, 2010 at 02:42:19AM +0000, Philipp Weis wrote:
+> Hi,
 > 
-> Indeed this was a regression caused by the SKIPEVAL removal.
-> 
-> This patch should fix it.
+> while inspecting some dash scripts on my system, I was surprised to
+> see that some of them use an open parenthesis at the beginning of case
+> patterns while that's not mentioned in the manpage. Dash currently is
+> fine with and without that parenthesis (parser.c:413). The attached
+> patch documents this feature.
 
-Thanks, it does fix it.
-
+Patch applied.  Thanks!
 -- 
-Guido Berhoerster
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
