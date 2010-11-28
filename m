@@ -1,39 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: read() builtin doesn't read integer value /proc files (but
-	bash's does)
-Date: Sun, 28 Nov 2010 16:42:19 +0800
-Message-ID: <20101128084219.GC8818@gondor.apana.org.au>
-References: <AANLkTinTd+29=8EkiTKptoE8nnVphcQ_TW=ezS99LmWw@mail.gmail.com> <AANLkTi=ZcNYJKCO_FM0RpJndwAgtzTU_C8J=9BsfmdAk@mail.gmail.com> <20100903212504.GA86276@stack.nl> <AANLkTi=d_13RCDhJHE_23BXN5Tf2RY_2e3rED7JwtFOK@mail.gmail.com> <20100904193504.GA3357@stack.nl>
+From: Guido Berhoerster <guido+kernel.org@berhoerster.name>
+Subject: Re: trap bug in recent versions of dash
+Date: Sun, 28 Nov 2010 09:50:54 +0100
+Message-ID: <20101128085054.GA6935@wopr.local.invalid>
+References: <20100811080616.GA18303@wopr.local.invalid>
+ <20101128071906.GA8818@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:42212 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750791Ab0K1ImZ (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 28 Nov 2010 03:42:25 -0500
+Received: from multivac.heapoverflow.de ([83.169.16.167]:39113 "EHLO
+	multivac.heapoverflow.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751760Ab0K1I47 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 28 Nov 2010 03:56:59 -0500
 Content-Disposition: inline
-In-Reply-To: <20100904193504.GA3357@stack.nl>
+In-Reply-To: <20101128071906.GA8818@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: Steve Schnepp <steve.schnepp@gmail.com>, dash@vger.kernel.org, 595063@bugs.debian.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org
 
-On Sat, Sep 04, 2010 at 07:35:04PM +0000, Jilles Tjoelker wrote:
+* Herbert Xu <herbert@gondor.apana.org.au> [2010-11-28 08:55]:
+> On Wed, Aug 11, 2010 at 08:06:16AM +0000, Guido Berhoerster wrote:
+> > Hello,
+> > 
+> > with the latest git version of dash trap actions are not
+> > evaluated in the context of a function.
+> > 
+> > The following script demonstrates the bug:
+> > ----8<----
+> > read_timeout () {
+> >     saved_traps="$(trap)"
+> >     trap 'printf "timed out\n"; eval "${saved_traps}"; return' TERM
+> >     ( sleep $1; kill -TERM $$ ) >/dev/null 2>&1 &
+> >     timer_pid=$!
+> >     read $2
+> >     kill $timer_pid 2>/dev/null
+> > }
+> > 
+> > read_timeout 5 value
+> > printf "read \"%s\"\n" "${value:=default}"
+> > 
+> > ---->8----
+> > The return statement in the trap inside the read_timeout function
+> > does not return from the function but rather exits the script.
+> > 
+> > With dash 0.5.5.1 it works as expected.
 > 
-> > I attached an updated patch that corrects this pb by discarding the
-> > buffer when opening a new file.
+> Indeed this was a regression caused by the SKIPEVAL removal.
 > 
-> This discarding is still bad as it throws away valid data if the open
-> file description is shared. This happens if stdin is redirected inside a
+> This patch should fix it.
 
-I'm with Jilles on this.  I also don't particularly feel like
-bloating dash just because of the borked /proc interface when
-there is a perfectly adequate work-around in "cat".
+Thanks, it does fix it.
 
-	value=$(cat /proc/file)
-
-Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Guido Berhoerster
