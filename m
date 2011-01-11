@@ -1,67 +1,51 @@
-From: Eric Blake <eblake@redhat.com>
+From: Jilles Tjoelker <jilles@stack.nl>
 Subject: Re: setvar MIA?
-Date: Tue, 11 Jan 2011 10:00:33 -0700
-Message-ID: <4D2C8CB1.4070204@redhat.com>
-References: <4D2C7D44.1060904@phat.za.net> <4D2C810E.4070707@redhat.com> <4D2C8B2C.3060001@phat.za.net>
+Date: Tue, 11 Jan 2011 20:58:12 +0100
+Message-ID: <20110111195811.GA62146@stack.nl>
+References: <4D2C7D44.1060904@phat.za.net>
+ <4D2C810E.4070707@redhat.com>
+ <4D2C8B2C.3060001@phat.za.net>
+ <4D2C8CB1.4070204@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------enig21CDB0AFAC7FF622D0E90664"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:64435 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932276Ab1AKRAj (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 11 Jan 2011 12:00:39 -0500
-In-Reply-To: <4D2C8B2C.3060001@phat.za.net>
+Received: from relay02.stack.nl ([131.155.140.104]:54565 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752441Ab1AKT6N (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 11 Jan 2011 14:58:13 -0500
+Content-Disposition: inline
+In-Reply-To: <4D2C8CB1.4070204@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Aragon Gouveia <aragon@phat.za.net>
-Cc: dash@vger.kernel.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Aragon Gouveia <aragon@phat.za.net>, dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig21CDB0AFAC7FF622D0E90664
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 11, 2011 at 10:00:33AM -0700, Eric Blake wrote:
+> On 01/11/2011 09:54 AM, Aragon Gouveia wrote:
+> > I wasn't sure of its status in POSIX.  It is useful for declaring
+> > variable variables - tidier than eval and I imagine faster, eg.
 
-On 01/11/2011 09:54 AM, Aragon Gouveia wrote:
-> I wasn't sure of its status in POSIX.  It is useful for declaring
-> variable variables - tidier than eval and I imagine faster, eg.
->=20
-> index=3D"1"
-> setvar var_${index} "value"
->=20
-> Will emulate it with a local function - thanks.
+> > index="1"
+> > setvar var_${index} "value"
 
-Indeed, it looks like FreeBSD introduced it as shorthand for:
+> > Will emulate it with a local function - thanks.
 
-setvar() { eval $1=3D\$2; }
+> Indeed, it looks like FreeBSD introduced it as shorthand for:
 
-The speed difference between that function doing an eval and a shell
-builtin would be in the noise.  I don't know why FreeBSD even bothered
-to pollute the namespace with a builtin like that.
+> setvar() { eval $1=\$2; }
 
---=20
-Eric Blake   eblake@redhat.com    +1-801-349-2682
-Libvirt virtualization library http://libvirt.org
+> The speed difference between that function doing an eval and a shell
+> builtin would be in the noise.  I don't know why FreeBSD even bothered
+> to pollute the namespace with a builtin like that.
 
+The setvar builtin was already present and documented in the initial
+ash. FreeBSD simply inherited it. Dash inherited it too, but it was
+removed in dash-0.4.14, 3 Apr 2003.
 
---------------enig21CDB0AFAC7FF622D0E90664
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+The use of Almquist's additions like this one is certainly questionable;
+many of them have been removed. However, setvar has been available and
+documented in /bin/sh in all versions of FreeBSD, which makes removal
+less likely at this point.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Fedora - http://enigmail.mozdev.org/
-
-iQEcBAEBCAAGBQJNLIyxAAoJEKeha0olJ0Nq1zcH/0RyRN7cYGZPN+BG0sMrapTe
-gvJTMOv8Zfln0KpfSOl3h6UO2iBcpWu9BkP2xfXTyULNn3syybLDfvpy5bPPxcVb
-Z7hqL3ncZNBnAosj7JePBdvw8bM/H6p68RZZqhuZt61qMsf/T/odSaGyluN6Q03C
-IAdN90LvLFazUPzk/qjP1+7+03lPDUjPqCrCtSNcY6TjDoiC4vr4nQ9jpnXb3xEF
-BTjVNIsrrwgCGQZsJhYz5349/tLCC0rGV0ErZ8AmcbPqU3z4oXffCSiOB600q94g
-sAfCiQMw3GKRxjg8p2Pvu7bwmQFjG1l0K/NTAHUb93d9jHa1pKm8eGSS52GaEpI=
-=8gXi
------END PGP SIGNATURE-----
-
---------------enig21CDB0AFAC7FF622D0E90664--
+-- 
+Jilles Tjoelker
