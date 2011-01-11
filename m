@@ -1,51 +1,51 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: setvar MIA?
-Date: Tue, 11 Jan 2011 20:58:12 +0100
-Message-ID: <20110111195811.GA62146@stack.nl>
-References: <4D2C7D44.1060904@phat.za.net>
- <4D2C810E.4070707@redhat.com>
- <4D2C8B2C.3060001@phat.za.net>
- <4D2C8CB1.4070204@redhat.com>
+From: peter kvillegard <peterkvillegard@gmail.com>
+Subject: dash 0.5.6.1-1, setting IFS to tab, bug?
+Date: Tue, 11 Jan 2011 23:08:01 +0100
+Message-ID: <AANLkTimH4dj4x12T1j5d4hd1Xeq2nMwev8ZLegbgCMT-@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay02.stack.nl ([131.155.140.104]:54565 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752441Ab1AKT6N (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 11 Jan 2011 14:58:13 -0500
-Content-Disposition: inline
-In-Reply-To: <4D2C8CB1.4070204@redhat.com>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:44636 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756294Ab1AKWIC (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 11 Jan 2011 17:08:02 -0500
+Received: by bwz15 with SMTP id 15so7787bwz.19
+        for <dash@vger.kernel.org>; Tue, 11 Jan 2011 14:08:01 -0800 (PST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <eblake@redhat.com>
-Cc: Aragon Gouveia <aragon@phat.za.net>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Tue, Jan 11, 2011 at 10:00:33AM -0700, Eric Blake wrote:
-> On 01/11/2011 09:54 AM, Aragon Gouveia wrote:
-> > I wasn't sure of its status in POSIX.  It is useful for declaring
-> > variable variables - tidier than eval and I imagine faster, eg.
+Hello, i'm new to all this but was encouraged to bring up an issue to
+the dash mailing list.
+It seems like setting the IFS for read to a tab does not work as it should.
+For example: consider a testfile with the following content:
 
-> > index="1"
-> > setvar var_${index} "value"
+test1(space)test2(tab)test3
 
-> > Will emulate it with a local function - thanks.
+(where the "(space)" is an actual space etc)
+then:
 
-> Indeed, it looks like FreeBSD introduced it as shorthand for:
+#!/bin/dash
 
-> setvar() { eval $1=\$2; }
+cat testfile |
+while IFS='  	' read col1 col2; do    #an actual tab
+echo $col1
+echo $col2
+done
 
-> The speed difference between that function doing an eval and a shell
-> builtin would be in the noise.  I don't know why FreeBSD even bothered
-> to pollute the namespace with a builtin like that.
+exit 0
 
-The setvar builtin was already present and documented in the initial
-ash. FreeBSD simply inherited it. Dash inherited it too, but it was
-removed in dash-0.4.14, 3 Apr 2003.
+it gives the output:
 
-The use of Almquist's additions like this one is certainly questionable;
-many of them have been removed. However, setvar has been available and
-documented in /bin/sh in all versions of FreeBSD, which makes removal
-less likely at this point.
+test1
+test2 test3
 
--- 
-Jilles Tjoelker
+because it seems to interpret the space as part of IFS?
+
+i might be wrong though, but some other people reproduced the error on
+various systems for the later versions of dash, so that's why im
+writing to you.
+
+regards
+
+peter
