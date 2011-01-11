@@ -1,65 +1,43 @@
-From: Eric Blake <eblake@redhat.com>
+From: Aragon Gouveia <aragon@phat.za.net>
 Subject: Re: setvar MIA?
-Date: Tue, 11 Jan 2011 09:10:54 -0700
-Message-ID: <4D2C810E.4070707@redhat.com>
-References: <4D2C7D44.1060904@phat.za.net>
+Date: Tue, 11 Jan 2011 18:54:04 +0200
+Message-ID: <4D2C8B2C.3060001@phat.za.net>
+References: <4D2C7D44.1060904@phat.za.net> <4D2C810E.4070707@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------enig38CE1E16B666556A221D0FF7"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:29680 "EHLO mx1.redhat.com"
+Received: from decoder.geek.sh ([196.36.198.81]:58236 "EHLO mail.geek.sh"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756163Ab1AKQLC (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 11 Jan 2011 11:11:02 -0500
-In-Reply-To: <4D2C7D44.1060904@phat.za.net>
+	id S932276Ab1AKQyI (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 11 Jan 2011 11:54:08 -0500
+In-Reply-To: <4D2C810E.4070707@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Aragon Gouveia <aragon@phat.za.net>
+To: Eric Blake <eblake@redhat.com>
 Cc: dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig38CE1E16B666556A221D0FF7
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 01/11/2011 08:54 AM, Aragon Gouveia wrote:
-> Hi,
->=20
-> I'm working on making a number of shell scripts cross compatible betwee=
-n
-> FreeBSD and Linux, but one thorn in my side has been dash's lack of a
-> setvar builtin.  Does anyone know if this is a work in progress, or a
-> decidedly void feature in dash?
+On 01/11/11 18:10, Eric Blake wrote:
+> Decidedly missing.  POSIX doesn't require it.  Neither bash nor ksh
+> provides setvar as a builtin, either.  And what does setvar do anyways?
+>   Perhaps it is some alias or shell function that you have inherited from
+> startup files in one of your other shells, but I've never heard of a
+> 'setvar' program.  So why bloat dash to include it?
 
-Decidedly missing.  POSIX doesn't require it.  Neither bash nor ksh
-provides setvar as a builtin, either.  And what does setvar do anyways?
- Perhaps it is some alias or shell function that you have inherited from
-startup files in one of your other shells, but I've never heard of a
-'setvar' program.  So why bloat dash to include it?
+It is a builtin in FreeBSD's Bourne shell:
 
---=20
-Eric Blake   eblake@redhat.com    +1-801-349-2682
-Libvirt virtualization library http://libvirt.org
+http://www.freebsd.org/cgi/man.cgi?query=sh&apropos=0&sektion=0&manpath=FreeBSD+8.1-RELEASE&format=html
+
+I wasn't sure of its status in POSIX.  It is useful for declaring 
+variable variables - tidier than eval and I imagine faster, eg.
+
+index="1"
+setvar var_${index} "value"
+
+Will emulate it with a local function - thanks.
 
 
---------------enig38CE1E16B666556A221D0FF7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Fedora - http://enigmail.mozdev.org/
-
-iQEcBAEBCAAGBQJNLIEOAAoJEKeha0olJ0NqcHwH+gJ3yKz2J5qrO+/+mPR7seic
-PC0iJ7QPtwGmzYtB77kNytjnU1xBGtENkyUdOhdr/ZrCbYtrf5mEI5eqMuqjFh4/
-YU7jCgUCQGzSZJGcFKFhiK9OL5b7/sEyCjSPtoGIdbzlGJIYB9WLWC4AFkeN8R2n
-dOR7Vx9JPeR7vbSxi9uYFQlblFDTXfzrqpOogOSjL2SJtiO19obixJxk+cr7vifx
-bR4qnDOb3IZC78v4pDMVL2/4SJQJqah2SRGEsDUSVh81lb17p5LyzODgb5YI7n/h
-qrxyjUybpgx/4G7iokrFk5B9SvdXTVmLI6hKJnXuWS3+jsVm8zBx/+cimVe9vj0=
-=eksO
------END PGP SIGNATURE-----
-
---------------enig38CE1E16B666556A221D0FF7--
+Regards,
+Aragon
