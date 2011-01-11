@@ -1,43 +1,67 @@
-From: Aragon Gouveia <aragon@phat.za.net>
+From: Eric Blake <eblake@redhat.com>
 Subject: Re: setvar MIA?
-Date: Tue, 11 Jan 2011 18:54:04 +0200
-Message-ID: <4D2C8B2C.3060001@phat.za.net>
-References: <4D2C7D44.1060904@phat.za.net> <4D2C810E.4070707@redhat.com>
+Date: Tue, 11 Jan 2011 10:00:33 -0700
+Message-ID: <4D2C8CB1.4070204@redhat.com>
+References: <4D2C7D44.1060904@phat.za.net> <4D2C810E.4070707@redhat.com> <4D2C8B2C.3060001@phat.za.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------enig21CDB0AFAC7FF622D0E90664"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from decoder.geek.sh ([196.36.198.81]:58236 "EHLO mail.geek.sh"
+Received: from mx1.redhat.com ([209.132.183.28]:64435 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932276Ab1AKQyI (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 11 Jan 2011 11:54:08 -0500
-In-Reply-To: <4D2C810E.4070707@redhat.com>
+	id S932276Ab1AKRAj (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 11 Jan 2011 12:00:39 -0500
+In-Reply-To: <4D2C8B2C.3060001@phat.za.net>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <eblake@redhat.com>
+To: Aragon Gouveia <aragon@phat.za.net>
 Cc: dash@vger.kernel.org
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig21CDB0AFAC7FF622D0E90664
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On 01/11/11 18:10, Eric Blake wrote:
-> Decidedly missing.  POSIX doesn't require it.  Neither bash nor ksh
-> provides setvar as a builtin, either.  And what does setvar do anyways?
->   Perhaps it is some alias or shell function that you have inherited from
-> startup files in one of your other shells, but I've never heard of a
-> 'setvar' program.  So why bloat dash to include it?
+On 01/11/2011 09:54 AM, Aragon Gouveia wrote:
+> I wasn't sure of its status in POSIX.  It is useful for declaring
+> variable variables - tidier than eval and I imagine faster, eg.
+>=20
+> index=3D"1"
+> setvar var_${index} "value"
+>=20
+> Will emulate it with a local function - thanks.
 
-It is a builtin in FreeBSD's Bourne shell:
+Indeed, it looks like FreeBSD introduced it as shorthand for:
 
-http://www.freebsd.org/cgi/man.cgi?query=sh&apropos=0&sektion=0&manpath=FreeBSD+8.1-RELEASE&format=html
+setvar() { eval $1=3D\$2; }
 
-I wasn't sure of its status in POSIX.  It is useful for declaring 
-variable variables - tidier than eval and I imagine faster, eg.
+The speed difference between that function doing an eval and a shell
+builtin would be in the noise.  I don't know why FreeBSD even bothered
+to pollute the namespace with a builtin like that.
 
-index="1"
-setvar var_${index} "value"
+--=20
+Eric Blake   eblake@redhat.com    +1-801-349-2682
+Libvirt virtualization library http://libvirt.org
 
-Will emulate it with a local function - thanks.
 
+--------------enig21CDB0AFAC7FF622D0E90664
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Regards,
-Aragon
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Fedora - http://enigmail.mozdev.org/
+
+iQEcBAEBCAAGBQJNLIyxAAoJEKeha0olJ0Nq1zcH/0RyRN7cYGZPN+BG0sMrapTe
+gvJTMOv8Zfln0KpfSOl3h6UO2iBcpWu9BkP2xfXTyULNn3syybLDfvpy5bPPxcVb
+Z7hqL3ncZNBnAosj7JePBdvw8bM/H6p68RZZqhuZt61qMsf/T/odSaGyluN6Q03C
+IAdN90LvLFazUPzk/qjP1+7+03lPDUjPqCrCtSNcY6TjDoiC4vr4nQ9jpnXb3xEF
+BTjVNIsrrwgCGQZsJhYz5349/tLCC0rGV0ErZ8AmcbPqU3z4oXffCSiOB600q94g
+sAfCiQMw3GKRxjg8p2Pvu7bwmQFjG1l0K/NTAHUb93d9jHa1pKm8eGSS52GaEpI=
+=8gXi
+-----END PGP SIGNATURE-----
+
+--------------enig21CDB0AFAC7FF622D0E90664--
