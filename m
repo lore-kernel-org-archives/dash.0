@@ -1,51 +1,63 @@
-From: peter kvillegard <peterkvillegard@gmail.com>
-Subject: dash 0.5.6.1-1, setting IFS to tab, bug?
-Date: Tue, 11 Jan 2011 23:08:01 +0100
-Message-ID: <AANLkTimH4dj4x12T1j5d4hd1Xeq2nMwev8ZLegbgCMT-@mail.gmail.com>
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: Re: dash 0.5.6.1-1, setting IFS to tab, bug?
+Date: Tue, 11 Jan 2011 16:25:38 -0600
+Message-ID: <20110111222538.GA29788@burratino>
+References: <AANLkTimH4dj4x12T1j5d4hd1Xeq2nMwev8ZLegbgCMT-@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:44636 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756294Ab1AKWIC (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 11 Jan 2011 17:08:02 -0500
-Received: by bwz15 with SMTP id 15so7787bwz.19
-        for <dash@vger.kernel.org>; Tue, 11 Jan 2011 14:08:01 -0800 (PST)
+Received: from mail-qy0-f174.google.com ([209.85.216.174]:53425 "EHLO
+	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751795Ab1AKWZw (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 11 Jan 2011 17:25:52 -0500
+Received: by qyj19 with SMTP id 19so3452265qyj.19
+        for <dash@vger.kernel.org>; Tue, 11 Jan 2011 14:25:51 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <AANLkTimH4dj4x12T1j5d4hd1Xeq2nMwev8ZLegbgCMT-@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: peter kvillegard <peterkvillegard@gmail.com>
+Cc: dash@vger.kernel.org
 
-Hello, i'm new to all this but was encouraged to bring up an issue to
-the dash mailing list.
-It seems like setting the IFS for read to a tab does not work as it should.
-For example: consider a testfile with the following content:
+Hi Peter,
 
-test1(space)test2(tab)test3
+peter kvillegard wrote:
 
-(where the "(space)" is an actual space etc)
-then:
+> test1(space)test2(tab)test3
+> 
+> (where the "(space)" is an actual space etc)
+> then:
+> 
+> #!/bin/dash
+> 
+> cat testfile |
+> while IFS='  	' read col1 col2; do    #an actual tab
 
-#!/bin/dash
+In my mailreader, this shows as
 
-cat testfile |
-while IFS='  	' read col1 col2; do    #an actual tab
-echo $col1
-echo $col2
-done
+	"while" SP "IFS='" SP SP HT "'" SP "read" ...
 
-exit 0
+In particular, IFS contains a space and a tab.  So I would expect
+"$col1" to be "test1" and "$col2" to be "test2	test3".
 
-it gives the output:
+> echo $col1
+> echo $col2
 
-test1
-test2 test3
+Because unquoted, $col2 is subject to word splitting.  So echo
+receives arguments "test2" "test3" and separates them with a space.
 
-because it seems to interpret the space as part of IFS?
+> done
+>
+> exit 0
+>
+> it gives the output:
+>
+> test1
+> test2 test3
 
-i might be wrong though, but some other people reproduced the error on
-various systems for the later versions of dash, so that's why im
-writing to you.
+Looks good to me. ;-)
 
-regards
+See http://unix.org/2008edition/ for details.
 
-peter
+Hope that helps,
+Jonathan
