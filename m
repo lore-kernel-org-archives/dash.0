@@ -1,63 +1,70 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: dash 0.5.6.1-1, setting IFS to tab, bug?
-Date: Tue, 11 Jan 2011 16:25:38 -0600
-Message-ID: <20110111222538.GA29788@burratino>
-References: <AANLkTimH4dj4x12T1j5d4hd1Xeq2nMwev8ZLegbgCMT-@mail.gmail.com>
+From: max ulidtko <ulidtko@gmail.com>
+Subject: [BUG] Improper 8-bit parsing because of signed overflow
+Date: Sat, 15 Jan 2011 21:24:37 +0200
+Message-ID: <1295119477.12334.78.camel@ulidtko>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-qy0-f174.google.com ([209.85.216.174]:53425 "EHLO
-	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751795Ab1AKWZw (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 11 Jan 2011 17:25:52 -0500
-Received: by qyj19 with SMTP id 19so3452265qyj.19
-        for <dash@vger.kernel.org>; Tue, 11 Jan 2011 14:25:51 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <AANLkTimH4dj4x12T1j5d4hd1Xeq2nMwev8ZLegbgCMT-@mail.gmail.com>
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:60679 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751657Ab1AQPAX (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 17 Jan 2011 10:00:23 -0500
+Received: by fxm20 with SMTP id 20so6129242fxm.19
+        for <dash@vger.kernel.org>; Mon, 17 Jan 2011 07:00:21 -0800 (PST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: peter kvillegard <peterkvillegard@gmail.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Hi Peter,
+In parser.c there is a function readtoken1() which fails to properly
+parse some 8-bit (i.e. UTF-8) tokens (filenames). Consider the followin=
+g
+test:
 
-peter kvillegard wrote:
+$ cat < =D1=82=D0=B5=D1=81=D1=82
+sh: cannot open =D1=82=D0=B5=EF=BF=BD=D1=82: No such file
+$ echo "=D1=82=D0=B5=D1=81=D1=82" | od -b
+0000000 321 202 320 265 321 201 321 202 012
+0000011
 
-> test1(space)test2(tab)test3
-> 
-> (where the "(space)" is an actual space etc)
-> then:
-> 
-> #!/bin/dash
-> 
-> cat testfile |
-> while IFS='  	' read col1 col2; do    #an actual tab
+Here "=D1=82=D0=B5=D1=81=D1=82" is four Cyrillic characters which get e=
+ncoded in 8 bytes of
+UTF-8. The third character (sixth byte, \201, to be exact) fails to be
+parsed by dash.
 
-In my mailreader, this shows as
+The reason is signed overflow. The parser uses syntax tables to
+determine the class to which a given byte (assuming it's a whole
+character) belongs. The lookup is done like this:
+	switch(syntax[c]) {
+But the variable c is declared as int. So instead of looking up the
+character \201 (129 in decimal) the parser uses signed index -127 to
+look up garbage which happens to be not equal to 0 (=3D=3DCWORD). As a
+result, the output token becomes corrupted.=20
 
-	"while" SP "IFS='" SP SP HT "'" SP "read" ...
+Here is some gdb output:
+(gdb) next
+884				switch(syntax[c]) {
+8: syntax[c] =3D 12 '\f'
+7: out =3D 0x8061659 ""
+6: stacknxt =3D 0x8061654 "=D1=82=D0=B5", <incomplete sequence \321>
+5: (char)c =3D -127 '\201'
+(gdb) print syntax[129]
+$42 =3D 0 '\000'
+(gdb) print syntax[(unsigned char)c]
+$43 =3D 0 '\000'
+(gdb) print syntax[c]
+$44 =3D 12 '\f'
 
-In particular, IFS contains a space and a tab.  So I would expect
-"$col1" to be "test1" and "$col2" to be "test2	test3".
+I would note that *any* 8-bit characters are being looked up in syntax
+tables incorrectly. Though only some cases lead to user-visible
+breakage, this is definitely a bug which needs to be fixed.
 
-> echo $col1
-> echo $col2
+But, due to the too lowlevel-ish style of the code I was unable to
+figure out working fix. My first suggested change to syntax[(unsigned
+char)c] didn't work.
 
-Because unquoted, $col2 is subject to word splitting.  So echo
-receives arguments "test2" "test3" and separates them with a space.
 
-> done
->
-> exit 0
->
-> it gives the output:
->
-> test1
-> test2 test3
+------
+Regards,
+max ulidtko
 
-Looks good to me. ;-)
-
-See http://unix.org/2008edition/ for details.
-
-Hope that helps,
-Jonathan
