@@ -1,70 +1,116 @@
-From: max ulidtko <ulidtko@gmail.com>
-Subject: [BUG] Improper 8-bit parsing because of signed overflow
-Date: Sat, 15 Jan 2011 21:24:37 +0200
-Message-ID: <1295119477.12334.78.camel@ulidtko>
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: Re: [BUG] Improper 8-bit parsing because of signed overflow
+Date: Mon, 17 Jan 2011 15:23:19 -0600
+Message-ID: <20110117212319.GB21507@burratino>
+References: <1295119477.12334.78.camel@ulidtko>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:60679 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751657Ab1AQPAX (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 17 Jan 2011 10:00:23 -0500
-Received: by fxm20 with SMTP id 20so6129242fxm.19
-        for <dash@vger.kernel.org>; Mon, 17 Jan 2011 07:00:21 -0800 (PST)
+Received: from mail-qw0-f46.google.com ([209.85.216.46]:60037 "EHLO
+	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752675Ab1AQVXa convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Mon, 17 Jan 2011 16:23:30 -0500
+Received: by qwa26 with SMTP id 26so5199561qwa.19
+        for <dash@vger.kernel.org>; Mon, 17 Jan 2011 13:23:29 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1295119477.12334.78.camel@ulidtko>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: max ulidtko <ulidtko@gmail.com>
+Cc: dash@vger.kernel.org
 
-In parser.c there is a function readtoken1() which fails to properly
-parse some 8-bit (i.e. UTF-8) tokens (filenames). Consider the followin=
-g
-test:
+Hi Max,
 
-$ cat < =D1=82=D0=B5=D1=81=D1=82
-sh: cannot open =D1=82=D0=B5=EF=BF=BD=D1=82: No such file
-$ echo "=D1=82=D0=B5=D1=81=D1=82" | od -b
-0000000 321 202 320 265 321 201 321 202 012
-0000011
+max ulidtko wrote:
 
-Here "=D1=82=D0=B5=D1=81=D1=82" is four Cyrillic characters which get e=
-ncoded in 8 bytes of
-UTF-8. The third character (sixth byte, \201, to be exact) fails to be
-parsed by dash.
+> $ cat < =D1=82=D0=B5=D1=81=D1=82
+> sh: cannot open =D1=82=D0=B5=EF=BF=BD=D1=82: No such file
 
-The reason is signed overflow. The parser uses syntax tables to
-determine the class to which a given byte (assuming it's a whole
-character) belongs. The lookup is done like this:
-	switch(syntax[c]) {
-But the variable c is declared as int. So instead of looking up the
-character \201 (129 in decimal) the parser uses signed index -127 to
-look up garbage which happens to be not equal to 0 (=3D=3DCWORD). As a
-result, the output token becomes corrupted.=20
+With Debian dash 0.5.5.1-7.4:
 
-Here is some gdb output:
-(gdb) next
-884				switch(syntax[c]) {
-8: syntax[c] =3D 12 '\f'
-7: out =3D 0x8061659 ""
-6: stacknxt =3D 0x8061654 "=D1=82=D0=B5", <incomplete sequence \321>
-5: (char)c =3D -127 '\201'
-(gdb) print syntax[129]
-$42 =3D 0 '\000'
-(gdb) print syntax[(unsigned char)c]
-$43 =3D 0 '\000'
-(gdb) print syntax[c]
-$44 =3D 12 '\f'
+ $ dash -c 'cat < =D1=82=D0=B5=D1=81=D1=82' 2>&1 |
+	LC_ALL=3DC sed -e 's/dash: cannot open \(.*\):.*/\1/' |
+	xxd
+ 0000000: d182 d0b5 d1d1 820a                      ........
+ $ dash -c 'echo =D1=82=D0=B5=D1=81=D1=82' | xxd
+ 0000000: d182 d0b5 d181 d182 0a                   .........
+=20
+The \x81 is being swallowed up.  This is <http://bugs.debian.org/532302=
+>,
+fixed by f8231a ([EXPAND] Fix corruption of redirections with byte 0x81=
+,
+2010-05-27).
 
-I would note that *any* 8-bit characters are being looked up in syntax
-tables incorrectly. Though only some cases lead to user-visible
-breakage, this is definitely a bug which needs to be fixed.
+But your question is still interesting from the point of view of
+investigation, so let's move on to that.
 
-But, due to the too lowlevel-ish style of the code I was unable to
-figure out working fix. My first suggested change to syntax[(unsigned
-char)c] didn't work.
+> The reason is signed overflow. The parser uses syntax tables to
+> determine the class to which a given byte (assuming it's a whole
+> character) belongs. The lookup is done like this:
+> 	switch(syntax[c]) {
 
+Given confusing code, it is often helpful to learn what the authors
+were thinking when it was written:
 
-------
-Regards,
-max ulidtko
+ $ git log -S'switch(syntax[c])' -- src/parser.c
+ commit 05c1076ba2d1a68fe7f3a5ae618f786b8898d327
+ Author: Herbert Xu <herbert@gondor.apana.org.au>
+ Date:   Mon Sep 26 18:32:28 2005 +1000
 
+     Initial import.
+
+Well, so much for that.  Except, does that mean the signed lookup
+has been present for five years?  So looking at 05c107:src/parser.c,
+one is led to wonder how c gets set in the first place.
+
+	c =3D pgetc();
+
+What did pgetc do?
+
+	int
+	pgetc(void)
+	{
+		return pgetc_macro();
+	}
+
+And pgetc_macro?
+
+	extern char *parsenextc;		/* next character in input buffer */
+[...]
+	#define pgetc_macro()	(--parsenleft >=3D 0? *parsenextc++ : preadbuffe=
+r())
+
+Sounds unportable --- the signedness depends on the platform.  Okay,
+so what does syntax[-1] give?  05c107:src/mksyntax.c has some hints:
+
+	if (sign)
+		base +=3D 1 << (nbits - 1);
+
+So syntax starts in the _middle_ of the builtin table when char is
+signed.
+
+That code isn't present in current src/mksyntax.c.  What gives, one
+might wonder?
+
+ $ git log -1 -S'base +=3D' -- src/mksyntax.c
+ commit d8014392bc291504997c65b3b44a7f21a60b0e07
+ Author: Herbert Xu <herbert@gondor.apana.org.au>
+ Date:   Sun Apr 23 16:01:05 2006 +1000
+
+     [PARSER] Only use signed char for syntax arrays
+
+     The existing scheme of using the native char for syntax array indi=
+cies
+     makes cross-compiling difficult.  Therefore it makes sense to choo=
+se
+     one specific sign for everyone.
+
+     Since signed chars are native to most platforms and i386, it makes=
+ more
+     sense to use that if we are to choose one type for everyone.
+
+Ah.
+
+Hope that helps,
+Jonathan
