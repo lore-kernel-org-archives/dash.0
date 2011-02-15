@@ -1,66 +1,44 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: [PATCH 1/3] Port to Solaris
-Date: Fri, 21 Jan 2011 14:06:02 +0100
-Message-ID: <20110121130602.GA70470@stack.nl>
-References: <1295413636.4278.28.camel@gemini>
- <1295414140.6486.3.camel@gemini>
+From: Dan Muresan <danmbox@gmail.com>
+Subject: set -m under setsid doesn't create pgrp's
+Date: Tue, 15 Feb 2011 12:45:58 +0200
+Message-ID: <AANLkTikxM==3q9AtL-SU+kqDjLheBbYde=BWMB6bom4+@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay02.stack.nl ([131.155.140.104]:50121 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752519Ab1AUNGE (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 21 Jan 2011 08:06:04 -0500
-Content-Disposition: inline
-In-Reply-To: <1295414140.6486.3.camel@gemini>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:65447 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753139Ab1BOKqB (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 15 Feb 2011 05:46:01 -0500
+Received: by bwz15 with SMTP id 15so293794bwz.19
+        for <dash@vger.kernel.org>; Tue, 15 Feb 2011 02:45:59 -0800 (PST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Brian Koropoff <bkoropoff@gmail.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Tue, Jan 18, 2011 at 09:15:40PM -0800, Brian Koropoff wrote:
-> - Older Solaris does not support %jd (intmax_t) in format
->   strings, but it does support %lld (long long), which is
->   the same size on all architectures it supports.  Do
->   a configure check for the sizes of both and prefer %lld
->   when it is safe to do so.
+dash (0.5.5.1-3ubuntu2) doesn't seem put jobs in their own pgrp when
+setsid'ed, as required by the "set -o monitor" (set -m) option:
 
-Pedantically, that's a regression for systems that do support %jd, and I
-expect compilers to warn about it. If %jd is available, it must be used
-for intmax_t, and not %lld, because that is for long long, not intmax_t.
 
-What you can do is use PRIdMAX from <inttypes.h>, normally defined as
-"jd". You can then define this to "lld" or "jd" if it is not defined.
-I think this makes the code uglier (just like your change), but oh well.
+$ cat >test.sh <<EOF
+#!/bin/sh
+set -m
+sh -c 'while :; do sleep 3; done' &
+set +m
+echo "Waiting for $!"; wait; echo Done
+EOF
 
-> - Older Solaris lacks stdint.h, but inttypes.h provides the
->   same types and works on all platforms I've tried dash on,
->   so just use it instead.
+$ setsid test.sh
+Waiting for 25828
+$ kill -- -25828
+kill: (-25828) - No such process
+$ ps -Leo pid,ppid,pgrp,cmd  # pgrp of job is pid of test.sh
 
-<inttypes.h> is defined to be a superset of <stdint.h>, so that is ok.
-It is also needed for the PRIdMAX suggestion above.
+This does not happen with bash, or if running the script directly
+without setsid.
 
-> [...]
-> diff --git a/src/arith_yacc.c b/src/arith_yacc.c
-> index 6c5a720..bf21830 100644
-> --- a/src/arith_yacc.c
-> +++ b/src/arith_yacc.c
-> @@ -33,7 +33,6 @@
->   */
->  
->  #include <inttypes.h>
-> -#include <stdint.h>
->  #include <stdlib.h>
->  #include "arith_yacc.h"
->  #include "expand.h"
+This bug makes it hard to write some scripts robustly.
 
-This is useful regardless as the <stdint.h> is redundant. The
-<inttypes.h> is already needed here because of imaxdiv().
-
-By the way, I wonder what the advantage of imaxdiv() above separate %
-and / is. Compilers can detect the matching between a % b and a / b and
-do it in one operation, and any use of imaxdiv() trips gcc's
--Waggregate-return.
 
 -- 
-Jilles Tjoelker
+Dan Muresan
+http://alumnus.caltech.edu/~muresan/
