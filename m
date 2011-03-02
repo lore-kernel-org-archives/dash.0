@@ -1,32 +1,65 @@
-From: "Taylan Ulrich B." <taylanbayirli@gmail.com>
-Subject: 'continue' does not work in files sourced with dotcmd
-Date: Sat, 26 Feb 2011 19:23:54 +0100
-Message-ID: <AANLkTimiFku8Uj9haYAxXWyJQOGSV7Uz3i2k75+aMvTU@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Tim Allen <screwtape@froup.com>
+Subject: [PATCH] Reset exit status before sourcing a file.
+Date: Wed,  2 Mar 2011 23:22:53 +1100
+Message-ID: <1299068573-581-1-git-send-email-screwtape@froup.com>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-qy0-f181.google.com ([209.85.216.181]:39637 "EHLO
-	mail-qy0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752070Ab1BZSXz (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 26 Feb 2011 13:23:55 -0500
-Received: by qyg14 with SMTP id 14so2327618qyg.19
-        for <dash@vger.kernel.org>; Sat, 26 Feb 2011 10:23:54 -0800 (PST)
+Received: from poplet3.per.eftel.com ([203.24.100.44]:48386 "EHLO
+	poplet3.per.eftel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756435Ab1CBMaV (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 2 Mar 2011 07:30:21 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash <dash@vger.kernel.org>
+To: dash@vger.kernel.org
+Cc: 615922@bugs.debian.org, Tim Allen <screwtape@froup.com>
 
-Using latest dash from git.
-Transcript:
+The POSIX specification for the dot command[1] states:
 
-$ echo continue > foo
-$ for i in 1; do . ./foo; echo foobar; done
-foobar
-$
+    EXIT STATUS
+        Returns the value of the last command executed, or a zero exit
+        status if no command is executed.
 
-By the way you guys should look into the Debian bugtracker for their
-dash package, if you don't already; most of the bugs there are
-probably upstream.
+If an empty file is sourced, then "no command is executed", and hence
+the exit status should be zero. If the exit status is not reset before
+sourcing an empty file, the exit status of the previous command "leaks"
+through. Here's a simple test case:
 
-Dash is awesome.
-Regards,
-Taylan
+    false
+    . /dev/null
+    [ $? = 0 ] && echo "Success" || echo "Failure"
+
+This behaviour becomes more problematic when combined with "set -e". Consider the following snippet:
+
+    if [ "$FILETYPE" != "shell" ]; then
+	run_external_script "$FILEPATH"
+    else
+	. "$FILEPATH"
+    fi
+
+Assume "set -e", that FILETYPE is set to "shell" and that FILEPATH points to
+an empty file. Since the condition returns a non-zero exit status (which is
+protected from "set -e" by the if statement), the shell runs the "else" branch
+of the code, sources the empty file, and then checks the last exit status
+again. Because the exit status from the condition hasn't been cleared, "set -e" causes the shell to exit even though no un-handled error has occurred.
+
+[1] http://pubs.opengroup.org/onlinepubs/009695399/utilities/dot.html
+
+Signed-off-by: Timothy Allen <screwtape@froup.com>
+---
+ src/main.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index 1735c67..b4c07e9 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -318,6 +318,7 @@ int
+ dotcmd(int argc, char **argv)
+ {
+ 	int status = 0;
++	exitstatus = 0;
+ 
+ 	if (argc >= 2) {		/* That's what SVR2 does */
+ 		char *fullname;
+-- 
+1.7.1
+
