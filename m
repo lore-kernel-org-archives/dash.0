@@ -1,99 +1,75 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: [PATCH] Reset exit status before sourcing a file.
-Date: Wed, 2 Mar 2011 14:42:34 -0600
-Message-ID: <20110302204233.GB21150@elie>
-References: <1299068573-581-1-git-send-email-screwtape@froup.com>
+From: "David A. Wheeler" <dwheeler@dwheeler.com>
+Subject: [PATCH] Allow == as synonym for = in test
+Date: Sun, 06 Mar 2011 18:01:11 -0500 (EST)
+Message-ID: <E1PwMwp-0001iy-B5@fenris.runbox.com>
+Reply-To: dwheeler@dwheeler.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:49153 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754777Ab1CBUmk (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 2 Mar 2011 15:42:40 -0500
-Received: by vxi39 with SMTP id 39so366564vxi.19
-        for <dash@vger.kernel.org>; Wed, 02 Mar 2011 12:42:40 -0800 (PST)
+Received: from aibo.runbox.com ([87.238.52.70]:58725 "EHLO aibo.runbox.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754934Ab1CFXYk convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sun, 6 Mar 2011 18:24:40 -0500
+Received: from [10.9.9.130] (helo=fenris.runbox.com)
+	by greyhound.runbox.com with esmtp (Exim 4.50)
+	id 1PwMwp-0006nV-R2
+	for dash@vger.kernel.org; Mon, 07 Mar 2011 00:01:11 +0100
 Content-Disposition: inline
-In-Reply-To: <1299068573-581-1-git-send-email-screwtape@froup.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Tim Allen <screwtape@froup.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
+Cc: dwheeler@dwheeler.com
 
-Tim Allen wrote:
+From: David A. Wheeler <dwheeler@dwheeler.com>
 
-> The POSIX specification for the dot command[1] states:
->
->     EXIT STATUS
->         Returns the value of the last command executed, or a zero exit
->         status if no command is executed.
-> 
-> If an empty file is sourced, then "no command is executed"
+The following patch adds support for "==" as a synonym for "=" (is-string-equal) in test, including the documentation and comment changes to note it.
 
-I agree.  Looking through "git log --patch src/main.c", though, I find
-v0.5.3~42 (Do not clobber exit status in dotcmd., 2005-03-03), which
-appears to have been meant to take care of the following case:
+Why add this?
+* Many current shell scripts use "==" instead of "=" to determine if strings are equal (as reported by https://wiki.ubuntu.com/DashAsBinSh and other places).  Bash, ksh, and probably other shells already support this, which is why its use is so common.
+* Using "==" makes it slightly clearer that this is an equality test and not an assignment (since "=" is used elsewhere in shell for assignment).  Note that this is consistent with C, C++, and many other languages.
+* A trivial amount of code is needed to implement it.
 
-	$ cat printstatus.sh
-	echo $?
-	$ false
-	$ . ./printstatus.sh
-	1
+This isn't required by POSIX, but "test" in dash already supports tests not in POSIX.  I think it'd be useful to add one that's already in common use.
 
-I wonder if the following on top might help (imitating evalcmd)?
+Signed-off-by: David A. Wheeler <dwheeler@dwheeler.com>
 
-Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
----
- src/main.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+diff --git a/src/bltin/test.1 b/src/bltin/test.1
+index 42435fb..56f8163 100644
+--- a/src/bltin/test.1
++++ b/src/bltin/test.1
+@@ -193,6 +193,12 @@ True if the strings
+ and
+ .Ar \&s\&2
+ are identical.
++.It Ar \&s\&1 Cm \&=\&= Ar \&s\&2
++True if the strings
++.Ar \&s\&1
++and
++.Ar \&s\&2
++are identical (this is a synonym for \&=).
+ .It Ar \&s\&1 Cm \&!= Ar \&s\&2
+ True if the strings
+ .Ar \&s\&1
+diff --git a/src/bltin/test.c b/src/bltin/test.c
+index 7888f38..5a581ed 100644
+--- a/src/bltin/test.c
++++ b/src/bltin/test.c
+@@ -31,7 +31,7 @@
+        unary-operator ::= "-r"|"-w"|"-x"|"-f"|"-d"|"-c"|"-b"|"-p"|
+                "-u"|"-g"|"-k"|"-s"|"-t"|"-z"|"-n"|"-o"|"-O"|"-G"|"-L"|"-S";
 
-diff --git a/src/main.c b/src/main.c
-index b4c07e9..b38dc27 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -202,6 +202,7 @@ cmdloop(int top)
- 	union node *n;
- 	struct stackmark smark;
- 	int inter;
-+	int status = 0;
- 	int numeof = 0;
- 
- 	TRACE(("cmdloop(%d) called\n", top));
-@@ -235,6 +236,7 @@ cmdloop(int top)
- 			job_warning = (job_warning == 2) ? 1 : 0;
- 			numeof = 0;
- 			evaltree(n, 0);
-+			status = exitstatus;
- 		}
- 		popstackmark(&smark);
- 
-@@ -245,7 +247,7 @@ cmdloop(int top)
- 		}
- 	}
- 
--	return 0;
-+	return status;
- }
- 
- 
-@@ -318,7 +320,6 @@ int
- dotcmd(int argc, char **argv)
- {
- 	int status = 0;
--	exitstatus = 0;
- 
- 	if (argc >= 2) {		/* That's what SVR2 does */
- 		char *fullname;
-@@ -326,9 +327,8 @@ dotcmd(int argc, char **argv)
- 		fullname = find_dot_file(argv[1]);
- 		setinputfile(fullname, INPUT_PUSH_FILE);
- 		commandname = fullname;
--		cmdloop(0);
-+		status = cmdloop(0);
- 		popfile();
--		status = exitstatus;
- 	}
- 	return status;
- }
--- 
-1.7.4.1
+-       binary-operator ::= "="|"!="|"-eq"|"-ne"|"-ge"|"-gt"|"-le"|"-lt"|
++       binary-operator ::= "="|"=="|"!="|"-eq"|"-ne"|"-ge"|"-gt"|"-le"|"-lt"|
+                        "-nt"|"-ot"|"-ef";
+        operand ::= <any legal UNIX file name>
+ */
+@@ -113,6 +113,7 @@ static struct t_op {
+        {"-L",  FILSYM, UNOP},
+        {"-S",  FILSOCK,UNOP},
+        {"=",   STREQ,  BINOP},
++       {"==",  STREQ,  BINOP},
+        {"!=",  STRNE,  BINOP},
+        {"<",   STRLT,  BINOP},
+        {">",   STRGT,  BINOP},
 
