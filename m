@@ -1,81 +1,89 @@
-From: Dan Muresan <danmbox@gmail.com>
+From: Guido Berhoerster <gber@opensuse.org>
 Subject: Re: [PATCH] Allow == as synonym for = in test
-Date: Tue, 8 Mar 2011 17:53:11 +0200
-Message-ID: <AANLkTikCce-a05ZHbNd-0C4ajuseg+yPuchW9LSEpQH5@mail.gmail.com>
+Date: Tue, 8 Mar 2011 19:13:01 +0100
+Message-ID: <20110308181301.GD3948@wopr.local.invalid>
 References: <E1PwMwp-0001iy-B5@fenris.runbox.com>
-	<20110306234845.GC18385@elie>
-	<E1PwOzt-0007C2-Qw@fenris.runbox.com>
-	<20110307103457.GA5987@wopr.local.invalid>
-	<E1Pwbqm-00056z-0V@garm.runbox.com>
-	<20110307220048.GE15732@elie>
-	<E1PwjSv-0004ZG-3B@fenris.runbox.com>
-	<20110308000557.GC5987@wopr.local.invalid>
-	<AANLkTinea9rwpq9M70SazaDCJ-usb5HuLeh=+62onYe9@mail.gmail.com>
-	<1299598034.27968.45.camel@homebase>
+ <20110306234845.GC18385@elie>
+ <E1PwOzt-0007C2-Qw@fenris.runbox.com>
+ <20110307103457.GA5987@wopr.local.invalid>
+ <E1Pwbqm-00056z-0V@garm.runbox.com>
+ <20110307220048.GE15732@elie>
+ <E1PwjSv-0004ZG-3B@fenris.runbox.com>
+ <20110308000557.GC5987@wopr.local.invalid>
+ <AANLkTinea9rwpq9M70SazaDCJ-usb5HuLeh=+62onYe9@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:40384 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752695Ab1CHPxN convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Tue, 8 Mar 2011 10:53:13 -0500
-Received: by bwz15 with SMTP id 15so4664442bwz.19
-        for <dash@vger.kernel.org>; Tue, 08 Mar 2011 07:53:11 -0800 (PST)
-In-Reply-To: <1299598034.27968.45.camel@homebase>
+Received: from multivac.heapoverflow.de ([83.169.16.167]:41399 "EHLO
+	multivac.heapoverflow.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751996Ab1CHSVI (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 8 Mar 2011 13:21:08 -0500
+Content-Disposition: inline
+In-Reply-To: <AANLkTinea9rwpq9M70SazaDCJ-usb5HuLeh=+62onYe9@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: paul@mad-scientist.net
-Cc: "David A. Wheeler" <dwheeler@dwheeler.com>, dash@vger.kernel.org, Guido Berhoerster <guido+kernel.org@berhoerster.name>
+To: Dan Muresan <danmbox@gmail.com>
+Cc: "David A. Wheeler" <dwheeler@dwheeler.com>, dash@vger.kernel.org
 
-> No one ever said you couldn't write shell scripts in bash rather than=
- in
-> sh, even on Ubuntu. =A0You just have to use #!/bin/bash at the top, n=
-ot
-> #!/bin/sh. =A0Truth in scripting!
+* Dan Muresan <danmbox@gmail.com> [2011-03-08 08:17]:
+> > The hard work of many Debian maintainers fixing broken shell
+> > scripts and pushing these changes upstream is certainly not
+> 
+> The hardest (and entirely avoidable) work fell on the shoulders of the
+> "community" who had scripts break mysteriously without so much as a
+> warning from Debian/Ubuntu. People would all of a sudden receive
+> errors from well established packages (such as vmware) with absolutely
+> no clue as to what was wrong.
+> 
+> > wasted time but a great service to other platforms as well by
+> 
+> Wherever Linux goes, bash goes too... except for embedded busyboxy
+> systems, where everything is customized by hand anyway.
 
-Please, not *that* red herring again... You know very well that the
-existing packages that broke were the problem, not the scripts yet to
-be written.
+Well you know, not the whole world revolves around Linux.
+And while there are pecularities, writing shell scripts
+using IEEE Std 1003.1-2001 as a baseline is a good starting point
+for achieving portability since most modern Unix or Unix-like OS
+come with a shell that claims to conform to it.
 
-Maybe I've made too many points, so let me summarize:
+> 
+> > improving portability. If you want bash or ksh scripts to work
+> > why do you use dash?
+> 
+> No sane user cares about bash / ksh / *sh in *scripts* -- but once
+> sh=bash became a de-facto standard, making a change swiftly and "under
+> the radar" was irresponsible. We are not living in an ideal world, and
+> I do not wish to debate worthy causes for that inexistent ideal world.
 
-1) changing from sh=3Dbash to sh=3Ddash in Ubuntu was done without due
-publicity for such a monumental upheaval. This should not have been
-buried in some bash / dash NEWS.gz, nor in some release notes. This
-should have been included in ALL CAPS in all public announcements, on
-all forums and above all download links (I'm exaggerating but you get
-the point)
+/bin/sh == bash might be common among Linux distros, however in
+the real world it is neither a de-facto standard nor guaranteed
+to even give you a POSIX-shell. While bash may be available on
+most platforms it versions are likely to vary. And since bash
+tends to make backwards-incompatible changes even with minor
+releases it I don't find it to be the best option for writing
+portable scripts.
 
-2) Before the update, there should have been a campaign promoting the
-checkbashisms tool
+> > That is a very weak argument as it applies to many such features,
+> > the question is whether to create precendent here and where that'll
+> 
+> I actually tend to agree with this (though I still think it's a
+> bikeshed issue). Now that we've paid the price to port scripts to
+> dash, why lose the one benefit we ever had?
+> 
+> Still, I wish dash would spend more effort making sure that everything
+> in SUSv3 works *at least as well* as it does in Bash, and less effort
+> in debating == vs =. I have had to abandon certain POSIX idioms that
+> work well in Bash because dash does not (or did not) support them.
+> 
+> Note that even when an upgraded dash fixes a bug, the impact on
+> distributions lingers on for years: it takes a while for new distros
+> to incorporate the new dash, and scripts can't know if they are
+> running on "new" or "old" distros. So dash, the now-default /bin/sh,
+> should be even more proactive about bugs than a normal package.
 
-3) I personally don't think dash was quite mature enough to be the
-default shell when the change was made. Maybe it's getting there
-today.
+In the real world software tends to have bugs, other shells have
+bugs, too. Given its resources dash is relatively well-
+maintained, bugs reported on this list are getting addressed.
 
-4) Now that everyone has paid the large price of a poorly prepared
-switch-over, I don't want dash to become more tolerant of non-POSIX
-idioms. The one benefit we have from dash is that it forces POSIX
-compliance.
-
-> blades that have 8+ cores and 24+G RAM, and 10gig ethernet interfaces=
-=2E
-
-Maybe you're not in the best position to argue in this case :) I have
-worked before with a few megs of RAM (and even with sub-1M DSP OSs,
-but that's different).
-
-> I personally am very grateful to Ubuntu for taking the high road here
-> and forcing some sanity and consideration back into the scripting
-
-I believe you. However, many thousands of users were *not* grateful,
-and I don't see why the preferences of a minority of developers in
-various niches should over-rule the necessities of a majority of
-desktop users.
-
-(Actually, we all know why stuff like this happens: Debian is not
-market-driven, so users' necessities, or their poor substitute --
-money -- do not directly impact its direction)
-
--- Dan
+-- 
+Guido Berhoerster
