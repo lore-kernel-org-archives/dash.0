@@ -1,70 +1,82 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
+From: Dan Muresan <danmbox@gmail.com>
 Subject: Re: Dash's web presence
-Date: Tue, 8 Mar 2011 01:38:25 -0600
-Message-ID: <20110308073824.GA25856@elie>
+Date: Tue, 8 Mar 2011 10:08:07 +0200
+Message-ID: <AANLkTiniFEYyxT1_UZ4kd5Fo=FdMg7OYJQQK3hEy0VaV@mail.gmail.com>
 References: <AANLkTi=eTw8jTtDGG-xBj6ycfnkvBGgY-G2W-r0WPBgy@mail.gmail.com>
+	<20110308073824.GA25856@elie>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-gw0-f51.google.com ([74.125.83.51]:64877 "EHLO
-	mail-gw0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751404Ab1CHHic (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 8 Mar 2011 02:38:32 -0500
-Received: by gwb15 with SMTP id 15so2992475gwb.10
-        for <dash@vger.kernel.org>; Mon, 07 Mar 2011 23:38:32 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <AANLkTi=eTw8jTtDGG-xBj6ycfnkvBGgY-G2W-r0WPBgy@mail.gmail.com>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:38775 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751281Ab1CHIIK convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Tue, 8 Mar 2011 03:08:10 -0500
+Received: by bwz15 with SMTP id 15so4376696bwz.19
+        for <dash@vger.kernel.org>; Tue, 08 Mar 2011 00:08:08 -0800 (PST)
+In-Reply-To: <20110308073824.GA25856@elie>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Dan Muresan <danmbox@gmail.com>
+To: Jonathan Nieder <jrnieder@gmail.com>
 Cc: dash@vger.kernel.org
 
-Hi,
+> have pages like that --- e.g.,
+>
+> =A0 =A0 =A0 =A0http://invisible-island.net/xterm/xterm.html
 
-Some quick answers.
+xterm is now a niche project used by a small minority. Even I use
+urxvtcd. Debian's X11 doesn't even require xterm.
 
-Dan Muresan wrote:
+> Was it lacking some information you needed? =A0Do you know someone
 
-> Does it look like a major project's page? Does the URL even look stable?
+Only the most essential things: how to send mail to the list and how
+to report bugs.
 
-Yes, to me it does.  Lots of low-level tools with single maintainers
-have pages like that --- e.g.,
+> willing to buy up dash dot org to make it redirect there?
 
-	http://invisible-island.net/xterm/xterm.html
+Sourceforge? Google Code? Berlioz?
 
-Was it lacking some information you needed?  Do you know someone
-willing to buy up dash dot org to make it redirect there?
+> A bug tracker makes no sense if no one is maintaining it. =A0Do you k=
+now
 
-> Going further, where is dash's mailing list? The link on that
-> "homepage" points to a read-only archive.
+So you admit that the dash community is not up to maintaining a bug tra=
+cker...
 
-This complaint I agree with.  It might be a good idea to let Herbert
-know so he can change the link to point to
-http://vger.kernel.org/vger-lists.html#dash
+Shall we go over the advantages of a BTS in ensuring bugs aren't
+forgotten, capturing the lifecycle of a bug, organizing follow-up,
+offering a template for bug reporters, providing a "big picture" for
+developers etc? I would be happy to detail these points for anyone who
+thinks a mailing list is equivalent to a BTS (or just read Joel on
+Software, he's already done this work).
 
-> Why did I sign up for this list? I wanted to report a bug. By the way,
-> where is dash's bug tracker?
+> Debian has a bug tracker.
 
-A bug tracker makes no sense if no one is maintaining it.  Do you know
-someone interested in doing that work?
+=2E.. and when they do get off the couch and want to push a report
+upstream, where do they go? To this list, where bug reports can get
+lost between =3D=3D discussions, nothing gets filed in an organized
+manner, and tracking a bug's status means leafing through pages of
+archives?
 
-> For the default Debian /bin/sh,
+>> I would expect a more dignified web presence
+>
+> Do you know anyone interested in making a new web site? =A0That's how
 
-Debian has a bug tracker.
+Again, Sourceforge, Google and a myriad of others would be happy to
+set up a project page, accessible mailing list and BTS for free.
 
-> I would expect a more dignified web presence
+>> and a more transparent development.
+>
+> I haven't noticed development going on behind doors. =A0What does thi=
+s
+> even mean? =A0Patches get sent to the list, discussed on the list, th=
+en
+> committed to the git repository.
 
-Do you know anyone interested in making a new web site?  That's how
-many projects got their fancy pages --- someone had a better idea for
-what the webpage should look like and the original page was changed to
-redirect to their page.  See for example
-http://mercurial.selenic.com/thepage/
+A read-only mailing list and non-existent BTS is transparent? How can
+users report bugs? How can they track what happened to a bug? How can
+they participate in discussions?
 
-> and a more transparent development.
+Oh, you do have a GIT repository. Kudos for that.
 
-I haven't noticed development going on behind doors.  What does this
-even mean?  Patches get sent to the list, discussed on the list, then
-committed to the git repository.
 
-Hope that clarifies some things.
-Jonathan
+-- Dan
