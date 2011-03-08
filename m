@@ -1,49 +1,42 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
+From: Dan Muresan <danmbox@gmail.com>
 Subject: Re: Dash's web presence
-Date: Tue, 8 Mar 2011 02:42:51 -0600
-Message-ID: <20110308084251.GE26516@elie>
+Date: Tue, 8 Mar 2011 11:02:34 +0200
+Message-ID: <AANLkTimRtgrffYhh4xSeXtxKNfdQc4Pjt5NRA=fn7tsT@mail.gmail.com>
 References: <AANLkTi=eTw8jTtDGG-xBj6ycfnkvBGgY-G2W-r0WPBgy@mail.gmail.com>
- <20110308073824.GA25856@elie>
- <AANLkTiniFEYyxT1_UZ4kd5Fo=FdMg7OYJQQK3hEy0VaV@mail.gmail.com>
+	<20110308073824.GA25856@elie>
+	<AANLkTiniFEYyxT1_UZ4kd5Fo=FdMg7OYJQQK3hEy0VaV@mail.gmail.com>
+	<20110308084251.GE26516@elie>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:55195 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756808Ab1CHImz (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 8 Mar 2011 03:42:55 -0500
-Received: by iyb26 with SMTP id 26so4651163iyb.19
-        for <dash@vger.kernel.org>; Tue, 08 Mar 2011 00:42:55 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <AANLkTiniFEYyxT1_UZ4kd5Fo=FdMg7OYJQQK3hEy0VaV@mail.gmail.com>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:46885 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750726Ab1CHJCg (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 8 Mar 2011 04:02:36 -0500
+Received: by bwz15 with SMTP id 15so4402977bwz.19
+        for <dash@vger.kernel.org>; Tue, 08 Mar 2011 01:02:34 -0800 (PST)
+In-Reply-To: <20110308084251.GE26516@elie>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Dan Muresan <danmbox@gmail.com>
+To: Jonathan Nieder <jrnieder@gmail.com>
 Cc: dash@vger.kernel.org
 
-Hi again,
+Hi,
 
-Dan Muresan wrote:
+> The word "transparent" has an implied subtext that there is something
+> happening concerning these bugs elsewhere --- perhaps a hidden
 
-> A read-only mailing list and non-existent BTS is transparent? How can
-> users report bugs? How can they track what happened to a bug? How can
-> they participate in discussions?
+Sorry, didn't mean anything like that. In fact, most problems seem to
+originate in the web page: if it simply said "we don't have a
+bugtracker, please send mail" and "this is where you can send mail",
+things would be much clearer (though, in my opinion, still in need of
+improvement).
 
-I forgot to mention: thanks for reporting bugs!  You may or may not
-have noticed that there are not as many people hacking on dash as
-one would like, but it is useful to users and developers alike to
-learn about existing problems.
+And sorry if I was being a bit abrasive -- I just wanted to make sure
+people "wake up" and realize that being the default shell brings some
+responsibilities. Shell programming can be frustrating even without
+bugs, but when bugs appear, options tend to narrow to using perl /
+python even when one doesn't want to depend on them. And shell bugs
+linger in distros for many, many years after they are fixed.
 
-The word "transparent" has an implied subtext that there is something
-happening concerning these bugs elsewhere --- perhaps a hidden
-bugtracker.  There isn't.
-
-And I should say: I am very new to working on this shell myself.  A
-little while ago I started working on patches to update src/TOUR to
-more closely match current reality; maybe it's time to send those out
-and get some review.
-
-So thanks for caring.
-
-Regards,
-Jonathan
+-- Dan
