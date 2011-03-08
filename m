@@ -1,76 +1,68 @@
-From: Eric Blake <eblake@redhat.com>
+From: Dan Muresan <danmbox@gmail.com>
 Subject: Re: [PATCH] Allow == as synonym for = in test
-Date: Mon, 07 Mar 2011 17:03:11 -0700
-Message-ID: <4D75723F.3030207@redhat.com>
-References: <E1PwMwp-0001iy-B5@fenris.runbox.com> <20110306234845.GC18385@elie> <E1PwOzt-0007C2-Qw@fenris.runbox.com> <20110307103457.GA5987@wopr.local.invalid> <E1Pwbqm-00056z-0V@garm.runbox.com> <20110307220048.GE15732@elie> <E1PwjSv-0004ZG-3B@fenris.runbox.com> <20110308000557.GC5987@wopr.local.invalid>
+Date: Tue, 8 Mar 2011 09:17:14 +0200
+Message-ID: <AANLkTinea9rwpq9M70SazaDCJ-usb5HuLeh=+62onYe9@mail.gmail.com>
+References: <E1PwMwp-0001iy-B5@fenris.runbox.com>
+	<20110306234845.GC18385@elie>
+	<E1PwOzt-0007C2-Qw@fenris.runbox.com>
+	<20110307103457.GA5987@wopr.local.invalid>
+	<E1Pwbqm-00056z-0V@garm.runbox.com>
+	<20110307220048.GE15732@elie>
+	<E1PwjSv-0004ZG-3B@fenris.runbox.com>
+	<20110308000557.GC5987@wopr.local.invalid>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------enigECC49B07BE6D4964A9A89A88"
+Content-Type: text/plain; charset=ISO-8859-1
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56305 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756800Ab1CHADQ (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 7 Mar 2011 19:03:16 -0500
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:49857 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751314Ab1CHHRQ (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 8 Mar 2011 02:17:16 -0500
+Received: by bwz15 with SMTP id 15so4355531bwz.19
+        for <dash@vger.kernel.org>; Mon, 07 Mar 2011 23:17:15 -0800 (PST)
 In-Reply-To: <20110308000557.GC5987@wopr.local.invalid>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: "David A. Wheeler" <dwheeler@dwheeler.com>, dash@vger.kernel.org
+Cc: Guido Berhoerster <guido+kernel.org@berhoerster.name>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enigECC49B07BE6D4964A9A89A88
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-On 03/07/2011 05:05 PM, Guido Berhoerster wrote:
-> * David A. Wheeler <dwheeler@dwheeler.com> [2011-03-08 00:03]:
->> Dan Muresan:
->>> ...the crusade against "bashisms" has broken so many scripts and wast=
-ed so
->>> many man-hours for Debian / Ubuntu users.
->=20
 > The hard work of many Debian maintainers fixing broken shell
 > scripts and pushing these changes upstream is certainly not
+
+The hardest (and entirely avoidable) work fell on the shoulders of the
+"community" who had scripts break mysteriously without so much as a
+warning from Debian/Ubuntu. People would all of a sudden receive
+errors from well established packages (such as vmware) with absolutely
+no clue as to what was wrong.
+
 > wasted time but a great service to other platforms as well by
+
+Wherever Linux goes, bash goes too... except for embedded busyboxy
+systems, where everything is customized by hand anyway.
+
 > improving portability. If you want bash or ksh scripts to work
 > why do you use dash?
->=20
->> Right.  Many existing scripts depend on "=3D=3D", not "=3D", and its i=
-mplementation is trivial.
->=20
+
+No sane user cares about bash / ksh / *sh in *scripts* -- but once
+sh=bash became a de-facto standard, making a change swiftly and "under
+the radar" was irresponsible. We are not living in an ideal world, and
+I do not wish to debate worthy causes for that inexistent ideal world.
+
 > That is a very weak argument as it applies to many such features,
 > the question is whether to create precendent here and where that'll
-> go.
 
-Personally, I _don't_ want to see this in dash _until_ the Austin Group
-makes their ruling on the pending discussion item of whether the next
-version of POSIX will be requiring support for '=3D=3D'.  But if the Aust=
-in
-Group ultimately requires it, then we've proven that it's very easy to
-add to dash at that time.
+I actually tend to agree with this (though I still think it's a
+bikeshed issue). Now that we've paid the price to port scripts to
+dash, why lose the one benefit we ever had?
 
---=20
-Eric Blake   eblake@redhat.com    +1-801-349-2682
-Libvirt virtualization library http://libvirt.org
+Still, I wish dash would spend more effort making sure that everything
+in SUSv3 works *at least as well* as it does in Bash, and less effort
+in debating == vs =. I have had to abandon certain POSIX idioms that
+work well in Bash because dash does not (or did not) support them.
 
+Note that even when an upgraded dash fixes a bug, the impact on
+distributions lingers on for years: it takes a while for new distros
+to incorporate the new dash, and scripts can't know if they are
+running on "new" or "old" distros. So dash, the now-default /bin/sh,
+should be even more proactive about bugs than a normal package.
 
---------------enigECC49B07BE6D4964A9A89A88
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Fedora - http://enigmail.mozdev.org/
-
-iQEcBAEBCAAGBQJNdXI/AAoJEKeha0olJ0Nqr8gH/3qAK0QZmZjJqhnqRyY5HefI
-eR6b/Z9pKQsDKvoZ30ymC4hVDqGMvU5Pji7FmOSjy289XZ89L3XwEcCA79IVMpSc
-YYndpvIEdebSFk0owsKQpvIuxEO2WS9O8tQMYSoDfXO2o2tUdvH4aKE+YYsUq7hI
-OgZerQfTOWGKApxy4dJB76DTFBaMHu9v3lFXoV5gua2HcdGjaVDXqe3yflxAwMdO
-+ZIaZkiH1p1GGka1ZihldhrcsaWEtVGW3I3fLhAZWmSWhdGHxB9ku8ovAzq9jcEO
-tBP+JEFV6A+6NfqCa5GRKkC3mbgqVDFIoGRUqXdnlpbP6eYwjQiRiTvxMmxHl2g=
-=6jxf
------END PGP SIGNATURE-----
-
---------------enigECC49B07BE6D4964A9A89A88--
+-- Dan
