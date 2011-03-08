@@ -1,55 +1,81 @@
-From: Paul Smith <paul@mad-scientist.net>
+From: Dan Muresan <danmbox@gmail.com>
 Subject: Re: [PATCH] Allow == as synonym for = in test
-Date: Tue, 08 Mar 2011 10:27:14 -0500
-Message-ID: <1299598034.27968.45.camel@homebase>
+Date: Tue, 8 Mar 2011 17:53:11 +0200
+Message-ID: <AANLkTikCce-a05ZHbNd-0C4ajuseg+yPuchW9LSEpQH5@mail.gmail.com>
 References: <E1PwMwp-0001iy-B5@fenris.runbox.com>
-	 <20110306234845.GC18385@elie> <E1PwOzt-0007C2-Qw@fenris.runbox.com>
-	 <20110307103457.GA5987@wopr.local.invalid>
-	 <E1Pwbqm-00056z-0V@garm.runbox.com> <20110307220048.GE15732@elie>
-	 <E1PwjSv-0004ZG-3B@fenris.runbox.com>
-	 <20110308000557.GC5987@wopr.local.invalid>
-	 <AANLkTinea9rwpq9M70SazaDCJ-usb5HuLeh=+62onYe9@mail.gmail.com>
-Reply-To: paul@mad-scientist.net
+	<20110306234845.GC18385@elie>
+	<E1PwOzt-0007C2-Qw@fenris.runbox.com>
+	<20110307103457.GA5987@wopr.local.invalid>
+	<E1Pwbqm-00056z-0V@garm.runbox.com>
+	<20110307220048.GE15732@elie>
+	<E1PwjSv-0004ZG-3B@fenris.runbox.com>
+	<20110308000557.GC5987@wopr.local.invalid>
+	<AANLkTinea9rwpq9M70SazaDCJ-usb5HuLeh=+62onYe9@mail.gmail.com>
+	<1299598034.27968.45.camel@homebase>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from oproxy3-pub.bluehost.com ([69.89.21.8]:50488 "HELO
-	oproxy3-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1755740Ab1CHP1T (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 8 Mar 2011 10:27:19 -0500
-In-Reply-To: <AANLkTinea9rwpq9M70SazaDCJ-usb5HuLeh=+62onYe9@mail.gmail.com>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:40384 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752695Ab1CHPxN convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Tue, 8 Mar 2011 10:53:13 -0500
+Received: by bwz15 with SMTP id 15so4664442bwz.19
+        for <dash@vger.kernel.org>; Tue, 08 Mar 2011 07:53:11 -0800 (PST)
+In-Reply-To: <1299598034.27968.45.camel@homebase>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Dan Muresan <danmbox@gmail.com>
+To: paul@mad-scientist.net
 Cc: "David A. Wheeler" <dwheeler@dwheeler.com>, dash@vger.kernel.org, Guido Berhoerster <guido+kernel.org@berhoerster.name>
 
-On Tue, 2011-03-08 at 09:17 +0200, Dan Muresan wrote:
-> Wherever Linux goes, bash goes too... except for embedded busyboxy
-> systems, where everything is customized by hand anyway.
+> No one ever said you couldn't write shell scripts in bash rather than=
+ in
+> sh, even on Ubuntu. =A0You just have to use #!/bin/bash at the top, n=
+ot
+> #!/bin/sh. =A0Truth in scripting!
 
-No one ever said you couldn't write shell scripts in bash rather than in
-sh, even on Ubuntu.  You just have to use #!/bin/bash at the top, not
-#!/bin/sh.  Truth in scripting!
+Please, not *that* red herring again... You know very well that the
+existing packages that broke were the problem, not the scripts yet to
+be written.
 
+Maybe I've made too many points, so let me summarize:
 
-On the other hand, I think you're underestimating the types of software
-that would go on an embedded busybox system: I run PXE-booted systems on
-blades that have 8+ cores and 24+G RAM, and 10gig ethernet interfaces.
-And they use busybox (because who wants to waste ramdisk space on a full
-GNU toolset?  I NEED that memory for other things).  And they use a
-bunch of other tools that I would dearly love to not have to "customize
-by hand".
+1) changing from sh=3Dbash to sh=3Ddash in Ubuntu was done without due
+publicity for such a monumental upheaval. This should not have been
+buried in some bash / dash NEWS.gz, nor in some release notes. This
+should have been included in ALL CAPS in all public announcements, on
+all forums and above all download links (I'm exaggerating but you get
+the point)
 
-It's one of the banes of my (professional) life, all the scripts out
-there for tools I want to install on my blades, written by people who
-think if it runs on Red Hat it's done and that sh == bash (... and who
-think they can write their own makefiles/configure environments that are
-as good as or better than the GNU autotools--but that's a topic for
-another day).
+2) Before the update, there should have been a campaign promoting the
+checkbashisms tool
 
+3) I personally don't think dash was quite mature enough to be the
+default shell when the change was made. Maybe it's getting there
+today.
 
-I personally am very grateful to Ubuntu for taking the high road here
-and forcing some sanity and consideration back into the scripting
-culture.  Little by little things ARE getting better.
+4) Now that everyone has paid the large price of a poorly prepared
+switch-over, I don't want dash to become more tolerant of non-POSIX
+idioms. The one benefit we have from dash is that it forces POSIX
+compliance.
 
+> blades that have 8+ cores and 24+G RAM, and 10gig ethernet interfaces=
+=2E
+
+Maybe you're not in the best position to argue in this case :) I have
+worked before with a few megs of RAM (and even with sub-1M DSP OSs,
+but that's different).
+
+> I personally am very grateful to Ubuntu for taking the high road here
+> and forcing some sanity and consideration back into the scripting
+
+I believe you. However, many thousands of users were *not* grateful,
+and I don't see why the preferences of a minority of developers in
+various niches should over-rule the necessities of a majority of
+desktop users.
+
+(Actually, we all know why stuff like this happens: Debian is not
+market-driven, so users' necessities, or their poor substitute --
+money -- do not directly impact its direction)
+
+-- Dan
