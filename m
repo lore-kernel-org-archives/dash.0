@@ -1,44 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/3] Port to Solaris
-Date: Thu, 10 Mar 2011 20:16:59 +0800
-Message-ID: <20110310121659.GC10824@gondor.apana.org.au>
-References: <1295413636.4278.28.camel@gemini> <1295414140.6486.3.camel@gemini> <20110121130602.GA70470@stack.nl>
+Subject: Re: [PATCH 2/3] Port to AIX
+Date: Thu, 10 Mar 2011 20:25:12 +0800
+Message-ID: <20110310122512.GD10824@gondor.apana.org.au>
+References: <1295413636.4278.28.camel@gemini> <1295414149.6486.4.camel@gemini>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:40577 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:41046 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752573Ab1CJMRG (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 10 Mar 2011 07:17:06 -0500
+	with ESMTP id S1751022Ab1CJMZP (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 10 Mar 2011 07:25:15 -0500
 Content-Disposition: inline
-In-Reply-To: <20110121130602.GA70470@stack.nl>
+In-Reply-To: <1295414149.6486.4.camel@gemini>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: Brian Koropoff <bkoropoff@gmail.com>, dash@vger.kernel.org
+To: Brian Koropoff <bkoropoff@gmail.com>
+Cc: dash@vger.kernel.org
 
-On Fri, Jan 21, 2011 at 01:06:02PM +0000, Jilles Tjoelker wrote:
->
-> What you can do is use PRIdMAX from <inttypes.h>, normally defined as
-> "jd". You can then define this to "lld" or "jd" if it is not defined.
-> I think this makes the code uglier (just like your change), but oh well.
+On Wed, Jan 19, 2011 at 05:15:49AM +0000, Brian Koropoff wrote:
+> - AIX lacks a WCOREDUMP macro.  It's just used to
+>   append "(core dumped)" to the crash message, so
+>   #ifdef around it.
+> 
+> - For some reason, the nl program on AIX defaults
+>   to not printing line numbers ("-b n"), even though
+>   the spec says it should default to "-b t".
+>   Explicitly pass "-b a" for good measure in mkbuiltins.
+> 
+> Signed-off-by: Brian Koropoff <bkoropoff@gmail.com>
 
-I agree.  Brian, please update your patch accordingly.
-
-Thanks!
-
-> By the way, I wonder what the advantage of imaxdiv() above separate %
-> and / is. Compilers can detect the matching between a % b and a / b and
-> do it in one operation, and any use of imaxdiv() trips gcc's
-> -Waggregate-return.
-
-It used to generate smaller code with gcc.  If gcc now knows how
-to optimise it properly then I guess we can remove imaxdiv.
-
-I just checked and gcc 4.4.5 still generates two divisions without
-imaxdiv.  On the other hand gcc doesn't even inline imaxdiv.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
