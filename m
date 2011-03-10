@@ -1,35 +1,81 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/3] Port to HP-UX
-Date: Thu, 10 Mar 2011 20:26:36 +0800
-Message-ID: <20110310122636.GE10824@gondor.apana.org.au>
-References: <1295413636.4278.28.camel@gemini> <1295414162.6486.5.camel@gemini>
+Subject: Re: [PATCH] [BUILTIN] Fix corruption of reads with byte 0x81
+Date: Thu, 10 Mar 2011 21:01:45 +0800
+Message-ID: <20110310130145.GF10824@gondor.apana.org.au>
+References: <4D5C4EE2.9060504@gmail.com> <4D664470.7070707@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48352 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:56678 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752780Ab1CJM0i (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 10 Mar 2011 07:26:38 -0500
+	with ESMTP id S1751329Ab1CJNBs (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 10 Mar 2011 08:01:48 -0500
 Content-Disposition: inline
-In-Reply-To: <1295414162.6486.5.camel@gemini>
+In-Reply-To: <4D664470.7070707@gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Brian Koropoff <bkoropoff@gmail.com>
+To: Alexey Gladkov <gladkov.alexey@gmail.com>
 Cc: dash@vger.kernel.org
 
-On Wed, Jan 19, 2011 at 05:16:02AM +0000, Brian Koropoff wrote:
->
->  - HP-UX needs _LARGEFILE64_SOURCE to be defined for open64()
->    and friends to be available.  This seems to be safe to
->    define everywhere, so do so.
+On Thu, Feb 24, 2011 at 11:43:44AM +0000, Alexey Gladkov wrote:
+> Starting with commit 55c46b dash removes CTLESC bytes ('\x81')
+> from read sequence. This leads to breakage of some UTF8
+> characters. Like in commit f8231a, this change fixes corruption
+> by removing the faulty code.
 
-Shouldn't this go into configure.ac? In fact, how can your patch
-have any effect if configure.ac doesn't detect open64 in the
-first place?
+Thanks for the diagnosis and patch!
 
-The rest looks OK.
+Unfortunately we can't just delete the rmescaps call since we do
+use CTLESC to represent backslash characters in the input stream
+which prevents field splitting.
 
-Thanks,
+So the correct fix is to add extra CTLESCs wherever CTLESC appears
+in the input.  The following patch should fix the problem.
+
+commit 54413164e587dd2dc5d7bce0bd3fab61d7ba758c
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Thu Mar 10 20:59:46 2011 +0800
+
+    [BUILTIN] Fix CTLESC clobbering by read(1)
+    
+    The changeset 55c46b7286f5d9f2d8291158203e2b61d2494420
+    
+    	[BUILTIN] Honor tab as IFS whitespace when splitting fields in readcmd
+    
+    uses CTLESC to prevent field splitting in read(1).  However,
+    it did not escape CTLESC itself in the input stream.  This patch
+    adds the necessary CTLESC characters so that CTLESC isn't corrupted.
+    
+    Reported-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/ChangeLog b/ChangeLog
+index 173f057..6d02fa9 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2011-03-10  Herbert Xu <herbert@gondor.apana.org.au>
++
++	* Fix CTLESC clobbering by read(1).
++
+ 2011-03-10  Brian Koropoff <bkoropoff@gmail.com>
+ 
+ 	* Port to AIX.
+diff --git a/src/miscbltin.c b/src/miscbltin.c
+index 653c92f..800cbbb 100644
+--- a/src/miscbltin.c
++++ b/src/miscbltin.c
+@@ -178,7 +178,7 @@ readcmd(int argc, char **argv)
+ 		}
+ 		if (c == '\0')
+ 			continue;
+-		if (backslash) {
++		if (backslash || c == CTLESC) {
+ 			if (c == '\n')
+ 				goto resetbs;
+ 			STPUTC(CTLESC, p);
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
