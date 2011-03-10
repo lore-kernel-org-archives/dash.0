@@ -1,79 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [BUILTIN] Fix corruption of reads with byte 0x81
-Date: Thu, 10 Mar 2011 21:01:45 +0800
-Message-ID: <20110310130145.GF10824@gondor.apana.org.au>
-References: <4D5C4EE2.9060504@gmail.com> <4D664470.7070707@gmail.com>
+Subject: Re: [PATCH] Reset exit status before sourcing a file.
+Date: Thu, 10 Mar 2011 21:27:06 +0800
+Message-ID: <20110310132706.GG10824@gondor.apana.org.au>
+References: <1299068573-581-1-git-send-email-screwtape@froup.com> <20110302204233.GB21150@elie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56678 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:43259 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751329Ab1CJNBs (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 10 Mar 2011 08:01:48 -0500
+	with ESMTP id S1752120Ab1CJN1N (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 10 Mar 2011 08:27:13 -0500
 Content-Disposition: inline
-In-Reply-To: <4D664470.7070707@gmail.com>
+In-Reply-To: <20110302204233.GB21150@elie>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Alexey Gladkov <gladkov.alexey@gmail.com>
-Cc: dash@vger.kernel.org
+To: Jonathan Nieder <jrnieder@gmail.com>
+Cc: Tim Allen <screwtape@froup.com>, dash@vger.kernel.org
 
-On Thu, Feb 24, 2011 at 11:43:44AM +0000, Alexey Gladkov wrote:
-> Starting with commit 55c46b dash removes CTLESC bytes ('\x81')
-> from read sequence. This leads to breakage of some UTF8
-> characters. Like in commit f8231a, this change fixes corruption
-> by removing the faulty code.
+On Wed, Mar 02, 2011 at 08:42:34PM +0000, Jonathan Nieder wrote:
+> Tim Allen wrote:
+> 
+> > The POSIX specification for the dot command[1] states:
+> >
+> >     EXIT STATUS
+> >         Returns the value of the last command executed, or a zero exit
+> >         status if no command is executed.
+> > 
+> > If an empty file is sourced, then "no command is executed"
+> 
+> I agree.  Looking through "git log --patch src/main.c", though, I find
+> v0.5.3~42 (Do not clobber exit status in dotcmd., 2005-03-03), which
+> appears to have been meant to take care of the following case:
+> 
+> 	$ cat printstatus.sh
+> 	echo $?
+> 	$ false
+> 	$ . ./printstatus.sh
+> 	1
+> 
+> I wonder if the following on top might help (imitating evalcmd)?
 
-Thanks for the diagnosis and patch!
+Patch applied.  Thanks a lot!
 
-Unfortunately we can't just delete the rmescaps call since we do
-use CTLESC to represent backslash characters in the input stream
-which prevents field splitting.
+Of course this does rely on evaltree actually setting exitstatus,
+which it doesn't always do due to oversights.
 
-So the correct fix is to add extra CTLESCs wherever CTLESC appears
-in the input.  The following patch should fix the problem.
-
-commit 54413164e587dd2dc5d7bce0bd3fab61d7ba758c
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Thu Mar 10 20:59:46 2011 +0800
-
-    [BUILTIN] Fix CTLESC clobbering by read(1)
-    
-    The changeset 55c46b7286f5d9f2d8291158203e2b61d2494420
-    
-    	[BUILTIN] Honor tab as IFS whitespace when splitting fields in readcmd
-    
-    uses CTLESC to prevent field splitting in read(1).  However,
-    it did not escape CTLESC itself in the input stream.  This patch
-    adds the necessary CTLESC characters so that CTLESC isn't corrupted.
-    
-    Reported-by: Alexey Gladkov <gladkov.alexey@gmail.com>
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/ChangeLog b/ChangeLog
-index 173f057..6d02fa9 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,7 @@
-+2011-03-10  Herbert Xu <herbert@gondor.apana.org.au>
-+
-+	* Fix CTLESC clobbering by read(1).
-+
- 2011-03-10  Brian Koropoff <bkoropoff@gmail.com>
- 
- 	* Port to AIX.
-diff --git a/src/miscbltin.c b/src/miscbltin.c
-index 653c92f..800cbbb 100644
---- a/src/miscbltin.c
-+++ b/src/miscbltin.c
-@@ -178,7 +178,7 @@ readcmd(int argc, char **argv)
- 		}
- 		if (c == '\0')
- 			continue;
--		if (backslash) {
-+		if (backslash || c == CTLESC) {
- 			if (c == '\n')
- 				goto resetbs;
- 			STPUTC(CTLESC, p);
+For example, evalpipe doesn't set exitstatus if the pipeline
+is backgrounded.  Amusingly pdksh seems to share this bug.
 
 Cheers,
 -- 
