@@ -1,95 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [EXPAND] Do not split the result of tilde expansion
-Date: Thu, 10 Mar 2011 17:17:09 +0800
-Message-ID: <20110310091709.GB10824@gondor.apana.org.au>
-References: <20101205173159.GA90217@stack.nl>
+Subject: Re: [PATCH 1/3] Port to Solaris
+Date: Thu, 10 Mar 2011 20:16:59 +0800
+Message-ID: <20110310121659.GC10824@gondor.apana.org.au>
+References: <1295413636.4278.28.camel@gemini> <1295414140.6486.3.camel@gemini> <20110121130602.GA70470@stack.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:36722 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:40577 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751950Ab1CJJRM (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 10 Mar 2011 04:17:12 -0500
+	with ESMTP id S1752573Ab1CJMRG (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 10 Mar 2011 07:17:06 -0500
 Content-Disposition: inline
-In-Reply-To: <20101205173159.GA90217@stack.nl>
+In-Reply-To: <20110121130602.GA70470@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Jilles Tjoelker <jilles@stack.nl>
-Cc: dash@vger.kernel.org
+Cc: Brian Koropoff <bkoropoff@gmail.com>, dash@vger.kernel.org
 
-On Sun, Dec 05, 2010 at 05:31:59PM +0000, Jilles Tjoelker wrote:
-> A tilde expansion generates a valid pathname. Splitting it using IFS
-> either leaves it unchanged or changes it to something unintended.
->=20
-> This fixes FreeBSD sh test expansion/tilde1.0 and does not change the
-> outcome of the other tests.
->=20
-> This fixes Debian bug #601096.
->=20
-> Example:
->   IFS=3Dm HOME=3D/tmp; printf "%s\n" ~
+On Fri, Jan 21, 2011 at 01:06:02PM +0000, Jilles Tjoelker wrote:
+>
+> What you can do is use PRIdMAX from <inttypes.h>, normally defined as
+> "jd". You can then define this to "lld" or "jd" if it is not defined.
+> I think this makes the code uglier (just like your change), but oh well.
 
-Thanks for the patch! I also removed startloc which is now unused.
+I agree.  Brian, please update your patch accordingly.
 
-commit 834629283f6c629a4da05ef60bae9445c954a19a
-Author: Jilles Tjoelker <jilles@stack.nl>
-Date:   Thu Mar 10 17:16:13 2011 +0800
+Thanks!
 
-    [EXPAND] Do not split the result of tilde expansion
-   =20
-    A tilde expansion generates a valid pathname. Splitting it using IF=
-S
-    either leaves it unchanged or changes it to something unintended.
-   =20
-    This fixes FreeBSD sh test expansion/tilde1.0 and does not change t=
-he
-    outcome of the other tests.
-   =20
-    This fixes Debian bug #601096.
-   =20
-    Example:
-      IFS=3Dm HOME=3D/tmp; printf "%s\n" ~
-   =20
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> By the way, I wonder what the advantage of imaxdiv() above separate %
+> and / is. Compilers can detect the matching between a % b and a / b and
+> do it in one operation, and any use of imaxdiv() trips gcc's
+> -Waggregate-return.
 
-diff --git a/ChangeLog b/ChangeLog
-index c94dff8..a64e030 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,6 +1,7 @@
- 2011-03-10  Jilles Tjoelker <jilles@stack.nl>
-=20
- 	* Replace GPL noclobberopen code with the FreeBSD version.
-+	* Do not split the result of tilde expansion.
-=20
- 2010-11-28  Maciej =C5=BBenczykowski <zenczykowski@gmail.com>
-=20
-diff --git a/src/expand.c b/src/expand.c
-index 1b77b7c..6bee5c5 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -364,7 +364,6 @@ exptilde(char *startp, char *p, int flag)
- 	char *name;
- 	const char *home;
- 	int quotes =3D flag & QUOTES_ESC;
--	int startloc;
-=20
- 	name =3D p + 1;
-=20
-@@ -393,9 +392,7 @@ done:
- 	if (!home || !*home)
- 		goto lose;
- 	*p =3D c;
--	startloc =3D expdest - (char *)stackblock();
- 	strtodest(home, SQSYNTAX, quotes);
--	recordregion(startloc, expdest - (char *)stackblock(), 0);
- 	return (p);
- lose:
- 	*p =3D c;
+It used to generate smaller code with gcc.  If gcc now knows how
+to optimise it properly then I guess we can remove imaxdiv.
+
+I just checked and gcc 4.4.5 still generates two divisions without
+imaxdiv.  On the other hand gcc doesn't even inline imaxdiv.
 
 Cheers,
---=20
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
