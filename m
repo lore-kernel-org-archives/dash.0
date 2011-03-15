@@ -1,113 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [BUG?] here documents, command substitution, and the { keyword
-Date: Tue, 15 Mar 2011 17:42:36 +0800
-Message-ID: <20110315094236.GA10637@gondor.apana.org.au>
-References: <20101107022121.GA22719@burratino>
+Subject: Re: inconsistency with handling of symlinked ttys in background
+Date: Tue, 15 Mar 2011 17:53:00 +0800
+Message-ID: <20110315095300.GA10726@gondor.apana.org.au>
+References: <4CD91FFB.40105@draigBrady.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:54919 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:35879 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753233Ab1COJmj (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 15 Mar 2011 05:42:39 -0400
+	with ESMTP id S1750893Ab1COJxF (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 15 Mar 2011 05:53:05 -0400
 Content-Disposition: inline
-In-Reply-To: <20101107022121.GA22719@burratino>
+In-Reply-To: <4CD91FFB.40105@draigBrady.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jonathan Nieder <jrnieder@gmail.com>
+To: =?iso-8859-1?Q?P=E1draig?= Brady <P@draigBrady.com>
 Cc: dash@vger.kernel.org
 
-On Sun, Nov 07, 2010 at 02:21:21AM +0000, Jonathan Nieder wrote:
-> 
-> Just ran into some strange behavior:
+On Tue, Nov 09, 2010 at 10:18:35AM +0000, P=E1draig Brady wrote:
+> I noticed a bug with dash-0.5.6-2.fc11.i586
+> in that it doesn't redirect from symlinked ttys
+> correctly for background processes.
+>=20
+> $ dash -c "tty < /dev/stdin&"
+> $ dash -c "tty < /dev/stdin"
+> /dev/pts/3
+> $ bash -c "tty < /dev/stdin&"
+> /dev/pts/3
+> $ dash -c "tty < $(readlink -f /dev/stdin)&"
+> /dev/pts/3
 
-This patch should fix the problem.
+It's completely expected as we close stdin for backgrounded
+commands.
 
-commit ec2c84d3c4dba4b74440d72bdd1de416a9acd2a9
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Tue Mar 15 17:41:53 2011 +0800
+Try:
 
-    [PARSER] Fix clobbering of checkkwd
-    
-    On Sun, Nov 07, 2010 at 02:21:21AM +0000, Jonathan Nieder wrote:
-    >
-    > Just ran into some strange behavior:
-    >
-    > $ cat test.sh
-    > #!/bin/sh
-    > echo hello >greeting
-    > cat <<EOF &&
-    > $(cat greeting)
-    > EOF
-    > {
-    > 	echo $?
-    > 	cat greeting
-    > } >/dev/null
-    >
-    >
-    > $ sh test.sh
-    > hello
-    > test.sh: 7: {: not found
-    > 127
-    > hello
-    > test.sh: 10: Syntax error: "}" unexpected
-    >
-    > bash, mksh, pdksh, and ksh93 all print hello as expected.  The problem
-    > is reproducible with all versions of dash in the git repo.
-    
-    This is caused by the clobbering of checkkwd due to readtoken
-    recursion while parsing a here document.
-    
-    This patch fixes it by saving the original value of checkkwd.
-    
-    Reported-by: Jonathan Nieder <jrnieder@gmail.com>
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+bash -c '{ :; tty < /dev/stdin; }&'
 
-diff --git a/ChangeLog b/ChangeLog
-index 5b6d53e..50a8044 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,7 @@
-+2011-03-15  Herbert Xu <herbert@gondor.apana.org.au>
-+
-+	* Fix clobbering of checkkwd.
-+
- 2011-03-15  Jonathan Nieder <jrnieder@gmail.com>
- 
- 	* Free IFS state after here document expansion.
-diff --git a/src/parser.c b/src/parser.c
-index 0bfd620..528d005 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -687,6 +687,7 @@ STATIC int
- readtoken(void)
- {
- 	int t;
-+	int kwd = checkkwd;
- #ifdef DEBUG
- 	int alreadyseen = tokpushback;
- #endif
-@@ -697,7 +698,7 @@ top:
- 	/*
- 	 * eat newlines
- 	 */
--	if (checkkwd & CHKNL) {
-+	if (kwd & CHKNL) {
- 		while (t == TNL) {
- 			parseheredoc();
- 			t = xxreadtoken();
-@@ -711,7 +712,7 @@ top:
- 	/*
- 	 * check for keywords
- 	 */
--	if (checkkwd & CHKKWD) {
-+	if (kwd & CHKKWD) {
- 		const char *const *pp;
- 
- 		if ((pp = findkwd(wordtext))) {
+Now who is inconsistent? :)
 
 Cheers,
--- 
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
