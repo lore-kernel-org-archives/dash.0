@@ -1,32 +1,27 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/3] Port to HP-UX
-Date: Tue, 15 Mar 2011 15:38:16 +0800
-Message-ID: <20110315073816.GA8985@gondor.apana.org.au>
-References: <1295413636.4278.28.camel@gemini> <1295414162.6486.5.camel@gemini> <20110310122636.GE10824@gondor.apana.org.au> <1299974083.3797.7.camel@gemini>
+Subject: Re: [PATCH] Improved LINENO support
+Date: Tue, 15 Mar 2011 15:52:29 +0800
+Message-ID: <20110315075229.GB8898@gondor.apana.org.au>
+References: <4CD85E90.6000308@gigawatt.nl> <20101110220008.GC17871@stack.nl> <4CDD8481.1060306@gigawatt.nl> <4CDD8908.9010206@redhat.com> <4CDD9095.5070106@gigawatt.nl> <20101112212932.GB57806@stack.nl> <4CF1380D.8000509@gigawatt.nl> <20110310081027.GA10360@gondor.apana.org.au> <1299880609.408.9.camel@gentoo>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:47041 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:59489 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752865Ab1COHiS (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 15 Mar 2011 03:38:18 -0400
+	with ESMTP id S1751046Ab1COHwe (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 15 Mar 2011 03:52:34 -0400
 Content-Disposition: inline
-In-Reply-To: <1299974083.3797.7.camel@gemini>
+In-Reply-To: <1299880609.408.9.camel@gentoo>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Brian Koropoff <bkoropoff@gmail.com>
-Cc: dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: dash@vger.kernel.org, Jilles Tjoelker <jilles@stack.nl>
 
-On Sat, Mar 12, 2011 at 03:54:43PM -0800, Brian Koropoff wrote:
-> AC_CHECK_FUNC just checks that the symbol exists in libc, so it
-> succeeds.  _LARGEFILE64_SOURCE is necessary to get the system headers to
-> give you function prototypes, but it doesn't affect the configure test.
+On Fri, Mar 11, 2011 at 09:56:49PM +0000, Harald van Dijk wrote:
+>
+> Signed-off-by: Harald van Dijk <harald@gigawatt.nl>
 
-OK, please regenerate the patch against the head of my tree and
-please move the macro definition from Makefile into config.h
-through configure.ac.
-
-Thanks,
+Both patches applied.  Thanks a lot!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
