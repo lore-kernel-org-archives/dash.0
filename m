@@ -1,74 +1,55 @@
-From: Jilles Tjoelker <jilles@stack.nl>
+From: Dan Muresan <danmbox@gmail.com>
 Subject: Re: shift "fatal error"
-Date: Tue, 15 Mar 2011 22:31:16 +0100
-Message-ID: <20110315213116.GA53303@stack.nl>
+Date: Sat, 26 Mar 2011 09:11:30 +0200
+Message-ID: <AANLkTinQyNdnbuE9Ytw43bnwVvFqXy4kxbsuiFReidDT@mail.gmail.com>
 References: <AANLkTik1TC3jv-imnbChRGqtHzRCvKCcB5_LnqEnDc9u@mail.gmail.com>
- <20110310192333.GE3948@wopr.local.invalid>
+	<20110310192333.GE3948@wopr.local.invalid>
+	<20110315213116.GA53303@stack.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:60054 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1756981Ab1COVbR (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 15 Mar 2011 17:31:17 -0400
-Content-Disposition: inline
-In-Reply-To: <20110310192333.GE3948@wopr.local.invalid>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:57433 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752428Ab1CZHLb convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sat, 26 Mar 2011 03:11:31 -0400
+Received: by bwz15 with SMTP id 15so1370441bwz.19
+        for <dash@vger.kernel.org>; Sat, 26 Mar 2011 00:11:30 -0700 (PDT)
+In-Reply-To: <20110315213116.GA53303@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Dan Muresan <danmbox@gmail.com>, dash@vger.kernel.org
+To: Jilles Tjoelker <jilles@stack.nl>
+Cc: dash@vger.kernel.org
 
-On Thu, Mar 10, 2011 at 08:23:33PM +0100, Guido Berhoerster wrote:
-> * Dan Muresan <danmbox@gmail.com> [2011-03-10 19:41]:
-> > Hi, is there some consensus on whether shift should cause a "fatal
-> > error" as reported by Herbert against bash:
-> > 
-> > http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=252378
-> > 
-> > # doesn't print anything
-> > dash -c 'shift 2; echo hi'
-> > 
-> > My copy of SUSv3 doesn't seem to imply any "fatal error" handling
-> > requirement for shift:
-> > 
-> > --- 8-X ---
-> > EXIT STATUS
-> > 
-> > The exit status is >0 if n>$#; otherwise, it is zero.
-> > 
-> > CONSEQUENCES OF ERRORS
-> > 
-> > Default.
-> > --- 8-X ---
+> That may have been the intention (considering that it matches the rea=
+l
+> Bourne shell in addition to various flavours of Korn shell), but that=
+ is
+> not how I would interpret it. A too high shift count still seems
+> syntactically valid to me.
 
-> For IEEE Std 1003.1-2008 see section 2.8.1 "Consequences of
-> Shell Errors": a "utility syntax error (option or operand error)"
-> with special built-ins shall cause the shell to exit. That's what
-> dash, ksh93, and pdksh do.
+After reading the other part of the spec (about syntax errors in
+utilities), I reached the conclusion that dash has just enough excuses
+in the spec and in history to behave as it currently does -- so
+presumably nothing will change (especially since the current behavior
+*reduces* usability).
 
-That may have been the intention (considering that it matches the real
-Bourne shell in addition to various flavours of Korn shell), but that is
-not how I would interpret it. A too high shift count still seems
-syntactically valid to me.
+> A statement about the exit status in a particular error situation als=
+o
+> usually indicates that the shell shall not abort.
 
-A statement about the exit status in a particular error situation also
-usually indicates that the shell shall not abort.
+Yes, that was the main point, but it's true that specs can be
+self-contradictory.
 
-Examples of shift commands that I think shall cause the shell to abort:
-shift -S  # unless a -S option is supported as an extension
-shift x   # unless arithmetic expressions are accepted as an extension
-shift @   # unless there is some strange extension
+> Examples of shift commands that I think shall cause the shell to abor=
+t:
+> shift -S =A0# unless a -S option is supported as an extension
+> shift x =A0 # unless arithmetic expressions are accepted as an extens=
+ion
+> shift @ =A0 # unless there is some strange extension
 
-The FreeBSD sh shift special builtin behaves this way (a too high shift
-count is not fatal but a syntactically invalid number is). This was done
-a few years ago when the syntax-error property of special builtins was
-implemented, as making a too high shift count fatal caused a configure
-script in the FreeBSD base system to fail.
+That's how I would have thought any reasonable person would interpret
+the blurb about syntax errors in special built-ins, but apparently
+there are other ways to see it, rooted in historical precedent even.
 
-I would not encourage the extension of accepting arithmetic expressions
-because that requires a subtly different kind of arithmetic expression
-without octal constants. POSIX is clear that 'shift 010' should shift
-ten positions, not eight, while 'shift $((010))' should shift eight
-positions.
-
--- 
-Jilles Tjoelker
+-- Dan
