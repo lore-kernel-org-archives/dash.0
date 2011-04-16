@@ -1,213 +1,149 @@
-From: Brian Koropoff <bkoropoff@gmail.com>
-Subject: [PATCH 2/2] Port to HP-UX
-Date: Fri, 15 Apr 2011 19:34:42 -0700
-Message-ID: <1302921282.2620.7.camel@gemini>
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: Re: [PATCH 1/2] Fix additional use of 'j' printf length modifier.
+Date: Fri, 15 Apr 2011 23:54:35 -0500
+Message-ID: <20110416045435.GA10455@elie>
 References: <1302921010.2620.3.camel@gemini>
+ <1302921279.2620.6.camel@gemini>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:56259 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752560Ab1DPCeo (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 15 Apr 2011 22:34:44 -0400
-Received: by pzk9 with SMTP id 9so1232430pzk.19
-        for <dash@vger.kernel.org>; Fri, 15 Apr 2011 19:34:43 -0700 (PDT)
-In-Reply-To: <1302921010.2620.3.camel@gemini>
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:47300 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750802Ab1DPEym (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 16 Apr 2011 00:54:42 -0400
+Received: by iyb14 with SMTP id 14so2620357iyb.19
+        for <dash@vger.kernel.org>; Fri, 15 Apr 2011 21:54:42 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1302921279.2620.6.camel@gemini>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Brian Koropoff <bkoropoff@gmail.com>
+Cc: dash@vger.kernel.org
 
-- strtoimax and strtoumax are macros and not functions,
-   so switch to using AC_CHECK_DECLS in configure.ac
-   to find them.
+Hi,
 
- - HP-UX lacks strsignal() and sys_siglist.  Check for
-   sys_siglist in configure.ac and #ifdef around it.
+Brian Koropoff wrote:
 
- - HP-UX's vsnprintf() completely violates the standard
-   by returning -1 (and neglecting to set errno) if the
-   buffer is not large enough rather than returning the
-   size necessary.  Work around it by (yuck) reallocating
-   a dynamic buffer until it succeeds so we can return
-   the expected result.
+> The printf builtin modifies the user's format strings
+> by prefixing integer conversion specifications with the
+> 'j' (intmax_t) length modifier.  Since this is not portable,
+> instead prefix them with the length modifier extracted from
+> the PRIdMAX constant.
 
- - HP-UX needs _LARGEFILE64_SOURCE to be defined for open64()
-   and friends to be available.  This seems to be safe to
-   define everywhere, so do so.
+This assumes PRIdMAX, PRIxMAX, etc all consist of the same prefix
+before the standard characters.  Since the most common definitions
+are j<usual char>, l<usual char>, q<usual char>, I64<usual char>,
+and ll<usual char>, that's probably a safe assumption.  I wonder why
+C99 and its predecessors did not use
 
- - The nl program doesn't like spaces between flags and their
-   arguments, so remove them in mkbuiltins.
+	printf("%"PRIMAX"x\n", val);
 
-Signed-off-by: Brian Koropoff <bkoropoff@gmail.com>
+Oh well.  Maybe it would warrant a comment, though?
+
+	/*
+	 * Replace a string like
+	 *
+	 *	%92.3u
+	 *	^    ^--- ch
+	 *	'-------- str
+	 *
+	 * with "%92.3" PRIuMAX "".
+	 *
+	 * Although C99 does not guarantee it, we assume PRIiMAX,
+	 * PRIoMAX, PRIuMAX, PRIxMAX, and PRIXMAX are all the same
+	 * as PRIdMAX with the final 'd' replaced by the corresponding
+	 * character.
+	 */
+
+> --- a/src/bltin/printf.c
+> +++ b/src/bltin/printf.c
+> @@ -317,15 +317,16 @@ static char *
+>  mklong(const char *str, const char *ch)
+>  {
+>  	char *copy;
+> -	size_t len;	
+> +	size_t len;
+> +	size_t pridmax_len = strlen(PRIdMAX);
+
+I think just using strlen(PRIdMAX) as-is would make it clearer that we
+are expecting the compiler to inline the "strlen" and provides a
+reminder of the value, too (i.e., is it 2 or 3 for "jd"?).
+
+>  
+> -	len = ch - str + 3;
+> +	len = ch - str + pridmax_len;
+
+This changes the meaning of "len" to no longer be the size of the
+buffer.  I suppose that doesn't matter, but...
+
+>  	STARTSTACKSTR(copy);
+> -	copy = makestrspace(len, copy);
+> -	memcpy(copy, str, len - 3);
+> -	copy[len - 3] = 'j';
+> -	copy[len - 2] = *ch;
+> -	copy[len - 1] = '\0';
+> +	copy = makestrspace(len + 1, copy);
+> +	memcpy(copy, str, len - pridmax_len);
+> +	memcpy(copy + len - pridmax_len, PRIdMAX, pridmax_len - 1);
+> +	copy[len - 1] = *ch;
+> +	copy[len] = '\0';
+
+... the arithmetic is getting complicated.  I think mempcpy could make
+the intention clearer, like so.
+
+	char *p;
+	[...]
+	len = ch - str + strlen(PRIdMAX) + 1;
+	p = copy = makestrspace(len, copy);
+	p = mempcpy(p, str, ch - str);
+	p = mempcpy(p, PRIdMAX, strlen(PRIdMAX) - 1);
+	*p++ = *ch;
+	*p++ = '\0';
+
+Like this, maybe (on top, untested)?
+
+Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
 ---
- configure.ac   |   18 +++++++++++++++---
- src/mkbuiltins |    2 +-
- src/output.c   |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/system.c   |    2 ++
- src/system.h   |    4 ++--
- 5 files changed, 72 insertions(+), 6 deletions(-)
+ src/bltin/printf.c |   23 ++++++++++++++++-------
+ 1 files changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index effdffc..ad09947 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -9,6 +9,8 @@ AC_PROG_CC
- AC_GNU_SOURCE
- AC_PROG_YACC
- 
-+AC_DEFINE([_LARGEFILE64_SOURCE],[1],[Always define])
-+
- AC_MSG_CHECKING([for build system compiler])
- if test "$cross_compiling" = yes; then
- 	CC_FOR_BUILD=${CC_FOR_BUILD-cc}
-@@ -43,7 +45,7 @@ AC_ARG_ENABLE(glob, AS_HELP_STRING(--enable-glob, [Use glob(3) from libc]))
- dnl Checks for libraries.
- 
- dnl Checks for header files.
--AC_CHECK_HEADERS(alloca.h paths.h)
-+AC_CHECK_HEADERS(alloca.h paths.h unistd.h signal.h)
- 
- dnl Check for declarations
- AC_CHECK_DECL([_PATH_BSHELL],,AC_DEFINE_UNQUOTED([_PATH_BSHELL], "/bin/sh", [Define to system shell path]),[
-@@ -84,11 +86,21 @@ AC_CHECK_DECL([PRIdMAX],,
- #include <inttypes.h>
- ])
- 
-+dnl strtoimax is a macro on some systems
-+AC_CHECK_DECLS([strtoimax, strtoumax],,,[#include <inttypes.h>])
-+
-+dnl Check for sys_siglist
-+AC_CHECK_DECLS([sys_siglist], [], [],
-+          [#include <signal.h>
-+          #ifdef HAVE_UNISTD_H
-+          # include <unistd.h>
-+          #endif
-+          ])
-+
- dnl Checks for library functions.
- AC_CHECK_FUNCS(bsearch faccessat getpwnam getrlimit imaxdiv isalpha killpg \
- 	       mempcpy \
--	       sigsetmask stpcpy strchrnul strsignal strtod strtoimax \
--	       strtoumax sysconf)
-+	       sigsetmask stpcpy strchrnul strsignal strtod sysconf)
- 
- if test "$enable_fnmatch" = yes; then
- 	use_fnmatch=
-diff --git a/src/mkbuiltins b/src/mkbuiltins
-index f562ae2..a0dd66d 100644
---- a/src/mkbuiltins
-+++ b/src/mkbuiltins
-@@ -97,7 +97,7 @@ cat <<\!
-  */
- 
- !
--sed 's/	-[a-z]*//' $temp2 | nl -b a -v 0 | LC_COLLATE=C sort -u -k 3,3 |
-+sed 's/	-[a-z]*//' $temp2 | nl -ba -v0 | LC_COLLATE=C sort -u -k 3,3 |
- tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ |
- 	awk '{	printf "#define %s (builtincmd + %d)\n", $3, $1}'
- printf '\n#define NUMBUILTINS %d\n' $(wc -l < $temp2)
-diff --git a/src/output.c b/src/output.c
-index f62e7ea..4134a85 100644
---- a/src/output.c
-+++ b/src/output.c
-@@ -372,6 +372,56 @@ __closememout(void) {
- #endif
- #endif
- 
-+#ifdef __hpux
-+static int
-+xvsnprintf(char *outbuf, size_t length, const char *fmt, va_list ap)
-+{
-+	int ret;
-+	char* dummy = NULL;
-+	char* dummy_new = NULL;
-+	size_t dummy_len = 8;
-+	va_list ap_mine;
-+
-+	if (length > 0) {
-+		INTOFF;
-+		va_copy(ap_mine, ap);
-+                errno = 0;
-+		ret = vsnprintf(outbuf, length, fmt, ap_mine);
-+		va_end(ap_mine);
-+		INTON;
-+	} else {
-+		ret = -1;
-+		errno = 0;
-+	}
-+
-+	if (ret < 0 && errno == 0) {
-+		do {
-+			dummy_len *= 2;
-+			dummy_new = realloc(dummy, dummy_len);
-+			if (!dummy_new) {
-+				ret = -1;
-+				errno = ENOMEM;
-+				break;
-+			}
-+			dummy = dummy_new;
-+			INTOFF;
-+			va_copy(ap_mine, ap);
-+                        errno = 0;
-+			ret = vsnprintf(dummy, dummy_len, fmt, ap_mine);
-+			va_end(ap_mine);
-+			INTON;
-+		} while (ret < 0 && errno == 0);
-+
-+		if (ret >= 0 && length) {
-+			memcpy(outbuf, dummy, length);
-+		}
-+		if (dummy) free(dummy);
-+	}
-+
-+	return ret;
-+}
-+
-+#else
- 
- static int
- xvsnprintf(char *outbuf, size_t length, const char *fmt, va_list ap)
-@@ -397,3 +447,5 @@ xvsnprintf(char *outbuf, size_t length, const char *fmt, va_list ap)
- 	INTON;
- 	return ret;
- }
-+
-+#endif
-diff --git a/src/system.c b/src/system.c
-index 844a641..dbf4601 100644
---- a/src/system.c
-+++ b/src/system.c
-@@ -92,8 +92,10 @@ char *strsignal(int sig)
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index 4ac2ee8..0b4a4e1 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -317,16 +317,25 @@ static char *
+ mklong(const char *str, const char *ch)
  {
- 	static char buf[19];
+ 	char *copy;
++	char *p;
+ 	size_t len;
+-	size_t pridmax_len = strlen(PRIdMAX);
  
-+#if HAVE_DECL_SYS_SIGLIST
- 	if ((unsigned)sig < NSIG && sys_siglist[sig])
- 		return (char *)sys_siglist[sig];
-+#endif
- 	fmtstr(buf, sizeof(buf), "Signal %d", sig); 
- 	return buf;
+-	len = ch - str + pridmax_len;
++	/*
++	 * Replace a string like "%92.3u" with "%92.3"PRIuMAX.
++	 *
++	 * Although C99 does not guarantee it, we assume PRIiMAX,
++	 * PRIoMAX, PRIuMAX, PRIxMAX, and PRIXMAX are all the same
++	 * as PRIdMAX with the final 'd' replaced by the corresponding
++	 * character.
++	 */
++
++	len = ch - str + strlen(PRIdMAX) + 1;
+ 	STARTSTACKSTR(copy);
+-	copy = makestrspace(len + 1, copy);
+-	memcpy(copy, str, len - pridmax_len);
+-	memcpy(copy + len - pridmax_len, PRIdMAX, pridmax_len - 1);
+-	copy[len - 1] = *ch;
+-	copy[len] = '\0';
++	p = copy = makestrspace(len, copy);
++	p = mempcpy(p, str, ch - str);
++	p = mempcpy(p, PRIdMAX, strlen(PRIdMAX) - 1);
++	*p++ = *ch;
++	*p++ = '\0';
+ 	return (copy);	
  }
-diff --git a/src/system.h b/src/system.h
-index a8d09b3..00fc757 100644
---- a/src/system.h
-+++ b/src/system.h
-@@ -69,11 +69,11 @@ static inline double strtod(const char *nptr, char **endptr)
- }
- #endif
- 
--#ifndef HAVE_STRTOIMAX
-+#if !HAVE_DECL_STRTOIMAX
- #define strtoimax strtoll
- #endif
- 
--#ifndef HAVE_STRTOUMAX
-+#if !HAVE_DECL_STRTOUMAX
- #define strtoumax strtoull
- #endif
  
 -- 
-1.7.1
-
+1.7.5.rc2
 
