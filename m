@@ -1,117 +1,65 @@
-From: Brian Koropoff <bkoropoff@gmail.com>
-Subject: Re: [PATCH 1/2] Fix additional use of 'j' printf length modifier.
-Date: Sat, 16 Apr 2011 11:25:19 -0700
-Message-ID: <1302978319.19920.14.camel@gemini>
-References: <1302921010.2620.3.camel@gemini>
-	 <1302921279.2620.6.camel@gemini>  <20110416045435.GA10455@elie>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: [PATCH/RFC dash 0/4] Avoid a fork before running last command
+ given to -c
+Date: Mon, 18 Apr 2011 00:13:27 +0200
+Message-ID: <20110417221326.GA18973@stack.nl>
+References: <20110410071734.GA16736@elie>
+ <20110415130709.GA3735@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:63522 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752116Ab1DPSZQ (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 16 Apr 2011 14:25:16 -0400
-Received: by pwi15 with SMTP id 15so1576124pwi.19
-        for <dash@vger.kernel.org>; Sat, 16 Apr 2011 11:25:15 -0700 (PDT)
-In-Reply-To: <20110416045435.GA10455@elie>
+Received: from relay02.stack.nl ([131.155.140.104]:51289 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751526Ab1DQWN2 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 17 Apr 2011 18:13:28 -0400
+Content-Disposition: inline
+In-Reply-To: <20110415130709.GA3735@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jonathan Nieder <jrnieder@gmail.com>
-Cc: dash@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Jonathan Nieder <jrnieder@gmail.com>, dash@vger.kernel.org, Drake Wilson <drake@begriffli.ch>, Reuben Thomas <rrt@sc3d.org>
 
-Hello,
+On Fri, Apr 15, 2011 at 09:07:09PM +0800, Herbert Xu wrote:
+> On Sun, Apr 10, 2011 at 07:18:17AM +0000, Jonathan Nieder wrote:
+> > Jilles Tjoelker wrote[0]:
 
-On Fri, 2011-04-15 at 23:54 -0500, Jonathan Nieder wrote:
-> Hi,
-> 
-> Brian Koropoff wrote:
-> 
-> > The printf builtin modifies the user's format strings
-> > by prefixing integer conversion specifications with the
-> > 'j' (intmax_t) length modifier.  Since this is not portable,
-> > instead prefix them with the length modifier extracted from
-> > the PRIdMAX constant.
-> 
-> This assumes PRIdMAX, PRIxMAX, etc all consist of the same prefix
-> before the standard characters.  Since the most common definitions
-> are j<usual char>, l<usual char>, q<usual char>, I64<usual char>,
-> and ll<usual char>, that's probably a safe assumption.  I wonder why
-> C99 and its predecessors did not use
-> 
-> 	printf("%"PRIMAX"x\n", val);
+> > > Regarding sh -c optimization, I am in favour of this. Uselessly waiting
+> > > 'sh -c' processes annoy me. I made the change for FreeBSD 8.0 sh, which
+> > > is very similar to dash. The SVN changeset is r194128.
 
-To be completely safe we could refactor mklong() to take the PRI?MAX
-string as a parameter and use the correct one at each invocation site.
-I'm not sure this is warranted until we actually encounter a platform
-where it makes a difference.
+> > So I grabbed that changeset with
 
-> Oh well.  Maybe it would warrant a comment, though?
-> 
-> 	/*
-> 	 * Replace a string like
-> 	 *
-> 	 *	%92.3u
-> 	 *	^    ^--- ch
-> 	 *	'-------- str
-> 	 *
-> 	 * with "%92.3" PRIuMAX "".
-> 	 *
-> 	 * Although C99 does not guarantee it, we assume PRIiMAX,
-> 	 * PRIoMAX, PRIuMAX, PRIxMAX, and PRIXMAX are all the same
-> 	 * as PRIdMAX with the final 'd' replaced by the corresponding
-> 	 * character.
-> 	 */
-> 
-> > --- a/src/bltin/printf.c
-> > +++ b/src/bltin/printf.c
-> > @@ -317,15 +317,16 @@ static char *
-> >  mklong(const char *str, const char *ch)
-> >  {
-> >  	char *copy;
-> > -	size_t len;	
-> > +	size_t len;
-> > +	size_t pridmax_len = strlen(PRIdMAX);
-> 
-> I think just using strlen(PRIdMAX) as-is would make it clearer that we
-> are expecting the compiler to inline the "strlen" and provides a
-> reminder of the value, too (i.e., is it 2 or 3 for "jd"?).
-> 
-> >  
-> > -	len = ch - str + 3;
-> > +	len = ch - str + pridmax_len;
-> 
-> This changes the meaning of "len" to no longer be the size of the
-> buffer.  I suppose that doesn't matter, but...
-> 
-> >  	STARTSTACKSTR(copy);
-> > -	copy = makestrspace(len, copy);
-> > -	memcpy(copy, str, len - 3);
-> > -	copy[len - 3] = 'j';
-> > -	copy[len - 2] = *ch;
-> > -	copy[len - 1] = '\0';
-> > +	copy = makestrspace(len + 1, copy);
-> > +	memcpy(copy, str, len - pridmax_len);
-> > +	memcpy(copy + len - pridmax_len, PRIdMAX, pridmax_len - 1);
-> > +	copy[len - 1] = *ch;
-> > +	copy[len] = '\0';
-> 
-> ... the arithmetic is getting complicated.  I think mempcpy could make
-> the intention clearer, like so.
-> 
-> 	char *p;
-> 	[...]
-> 	len = ch - str + strlen(PRIdMAX) + 1;
-> 	p = copy = makestrspace(len, copy);
-> 	p = mempcpy(p, str, ch - str);
-> 	p = mempcpy(p, PRIdMAX, strlen(PRIdMAX) - 1);
-> 	*p++ = *ch;
-> 	*p++ = '\0';
-> 
-> Like this, maybe (on top, untested)?
+> > 	svn log -v svn://svn.freebsd.org/base/head/bin/sh -r 194128
+> > 	svn diff -r 194127:194128 svn://svn.freebsd.org/base/head/bin/sh
 
-I like this, it feels a bit cleaner.  Maybe get rid of the len variable
-now since it's only used once.
+> > and made it a tiny bit smaller.   Here's the result.
 
--- Brian
+> >    text    data     bss     dec     hex filename
+> >   83994    1784   11128   96906   17a8a dash.before-O2
+> >   83994    1784   11128   96906   17a8a dash.before-Os
+> >   84146    1784   11128   97058   17b22 dash.after-O2
+> >   84146    1784   11128   97058   17b22 dash.after-Os
 
+> > On this amd64 the cost is 152 bytes of text.  Thoughts?
+
+> I must say that I don't see much value in this feature.  Adding
+> exec to the invocation is trivial.
+
+It is trivial when writing command lines that are obviously going to be
+passed to sh -c, but in practice it is often not done. The optimization
+would be useful with system(), popen() and Makefiles; rarely does one
+see an "exec" in such contexts. In a Makefile, "exec" can be actively
+detrimental since it usually forces the command to be run using the
+shell, preventing a direct execve() by make.
+
+In all contexts, "exec" is detrimental if a builtin version of the
+executed utility exists. If the utility is a special builtin, prepending
+"exec" is very likely to cause the command to stop working, and
+otherwise it adds a useless execve().
+
+It was proposed to add text encouraging "exec" prepending to POSIX, but
+this was rejected. See http://austingroupbugs.net/view.php?id=236 and
+http://thread.gmane.org/gmane.comp.standards.posix.austin.general/1918 .
+
+-- 
+Jilles Tjoelker
