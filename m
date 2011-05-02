@@ -1,65 +1,82 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: [PATCH/RFC dash 0/4] Avoid a fork before running last command
- given to -c
-Date: Mon, 18 Apr 2011 00:13:27 +0200
-Message-ID: <20110417221326.GA18973@stack.nl>
-References: <20110410071734.GA16736@elie>
- <20110415130709.GA3735@gondor.apana.org.au>
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: [PATCH] [MAN] Remove spurious space in descriptions of PS1, PS2, PS4
+Date: Mon, 2 May 2011 03:07:01 -0500
+Message-ID: <20110502080648.GA16077@elie>
+References: <87fwozqy21.fsf@Pulska.kon.iki.fi>
+ <20110430220553.GB20433@elie>
+ <87liyqpudv.fsf@Pulska.kon.iki.fi>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay02.stack.nl ([131.155.140.104]:51289 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751526Ab1DQWN2 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 17 Apr 2011 18:13:28 -0400
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:39797 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752348Ab1EBIHK (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 2 May 2011 04:07:10 -0400
+Received: by iyb14 with SMTP id 14so4465150iyb.19
+        for <dash@vger.kernel.org>; Mon, 02 May 2011 01:07:10 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20110415130709.GA3735@gondor.apana.org.au>
+In-Reply-To: <87liyqpudv.fsf@Pulska.kon.iki.fi>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jonathan Nieder <jrnieder@gmail.com>, dash@vger.kernel.org, Drake Wilson <drake@begriffli.ch>, Reuben Thomas <rrt@sc3d.org>
+To: dash@vger.kernel.org
+Cc: Kalle Olavi Niemitalo <kon@iki.fi>
 
-On Fri, Apr 15, 2011 at 09:07:09PM +0800, Herbert Xu wrote:
-> On Sun, Apr 10, 2011 at 07:18:17AM +0000, Jonathan Nieder wrote:
-> > Jilles Tjoelker wrote[0]:
+From: Kalle Olavi Niemitalo <kon@iki.fi>
 
-> > > Regarding sh -c optimization, I am in favour of this. Uselessly waiting
-> > > 'sh -c' processes annoy me. I made the change for FreeBSD 8.0 sh, which
-> > > is very similar to dash. The SVN changeset is r194128.
+LANG=C man dash shows:
 
-> > So I grabbed that changeset with
+     PS1        The primary prompt string, which defaults to ``$  '', unless
+                you are the superuser, in which case it defaults to ``#  ''.
 
-> > 	svn log -v svn://svn.freebsd.org/base/head/bin/sh -r 194128
-> > 	svn diff -r 194127:194128 svn://svn.freebsd.org/base/head/bin/sh
+     PS2        The secondary prompt string, which defaults to ``>  ''.
 
-> > and made it a tiny bit smaller.   Here's the result.
+     PS4        Output before each line when execution trace (set -x) is
+                enabled, defaults to ``+  ''.
 
-> >    text    data     bss     dec     hex filename
-> >   83994    1784   11128   96906   17a8a dash.before-O2
-> >   83994    1784   11128   96906   17a8a dash.before-Os
-> >   84146    1784   11128   97058   17b22 dash.after-O2
-> >   84146    1784   11128   97058   17b22 dash.after-Os
+Each of the documented default values has a graphic character and
+two spaces between the quotation marks.  However, the actual
+default values have only one space, rather than two.
 
-> > On this amd64 the cost is 152 bytes of text.  Thoughts?
+Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
+---
+Kalle Olavi Niemitalo wrote[1]:
 
-> I must say that I don't see much value in this feature.  Adding
-> exec to the invocation is trivial.
+> Here's the diff against 0.5.5.1-7.4.
 
-It is trivial when writing command lines that are obviously going to be
-passed to sh -c, but in practice it is often not done. The optimization
-would be useful with system(), popen() and Makefiles; rarely does one
-see an "exec" in such contexts. In a Makefile, "exec" can be actively
-detrimental since it usually forces the command to be run using the
-shell, preventing a direct execve() by make.
+Thanks.  Looking at the formatted output, I see some other extra
+spaces (mostly around punctuation), but fixing these confusing ones
+first doesn't sound like a bad idea.
 
-In all contexts, "exec" is detrimental if a builtin version of the
-executed utility exists. If the utility is a special builtin, prepending
-"exec" is very likely to cause the command to stop working, and
-otherwise it adds a useless execve().
+[1] http://bugs.debian.org/624715
 
-It was proposed to add text encouraging "exec" prepending to POSIX, but
-this was rejected. See http://austingroupbugs.net/view.php?id=236 and
-http://thread.gmane.org/gmane.comp.standards.posix.austin.general/1918 .
+ src/dash.1 |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/src/dash.1 b/src/dash.1
+index ddeb52b..3847d98 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -2276,16 +2276,16 @@ setting.
+ There is a maximum of 10 mailboxes that can be monitored at once.
+ .It Ev PS1
+ The primary prompt string, which defaults to
+-.Dq $ \  ,
++.Dq $\  ,
+ unless you are the superuser, in which case it defaults to
+-.Dq # \  .
++.Dq #\  .
+ .It Ev PS2
+ The secondary prompt string, which defaults to
+-.Dq \*[Gt] \  .
++.Dq \*[Gt]\  .
+ .It Ev PS4
+ Output before each line when execution trace (set -x) is enabled,
+ defaults to
+-.Dq + \  .
++.Dq +\  .
+ .It Ev IFS
+ Input Field Separators.
+ This is normally set to
 -- 
-Jilles Tjoelker
+1.7.5
+
