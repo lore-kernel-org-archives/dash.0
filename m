@@ -1,82 +1,92 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH] [MAN] Remove spurious space in descriptions of PS1, PS2, PS4
-Date: Mon, 2 May 2011 03:07:01 -0500
-Message-ID: <20110502080648.GA16077@elie>
-References: <87fwozqy21.fsf@Pulska.kon.iki.fi>
- <20110430220553.GB20433@elie>
- <87liyqpudv.fsf@Pulska.kon.iki.fi>
+From: Eric Blake <eblake@redhat.com>
+Subject: positional argument bug
+Date: Thu, 05 May 2011 08:15:25 -0600
+Message-ID: <4DC2B0FD.1000802@redhat.com>
+References: <BANLkTi=cmXee5Ej2fmhX2dp4FG6U3_1JqQ@mail.gmail.com>	<20110504024128.GB8187@elie>	<BANLkTimmAWkEne0SYFDpc4Kq-4ChBJ_dWg@mail.gmail.com>	<BANLkTimUJX-asm1rBoKHKMH6HU8asWdLPA@mail.gmail.com>	<20110504050223.GG8187@elie>	<m3oc3ic2sc.fsf@linux-m68k.org>	<BANLkTi=n37vhi63Rh1YRh8uqxZ6cyR65wQ@mail.gmail.com>	<4DC2A4E8.7020904@case.edu> <4DC2AFF7.7070007@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------enigEB47BF9F246DA21D5CD48785"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:39797 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752348Ab1EBIHK (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 2 May 2011 04:07:10 -0400
-Received: by iyb14 with SMTP id 14so4465150iyb.19
-        for <dash@vger.kernel.org>; Mon, 02 May 2011 01:07:10 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <87liyqpudv.fsf@Pulska.kon.iki.fi>
+Received: from mx1.redhat.com ([209.132.183.28]:41315 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754271Ab1EEOP0 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 5 May 2011 10:15:26 -0400
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	by mx1.redhat.com (8.14.4/8.14.4) with ESMTP id p45EFPma018894
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
+	for <dash@vger.kernel.org>; Thu, 5 May 2011 10:15:26 -0400
+Received: from [10.3.113.2] ([10.3.113.2])
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP id p45EFP75002722
+	for <dash@vger.kernel.org>; Thu, 5 May 2011 10:15:25 -0400
+In-Reply-To: <4DC2AFF7.7070007@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-Cc: Kalle Olavi Niemitalo <kon@iki.fi>
 
-From: Kalle Olavi Niemitalo <kon@iki.fi>
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigEB47BF9F246DA21D5CD48785
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-LANG=C man dash shows:
+[originally brought up on the bash list as a NetBSD bug, but dash is
+also affected]
 
-     PS1        The primary prompt string, which defaults to ``$  '', unless
-                you are the superuser, in which case it defaults to ``#  ''.
+On 05/05/2011 08:11 AM, Eric Blake wrote:
+>> I'd call that a pretty serious incompatibility on the part of ash and =
+its
+>> descendants (BSD sh, dash, etc.).  There's no good reason that
+>>
+>> set -- a b c d e f g h i j
+>> echo $10
+>>
+>> should echo `j'.
+>=20
+> Also a POSIX violation:
+>=20
+> http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.htm=
+l#tag_18_06_02
+>=20
+> "The parameter name or symbol can be enclosed in braces, which are
+> optional except for positional parameters with more than one digit or
+> when parameter is followed by a character that could be interpreted as
+> part of the name."
 
-     PS2        The secondary prompt string, which defaults to ``>  ''.
+Additionally from POSIX:
 
-     PS4        Output before each line when execution trace (set -x) is
-                enabled, defaults to ``+  ''.
+"If the parameter name or symbol is not enclosed in braces, the
+expansion shall use the longest valid name (see XBD Name)"
 
-Each of the documented default values has a graphic character and
-two spaces between the quotation marks.  However, the actual
-default values have only one space, rather than two.
+"In the shell command language, a word consisting solely of underscores,
+digits, and alphabetics from the portable character set. The first
+character of a name is not a digit."
 
-Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
----
-Kalle Olavi Niemitalo wrote[1]:
+Therefore, in "$10", 10 is not a name, so the longest name is the empty
+string, and the single-character symbol is used instead, such that this
+MUST be parsed as ${1}0, not as ${10}.
 
-> Here's the diff against 0.5.5.1-7.4.
+--=20
+Eric Blake   eblake@redhat.com    +1-801-349-2682
+Libvirt virtualization library http://libvirt.org
 
-Thanks.  Looking at the formatted output, I see some other extra
-spaces (mostly around punctuation), but fixing these confusing ones
-first doesn't sound like a bad idea.
 
-[1] http://bugs.debian.org/624715
+--------------enigEB47BF9F246DA21D5CD48785
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
- src/dash.1 |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Fedora - http://enigmail.mozdev.org/
 
-diff --git a/src/dash.1 b/src/dash.1
-index ddeb52b..3847d98 100644
---- a/src/dash.1
-+++ b/src/dash.1
-@@ -2276,16 +2276,16 @@ setting.
- There is a maximum of 10 mailboxes that can be monitored at once.
- .It Ev PS1
- The primary prompt string, which defaults to
--.Dq $ \  ,
-+.Dq $\  ,
- unless you are the superuser, in which case it defaults to
--.Dq # \  .
-+.Dq #\  .
- .It Ev PS2
- The secondary prompt string, which defaults to
--.Dq \*[Gt] \  .
-+.Dq \*[Gt]\  .
- .It Ev PS4
- Output before each line when execution trace (set -x) is enabled,
- defaults to
--.Dq + \  .
-+.Dq +\  .
- .It Ev IFS
- Input Field Separators.
- This is normally set to
--- 
-1.7.5
+iQEcBAEBCAAGBQJNwrD9AAoJEKeha0olJ0Nqs40IALAt14IAGogVouFmYMcASXU2
+ZAN0QksCww1jgoe6yqf7HA+bIayaVbhEH7/TofwkdAHmkYvKEaqpK+v52dem+3u1
+viXD+figKGk1yFds6qNrxsvoUkmks+HECBrS/R36rppI0uaQ57rh4m7cPoGPIWkX
+XJh+ooxRJEkVp5n5HhfjlAWC1yGsfwrocE2b/2x76BGAL5kU4uywcjzI9bZXZAj4
+Vv2Rj+bwP+QGPV+e9zsoDwdQ7sJJQgCvImVyxspSjYwrYaMqvbEg745UUM2s9S4a
+/uYJLB3a0S6NmfXptModF+bNfwrGBPIAypsL7/Wt/Jbd8hRPIKoOxdzsiIeldrs=
+=wz1b
+-----END PGP SIGNATURE-----
 
+--------------enigEB47BF9F246DA21D5CD48785--
