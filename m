@@ -1,76 +1,128 @@
 From: Jim Meyering <jim@meyering.net>
-Subject: [PATCH] avoid clang warning about dead store to "size"
-Date: Mon, 23 May 2011 10:31:43 +0200
-Message-ID: <878vtxrf68.fsf@rho.meyering.net>
+Subject: [PATCH] avoid using undefined handler
+Date: Wed, 25 May 2011 14:30:53 +0200
+Message-ID: <87aaebc682.fsf@rho.meyering.net>
 Mime-Version: 1.0
 Content-Type: text/plain
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp1-g21.free.fr ([212.27.42.1]:40346 "EHLO smtp1-g21.free.fr"
+Received: from smtp1-g21.free.fr ([212.27.42.1]:48322 "EHLO smtp1-g21.free.fr"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751973Ab1EWIbu (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 23 May 2011 04:31:50 -0400
+	id S1756863Ab1EYMbH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 25 May 2011 08:31:07 -0400
 Received: from mx.meyering.net (unknown [82.230.74.64])
-	by smtp1-g21.free.fr (Postfix) with ESMTP id 7D2B9940262
-	for <dash@vger.kernel.org>; Mon, 23 May 2011 10:31:44 +0200 (CEST)
+	by smtp1-g21.free.fr (Postfix) with ESMTP id C909D9401A3
+	for <dash@vger.kernel.org>; Wed, 25 May 2011 14:30:54 +0200 (CEST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-I ran clang's scan-build on dash and it reported one nit:
+Clang had some legitimate warnings:
 
-ANALYZE: memalloc.c makestrspace
-memalloc.c:276:9: warning: Value stored to 'size' during its initialization is never read
-        size_t size = stackblocksize();
-               ^      ~~~~~~~~~~~~~~~~
+2011-05-25  Jim Meyering  <meyering@redhat.com>
 
+	avoid using undefined handler
+	* src/eval.c (evalbltin, evalfun): Set savehandler before calling
+	setjmp with the possible "goto *done", where savehandler is used.
+	Otherwise, clang warns that "Assigned value is garbage or undefined"
+	at the point where "savehandler" is used on the RHS.
 
-From f6fb674bab5afa22de4fcfb4a2debfa4d139c73c Mon Sep 17 00:00:00 2001
+From 067f8b4da3005ab226652b19ed796d67bf1fa6d4 Mon Sep 17 00:00:00 2001
 From: Jim Meyering <meyering@redhat.com>
-Date: Mon, 23 May 2011 10:27:57 +0200
-Subject: [PATCH] avoid clang warning about dead store to "size"
+Date: Wed, 25 May 2011 14:27:14 +0200
+Subject: [PATCH] avoid using undefined handler
 
-* src/memalloc.c (makestrspace): Remove dead store.
+* src/eval.c (evalbltin, evalfun): Set savehandler before calling
+setjmp with the possible "goto *done", where savehandler is used.
+Otherwise, clang warns that "Assigned value is garbage or undefined"
+at the point where "savehandler" is used on the RHS.
 
 Signed-off-by: Jim Meyering <meyering@redhat.com>
 ---
- ChangeLog      |    3 +++
- src/memalloc.c |    2 +-
- 2 files changed, 4 insertions(+), 1 deletions(-)
+ src/eval.c |    4 ++--
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/ChangeLog b/ChangeLog
-index 56c5c3f..8725b08 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,8 +1,11 @@
- 2011-05-23  Jim Meyering  <meyering@redhat.com>
+diff --git a/src/eval.c b/src/eval.c
+index 426c03a..911fb2c 100644
+--- a/src/eval.c
++++ b/src/eval.c
+@@ -911,76 +911,76 @@ out:
+ 	if (lastarg)
+ 		/* dsl: I think this is intended to be used to support
+ 		 * '_' in 'vi' command mode during line editing...
+ 		 * However I implemented that within libedit itself.
+ 		 */
+ 		setvar("_", lastarg, 0);
+ 	popstackmark(&smark);
+ }
 
-+	avoid clang warning about dead store to "size"
-+	* src/memalloc.c (makestrspace): Remove dead store.
-+
- 	avoid gcc warning: variable 'oldstackp' set but not used
- 	* src/memalloc.c (growstackblock): Remove declaration and set of
- 	set-but-not-used variable.  Also remove a stray space-before-TAB.
-
- 2011-03-15  Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/src/memalloc.c b/src/memalloc.c
-index 9fea067..d8e4413 100644
---- a/src/memalloc.c
-+++ b/src/memalloc.c
-@@ -270,13 +270,13 @@ growstackstr(void)
-  */
-
- char *
- makestrspace(size_t newlen, char *p)
+ STATIC int
+ evalbltin(const struct builtincmd *cmd, int argc, char **argv, int flags)
  {
- 	size_t len = p - stacknxt;
--	size_t size = stackblocksize();
-+	size_t size;
+ 	char *volatile savecmdname;
+ 	struct jmploc *volatile savehandler;
+ 	struct jmploc jmploc;
+ 	int status;
+ 	int i;
 
- 	for (;;) {
- 		size_t nleft;
+ 	savecmdname = commandname;
++	savehandler = handler;
+ 	if ((i = setjmp(jmploc.loc)))
+ 		goto cmddone;
+-	savehandler = handler;
+ 	handler = &jmploc;
+ 	commandname = argv[0];
+ 	argptr = argv + 1;
+ 	optptr = NULL;			/* initialize nextopt */
+ 	if (cmd == EVALCMD)
+ 		status = evalcmd(argc, argv, flags);
+ 	else
+ 		status = (*cmd->builtin)(argc, argv);
+ 	flushall();
+ 	status |= outerr(out1);
+ 	exitstatus = status;
+ cmddone:
+ 	freestdout();
+ 	commandname = savecmdname;
+ 	handler = savehandler;
 
- 		size = stackblocksize();
- 		nleft = size - len;
+ 	return i;
+ }
+
+ STATIC int
+ evalfun(struct funcnode *func, int argc, char **argv, int flags)
+ {
+ 	volatile struct shparam saveparam;
+ 	struct jmploc *volatile savehandler;
+ 	struct jmploc jmploc;
+ 	int e;
+ 	int savefuncline;
+
+ 	saveparam = shellparam;
+ 	savefuncline = funcline;
++	savehandler = handler;
+ 	if ((e = setjmp(jmploc.loc))) {
+ 		goto funcdone;
+ 	}
+ 	INTOFF;
+-	savehandler = handler;
+ 	handler = &jmploc;
+ 	shellparam.malloc = 0;
+ 	func->count++;
+ 	funcline = func->n.ndefun.linno;
+ 	INTON;
+ 	shellparam.nparam = argc - 1;
+ 	shellparam.p = argv + 1;
+ 	shellparam.optind = 1;
+ 	shellparam.optoff = -1;
+ 	pushlocalvars();
+ 	evaltree(func->n.ndefun.body, flags & EV_TESTED);
+ 	poplocalvars(0);
+ funcdone:
+ 	INTOFF;
+ 	funcline = savefuncline;
+ 	freefunc(func);
+ 	freeparam(&shellparam);
+ 	shellparam = saveparam;
+ 	handler = savehandler;
 --
-1.7.5.2.1.g56b30
+1.7.5.2.609.g6dbbf
