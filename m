@@ -1,58 +1,45 @@
 From: maximilian attems <max@stro.at>
-Subject: Re: [PATCH] JOBS: fix klibc DEBUG compilation
-Date: Sat, 4 Jun 2011 06:45:59 +0000
-Message-ID: <20110604064559.GD22026@vostochny.stro.at>
-References: <1307122707-30526-1-git-send-email-max@stro.at>
- <20110603181302.GA13418@stack.nl>
+Subject: [RFC] klibc dash merge
+Date: Sat, 4 Jun 2011 07:00:05 +0000
+Message-ID: <20110604070005.GE22026@vostochny.stro.at>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from vostochny.stro.at ([78.47.22.85]:49777 "EHLO vostochny.stro.at"
+Received: from vostochny.stro.at ([78.47.22.85]:37587 "EHLO vostochny.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752185Ab1FDGqA (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 4 Jun 2011 02:46:00 -0400
+	id S1752185Ab1FDHAG (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 4 Jun 2011 03:00:06 -0400
 Content-Disposition: inline
-In-Reply-To: <20110603181302.GA13418@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>, klibc@zytor.com, dash@vger.kernel.org
+To: klibc@zytor.com, dash@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>
 
-On Fri, Jun 03, 2011 at 08:13:02PM +0200, Jilles Tjoelker wrote:
-> >  src/show.c |    2 ++
-> >  1 files changed, 2 insertions(+), 0 deletions(-)
-> 
-> > diff --git a/src/show.c b/src/show.c
-> > index 14dbef3..b4160e1 100644
-> > --- a/src/show.c
-> > +++ b/src/show.c
-> > @@ -394,7 +394,9 @@ opentrace(void)
-> >  	if ((flags = fcntl(fileno(tracefile), F_GETFL, 0)) >= 0)
-> >  		fcntl(fileno(tracefile), F_SETFL, flags | O_APPEND);
-> >  #endif
-> > +#ifndef SMALL
-> >  	setlinebuf(tracefile);
-> > +#endif /* SMALL */
-> >  	fputs("\nTracing started.\n", tracefile);
-> >  }
-> >  #endif /* DEBUG */
-> 
-> Why not just replace the non-standard setlinebuf() call with the
-> standard  setvbuf(tracefile, NULL, _IOLBF, 0);  ? This appears to work
-> just as well on FreeBSD and is C99 compliant (no POSIX needed here).
-> 
-> The #define SMALL is only for disabling line editing and history (using
-> libedit). Setting the trace file line buffered is useful regardless of
-> that.
+Hello,
 
-If one doesn't support libedit one is assumed to define SMALL
-and klibc does such.
-http://www.spinics.net/lists/dash/msg00311.html
+Since klibc dash last merge is a bit dated yesterday I resyncronised
+the dash in klibc repo from dc2bc17c7bbe3188cfb0c695dc472b39bcf0b27a
+up to ec2c84d3c4dba4b74440d72bdd1de416a9acd2a9 commit.
 
-oh and I seem to not have recieved Herbert's answer from last Sept.
-http://www.spinics.net/lists/dash/msg00367.html
+Please test it:
+git://git.kernel.org/pub/scm/libs/klibc/klibc-queue.git
+http://git.kernel.org/?p=libs/klibc/klibc-queue.git;a=shortlog
 
-I'll respin the patch based on it, thank you.
+Without objections this will land in klibc-1.5.23.
+
+It got easier (less error prone handeting) since newer git got more
+features. Only some commits needed a manual merge fixup.
+The end result runs fine for an initramfs-tools boot.
+
+Nevertheless please give me hints if I shouldn't merge at this
+point of history and wait for some upcoming push (eventual v0.5.7)?
+
+Thank you
 
 -- 
 maks
+
+
+P.S. will send soonest the DEBUG compile fix.
+P.P.S need to send in 2 klibc dash features to the main repo from hpa.
+
