@@ -1,61 +1,56 @@
-From: Jim Meyering <jim@meyering.net>
-Subject: [PATCH] setvareq: do not return a freed pointer
-Date: Sun, 19 Jun 2011 21:30:41 +0200
-Message-ID: <8739j5aaam.fsf@rho.meyering.net>
+From: Mike Korbakov <mike-kmv@yandex.ru>
+Subject: Porting dash to OpenBSD
+Date: Sun, 26 Jun 2011 06:18:59 +0400
+Message-ID: <223511309054739@web103.yandex.ru>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=koi8-r
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp1-g21.free.fr ([212.27.42.1]:35271 "EHLO smtp1-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754196Ab1FSTa4 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 19 Jun 2011 15:30:56 -0400
-Received: from mx.meyering.net (unknown [82.230.74.64])
-	by smtp1-g21.free.fr (Postfix) with ESMTP id D139194013C
-	for <dash@vger.kernel.org>; Sun, 19 Jun 2011 21:30:42 +0200 (CEST)
+Received: from forward7.mail.yandex.net ([77.88.61.37]:45699 "EHLO
+	forward7.mail.yandex.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752395Ab1FZC0G (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 25 Jun 2011 22:26:06 -0400
+Received: from web103.yandex.ru (web103.yandex.ru [77.88.61.4])
+	by forward7.mail.yandex.net (Yandex) with ESMTP id CAF691C1D94
+	for <dash@vger.kernel.org>; Sun, 26 Jun 2011 06:18:59 +0400 (MSD)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by web103.yandex.ru (Yandex) with ESMTP id C07FC1D58038
+	for <dash@vger.kernel.org>; Sun, 26 Jun 2011 06:18:59 +0400 (MSD)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-This change may be technically unnecessary, but it's worth
-the minuscule cost of the initialization.
+Hello!
 
-2011-06-19  Jim Meyering  <meyering@redhat.com>
+Unfortunatly,=9Anot=9Aall=9Asystems=9A(like=9AOpenBSD)=9Ahas=9Abuilt-in=
+=9Atexttools=9Alike=9Anl,
+that=9Amakes=9Ait=9Adifficult=9Ato=9Aport=9Adash,=9Awith=9Aminimum=9Atr=
+oubles.
 
-	setvareq: do not return a freed pointer
-	* src/var.c (setvareq): Don't return a freed pointer.
-	In at least one case (when called from unsetvar), the return
-	value is not used, but better not to risk it, and to placate
-	static analyzers.  Spotted by coverity.
-	Exercise via dash -c 'j=; unset j'
+To reduce dependencies, I=9Asuggest=9Ausing=9Ainstead=9Aof=9Anl other=9A=
+tools like awk=9Aor=9Acat
+(as=9Aadvised=9Aopenbsd=9Aporters=9Ateam).
 
-From e91caa66e9f1e449e5ea129d2c1e304e66784e2f Mon Sep 17 00:00:00 2001
-From: Jim Meyering <meyering@redhat.com>
-Date: Sun, 19 Jun 2011 21:28:02 +0200
-Subject: [PATCH] setvareq: do not return a freed pointer
+Building=9Adash-0.5.6.1=9Awas=9Asuccessfull=9Awith=9Athis=9Apatch:
 
-* src/var.c (setvareq): Don't return a freed pointer.
-In at least one case (when called from unsetvar), the return
-value is not used, but better not to risk it, and to placate
-static analyzers.  Spotted by coverity.
-Exercise via dash -c 'j=; unset j'
+---=9Asrc/mkbuiltins.orig=9ASat=9AJun=9A=9A5=9A13:34:23=9A2010
++++=9Asrc/mkbuiltins=9A=9A=9A=9A=9A=9ASun=9AJun=9A26=9A02:36:23=9A2011
+@@=9A-84,7=9A+84,7=9A@@=9Acat=9A<<\!
+=9A=9A*/
 
-Signed-off-by: Jim Meyering <meyering@redhat.com>
----
- ChangeLog |    9 +++++++++
- src/var.c |    1 +
- 2 files changed, 10 insertions(+), 0 deletions(-)
+=9A!
+-sed=9A's/=9A=9A=9A=9A=9A=9A=9A=9A-[a-z]*//'=9A$temp2=9A|=9Anl=9A-v=9A0=
+=9A|=9ALC_COLLATE=3DC=9Asort=9A-u=9A-k=9A3,3=9A|
++sed=9A's/=9A=9A=9A=9A=9A=9A=9A=9A-[a-z]*//'=9A$temp2=9A|=9Aawk=9A'{=9A=
+print=9A"=9A=9A"=9AFNR-1=9A"=9A=9A"=9A$0=9A}'=9A=9A|=9ALC_COLLATE=3DC=9A=
+sort=9A-u=9A-k=9A3,3=9A|
+=9Atr=9Aabcdefghijklmnopqrstuvwxyz=9AABCDEFGHIJKLMNOPQRSTUVWXYZ=9A|
+=9A=9A=9A=9A=9A=9A=9A=9Aawk=9A'{=9A=9Aprintf=9A"#define=9A%s=9A(builtin=
+cmd=9A+=9A%d)\n",=9A$3,=9A$1}'
+=9Aprintf=9A'\n#define=9ANUMBUILTINS=9A%d\n'=9A$(wc=9A-l=9A<=9A$temp2)
 
-diff --git a/src/var.c b/src/var.c
-index ecc8c90..34c5d32 100644
---- a/src/var.c
-+++ b/src/var.c
-@@ -276,6 +276,7 @@ struct var *setvareq(char *s, int flags)
- 		     (vp->flags & VSTRFIXED)) == VUNSET) {
- 			*vpp = vp->next;
- 			ckfree(vp);
-+			vp = NULL;
- out_free:
- 			if ((flags & (VTEXTFIXED|VSTACK|VNOSAVE)) == VNOSAVE)
- 				ckfree(s);
---
-1.7.6.rc2.4.g36bfb.dirty
+
+Would you make these changes in future releases?
+
+Best regards,
+Mike Korbakov.
