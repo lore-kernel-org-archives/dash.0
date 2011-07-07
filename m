@@ -1,33 +1,81 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: [PATCH 1/2] Fix additional use of 'j' printf length modifier.
-Date: Thu, 7 Jul 2011 02:12:44 -0500
-Message-ID: <20110707071244.GB11514@elie>
-References: <1302921010.2620.3.camel@gemini>
- <1302921279.2620.6.camel@gemini>
- <20110707064154.GE16157@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: build issues when using pcc
+Date: Thu, 7 Jul 2011 15:22:27 +0800
+Message-ID: <20110707072227.GG16157@gondor.apana.org.au>
+References: <20110522123414.GD6142@port70.net> <20110522164605.GA8654@elie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:37149 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750776Ab1GGHMu (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 7 Jul 2011 03:12:50 -0400
-Received: by iyb12 with SMTP id 12so620871iyb.19
-        for <dash@vger.kernel.org>; Thu, 07 Jul 2011 00:12:49 -0700 (PDT)
+Received: from helcar.apana.org.au ([209.40.204.226]:43880 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750900Ab1GGHWf (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 7 Jul 2011 03:22:35 -0400
 Content-Disposition: inline
-In-Reply-To: <20110707064154.GE16157@gondor.apana.org.au>
+In-Reply-To: <20110522164605.GA8654@elie>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Brian Koropoff <bkoropoff@gmail.com>, dash@vger.kernel.org
+To: Jonathan Nieder <jrnieder@gmail.com>
+Cc: Szabolcs Nagy <nsz@port70.net>, dash@vger.kernel.org
 
-Herbert Xu wrote:
+On Sun, May 22, 2011 at 04:46:05PM +0000, Jonathan Nieder wrote:
+>
+> Subject: [OUTPUT] Make outc an inline function
+> 
+> As "gcc -pedantic" warns, ISO C forbids conditional expressions with
+> only one void side.  So the (needslow ?  slowpath() : fastpath) code
+> for outc in the !USE_GLIBC_STDIO case might not be portable.
+> 
+> More importantly, it's hard to read.  Rip it out and replace it
+> with an inline function which should generate the same code.
+> 
+> Reported-by: Szabolcs Nagy <nsz@port70.net>
+> Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
 
-> %j is part of ISO C99 and POSIX
+Patch applied.
 
-*checks*  Oh, so it is!  Thanks; it's nice to learn the standard
-offers more than expected.
+I've also added this one-liner on top to eliminate an unnecessary
+promotion caused by this patch.
 
-Brian: fwiw gnulib printf seems to provide %j, though of course it's a
-bit more heavyweight.  And of course there are alternative C libraries
---- e.g., glibc runs on Solaris.
+commit 155b0b518f485b8b5cb574cd2f0dc936c3fd1902
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Thu Jul 7 15:22:03 2011 +0800
+
+    [BUILTIN] Eliminate unnecessary promotion in echocmd
+    
+    The patch to make outc into an inline function created an unnecessary
+    promotion in echocmd due to its use of char vs. the int used by outc.
+    This patch changes echocmd to use int instead.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/ChangeLog b/ChangeLog
+index ade43e9..2093fc7 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,6 +1,7 @@
+ 2011-07-07  Herbert Xu <herbert@gondor.apana.org.au>
+ 
+ 	* Optimize dash -c "command" to avoid a fork.
++	* Eliminate unnecessary promotion in echocmd.
+ 
+ 2011-05-22  Jonathan Nieder <jrnieder@gmail.com>
+ 
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index b0c3774..893295c 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -443,7 +443,7 @@ echocmd(int argc, char **argv)
+ 	}
+ 
+ 	do {
+-		char c;
++		int c;
+ 
+ 		nonl += conv_escape_str(*argv);
+ 		outstr(stackblock(), outs);
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
