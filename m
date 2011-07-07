@@ -1,46 +1,35 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 4/4] [MAIN] Optimize dash -c "command" to avoid a fork
-Date: Wed, 6 Jul 2011 23:27:53 -0500
-Message-ID: <20110707042753.GA7684@elie>
-References: <20110410071734.GA16736@elie>
- <20110410073649.GD17649@elie>
- <20110707034833.GC16157@gondor.apana.org.au>
+Date: Thu, 7 Jul 2011 12:57:19 +0800
+Message-ID: <20110707045719.GA16810@gondor.apana.org.au>
+References: <20110410071734.GA16736@elie> <20110410073649.GD17649@elie> <20110707034833.GC16157@gondor.apana.org.au> <20110707042753.GA7684@elie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:46013 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750753Ab1GGE2O (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 7 Jul 2011 00:28:14 -0400
-Received: by iwn6 with SMTP id 6so515822iwn.19
-        for <dash@vger.kernel.org>; Wed, 06 Jul 2011 21:28:14 -0700 (PDT)
+Received: from helcar.apana.org.au ([209.40.204.226]:37362 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750756Ab1GGE5X (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 7 Jul 2011 00:57:23 -0400
 Content-Disposition: inline
-In-Reply-To: <20110707034833.GC16157@gondor.apana.org.au>
+In-Reply-To: <20110707042753.GA7684@elie>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jonathan Nieder <jrnieder@gmail.com>
 Cc: dash@vger.kernel.org, Jilles Tjoelker <jilles@stack.nl>, Drake Wilson <drake@begriffli.ch>, Reuben Thomas <rrt@sc3d.org>
 
-Herbert Xu wrote:
-> On Sun, Apr 10, 2011 at 07:36:49AM +0000, Jonathan Nieder wrote:
+On Wed, Jul 06, 2011 at 11:27:53PM -0500, Jonathan Nieder wrote:
+>
+> Will that work?  Without the preadateof check, I would worry that
+> passing EV_EXIT to evalstring would break:
+> 
+> 	$ dash -c 'echo one
+> 		echo two'
+> 	one
 
->> From: Jilles Tjoelker <jilles@stack.nl>
->> Date: Sat, 13 Jun 2009 16:17:45 -0500
->>
->> This change only affects strings passed to -c, when the -s option is
->> not used.
->>
->> Use the EV_EXIT flag to inform the eval machinery that the string
->> being passed is the entirety of input.  This way, a fork may be
->> omitted in many special cases.
-[...]
-> OK I will take this patch since its impact is much smaller than
-> one that hacks around the input path, and seems to achieve most of
-> what you want anyway.
+You're right.  I'll back this out for now.
 
-Will that work?  Without the preadateof check, I would worry that
-passing EV_EXIT to evalstring would break:
-
-	$ dash -c 'echo one
-		echo two'
-	one
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
