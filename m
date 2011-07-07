@@ -1,92 +1,82 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 4/4] [MAIN] Optimize dash -c "command" to avoid a fork
-Date: Thu, 7 Jul 2011 02:48:56 -0500
-Message-ID: <20110707074856.GC11514@elie>
-References: <20110410071734.GA16736@elie>
- <20110410073649.GD17649@elie>
- <20110707034833.GC16157@gondor.apana.org.au>
- <20110707042753.GA7684@elie>
- <20110707045719.GA16810@gondor.apana.org.au>
- <20110707055602.GA17215@gondor.apana.org.au>
+Date: Thu, 7 Jul 2011 16:22:53 +0800
+Message-ID: <20110707082253.GA18209@gondor.apana.org.au>
+References: <20110410071734.GA16736@elie> <20110410073649.GD17649@elie> <20110707034833.GC16157@gondor.apana.org.au> <20110707042753.GA7684@elie> <20110707045719.GA16810@gondor.apana.org.au> <20110707055602.GA17215@gondor.apana.org.au> <20110707074856.GC11514@elie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:33967 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752735Ab1GGHtC (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 7 Jul 2011 03:49:02 -0400
-Received: by iyb12 with SMTP id 12so641424iyb.19
-        for <dash@vger.kernel.org>; Thu, 07 Jul 2011 00:49:02 -0700 (PDT)
+Received: from helcar.apana.org.au ([209.40.204.226]:45154 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751384Ab1GGIW6 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 7 Jul 2011 04:22:58 -0400
 Content-Disposition: inline
-In-Reply-To: <20110707055602.GA17215@gondor.apana.org.au>
+In-Reply-To: <20110707074856.GC11514@elie>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jonathan Nieder <jrnieder@gmail.com>
 Cc: dash@vger.kernel.org, Jilles Tjoelker <jilles@stack.nl>, Drake Wilson <drake@begriffli.ch>, Reuben Thomas <rrt@sc3d.org>
 
-Herbert Xu wrote:
+On Thu, Jul 07, 2011 at 02:48:56AM -0500, Jonathan Nieder wrote:
+>
+> By the way, is the pungetc() call needed?  I tried to provoke
+> misbehavior using here documents and reading from the terminal but
+> didn't manage to come up with a relevant scenario.
 
-> OK, what about this patch?
+It's probably not needed.  I didn't touch it in order to minimise
+the changes.
 
-Neat.  Let's see:
+> mksyntax #include-s parser.h, so after a "make clean":
+> 
+> 	gcc -include ../config.h -DBSD=1 -DSHELL -DIFS_BROKEN  -g -Os -Wall -o mksyntax mksyntax.c
+> 	In file included from mksyntax.c:43:0:
+> 	parser.h:37:19: fatal error: token.h: No such file or directory
+> 
+> The following (on top) fixes it here.
 
-> --- a/src/parser.c
-> +++ b/src/parser.c
-[...]
-> @@ -210,6 +210,7 @@ list(int nlflag)
->  				parseheredoc();
->  			else
->  				pungetc();		/* push back EOF on input */
-> +			tokpushback++;
->  			return n1;
->  		default:
->  			if (nlflag == 1)
+Oops, does this patch fix it?
 
-This means to push back the TEOF instead of calling pgetc again and
-again.  Should be safe.
-
-By the way, is the pungetc() call needed?  I tried to provoke
-misbehavior using here documents and reading from the terminal but
-didn't manage to come up with a relevant scenario.
-
-> --- a/src/parser.h
-> +++ b/src/parser.h
-> @@ -34,6 +34,8 @@
->   *	@(#)parser.h	8.3 (Berkeley) 5/4/95
->   */
->  
-> +#include "token.h"
-
-mksyntax #include-s parser.h, so after a "make clean":
-
-	gcc -include ../config.h -DBSD=1 -DSHELL -DIFS_BROKEN  -g -Os -Wall -o mksyntax mksyntax.c
-	In file included from mksyntax.c:43:0:
-	parser.h:37:19: fatal error: token.h: No such file or directory
-
-The following (on top) fixes it here.
----
- src/parser.c |    1 +
- src/parser.h |   11 +++++++++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/src/parser.c b/src/parser.c
-index 6de27629..9c0ef606 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -40,6 +40,7 @@
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 05ed70a..a552087 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -12,7 +12,8 @@ AM_CFLAGS_FOR_BUILD = -g -O2 $(COMMON_CFLAGS)
+ AM_CPPFLAGS_FOR_BUILD = $(COMMON_CPPFLAGS)
  
- #include "shell.h"
- #include "parser.h"
-+#include "token.h"
- #include "nodes.h"
- #include "expand.h"	/* defines rmescapes() */
- #include "exec.h"	/* defines find_builtin() */
-diff --git a/src/parser.h b/src/parser.h
-index 2875cce6..8735890e 100644
---- a/src/parser.h
-+++ b/src/parser.h
-@@ -34,8 +34,6 @@
-  *	@(#)parser.h	8.3 (Berkeley) 5/4/95
-  */
+ COMPILE_FOR_BUILD = \
+-	$(CC_FOR_BUILD) $(AM_CPPFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) \
++	$(CC_FOR_BUILD) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS_FOR_BUILD) \
++	$(CPPFLAGS_FOR_BUILD) \
+ 	$(AM_CFLAGS_FOR_BUILD) $(CFLAGS_FOR_BUILD) 
  
--#include "token.h"
+ bin_PROGRAMS = dash
+@@ -31,12 +32,12 @@ dash_SOURCES = \
+ 	show.h system.h trap.h var.h
+ dash_LDADD = builtins.o init.o nodes.o signames.o syntax.o
+ 
+-HELPERS = mkinit mksyntax mknodes mksignames
++HELPERS = mkinit mknodes mksignames
+ 
+ BUILT_SOURCES = builtins.h nodes.h syntax.h token.h token_vars.h
+ CLEANFILES = \
+ 	$(BUILT_SOURCES) $(patsubst %.o,%.c,$(dash_LDADD)) \
+-	$(HELPERS) builtins.def
++	$(HELPERS) mksyntax builtins.def
+ 
+ man_MANS = dash.1
+ EXTRA_DIST = \
+@@ -65,5 +66,8 @@ syntax.c syntax.h: mksyntax
+ signames.c: mksignames
+ 	./$^
+ 
++mksyntax: mksyntax.c token.h
++	$(COMPILE_FOR_BUILD) -o $@ $<
++
+ $(HELPERS): %: %.c
+ 	$(COMPILE_FOR_BUILD) -o $@ $<
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
