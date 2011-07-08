@@ -1,35 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Porting dash to OpenBSD
-Date: Fri, 8 Jul 2011 16:58:36 +0800
-Message-ID: <20110708085836.GF28449@gondor.apana.org.au>
-References: <223511309054739@web103.yandex.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: maximilian attems <max@stro.at>
+Subject: [PATCH] [SHELL] Fix klibc DEBUG compilation v3
+Date: Fri,  8 Jul 2011 12:05:38 +0200
+Message-ID: <1310119538-25514-1-git-send-email-max@stro.at>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:52114 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751352Ab1GHI6k (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 8 Jul 2011 04:58:40 -0400
-Content-Disposition: inline
-In-Reply-To: <223511309054739@web103.yandex.ru>
+Received: from vostochny.stro.at ([78.47.22.85]:33744 "EHLO vostochny.stro.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751951Ab1GHKFk (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 8 Jul 2011 06:05:40 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Mike Korbakov <mike-kmv@yandex.ru>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
+Cc: klibc@zytor.com, maximilian attems <max@stro.at>
 
-On Sun, Jun 26, 2011 at 02:18:59AM +0000, Mike Korbakov wrote:
-> Hello!
->=20
-> Unfortunatly,=A0not=A0all=A0systems=A0(like=A0OpenBSD)=A0has=A0built-=
-in=A0texttools=A0like=A0nl,
-> that=A0makes=A0it=A0difficult=A0to=A0port=A0dash,=A0with=A0minimum=A0=
-troubles.
+dash didn't compile in DEBUG mode against klibc for all long time.
+Now it only fails at link stage for not having setlinebuf(3) and
+freopen(3).
 
-Hmm, nl is part of POSIX and dash is supposed to be a POSIX shell.
+Fixes:
 
-Cheers,
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+usr/dash/show.o: In function `opentrace':
+show.c:(.text+0x36): undefined reference to `freopen'
+show.c:(.text+0x86): undefined reference to `setlinebuf'
+
+Skip setlinebuf and use fclose/fopen inside __KLIBC__
+Compile tested with debug in klibc and against glibc in dash repo.
+
+Signed-off-by: maximilian attems <max@stro.at>
+---
+ src/show.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/src/show.c b/src/show.c
+index 14dbef3..4a049e9 100644
+--- a/src/show.c
++++ b/src/show.c
+@@ -378,7 +378,11 @@ opentrace(void)
+ 	scopy("./trace", s);
+ #endif /* not_this_way */
+ 	if (tracefile) {
++#ifndef __KLIBC__
+ 		if (!freopen(s, "a", tracefile)) {
++#else
++		if (!(!fclose(tracefile) && (tracefile = fopen(s, "a")))) {
++#endif /* __KLIBC__ */
+ 			fprintf(stderr, "Can't re-open %s\n", s);
+ 			debug = 0;
+ 			return;
+@@ -394,7 +398,9 @@ opentrace(void)
+ 	if ((flags = fcntl(fileno(tracefile), F_GETFL, 0)) >= 0)
+ 		fcntl(fileno(tracefile), F_SETFL, flags | O_APPEND);
+ #endif
++#ifndef __KLIBC__
+ 	setlinebuf(tracefile);
++#endif /* __KLIBC__ */
+ 	fputs("\nTracing started.\n", tracefile);
+ }
+ #endif /* DEBUG */
+-- 
+1.7.5.4
+
