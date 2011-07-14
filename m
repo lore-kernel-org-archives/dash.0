@@ -1,86 +1,60 @@
-From: Rudolf Polzer <divverent@xonotic.org>
-Subject: Bug: temporary assignments vs shell function
-Date: Thu, 14 Jul 2011 10:34:56 +0200
-Message-ID: <20110714083455.GA25362@div0.qc.to>
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: Re: Bug: temporary assignments vs shell function
+Date: Thu, 14 Jul 2011 04:26:16 -0500
+Message-ID: <20110714092615.GA15476@elie>
+References: <20110714083455.GA25362@div0.qc.to>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from rm.div0.qc.to ([94.23.21.40]:35579 "EHLO rm.div0.qc.to"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753328Ab1GNJI0 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 14 Jul 2011 05:08:26 -0400
-Received: from rpolzer by rm.div0.qc.to with local (Exim 4.69)
-	(envelope-from <divverent@xonotic.org>)
-	id 1QhHNo-0006kZ-8L
-	for dash@vger.kernel.org; Thu, 14 Jul 2011 10:34:56 +0200
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:35210 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752606Ab1GNJ0d (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 14 Jul 2011 05:26:33 -0400
+Received: by iwn6 with SMTP id 6so28602iwn.19
+        for <dash@vger.kernel.org>; Thu, 14 Jul 2011 02:26:32 -0700 (PDT)
 Content-Disposition: inline
+In-Reply-To: <20110714083455.GA25362@div0.qc.to>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Rudolf Polzer <divverent@xonotic.org>
+Cc: dash@vger.kernel.org
 
 Hi,
 
-I noticed a little bug:
+Rudolf Polzer wrote:
 
-func()
-{
-	echo "Inside the shell function, foo is $foo"
-}
-foo=3Dfoo
-foo=3Dbar func
-echo "foo is now $foo"
+> foo=bar func
+> echo "foo is now $foo"
+>
+> will export foo=bar in global scope (i.e. it affects the execution environment
+> after the function call).
+[...]
+> A shell function however isn't a "special built-in" and also counts as a
+> "command name", thus the last echo line really should output "foo is now foo",
+> which it does in e.g. bash and the FreeBSD /bin/sh.
 
-will export foo=3Dbar in global scope (i.e. it affects the execution en=
-vironment
-after the function call).
+From XCU 2.9.5:
 
-This is inconsistent with calls to commands (both built-in and external=
-). In
-both cases, the variable assignment does not affect the execution envir=
-onment
-after the command.
+| When a function is executed, it shall have the syntax-error and
+| variable-assignment properties described for special built-in
+| utilities in the enumerated list at the beginning of Section 2.14.
 
-In SUSv3, I only can find:
+This seems to be one of those odd cases where "bash -o posix" behaves
+differently from bash.  Based on this test:
 
-| If no command name results, variable assignments shall affect the cur=
-rent
-| execution environment. Otherwise, the variable assignments shall be e=
-xported
-| for the execution environment of the command and shall not affect the=
- current
-| execution environment (except for special built-ins).
+	$sh -c 'func () { :; }; foo=bar func; echo $foo'
 
-A shell function however isn't a "special built-in" and also counts as =
-a
-"command name", thus the last echo line really should output "foo is no=
-w foo",
-which it does in e.g. bash and the FreeBSD /bin/sh.
+dash, ksh93, bash -o posix, pdksh and its derivatives, zsh with
+"emulate sh", and busybox sh implement the specified behavior.  I'm
+surprised to hear your copy of FreeBSD sh behaves differently.
 
-I tried this with current git master, too, and saw no difference, so I =
-suppose
-this bug is still open.
+Meanwhile I agree with you that this could be made clearer in POSIX
+without too many changes (for example by adding a reference back to
+section 2.9.5 in section 2.14).  If you are interested in fixing that,
+the kind people in the Austin group at <http://austingroupbugs.net>
+would probably be interested.
 
-What makes this difficult, is that the execution environment of the fun=
-ction is
-the SAME as the execution environment of the rest of the script, as nei=
-ther a
-subshell nor a new process is spawned. In a way, this passage of SUSv3 =
-can be
-seen as contradictory: the execution environment of the command, and th=
-e
-current execution environment, are the same, and thus the assignment wo=
-uld have
-to both affect the current environment, and not affect it, at the same =
-time
-("Schr=F6dinger's Execution Environment").  Most other shells however r=
-esolve
-this in "some" way so that the called command sees the assignments, and=
- after
-the command completes, the assignments are "undone", and I would like d=
-ash to
-do the same.
+Thanks for writing and hope that helps.
 
-Best regards,
-
-Rudolf Polzer
+Regards,
+Jonathan
