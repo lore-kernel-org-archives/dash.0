@@ -1,35 +1,39 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: [PATCH] Avoid imaxdiv when only one of the results is wanted
-Date: Tue, 26 Jul 2011 02:26:21 +0200
-Message-ID: <1311639981.15439.11.camel@linux>
-References: <1311635376.10727.8.camel@linux>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: Bug: temporary assignments vs shell function
+Date: Mon, 1 Aug 2011 00:19:04 +0200
+Message-ID: <20110731221904.GA74938@stack.nl>
+References: <20110714083455.GA25362@div0.qc.to>
+ <20110714092615.GA15476@elie>
+ <20110714100915.GA18946@div0.qc.to>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from hosting12.csv-networks.nl ([84.244.151.141]:36329 "EHLO
-	hosting12.csv-networks.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751694Ab1GZA0Y (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 25 Jul 2011 20:26:24 -0400
-Received: from 541f32bc.cm-5-8a.dynamic.ziggo.nl ([84.31.50.188] helo=[10.0.1.100])
-	by hosting12.csv-networks.nl with esmtpa (Exim 4.68)
-	(envelope-from <harald@gigawatt.nl>)
-	id 1QlVQW-0005C8-8R
-	for dash@vger.kernel.org; Tue, 26 Jul 2011 02:23:12 +0200
-In-Reply-To: <1311635376.10727.8.camel@linux>
+Received: from relay04.stack.nl ([131.155.140.107]:54642 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752907Ab1GaWTH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 31 Jul 2011 18:19:07 -0400
+Content-Disposition: inline
+In-Reply-To: <20110714100915.GA18946@div0.qc.to>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Rudolf Polzer <divverent@xonotic.org>
+Cc: Jonathan Nieder <jrnieder@gmail.com>, dash@vger.kernel.org
 
-On Tue, 2011-07-26 at 01:09 +0200, Harald van Dijk wrote:
-> dash rather pointlessly calls imaxdiv, only to discard one of its
-> results. The call was already made conditional a while back because some
-> systems don't have imaxdiv, but the generated code for the version with
-> imaxdiv and the one with / and % is identical (with GCC 4.6.1 or ICC
-> 12.0.2, with -O0, -O2 or -Os), so it could just as well go entirely to
-> clean up the code a little bit.
+On Thu, Jul 14, 2011 at 12:09:15PM +0200, Rudolf Polzer wrote:
+> I just retested with that very command, and yes, the FreeBSD /bin/sh
+> does behave the "non-POSIX" (and "obvious") way, and so does the
+> Solaris /bin/sh.
 
-As I should have expected from those results, I messed up on the
-comparisons. I still had an alternate definition of imaxdiv I was
-testing with. The size actually decreases with the patch.
+Yes, FreeBSD /bin/sh is not POSIX compliant here. Because the current
+behaviour is explicitly documented and much more useful than the POSIX
+behaviour, I don't really like changing it ;-)
 
+Different from bash in non-posix mode, FreeBSD /bin/sh does persist
+assignments before special builtins as required by POSIX.
+
+The original Bourne shell is different again, though. It ignores the
+assignments completely and does not even expand them (a
+y=${someunsetvar?} assignment is silently ignored).
+
+-- 
+Jilles Tjoelker
