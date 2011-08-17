@@ -1,50 +1,42 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
+From: Harald van Dijk <harald@gigawatt.nl>
 Subject: Re: [PATCH 1/2] [SHELL] Allow building without LINEO support.
-Date: Tue, 16 Aug 2011 21:07:44 -0500
-Message-ID: <20110817020743.GA29205@elie.gateway.2wire.net>
+Date: Wed, 17 Aug 2011 08:04:46 +0200
+Message-ID: <1313561086.28006.6.camel@linux>
 References: <20110816.174502.2209127983953431973.davem@davemloft.net>
- <20110817011235.GA22867@elie.gateway.2wire.net>
- <20110817013805.GA16333@gondor.apana.org.au>
+	 <20110817011235.GA22867@elie.gateway.2wire.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-yw0-f46.google.com ([209.85.213.46]:43275 "EHLO
-	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751771Ab1HQCHv (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 16 Aug 2011 22:07:51 -0400
-Received: by ywf7 with SMTP id 7so426235ywf.19
-        for <dash@vger.kernel.org>; Tue, 16 Aug 2011 19:07:51 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20110817013805.GA16333@gondor.apana.org.au>
+Received: from hosting12.csv-networks.nl ([84.244.151.141]:51612 "EHLO
+	hosting12.csv-networks.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750813Ab1HQGIE (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 17 Aug 2011 02:08:04 -0400
+Received: from 541f32bc.cm-5-8a.dynamic.ziggo.nl ([84.31.50.188] helo=[10.0.1.116])
+	by hosting12.csv-networks.nl with esmtpa (Exim 4.68)
+	(envelope-from <harald@gigawatt.nl>)
+	id 1QtZEf-0002RZ-21
+	for dash@vger.kernel.org; Wed, 17 Aug 2011 08:04:17 +0200
+In-Reply-To: <20110817011235.GA22867@elie.gateway.2wire.net>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David Miller <davem@davemloft.net>, dash@vger.kernel.org, dash@packages.debian.org
+To: dash@vger.kernel.org
 
-Herbert Xu wrote:
+On Tue, 2011-08-16 at 20:12 -0500, Jonathan Nieder wrote:
+> David Miller wrote:
+> 
+> > [Subject: [SHELL] Allow building without LINEO support.]
+> 
+> Thanks!  Debian has been using something like this (but unconditional)
+> to convince autoconf not to use dash as CONFIG_SHELL, to work around
+> bugs in various configure scripts[1].  I imagine other users might
+> want the same thing, so a patch like this seems like a good idea.
 
-> So this isn't the reason why Debian has been stuck on 0.5.5.1?
-> If so what is the reason please?
+If you don't mind me asking, if you want configure scripts to run from
+bash, why not simply run configure scripts from bash, instead of running
+them from sh and trusting that sh will call bash if it is really some
+other shell? Don't get me wrong, there are other reasons why making
+LINENO support optional is a good idea (smaller executable at the low
+cost of a rarely used feature), so don't take this as an argument
+against this patch, I'm just curious about this one point.
 
-Probably just Gerrit being busy and me getting distracted by how
-to handle the /bin/sh symlink.
-
-I'll propose a package for sid that just moves to the latest upstream
-version with no packaging changes later today.
-
->> Makes sense.  The following on top trims away some code in the
->> !WITH_LINENO case, though it's kind of ugly.  Maybe something like
->>
->> 	#ifndef WITH_LINENO
->> 	static void update_lineno(void) { }
->> 	#else
->> 	static void update_lineno(void)
-[...]
->> would make it more palatable.
->
-> Yes please do it like that.
-
-Will do this as well.
-
-Thanks,
-Jonathan
