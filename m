@@ -1,42 +1,39 @@
-From: maximilian attems <max@stro.at>
-Subject: Re: Kbuild dash headers generation
-Date: Fri, 5 Aug 2011 13:09:19 +0000
-Message-ID: <20110805130919.GV30099@vostochny.stro.at>
-References: <20110803092700.GG20986@stro.at>
- <20110804213214.GA13949@merkur.ravnborg.org>
+From: David Miller <davem@davemloft.net>
+Subject: [PATCH 2/2] [SHELL] Add top-level autogen.sh
+Date: Tue, 16 Aug 2011 17:45:22 -0700 (PDT)
+Message-ID: <20110816.174522.285622493440427234.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from vostochny.stro.at ([78.47.22.85]:34177 "EHLO vostochny.stro.at"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753374Ab1HENJV (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 5 Aug 2011 09:09:21 -0400
-Content-Disposition: inline
-In-Reply-To: <20110804213214.GA13949@merkur.ravnborg.org>
+Received: from shards.monkeyblade.net ([198.137.202.13]:53256 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751562Ab1HQAp0 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 16 Aug 2011 20:45:26 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org, klibc@zytor.com
+To: dash@vger.kernel.org
+Cc: herbert@gondor.hengli.com.au
 
-On Thu, Aug 04, 2011 at 11:32:14PM +0200, Sam Ravnborg wrote:
-> On Wed, Aug 03, 2011 at 11:27:00AM +0200, maximilian attems wrote:
-> > hello Sam,
-> > 
-> > tried to sync current git dash for klibc,
-> > but failed on this Kbuild step.
-> 
-> Took a quick look - but nothing really triggered.
-> Will take a closer look friday or saturday.
 
-thank you very much, you need latest klibc git,
-but guess you have that (:
- 
-> This mail is mainly to say that I have not sent the mail to /dev/null
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
+ autogen.sh |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
+ create mode 100755 autogen.sh
 
-No need to rush this.
-Just happy when this stumbling block is out of the way. The dash git
-gives us the bonus back of building all klibc repo with defined DEBUG
-plus calm gcc-4.6 compilation.
-
+diff --git a/autogen.sh b/autogen.sh
+new file mode 100755
+index 0000000..9879c53
+--- /dev/null
++++ b/autogen.sh
+@@ -0,0 +1,6 @@
++#!/bin/sh
++
++aclocal \
++&& autoheader \
++&& automake --add-missing \
++&& autoconf
 -- 
-maks
+1.7.6.401.g6a319
+
