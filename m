@@ -1,34 +1,36 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: [PATCH 2/2] [SHELL] Add top-level autogen.sh
-Date: Tue, 16 Aug 2011 20:15:06 -0500
-Message-ID: <20110817011506.GB22867@elie.gateway.2wire.net>
-References: <20110816.174522.285622493440427234.davem@davemloft.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] Avoid imaxdiv when only one of the results is wanted
+Date: Wed, 17 Aug 2011 09:27:52 +0800
+Message-ID: <20110817012752.GA16223@gondor.apana.org.au>
+References: <1311635376.10727.8.camel@linux>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-yi0-f46.google.com ([209.85.218.46]:62016 "EHLO
-	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751771Ab1HQBPK (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 16 Aug 2011 21:15:10 -0400
-Received: by yie30 with SMTP id 30so403255yie.19
-        for <dash@vger.kernel.org>; Tue, 16 Aug 2011 18:15:10 -0700 (PDT)
+Received: from helcar.apana.org.au ([209.40.204.226]:40788 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751862Ab1HQB15 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 16 Aug 2011 21:27:57 -0400
 Content-Disposition: inline
-In-Reply-To: <20110816.174522.285622493440427234.davem@davemloft.net>
+In-Reply-To: <1311635376.10727.8.camel@linux>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: David Miller <davem@davemloft.net>
-Cc: dash@vger.kernel.org, herbert@gondor.hengli.com.au
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: dash@vger.kernel.org
 
-David Miller wrote:
+On Mon, Jul 25, 2011 at 11:09:36PM +0000, Harald van Dijk wrote:
+> dash rather pointlessly calls imaxdiv, only to discard one of its
+> results. The call was already made conditional a while back because some
+> systems don't have imaxdiv, but the generated code for the version with
+> imaxdiv and the one with / and % is identical (with GCC 4.6.1 or ICC
+> 12.0.2, with -O0, -O2 or -Os), so it could just as well go entirely to
+> clean up the code a little bit.
+> 
+> Signed-off-by: Harald van Dijk <harald@gigawatt.nl>
 
-> --- /dev/null
-> +++ b/autogen.sh
-> @@ -0,0 +1,6 @@
-> +#!/bin/sh
-> +
-> +aclocal \
-> +&& autoheader \
-> +&& automake --add-missing \
-> +&& autoconf
+Nice work, patch applied.
 
-Doesn't "autoreconf -fis" work?
+Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
