@@ -1,42 +1,54 @@
-From: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 1/2] [SHELL] Allow building without LINEO support.
-Date: Wed, 17 Aug 2011 06:35:48 -0600
-Message-ID: <4E4BB5A4.10702@redhat.com>
-References: <20110816.174502.2209127983953431973.davem@davemloft.net>	 <20110817011235.GA22867@elie.gateway.2wire.net> <1313561086.28006.6.camel@linux>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Paul Gilmartin <PaulGBoulder@aim.com>
+Subject: set -o vi
+Date: Sun, 21 Aug 2011 10:01:24 -0600
+Message-ID: <9AD96B5F-3C88-4E01-9582-B75184164026@aim.com>
+Mime-Version: 1.0 (Apple Message framework v1084)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40976 "EHLO mx1.redhat.com"
+Received: from hera.kernel.org ([140.211.167.34]:58758 "EHLO hera.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752630Ab1HQMgZ (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 17 Aug 2011 08:36:25 -0400
-In-Reply-To: <1313561086.28006.6.camel@linux>
+	id S1753647Ab1HUQBi convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sun, 21 Aug 2011 12:01:38 -0400
+Received: from imr-da03.mx.aol.com (imr-da03.mx.aol.com [205.188.105.145])
+	by hera.kernel.org (8.14.4/8.14.3) with ESMTP id p7LG1a1I026880
+	for <dash@vger.kernel.org>; Sun, 21 Aug 2011 16:01:37 GMT
+Received: from mtaout-ma01.r1000.mx.aol.com (mtaout-ma01.r1000.mx.aol.com [172.29.41.1])
+	by imr-da03.mx.aol.com (8.14.1/8.14.1) with ESMTP id p7LG1XtL011748
+	for <dash@vger.kernel.org>; Sun, 21 Aug 2011 12:01:33 -0400
+Received: from [192.168.0.3] (75-166-241-37.hlrn.qwest.net [75.166.241.37])
+	(using TLSv1 with cipher AES128-SHA (128/128 bits))
+	(No client certificate requested)
+	by mtaout-ma01.r1000.mx.aol.com (MUA/Third Party Client Interface) with ESMTPSA id D5A97E0001A0
+	for <dash@vger.kernel.org>; Sun, 21 Aug 2011 12:01:30 -0400 (EDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On 08/17/2011 12:04 AM, Harald van Dijk wrote:
-> On Tue, 2011-08-16 at 20:12 -0500, Jonathan Nieder wrote:
->> David Miller wrote:
->>
->>> [Subject: [SHELL] Allow building without LINEO support.]
->>
->> Thanks!  Debian has been using something like this (but unconditional)
->> to convince autoconf not to use dash as CONFIG_SHELL, to work around
->> bugs in various configure scripts[1].  I imagine other users might
->> want the same thing, so a patch like this seems like a good idea.
->
-> If you don't mind me asking, if you want configure scripts to run from
-> bash, why not simply run configure scripts from bash, instead of running
-> them from sh and trusting that sh will call bash if it is really some
-> other shell?
+(Damn! I clicked the wrong link in the confirmation notice.
+Apologies.)
 
-And remember, most configure scripts already support that:
+For some time now, on both Ubuntu and Cygwin, "set -o vi"
+is ineffective.
 
-CONFIG_SHELL=path/to/bash path/to/bash ./configure
+The command is accepted and a query indicates it's in effect:
 
--- 
-Eric Blake   eblake@redhat.com    +1-801-349-2682
-Libvirt virtualization library http://libvirt.org
+\! $ uname -a
+Linux Linux-Mac 2.6.38-11-generic #48-Ubuntu SMP Fri Jul 29 19:05:14 UTC 2011 i686 i686 i386 GNU/Linux
+\! $ set -o vi
+\! $ set -o
+Current option settings
+    ...
+vi              on
+emacs           off
+    ...
+
+But when I press ESC to enter command history, it simply
+echoes the ESC as "^[" and calls the next command illegal:
+
+\! $ ^[
+dash:  not found
+
+Thanks,
+gil
+
