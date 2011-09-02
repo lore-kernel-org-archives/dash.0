@@ -1,80 +1,204 @@
-From: Petr Sabata <contyk@redhat.com>
-Subject: Re: set -o vi
-Date: Mon, 22 Aug 2011 10:45:22 +0200
-Message-ID: <20110822084522.GB31885@rincewind.brq.redhat.com>
-References: <9AD96B5F-3C88-4E01-9582-B75184164026@aim.com>
+From: nothink <nothink@shellmix.com>
+Subject: build static with libedit
+Date: Sat, 03 Sep 2011 03:30:25 +0600
+Message-ID: <4E614AF1.7080802@shellmix.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+g7M9IMkV8truYOl"
+Content-Type: multipart/mixed;
+ boundary="------------020708090406070707050803"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:18149 "EHLO mx1.redhat.com"
+Received: from shellmix.com ([213.155.190.130]:47148 "EHLO shellmix.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752722Ab1HVIp7 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 22 Aug 2011 04:45:59 -0400
-Received: from int-mx02.intmail.prod.int.phx2.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-	by mx1.redhat.com (8.14.4/8.14.4) with ESMTP id p7M8jwab007972
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
-	for <dash@vger.kernel.org>; Mon, 22 Aug 2011 04:45:58 -0400
-Received: from rincewind.brq.redhat.com (dhcp-25-238.brq.redhat.com [10.34.25.238])
-	by int-mx02.intmail.prod.int.phx2.redhat.com (8.13.8/8.13.8) with ESMTP id p7M8jwtO032018
-	for <dash@vger.kernel.org>; Mon, 22 Aug 2011 04:45:58 -0400
-Content-Disposition: inline
-In-Reply-To: <9AD96B5F-3C88-4E01-9582-B75184164026@aim.com>
+	id S1756076Ab1IBVmU (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 2 Sep 2011 17:42:20 -0400
+Received: from shellmix.com (localhost [127.0.0.1])
+	by shellmix.com (SPaj) with ESMTP id E528A17444
+	for <dash@vger.kernel.org>; Fri,  2 Sep 2011 23:27:45 +0000 (UTC)
+Received: from [10.64.234.51] (unknown [213.87.128.117])
+	(using TLSv1 with cipher DHE-RSA-CAMELLIA256-SHA (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: nothink)
+	by shellmix.com (SPaj) with ESMTPSA id 7F22B17208
+	for <dash@vger.kernel.org>; Fri,  2 Sep 2011 23:27:42 +0000 (UTC)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
+This is a multi-part message in MIME format.
+--------------020708090406070707050803
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
---+g7M9IMkV8truYOl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Good time!
+First of all, thank to everyone who develops dash.
+Maybe I'm wrong, but I can't build 0.5.7-, git-version of dash with 
+option: --enable-static --with-libedit.
 
-On Sun, Aug 21, 2011 at 10:01:24AM -0600, Paul Gilmartin wrote:
-> (Damn! I clicked the wrong link in the confirmation notice.
-> Apologies.)
->=20
-> For some time now, on both Ubuntu and Cygwin, "set -o vi"
-> is ineffective.
->=20
-> The command is accepted and a query indicates it's in effect:
->=20
-> \! $ uname -a
-> Linux Linux-Mac 2.6.38-11-generic #48-Ubuntu SMP Fri Jul 29 19:05:14 UTC =
-2011 i686 i686 i386 GNU/Linux
-> \! $ set -o vi
-> \! $ set -o
-> Current option settings
->     ...
-> vi              on
-> emacs           off
->     ...
->=20
-> But when I press ESC to enter command history, it simply
-> echoes the ESC as "^[" and calls the next command illegal:
->=20
-> \! $ ^[
-> dash:  not found
->=20
-> Thanks,
-> gil
+gcc -Wall -g -O2  -static -Wl,--fatal-warnings -o dash alias.o arith_yacc.o arith_yylex.o cd.o error.o eval.o exec.o expand.o histedit.o input.o jobs.o mail.o main.o memalloc.o miscbltin.o mystring.o options.o parser.o redir.o show.o trap.o output.o printf.o system.o test.o times.o var.o builtins.o init.o nodes.o signames.o syntax.o -ledit
+/usr/lib/libedit.a(terminal.o): In function `terminal_tputs':
+/tmp/build/libedit-20110802-3.0/src/terminal.c:1223: undefined reference to `tputs'
+/usr/lib/libedit.a(terminal.o): In function `terminal_deletechars':
+/tmp/build/libedit-20110802-3.0/src/terminal.c:714: undefined reference to `tgoto'
+/usr/lib/libedit.a(terminal.o): In function `terminal_set':
+/tmp/build/libedit-20110802-3.0/src/terminal.c:881: undefined reference to `tgetent'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:899: undefined reference to `tgetflag'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:900: undefined reference to `tgetflag'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:902: undefined reference to `tgetflag'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:903: undefined reference to `tgetflag'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:905: undefined reference to `tgetflag'
+/usr/lib/libedit.a(terminal.o):/tmp/build/libedit-20110802-3.0/src/terminal.c:906: more undefined references to `tgetflag' follow
+/usr/lib/libedit.a(terminal.o): In function `terminal_set':
+/tmp/build/libedit-20110802-3.0/src/terminal.c:908: undefined reference to `tgetnum'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:909: undefined reference to `tgetnum'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:912: undefined reference to `tgetstr'
+/usr/lib/libedit.a(terminal.o): In function `terminal_insertwrite':
+/tmp/build/libedit-20110802-3.0/src/terminal.c:755: undefined reference to `tgoto'
+/usr/lib/libedit.a(terminal.o): In function `terminal_move_to_char':
+/tmp/build/libedit-20110802-3.0/src/terminal.c:613: undefined reference to `tgoto'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:570: undefined reference to `tgoto'
+/usr/lib/libedit.a(terminal.o): In function `terminal_move_to_line':
+/tmp/build/libedit-20110802-3.0/src/terminal.c:517: undefined reference to `tgoto'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:530: undefined reference to `tgoto'
+/usr/lib/libedit.a(terminal.o): In function `terminal_echotc':
+/tmp/build/libedit-20110802-3.0/src/terminal.c:1522: undefined reference to `tgetstr'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:1658: undefined reference to `tgoto'
+/tmp/build/libedit-20110802-3.0/src/terminal.c:1602: undefined reference to `tgoto'
+collect2: ld returned 1 exit status
 
-I think this requires dash to be built with libedit support to work.
-Check your packages.
+Obviously, need dependency lib - curses.
+Somehow, builds system dash not use her.
 
-Regards,
---=20
-# Petr Sabata
+diff -cr dash_np/configure.ac dash_mp/configure.ac
+*** dash_np/configure.ac	Sat Sep  3 01:06:25 2011
+--- dash_mp/configure.ac	Sat Sep  3 01:45:59 2011
+***************
+*** 129,135 ****
+   if test "$use_libedit" != "yes"; then
+   	AC_DEFINE([SMALL], 1, [Define if you build with -DSMALL])
+   else
+! 	export LIBS="$LIBS -ledit"
+   fi
+   AC_ARG_ENABLE(lineno, AS_HELP_STRING(--disable-lineno, \
+   				     [Disable LINENO support]))
+--- 129,139 ----
+   if test "$use_libedit" != "yes"; then
+   	AC_DEFINE([SMALL], 1, [Define if you build with -DSMALL])
+   else
+! 	if test "$enable_static" = "yes"; then
+! 		PKG_CHECK_MODULES([LIBEDIT], [libedit>= 0])
+! 	else
+! 		export LIBS="$LIBS -ledit"
+! 	fi
+   fi
+   AC_ARG_ENABLE(lineno, AS_HELP_STRING(--disable-lineno, \
+   				     [Disable LINENO support]))
+diff -cr dash_np/src/Makefile.am dash_mp/src/Makefile.am
+*** dash_np/src/Makefile.am	Sat Sep  3 01:06:25 2011
+--- dash_mp/src/Makefile.am	Sat Sep  3 01:47:39 2011
+***************
+*** 6,12 ****
+   	-DBSD=1 -DSHELL \
+   	-DIFS_BROKEN
 
---+g7M9IMkV8truYOl
-Content-Type: application/pgp-signature
+! AM_CFLAGS = $(COMMON_CFLAGS)
+   AM_CPPFLAGS = $(COMMON_CPPFLAGS)
+   AM_CFLAGS_FOR_BUILD = -g -O2 $(COMMON_CFLAGS)
+   AM_CPPFLAGS_FOR_BUILD = $(COMMON_CPPFLAGS)
+--- 6,12 ----
+   	-DBSD=1 -DSHELL \
+   	-DIFS_BROKEN
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
+! AM_CFLAGS = $(COMMON_CFLAGS) $(LIBEDIT_CFLAGS)
+   AM_CPPFLAGS = $(COMMON_CPPFLAGS)
+   AM_CFLAGS_FOR_BUILD = -g -O2 $(COMMON_CFLAGS)
+   AM_CPPFLAGS_FOR_BUILD = $(COMMON_CPPFLAGS)
+***************
+*** 30,36 ****
+   	init.h input.h jobs.h machdep.h mail.h main.h memalloc.h miscbltin.h \
+   	myhistedit.h mystring.h options.h output.h parser.h redir.h shell.h \
+   	show.h system.h trap.h var.h
+! dash_LDADD = builtins.o init.o nodes.o signames.o syntax.o
 
-iF4EAREIAAYFAk5SFyIACgkQT+hZYwG3Kb4nRQD9HUOJncf8skqJ9V5gcjNPkhrM
-QEiJe7DaJzPOH+siPOcA/RQXq54PUmIXIUaqSYtMMpZPTsdh5H038NJn9AQrvEHs
-=rdSo
------END PGP SIGNATURE-----
+   HELPERS = mkinit mksyntax mknodes mksignames
 
---+g7M9IMkV8truYOl--
+--- 30,36 ----
+   	init.h input.h jobs.h machdep.h mail.h main.h memalloc.h miscbltin.h \
+   	myhistedit.h mystring.h options.h output.h parser.h redir.h shell.h \
+   	show.h system.h trap.h var.h
+! dash_LDADD = builtins.o init.o nodes.o signames.o syntax.o $(LIBEDIT_LIBS)
+
+   HELPERS = mkinit mksyntax mknodes mksignames
+
+
+Thank for attention!
+Good luck!
+
+--------------020708090406070707050803
+Content-Type: text/plain;
+ name="dash_static_with_libedit.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="dash_static_with_libedit.patch"
+
+diff -cr dash_np/configure.ac dash_mp/configure.ac
+*** dash_np/configure.ac	Sat Sep  3 01:06:25 2011
+--- dash_mp/configure.ac	Sat Sep  3 01:45:59 2011
+***************
+*** 129,135 ****
+  if test "$use_libedit" != "yes"; then
+  	AC_DEFINE([SMALL], 1, [Define if you build with -DSMALL])
+  else
+! 	export LIBS="$LIBS -ledit"
+  fi
+  AC_ARG_ENABLE(lineno, AS_HELP_STRING(--disable-lineno, \
+  				     [Disable LINENO support]))
+--- 129,139 ----
+  if test "$use_libedit" != "yes"; then
+  	AC_DEFINE([SMALL], 1, [Define if you build with -DSMALL])
+  else
+! 	if test "$enable_static" = "yes"; then
+! 		PKG_CHECK_MODULES([LIBEDIT], [libedit >= 0])
+! 	else
+! 		export LIBS="$LIBS -ledit"
+! 	fi
+  fi
+  AC_ARG_ENABLE(lineno, AS_HELP_STRING(--disable-lineno, \
+  				     [Disable LINENO support]))
+diff -cr dash_np/src/Makefile.am dash_mp/src/Makefile.am
+*** dash_np/src/Makefile.am	Sat Sep  3 01:06:25 2011
+--- dash_mp/src/Makefile.am	Sat Sep  3 01:47:39 2011
+***************
+*** 6,12 ****
+  	-DBSD=1 -DSHELL \
+  	-DIFS_BROKEN
+  
+! AM_CFLAGS = $(COMMON_CFLAGS)
+  AM_CPPFLAGS = $(COMMON_CPPFLAGS)
+  AM_CFLAGS_FOR_BUILD = -g -O2 $(COMMON_CFLAGS) 
+  AM_CPPFLAGS_FOR_BUILD = $(COMMON_CPPFLAGS)
+--- 6,12 ----
+  	-DBSD=1 -DSHELL \
+  	-DIFS_BROKEN
+  
+! AM_CFLAGS = $(COMMON_CFLAGS) $(LIBEDIT_CFLAGS)
+  AM_CPPFLAGS = $(COMMON_CPPFLAGS)
+  AM_CFLAGS_FOR_BUILD = -g -O2 $(COMMON_CFLAGS) 
+  AM_CPPFLAGS_FOR_BUILD = $(COMMON_CPPFLAGS)
+***************
+*** 30,36 ****
+  	init.h input.h jobs.h machdep.h mail.h main.h memalloc.h miscbltin.h \
+  	myhistedit.h mystring.h options.h output.h parser.h redir.h shell.h \
+  	show.h system.h trap.h var.h
+! dash_LDADD = builtins.o init.o nodes.o signames.o syntax.o
+  
+  HELPERS = mkinit mksyntax mknodes mksignames
+  
+--- 30,36 ----
+  	init.h input.h jobs.h machdep.h mail.h main.h memalloc.h miscbltin.h \
+  	myhistedit.h mystring.h options.h output.h parser.h redir.h shell.h \
+  	show.h system.h trap.h var.h
+! dash_LDADD = builtins.o init.o nodes.o signames.o syntax.o $(LIBEDIT_LIBS)
+  
+  HELPERS = mkinit mksyntax mknodes mksignames
+  
+
+--------------020708090406070707050803--
