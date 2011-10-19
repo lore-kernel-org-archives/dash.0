@@ -1,54 +1,31 @@
-From: Jilles Tjoelker <jilles@stack.nl>
+From: Dima Sorkin <dima@minignu.minidns.net>
 Subject: Re: evaluation of env variables in DASH
-Date: Wed, 19 Oct 2011 23:58:44 +0200
-Message-ID: <20111019215844.GA6049@stack.nl>
-References: <87aa8woesd.fsf@minignu.minidns.net>
+Date: Thu, 20 Oct 2011 00:13:08 +0200
+Message-ID: <87sjmoaavf.fsf@minignu.minidns.net>
+References: <20111019215844.GA6049@stack.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; CHARSET=US-ASCII
+Content-Transfer-Encoding: 7BIT
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay02.stack.nl ([131.155.140.104]:53741 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754339Ab1JSWFg (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 19 Oct 2011 18:05:36 -0400
-Content-Disposition: inline
-In-Reply-To: <87aa8woesd.fsf@minignu.minidns.net>
+Received: from mxout1.netvision.net.il ([194.90.9.20]:38036 "EHLO
+	mxout1.netvision.net.il" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754676Ab1JSWNL (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 19 Oct 2011 18:13:11 -0400
+Received: from minignu.minidns.net ([46.117.200.72]) by mxout1.netvision.net.il
+ (Sun Java(tm) System Messaging Server 7u3-15.01 64bit (built Feb 12 2010))
+ with ESMTPA id <0LTC004EJ31WO510@mxout1.netvision.net.il> for
+ dash@vger.kernel.org; Thu, 20 Oct 2011 00:13:09 +0200 (IST)
+In-reply-to: <20111019215844.GA6049@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Dima Sorkin <dima@minignu.minidns.net>
-Cc: dash@vger.kernel.org, herbert@gondor.apana.org.au
+To: dash@vger.kernel.org
+Cc: herbert@gondor.apana.org.au
 
-On Wed, Oct 19, 2011 at 11:24:50PM +0200, Dima Sorkin wrote:
->   The following DASH behaviour seems buggy to me
 
-> -----------------
-> $ export A='\n'
-> $ echo $A
-> 
-> $
-> -----------------
+> ... The echo builtin in dash ...
 
-> whereas using BASH would result in printing literally \n .
+What confused me is that I thought that /bin/echo is used, and wrong
+argument is passed to it. I was not aware it is a builtin.
 
-> I.e. presumingly DASH does secondary interpolation of escaped
-> symols in values of environment variables. 
-
-The echo builtin in dash differs from most other echo utilities on Linux
-and *BSD in interpreting System V-like backslash escape sequences. This
-is the "expansion" you are seeing and the same thing can be seen in
-  echo '\n'
-It is documented in dash's manual page.
-
-This also happens in bash if you 'shopt -s xpg_echo'.
-
-This behaviour is permitted by POSIX and required for the XSI option,
-and is more commonly seen on Solaris or other System V derivatives.
-
-The fix is to use printf(1) instead of echo(1) if there is a possibility
-the string may start with '-' or contain '\'. In this case,
-  printf '%s\n' "$A"
-
-This has been asked/reported more frequently and the answer has been
-that it will not be changed.
-
--- 
-Jilles Tjoelker
+Thanks for replies, regards,
+  Dima.
