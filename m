@@ -1,36 +1,54 @@
-From: Eric Blake <eblake@redhat.com>
+From: Jilles Tjoelker <jilles@stack.nl>
 Subject: Re: evaluation of env variables in DASH
-Date: Wed, 19 Oct 2011 15:42:51 -0600
-Message-ID: <4E9F445B.2090609@redhat.com>
+Date: Wed, 19 Oct 2011 23:58:44 +0200
+Message-ID: <20111019215844.GA6049@stack.nl>
 References: <87aa8woesd.fsf@minignu.minidns.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:1025 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754607Ab1JSVm7 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 19 Oct 2011 17:42:59 -0400
+Received: from relay02.stack.nl ([131.155.140.104]:53741 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1754339Ab1JSWFg (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 19 Oct 2011 18:05:36 -0400
+Content-Disposition: inline
 In-Reply-To: <87aa8woesd.fsf@minignu.minidns.net>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Dima Sorkin <dima@minignu.minidns.net>
-Cc: dash@vger.kernel.org, herbert@gondor.hengli.com.au
+Cc: dash@vger.kernel.org, herbert@gondor.apana.org.au
 
-On 10/19/2011 03:24 PM, Dima Sorkin wrote:
-> Hi.
->    The following DASH behaviour seems buggy to me
+On Wed, Oct 19, 2011 at 11:24:50PM +0200, Dima Sorkin wrote:
+>   The following DASH behaviour seems buggy to me
 
-The only bug here is your expectations.
-
->
 > -----------------
 > $ export A='\n'
 > $ echo $A
->
+> 
+> $
+> -----------------
 
-Passing a literal backslash to echo is non-portable.  POSIX even says 
-so.  And bash can match dash behavior:
+> whereas using BASH would result in printing literally \n .
 
-$ (shopt -s xpg_echo; A='\n'; echo -$A-)
--
+> I.e. presumingly DASH does secondary interpolation of escaped
+> symols in values of environment variables. 
+
+The echo builtin in dash differs from most other echo utilities on Linux
+and *BSD in interpreting System V-like backslash escape sequences. This
+is the "expansion" you are seeing and the same thing can be seen in
+  echo '\n'
+It is documented in dash's manual page.
+
+This also happens in bash if you 'shopt -s xpg_echo'.
+
+This behaviour is permitted by POSIX and required for the XSI option,
+and is more commonly seen on Solaris or other System V derivatives.
+
+The fix is to use printf(1) instead of echo(1) if there is a possibility
+the string may start with '-' or contain '\'. In this case,
+  printf '%s\n' "$A"
+
+This has been asked/reported more frequently and the answer has been
+that it will not be changed.
+
+-- 
+Jilles Tjoelker
