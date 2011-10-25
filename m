@@ -1,31 +1,74 @@
-From: Dima Sorkin <dima@minignu.minidns.net>
-Subject: Re: evaluation of env variables in DASH
-Date: Thu, 20 Oct 2011 00:13:08 +0200
-Message-ID: <87sjmoaavf.fsf@minignu.minidns.net>
-References: <20111019215844.GA6049@stack.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; CHARSET=US-ASCII
-Content-Transfer-Encoding: 7BIT
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: [PATCH] echo: fix octal escaping with \1...\7
+Date: Tue, 25 Oct 2011 17:58:04 -0400
+Message-ID: <1319579884-423-1-git-send-email-vapier@gentoo.org>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mxout1.netvision.net.il ([194.90.9.20]:38036 "EHLO
-	mxout1.netvision.net.il" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754676Ab1JSWNL (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 19 Oct 2011 18:13:11 -0400
-Received: from minignu.minidns.net ([46.117.200.72]) by mxout1.netvision.net.il
- (Sun Java(tm) System Messaging Server 7u3-15.01 64bit (built Feb 12 2010))
- with ESMTPA id <0LTC004EJ31WO510@mxout1.netvision.net.il> for
- dash@vger.kernel.org; Thu, 20 Oct 2011 00:13:09 +0200 (IST)
-In-reply-to: <20111019215844.GA6049@stack.nl>
+Received: from smtp.gentoo.org ([140.211.166.183]:54286 "EHLO smtp.gentoo.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752034Ab1JYV6i (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 25 Oct 2011 17:58:38 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-Cc: herbert@gondor.apana.org.au
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 
+POSIX states that octal escape sequences should take the form \0num
+when using echo.  dash however additionally treats \num as an octal
+sequence.  This breaks some packages (like libtool) who attempt to
+use strings with these escape sequences via variables to execute sed
+(since sed ends up getting passed a byte instead of a literal \1).
 
-> ... The echo builtin in dash ...
+The code that consumes this sequence includes a comment that indicates
+it doesn't actually mean to do this.  So simplify the code a bit by
+ignoring these sequences that lack a leading 0 and falling through to
+the existing escape parsing logic.
 
-What confused me is that I thought that /bin/echo is used, and wrong
-argument is passed to it. I was not aware it is a builtin.
+before:
+	$ echo '\1' | hexdump -C
+	00000000  01 0a                 |..|
+after:
+	$ echo '\1' | hexdump -C
+	00000000  5c 31 0a              |\1.|
+(existing \01 sequence still works the same)
 
-Thanks for replies, regards,
-  Dima.
+This also slightly shrinks the resulting compiled code :).
+
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+---
+Note: I assume this still applies to the latest git.  The last
+	checkout I have is from Sep 2010 though, and kernel.org does
+	not yet have the dash tree back on it.
+
+ src/bltin/printf.c |   16 ++++------------
+ 1 files changed, 4 insertions(+), 12 deletions(-)
+
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index b0c3774..1d373f9 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -247,18 +247,10 @@ conv_escape_str(char *str)
+ 		 * They start with a \0, and are followed by 0, 1, 2, 
+ 		 * or 3 octal digits. 
+ 		 */
+-		if (ch == '0') {
+-			unsigned char i;
+-			i = 3;
+-			ch = 0;
+-			do {
+-				unsigned k = octtobin(*str);
+-				if (k > 7)
+-					break;
+-				str++;
+-				ch <<= 3;
+-				ch += k;
+-			} while (--i);
++		if (ch >= '1' && ch <= '9') {
++			/* Filter \1...\9; let \0 fall to conv_escape(). */
++			ch = '\\';
++			--str;
+ 			continue;
+ 		}
+ 
+-- 
+1.7.6.1
+
