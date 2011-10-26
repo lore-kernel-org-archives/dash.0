@@ -1,74 +1,47 @@
-From: Mike Frysinger <vapier@gentoo.org>
-Subject: [PATCH] echo: fix octal escaping with \1...\7
-Date: Tue, 25 Oct 2011 17:58:04 -0400
-Message-ID: <1319579884-423-1-git-send-email-vapier@gentoo.org>
+From: Stephane CHAZELAS <stephane_chazelas@yahoo.fr>
+Subject: Re: [PATCH] echo: fix octal escaping with \1...\7
+Date: Wed, 26 Oct 2011 07:59:06 +0000 (UTC)
+Message-ID: <slrnjaffea.cpd.stephane.chazelas@spam.is.invalid>
+References: <1319579884-423-1-git-send-email-vapier@gentoo.org>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:54286 "EHLO smtp.gentoo.org"
+Received: from lo.gmane.org ([80.91.229.12]:44070 "EHLO lo.gmane.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752034Ab1JYV6i (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 25 Oct 2011 17:58:38 -0400
+	id S1754827Ab1JZIFM (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 26 Oct 2011 04:05:12 -0400
+Received: from list by lo.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1RIyU0-0003JL-To
+	for dash@vger.kernel.org; Wed, 26 Oct 2011 10:05:08 +0200
+Received: from 188-223-3-27.zone14.bethere.co.uk ([188.223.3.27])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Wed, 26 Oct 2011 10:05:08 +0200
+Received: from stephane_chazelas by 188-223-3-27.zone14.bethere.co.uk with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Wed, 26 Oct 2011 10:05:08 +0200
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
 
-POSIX states that octal escape sequences should take the form \0num
-when using echo.  dash however additionally treats \num as an octal
-sequence.  This breaks some packages (like libtool) who attempt to
-use strings with these escape sequences via variables to execute sed
-(since sed ends up getting passed a byte instead of a literal \1).
+2011-10-25, 17:58(-04), Mike Frysinger:
+> POSIX states that octal escape sequences should take the form \0num
+> when using echo.
 
-The code that consumes this sequence includes a comment that indicates
-it doesn't actually mean to do this.  So simplify the code a bit by
-ignoring these sequences that lack a leading 0 and falling through to
-the existing escape parsing logic.
+Only with the XSI option (Unix), for POSIX, echo "\whatever" is
+unspecified. But as far as I can tell even with XSI, "echo
+'\123'" is unspecified as well, so dash is free to do what it
+likes here.
 
-before:
-	$ echo '\1' | hexdump -C
-	00000000  01 0a                 |..|
-after:
-	$ echo '\1' | hexdump -C
-	00000000  5c 31 0a              |\1.|
-(existing \01 sequence still works the same)
+> dash however additionally treats \num as an octal
+> sequence.  This breaks some packages (like libtool) who attempt to
+> use strings with these escape sequences via variables to execute sed
+> (since sed ends up getting passed a byte instead of a literal \1).
 
-This also slightly shrinks the resulting compiled code :).
+Given that the result of  
 
-Signed-off-by: Mike Frysinger <vapier@gentoo.org>
----
-Note: I assume this still applies to the latest git.  The last
-	checkout I have is from Sep 2010 though, and kernel.org does
-	not yet have the dash tree back on it.
+echo "\123" is unspecified, those scripts would not be POSIX and
+they are those to be fixed.
 
- src/bltin/printf.c |   16 ++++------------
- 1 files changed, 4 insertions(+), 12 deletions(-)
-
-diff --git a/src/bltin/printf.c b/src/bltin/printf.c
-index b0c3774..1d373f9 100644
---- a/src/bltin/printf.c
-+++ b/src/bltin/printf.c
-@@ -247,18 +247,10 @@ conv_escape_str(char *str)
- 		 * They start with a \0, and are followed by 0, 1, 2, 
- 		 * or 3 octal digits. 
- 		 */
--		if (ch == '0') {
--			unsigned char i;
--			i = 3;
--			ch = 0;
--			do {
--				unsigned k = octtobin(*str);
--				if (k > 7)
--					break;
--				str++;
--				ch <<= 3;
--				ch += k;
--			} while (--i);
-+		if (ch >= '1' && ch <= '9') {
-+			/* Filter \1...\9; let \0 fall to conv_escape(). */
-+			ch = '\\';
-+			--str;
- 			continue;
- 		}
- 
 -- 
-1.7.6.1
+Stephane
 
