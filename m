@@ -1,50 +1,73 @@
-From: Stephane CHAZELAS <stephane_chazelas@yahoo.fr>
+From: Eric Blake <eblake@redhat.com>
 Subject: Re: Dashhh
-Date: Thu, 17 Nov 2011 20:11:59 +0000 (UTC)
-Message-ID: <slrnjcaqkf.lrr.stephane.chazelas@spam.is.invalid>
-References: <4EC53397.2030005@am-anger-1.de>
+Date: Thu, 17 Nov 2011 13:38:11 -0700
+Message-ID: <4EC570B3.7040408@redhat.com>
+References: <4EC53397.2030005@am-anger-1.de> <slrnjcaqkf.lrr.stephane.chazelas@spam.is.invalid>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------enig724E4F349CA83BC2E97750FF"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from lo.gmane.org ([80.91.229.12]:38813 "EHLO lo.gmane.org"
+Received: from mx1.redhat.com ([209.132.183.28]:1026 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754162Ab1KQUMN (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 17 Nov 2011 15:12:13 -0500
-Received: from list by lo.gmane.org with local (Exim 4.69)
-	(envelope-from <gcsd-dash@m.gmane.org>)
-	id 1RR8Jg-0006r0-FJ
-	for dash@vger.kernel.org; Thu, 17 Nov 2011 21:12:12 +0100
-Received: from 188-223-3-27.zone14.bethere.co.uk ([188.223.3.27])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Thu, 17 Nov 2011 21:12:12 +0100
-Received: from stephane_chazelas by 188-223-3-27.zone14.bethere.co.uk with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Thu, 17 Nov 2011 21:12:12 +0100
+	id S1754225Ab1KQUiM (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 17 Nov 2011 15:38:12 -0500
+Received: from int-mx01.intmail.prod.int.phx2.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+	by mx1.redhat.com (8.14.4/8.14.4) with ESMTP id pAHKcCAJ019521
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
+	for <dash@vger.kernel.org>; Thu, 17 Nov 2011 15:38:12 -0500
+Received: from [10.3.113.130] (ovpn-113-130.phx2.redhat.com [10.3.113.130])
+	by int-mx01.intmail.prod.int.phx2.redhat.com (8.13.8/8.13.8) with ESMTP id pAHKcBYJ018675
+	for <dash@vger.kernel.org>; Thu, 17 Nov 2011 15:38:11 -0500
+In-Reply-To: <slrnjcaqkf.lrr.stephane.chazelas@spam.is.invalid>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-2011-11-17, 17:17(+01), Heiko Gerstung:
-[...]
-> 1. The usual "[[" and "==" stuff (pretty easy to change, thank you sed)
-> 2. shift returns with a critical error when no arguments are left (no really good solution found)
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig724E4F349CA83BC2E97750FF
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-[ "$#" -eq 0 ] || shift
+On 11/17/2011 01:11 PM, Stephane CHAZELAS wrote:
+>> 4. The bash FUNCNAME variable was very valuable for debugging purposes=
+ and is nonexistent in dash
+>=20
+>=20
+> If your functions are written as
+>=20
+> f() {
+>   ...
+> }
+>=20
+> sed 's/^[[:blank:]]*\([^[:blank:]]*\)[[:blank:]]*()[[:blank:]]*{/& loca=
+l FUNCNAME=3D\1;/'
 
-> 3. $[] arithmetic stuff not working (OK, worked around that with bc)
+Except that 'local' is not part of POSIX, so while this conversion may
+work for dash, it's not a portable catch-all for other compliant shells.
 
-$((...))
+--=20
+Eric Blake   eblake@redhat.com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-> 4. The bash FUNCNAME variable was very valuable for debugging purposes and is nonexistent in dash
 
+--------------enig724E4F349CA83BC2E97750FF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-If your functions are written as
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
 
-f() {
-  ...
-}
+iQEcBAEBCAAGBQJOxXCzAAoJEKeha0olJ0NqqJAH/j/LjtYXJ69KyZFd+dFiwvIA
+1CQKQWeNKy/PY+FaSSb3+NxBjqdfpZ5MW6zYSxZf3cBFlcy4yqSZSRvYk+fFzOdt
+rIiv1mF1Bc5Zzz4vYX2MDeZZxxEbeg3/jXEVfBY+H7AiOKNblBko6qJmmSSqHNv4
+p3b1Jeje5is9L6HiA6A6nabFVGurWARSv3DvDRfpfk9gt61tGA6DdVy/wolGrTct
+dr1cupw7VEaQEjuxIL/Yv3AtgrAopuh6/garM3t+D8CA/Zx/jJDFUXGQJLJbZw1P
+TwyAOp47F+xF9wrR78sksPMDqWaOGgYWyTl8dKhl8R8bNfE1O7m+4wmsy1Ee1R8=
+=BNwT
+-----END PGP SIGNATURE-----
 
-sed 's/^[[:blank:]]*\([^[:blank:]]*\)[[:blank:]]*()[[:blank:]]*{/& local FUNCNAME=\1;/'
-
--- 
-Stephane
-
+--------------enig724E4F349CA83BC2E97750FF--
