@@ -1,50 +1,57 @@
-From: Stephane CHAZELAS <stephane_chazelas@yahoo.fr>
+From: Stefano Lattarini <stefano.lattarini@gmail.com>
 Subject: Re: Dashhh
-Date: Fri, 18 Nov 2011 08:18:04 +0000 (UTC)
-Message-ID: <slrnjcc55s.5b4.stephane.chazelas@spam.is.invalid>
-References: <4EC53397.2030005@am-anger-1.de>
- <slrnjcaqkf.lrr.stephane.chazelas@spam.is.invalid>
- <4EC570B3.7040408@redhat.com>
+Date: Fri, 18 Nov 2011 11:50:52 +0100
+Message-ID: <201111181150.52823.stefano.lattarini@gmail.com>
+References: <4EC53397.2030005@am-anger-1.de> <201111171821.58460.stefano.lattarini@gmail.com> <4EC56973.70504@am-anger-1.de>
+Mime-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from lo.gmane.org ([80.91.229.12]:59025 "EHLO lo.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751604Ab1KRISU (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 18 Nov 2011 03:18:20 -0500
-Received: from list by lo.gmane.org with local (Exim 4.69)
-	(envelope-from <gcsd-dash@m.gmane.org>)
-	id 1RRJeN-00054R-Qq
-	for dash@vger.kernel.org; Fri, 18 Nov 2011 09:18:19 +0100
-Received: from 188-223-3-27.zone14.bethere.co.uk ([188.223.3.27])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Fri, 18 Nov 2011 09:18:19 +0100
-Received: from stephane_chazelas by 188-223-3-27.zone14.bethere.co.uk with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Fri, 18 Nov 2011 09:18:19 +0100
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:36618 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751200Ab1KRKvI (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 18 Nov 2011 05:51:08 -0500
+Received: by eye27 with SMTP id 27so3104756eye.19
+        for <dash@vger.kernel.org>; Fri, 18 Nov 2011 02:51:06 -0800 (PST)
+In-Reply-To: <4EC56973.70504@am-anger-1.de>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Heiko Gerstung <heiko@am-anger-1.de>
+Cc: dash@vger.kernel.org
 
-2011-11-17, 13:38(-07), Eric Blake:
-[...]
->> sed 's/^[[:blank:]]*\([^[:blank:]]*\)[[:blank:]]*()[[:blank:]]*{/& loca=
-> l FUNCNAME=3D\1;/'
+Hi Heiko.
+
+On Thursday 17 November 2011, Heiko Gerstung wrote:
+> >>
+> >> I can understand the reasoning behind the relucatance of the dash crew
+> >> to apply any of those changes to the main codebase.
+> >> For me it is not so important that dash is fully POSIX compliant
+> >>
+> > But for many people, this is VERY important!
+> I know and I never wanted to question that. That's why I pointed out 
+> that for me it is not so important. I need a fast, powerful and 
+> ressource-friendly non-interactive shell for my scripts and dash is 
+> really kicking ass in this respect.
+> 
+> >
+> > (Still, it seems to me that your proposed changes would leave dash
+> > POSIX-compliant, so there's no need to venture into a discussion
+> > of the merits of POSIX-compatibility).
 >
-> Except that 'local' is not part of POSIX, so while this conversion may
-> work for dash, it's not a portable catch-all for other compliant shells.
-[...]
+> OK. Although I always thought that the POSIX standard defines a minimum 
+> feature set that should be shared among all shells out there. 
+>
+> [SNIP]
+>
+> Being stricly POSIX compliant does not prevent you from offering 
+> additions and enhancements
+>
+> [SNIP]
+>
+That was exactly what I was trying to say (when I wrote "it seems to
+me that your proposed changes would leave dash POSIX-compliant").  So
+we agree on this, no worry :-)
 
-Though "local" is in LSB, so supported by sh implementations on
-Linux. Which is probably why even posh supports it. However LSB
-only supports:
-
-local var
-var=value
-
-Not
-
-local var=value
-
--- 
-Stephane
-
+Regards,
+  Stefano
