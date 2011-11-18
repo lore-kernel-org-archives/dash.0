@@ -1,46 +1,50 @@
-From: Heiko Gerstung <heiko@am-anger-1.de>
+From: Stephane CHAZELAS <stephane_chazelas@yahoo.fr>
 Subject: Re: Dashhh
-Date: Thu, 17 Nov 2011 21:46:45 +0100
-Message-ID: <4EC572B5.8020907@am-anger-1.de>
-References: <4EC53397.2030005@am-anger-1.de> <slrnjcaqkf.lrr.stephane.chazelas@spam.is.invalid>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
+Date: Fri, 18 Nov 2011 08:18:04 +0000 (UTC)
+Message-ID: <slrnjcc55s.5b4.stephane.chazelas@spam.is.invalid>
+References: <4EC53397.2030005@am-anger-1.de>
+ <slrnjcaqkf.lrr.stephane.chazelas@spam.is.invalid>
+ <4EC570B3.7040408@redhat.com>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.187]:49687 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752250Ab1KQUqr (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 17 Nov 2011 15:46:47 -0500
-In-Reply-To: <slrnjcaqkf.lrr.stephane.chazelas@spam.is.invalid>
+Received: from lo.gmane.org ([80.91.229.12]:59025 "EHLO lo.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751604Ab1KRISU (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 18 Nov 2011 03:18:20 -0500
+Received: from list by lo.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1RRJeN-00054R-Qq
+	for dash@vger.kernel.org; Fri, 18 Nov 2011 09:18:19 +0100
+Received: from 188-223-3-27.zone14.bethere.co.uk ([188.223.3.27])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Fri, 18 Nov 2011 09:18:19 +0100
+Received: from stephane_chazelas by 188-223-3-27.zone14.bethere.co.uk with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Fri, 18 Nov 2011 09:18:19 +0100
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Am 17.11.11 21:11, schrieb Stephane CHAZELAS:
-> 2011-11-17, 17:17(+01), Heiko Gerstung:
-> [...]
->> 1. The usual "[[" and "==" stuff (pretty easy to change, thank you sed)
->> 2. shift returns with a critical error when no arguments are left (no really good solution found)
-> [ "$#" -eq 0 ] || shift
+2011-11-17, 13:38(-07), Eric Blake:
+[...]
+>> sed 's/^[[:blank:]]*\([^[:blank:]]*\)[[:blank:]]*()[[:blank:]]*{/& loca=
+> l FUNCNAME=3D\1;/'
 >
->> 3. $[] arithmetic stuff not working (OK, worked around that with bc)
-> $((...))
->
->> 4. The bash FUNCNAME variable was very valuable for debugging purposes and is nonexistent in dash
->
-> If your functions are written as
->
-> f() {
->    ...
-> }
->
-> sed 's/^[[:blank:]]*\([^[:blank:]]*\)[[:blank:]]*()[[:blank:]]*{/&  local FUNCNAME=\1;/'
->
-Thanks for your helpful comments, in fact I did something like this 
-before I added the FUNCNAME patch to my dash sourcetree. I still prefer 
-the FUNCNAME implementation as provided by my patch, but it is certainly 
-possible to work around that as proposed by you.
+> Except that 'local' is not part of POSIX, so while this conversion may
+> work for dash, it's not a portable catch-all for other compliant shells.
+[...]
 
-Regards,
-  Heiko
+Though "local" is in LSB, so supported by sh implementations on
+Linux. Which is probably why even posh supports it. However LSB
+only supports:
+
+local var
+var=value
+
+Not
+
+local var=value
+
+-- 
+Stephane
 
