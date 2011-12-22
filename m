@@ -1,84 +1,68 @@
-From: David Korn <dgk@research.att.com>
-Subject: Re: '>;' redirection operator [was: [1003.1(2008)/Issue 7 0000530]: Support  in-place editing in sed  (-iEXTENSION)]
-Date: Thu, 22 Dec 2011 17:06:51 -0500
-Message-ID: <201112222206.pBMM6pRc001416@penguin.research.att.com>
+From: Thorsten Glaser <tg+ml-SdpXnpOQhD8dnm+yROfE0A@public.gmane.org>
+Subject: Re: '>;' redirection operator
+Date: Thu, 22 Dec 2011 23:34:23 +0000 (UTC)
+Message-ID: <Pine.BSM.4.64L.1112222327530.2211@herc.mirbsd.org>
+References: <201112221539.pBMFdlaj011933@penguin.research.att.com>
+ <4EF39B1E.80709@redhat.com> <4EF3AA9A.9070009@gnu.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-pink.research.att.com ([192.20.225.111]:50747 "EHLO
-	mail-pink.research.att.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753138Ab1LVW1l (ORCPT
-	<rfc822;dash@vger.kernel.org>); Thu, 22 Dec 2011 17:27:41 -0500
-Sender: dash-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <austin-group-l-request-7882/jkIBncuagvECLh61g@public.gmane.org>
+In-Reply-To: <4EF3AA9A.9070009-mXXj517/zsQ@public.gmane.org>
+Resent-Message-ID: <"CuPPLB.A.xLC.O778OB"@Phoebe.vpn.opengroup.org>
+Resent-To: austin-group-l-7882/jkIBncuagvECLh61g@public.gmane.org
+To: Eric Blake <eblake-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Bruce Korb <bkorb-mXXj517/zsQ@public.gmane.org>
+Cc: David Korn <dgk-7WuBAv+fczCkVZkbZjKZZw@public.gmane.org>, austin-group-l-7882/jkIBncuagvECLh61g@public.gmane.org, Bash - Bug <bug-bash-mXXj517/zsQ@public.gmane.org>, zsh-workers-SwHCXuVDQaU@public.gmane.org, dash <dash-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, miros-discuss-SdpXnpOQhD8dnm+yROfE0A@public.gmane.org
 List-Id: dash@vger.kernel.org
-To: austin-group-l-request@opengroup.org, bug-bash@gnu.org, dash@vger.kernel.org, eblake@redhat.com, miros-discuss@mirbsd.org
 
-cc: eblake@redhat.com bug-bash@gnu.org dash@vger.kernel.org miros-discuss@mirbsd.org
-Subject: Re: '>;' redirection operator [was: [1003.1(2008)/Issue 7 0000530]: Support  in-place editing in sed  (-iEXTENSION)]
---------
+Eric Blake dixit:
 
-> On 12/22/2011 08:39 AM, David Korn wrote:
-> > Subject: Re: Re: [1003.1(2008)/Issue 7 0000530]: Support in-place editi=
-> ng in sed  (-iEXTENSION)
-> > --------
-> >=20
-> > There are many commands other than sed that want the output to replace
-> > an input file.  That is why I added the >; redirection operator to ksh9=
-> 3.
-> >=20
-> > With >; you can do
-> > 	sed -e s/foo/bar/ file >; file
-> > to do in place sed.  The >; operator generates the output in a temporar=
-> y file
-> > and moves the file to the original file only if the command terminates
-> > with 0 exit status.
-> 
-> On 12/22/2011 16:04 AM,Eric Blake  wrote:
-> I agree that engineering a single fix into the shell that can apply to
-> multiple situations, rather than chasing down a set of applications to
-> add an in-place editing option to each, is a much more flexible and
-> powerful approach.  Can we get buy-in from other shell developers to
-> support '>;' as an atomic temp-file replacement-on-success idiom, if
-> POSIX were to standardize the existing practice of ksh93 as the basis?
-> 
-> I assume on the ksh implementation that the temp file is discarded if
-> the command (simple or compound) feeding the redirection failed?  If the
-Yes.
-> redirection is used on a simple command, is there any shorthand for
-> specifying that the destination name on success also be fed as an
-> argument to the command, to avoid the redundancy of having to type
-> 'file' both before and after the '>;' operator?  I assume that this is
-> like any other redirection operator, where an optional fd number can be
-> prepended, as in '2>; file' to collect stderr and overwrite file on
-> success?  What happens if there is more than one '>;' redirection in the
-> same command, and both target the same end file (whether or not by the
-> same file name)?  What happens if the command succeeds, but the rename
-> of the temp file to the destination fails?  Are there clobber ('>|') or
-> append ('>>') variants?
-No, it only works if the file specified with >; is a regular file.
-How could it know which command argument to use for the name, for example
-	cat foo bar >; /dev/fd/2
-how would it know whether to use foo or bar?
+>powerful approach.  Can we get buy-in from other shell developers to
+>support '>;' as an atomic temp-file replacement-on-success idiom, if
 
-If there is more than one >; command, then ksh will create a temporary file
-for each of these but will only the last one will get standard out.
-Thus the first one will be replaced by and empty file and the second one
-will get the output if successful.  Thus
-	command ... >; f1 >; f2
-is equivalent to
-	command ... > f1 >; f2
+Urgh, PLEASE NOT!
+
+People complain about the readability of code enough already, and as
+practice shows, things like [[ have been around and nobody uses them
+anyway (often using just POSIX, but not even knowing – myself included
+– that POSIX sh has $((…))⁺; or even using less-than-POSIX, e.g. in
+autoconf, which means that anything we were to introduce now would not
+be used in the places where it counts anyway, for compatibility).
+
+⁺) Reminds me to write to the list about that. Buried in dayjob work
+   atm though. Expect something about that next year.
 
 
-There is no clobber or append variants.  Append doesn't wipe anything out so
-it is not needed.
+Bruce Korb dixit:
 
-I also added the operator <>; which is the same as <> except that the file
-is truncated on close.  Thus,
-	tail -s 1000000 file <>; file
-will remove the first 1000000 lines of a file and will not require extra
-temporary disk space.
-> 
+> slide on slippery slopes.  Shells can always add some useful builtins:
+>
+>   sh_move_if_changed
+>   sh_save_on_success
+>   sh_save_on_failure
 
-David Korn
-dgk@research.att.com
+In mksh, practice is to keep such things out of the core code and
+optionally put it into ~/.mkshrc instead. The pushd/popd/dirs code
+is a prime example of it. Also, this way, the shell is extended in
+shell instead of in C. (I’ve seen the C201x draft this week. This
+drives home _that_ point even better. That’s bloat, not C any more.)
+
+Many languages have standard libraries written in that language
+itself, for better portability and easier maintenance, so I’d say
+do it like that. Heck, https://evolvis.org/projects/shellsnippets/
+(disclaimer: a pet project of a coworker and me) is waiting for
+more contributions. (Hosted at my current employer, that’s why I
+untypically-for-me chose git so nobody needs to fear they could
+take it down.)
+
+
+Oh, and: sed. has. no. -i. option. either. Please. There’s a
+perfectly fine ed, man! man ed! for that.
+
+bye,
+//mirabilos
+-- 
+FWIW, I'm quite impressed with mksh interactively. I thought it was much
+*much* more bare bones. But it turns out it beats the living hell out of
+ksh93 in that respect. I'd even consider it for my daily use if I hadn't
+wasted half my life on my zsh setup. :-) -- Frank Terbeck in #!/bin/mksh
