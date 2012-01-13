@@ -1,37 +1,41 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
+From: Jilles Tjoelker <jilles@stack.nl>
 Subject: Re: Question about job control in non-interactive shells
-Date: Mon, 9 Jan 2012 10:37:45 -0600
-Message-ID: <20120109163745.GA23825@burratino>
+Date: Fri, 13 Jan 2012 16:49:26 +0100
+Message-ID: <20120113154926.GA42715@stack.nl>
 References: <tntr4z8j1fk.fsf@waterbuck.yellow.cert.org>
+ <20120109163745.GA23825@burratino>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:52564 "EHLO
-	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932170Ab2AIQcq (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 9 Jan 2012 11:32:46 -0500
-Received: by yenm10 with SMTP id m10so252087yen.19
-        for <dash@vger.kernel.org>; Mon, 09 Jan 2012 08:32:45 -0800 (PST)
+Received: from relay04.stack.nl ([131.155.140.107]:50743 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S932216Ab2AMQA0 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 13 Jan 2012 11:00:26 -0500
 Content-Disposition: inline
-In-Reply-To: <tntr4z8j1fk.fsf@waterbuck.yellow.cert.org>
+In-Reply-To: <20120109163745.GA23825@burratino>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Michael Welsh Duggan <mwd@cert.org>
-Cc: dash@vger.kernel.org
+To: Jonathan Nieder <jrnieder@gmail.com>
+Cc: Michael Welsh Duggan <mwd@cert.org>, dash@vger.kernel.org
 
-Hi Michael,
+On Mon, Jan 09, 2012 at 10:37:45AM -0600, Jonathan Nieder wrote:
+> Michael Welsh Duggan wrote:
+> > I am trying to determine why:
 
-Michael Welsh Duggan wrote:
+> >   dash -c "sleep 5 & kill %1"
 
-> I am trying to determine why:
->
->   dash -c "sleep 5 & kill %1"
->
-> results in:
->
->   dash: 1: kill: No such process
+> > results in:
 
-You are probably looking for the -m option.
+> >   dash: 1: kill: No such process
 
-Thanks for writing, and hope that helps,
-Jonathan
+> You are probably looking for the -m option.
+
+The cause is that the -m option ("job control") enables running commands
+in separate process groups, and dash follows literally what POSIX says
+about kill %job: a background process group should be signaled; however,
+there is no background process group. Some shells signal one or more
+processes they know are part of the job in this case, but dash calls
+kill() on a process group that is guaranteed not to exist.
+
+-- 
+Jilles Tjoelker
