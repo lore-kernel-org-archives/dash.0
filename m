@@ -1,50 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Question about job control in non-interactive shells
-Date: Sun, 15 Jan 2012 14:53:19 +1100
-Message-ID: <20120115035319.GA30190@gondor.apana.org.au>
-References: <20120113154926.GA42715@stack.nl>
+From: Richard Retanubun <richardretanubun@ruggedcom.com>
+Subject: /bin/dash -c != /bin/bash -c with pgrep
+Date: Tue, 24 Jan 2012 10:51:38 -0500
+Message-ID: <4F1ED38A.1050401@ruggedcom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:54163 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754953Ab2AODxe (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 14 Jan 2012 22:53:34 -0500
-Content-Disposition: inline
-In-Reply-To: <20120113154926.GA42715@stack.nl>
+Received: from mail2.ruggedcom.com ([204.50.148.11]:12965 "EHLO
+	mail2.ruggedcom.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754501Ab2AXP7j (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 24 Jan 2012 10:59:39 -0500
+Received: from [10.200.21.246] (unknown [10.200.21.246])	by rceng01.eng.lan
+ (Postfix) with ESMTP id 4770129A185	for <dash@vger.kernel.org>; Tue, 24 Jan
+ 2012 10:54:11 -0500 (EST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: jrnieder@gmail.com, mwd@cert.org, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Jilles Tjoelker <jilles@stack.nl> wrote:
-> On Mon, Jan 09, 2012 at 10:37:45AM -0600, Jonathan Nieder wrote:
->> Michael Welsh Duggan wrote:
->> > I am trying to determine why:
-> 
->> >   dash -c "sleep 5 & kill %1"
-> 
->> > results in:
-> 
->> >   dash: 1: kill: No such process
-> 
->> You are probably looking for the -m option.
-> 
-> The cause is that the -m option ("job control") enables running commands
-> in separate process groups, and dash follows literally what POSIX says
-> about kill %job: a background process group should be signaled; however,
-> there is no background process group. Some shells signal one or more
-> processes they know are part of the job in this case, but dash calls
-> kill() on a process group that is guaranteed not to exist.
+Hello,
 
-Right.  And you don't even need %1:
+my dash version is 0.5.5.1-7.4 (from debian/stable I believe)
 
-	dash -c "sleep 5 & kill $!"
+I ran these two commands on a system where atftpd is not running and I am getting different results
 
-works just fine.
+/bin/dash -c "pgrep -f /usr/sbin/atftpd"; echo $?
+-vs-
+/bin/bash -c "pgrep -f /usr/sbin/atftpd"; echo $?
 
-Cheers,
+The dash version returns the PID of the grep itself and thus always succeeds.
+The bash version works as expected.
+
+Sorry if this is an old bug that is already fixed...
+Has it been reported? (and fixed?) I saw a patch about the "-c" mode in  but it was reverted...
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Richard Retanubun
