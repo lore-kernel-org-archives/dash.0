@@ -1,38 +1,63 @@
-From: Chet Ramey <chet.ramey@case.edu>
-Subject: Re: bug in handling of ignored traps
-Date: Wed, 8 Feb 2012 15:12:01 -0500
-Message-ID: <120208201201.AA20769.SM@caleb.ins.cwru.edu>
-References: <4F32B081.6090007@redhat.com>
-Reply-To: chet.ramey@case.edu
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: harald@redhat.com
+Subject: [PATCH] var.c: check for valid variable name before printing in "export -p"
+Date: Tue, 14 Feb 2012 11:48:48 +0100
+Message-ID: <1329216528-8462-1-git-send-email-harald@redhat.com>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mpv2.tis.cwru.edu ([129.22.105.37]:57481 "EHLO
-	mpv2.tis.cwru.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750764Ab2BHUVy (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 8 Feb 2012 15:21:54 -0500
-In-Reply-To: Message from eblake@redhat.com of Wed, 08 Feb 2012 10:27:29 -0700 (id <4F32B081.6090007@redhat.com>)
+Received: from mx1.redhat.com ([209.132.183.28]:47028 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754563Ab2BNKsv (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 14 Feb 2012 05:48:51 -0500
+Received: from int-mx01.intmail.prod.int.phx2.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+	by mx1.redhat.com (8.14.4/8.14.4) with ESMTP id q1EAmpWH000708
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
+	for <dash@vger.kernel.org>; Tue, 14 Feb 2012 05:48:51 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: eblake@redhat.com
-Cc: dash@vger.kernel.org, chet@po.cwru.edu
+To: dash@vger.kernel.org
+Cc: Harald Hoyer <harald@redhat.com>
 
-> Per POSIX requirements on trap, dash is properly refusing to let
-> non-interactive scripts reset signal handlers via trap if the shell was
-> started with an inherited ignored signal handler.  However, dash lies to
-> the user, making it impossible to tell if the user is invoking a shell
-> in an environment where a signal was inherited as ignored.  ksh and bash
-> are nicer about things, and at least let the user query whether a shell
-> is treating a particular signal as non-resettable.
+From: Harald Hoyer <harald@redhat.com>
 
-I don't think this is a bug.  It's more of a quality-of-implementation
-issue.  dash appears to be following the "no error need be reported
-when attempting to do so" part of the Posix spec, which is fine.  Bash
-did more or less the same thing until bash-4.2.
+"export -p" prints all environment variables, without checking if the
+environment variable is a valid dash variable name.
 
-Chet
+IMHO, the only valid usecase for "export -p" is to eval the output.
 
--- 
-``The lyf so short, the craft so long to lerne.'' - Chaucer
-		 ``Ars longa, vita brevis'' - Hippocrates
-Chet Ramey, ITS, CWRU    chet@case.edu    http://cnswww.cns.cwru.edu/~chet/
+$ eval $(export -p); echo OK
+OK
+
+Without this patch the following test does error out with:
+
+test.py:
+import os
+os.environ["test-test"]="test"
+os.environ["test_test"]="test"
+os.execv("./dash", [ './dash', '-c', 'eval $(export -p); echo OK' ])
+
+$ python test.py
+./dash: 1: export: test-test: bad variable name
+
+Of course the results can be more evil, if the environment variable
+name is crafted, that it injects valid shell code.
+---
+ src/var.c |    9 ++++++---
+ 1 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/var.c b/src/var.c
+index 027beff..06771d3 100644
+--- a/src/var.c
++++ b/src/var.c
+@@ -409,12 +409,15 @@ showvars(const char *prefix, int on, int off)
+ 	for (; ep < epend; ep++) {
+ 		const char *p;
+ 		const char *q;
+-
++		const char *r;
++		r = endofname(*ep);
+ 		p = strchrnul(*ep, '=');
+ 		q = nullstr;
+-		if (*p)
++		if (*p) {
++			if (p != r)
++				continue;
+ 			q = single_quote(++p);
