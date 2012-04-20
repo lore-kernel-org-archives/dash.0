@@ -1,63 +1,43 @@
-From: Jim Pryor <dubiousjim@gmail.com>
-Subject: Re: local var=$(cat) only reads one line
-Date: Mon, 09 Apr 2012 12:23:00 -0400
-Message-ID: <1333988580.17858.140661060105101.2C9776B2@webmail.messagingengine.com>
-References: <1333922946.15345.140661059835993.31129B93@webmail.messagingengine.com>
- <1333933963.12672.140661059876041.485D9C2C@webmail.messagingengine.com>
+From: Marc Glisse <marc.glisse@inria.fr>
+Subject: wait and ctrl+Z
+Date: Fri, 20 Apr 2012 13:31:39 +0200 (CEST)
+Message-ID: <alpine.DEB.2.02.1204201316550.2583@laptop-mg.saclay.inria.fr>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
 Return-path: <dash-owner@vger.kernel.org>
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:46268 "EHLO
-	out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757437Ab2DIQXA (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 9 Apr 2012 12:23:00 -0400
-Received: from compute1.internal (compute1.nyi.mail.srv.osa [10.202.2.41])
-	by gateway1.nyi.mail.srv.osa (Postfix) with ESMTP id 9694321670
-	for <dash@vger.kernel.org>; Mon,  9 Apr 2012 12:23:00 -0400 (EDT)
-In-Reply-To: <1333933963.12672.140661059876041.485D9C2C@webmail.messagingengine.com>
+Received: from mail4-relais-sop.national.inria.fr ([192.134.164.105]:3539 "EHLO
+	mail4-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752781Ab2DTLbn (ORCPT
+	<rfc822;dash@vger.kernel.org>); Fri, 20 Apr 2012 07:31:43 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Hi Jilles, thanks for your reply. Indeed now I remember having read
-somewhere that you couldn't portably rely on assignments after "local"
-to suppress word expansion in the same way that ordinary assignments do.
-I had forgotten that. I hope shell implementations evolve towards more
-consistency about this. In the meantime, it's easy enough to get
-portable behavior if you remember the issue.
+Hello,
 
-On another note, I was reading in this mailing list about dash's
-treatment of:
-    FOO=value shell_function $args
-    printf "%s\n" "$FOO" # prints 'value'
+I noticed a strange behavior of "wait" when I suspend and resume a script.
 
-The other discussion points out that this surprising behavior is in fact
-mandated by POSIX.
+$ cat a.sh
+#!/bin/dash
+(sleep 7; echo blah) &
+(sleep 7; echo bloh) &
+wait ; echo coucou
+$ ./a.sh
+^Z
+zsh: suspended  ./a.sh
+$ fg
+[1]  + continued  ./a.sh
+coucou
+$ blah
+bloh
 
-I notice however in the dash.1 manpage distributed with finnix 103, the
-following:
+As you can see, the instruction after "wait" was executed immediatly on 
+resume, without waiting for the jobs.
 
-     When a shell function is executed, all of the shell positional
-     parameters
-     (except $0, which remains unchanged) are set to the arguments of
-     the
-     shell function.  The variables which are explicitly placed in the
-     envi-
-     ronment of the command (by placing assignments to them before the
-     func-
-     tion name) ***are made local to the function and are set to the
-     values
-     given.***  Then the command given in the function definition is
-     executed.
-     The positional parameters are restored to their original values
-     when the
-     command completes.  This all occurs within the current shell.
+If I replace the ';' after "wait" by "&&" and do the same suspend+resume, 
+"coucou" is never printed.
 
-Presumably this manpage should be updated to track the current behavior
-of dash. I'm not sure whether it comes from the dash source distro, or
-was added in by the finnix maintainers.
+I am using dash version 0.5.7-3 in debian testing.
 
 -- 
-dubiousjim@gmail.com
-
+Marc Glisse
