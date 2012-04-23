@@ -1,28 +1,25 @@
-From: Stefano Lattarini <stefano.lattarini@gmail.com>
+From: Chet Ramey <chet.ramey@case.edu>
 Subject: Re: [BUG] dash doesn't report syntax error when it should on stray
  "fi"
-Date: Mon, 23 Apr 2012 19:09:40 +0200
-Message-ID: <4F958CD4.5000604@gmail.com>
+Date: Mon, 23 Apr 2012 15:27:33 -0400
+Message-ID: <4F95AD25.3060200@case.edu>
 References: <4F958907.9030508@gmail.com> <20120423170339.GA9635@burratino>
+Reply-To: chet.ramey@case.edu
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:63198 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754391Ab2DWRJr (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 23 Apr 2012 13:09:47 -0400
-Received: by eaaq12 with SMTP id q12so3281256eaa.19
-        for <dash@vger.kernel.org>; Mon, 23 Apr 2012 10:09:45 -0700 (PDT)
+Received: from mpv2.tis.CWRU.Edu ([129.22.105.37]:63630 "EHLO
+	mpv2.tis.cwru.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752287Ab2DWTdg (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 23 Apr 2012 15:33:36 -0400
 In-Reply-To: <20120423170339.GA9635@burratino>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Jonathan Nieder <jrnieder@gmail.com>
-Cc: dash@vger.kernel.org
+Cc: Stefano Lattarini <stefano.lattarini@gmail.com>, dash@vger.kernel.org, chet.ramey@case.edu
 
-Hi Jonathan, thanks for the quick reply.
-
-On 04/23/2012 07:03 PM, Jonathan Nieder wrote:
+On 4/23/12 1:03 PM, Jonathan Nieder wrote:
 > Hi Stefano,
 > 
 > Stefano Lattarini wrote:
@@ -32,18 +29,13 @@ On 04/23/2012 07:03 PM, Jonathan Nieder wrote:
 >>   $ dash -c ':; fi'; echo stat = $?
 >>   stat = 0
 > 
-> Since this doesn't affect conforming scripts,
->
-True, it it makes "dash -n" less useful (not that I deeply care, just pointing
-it out).
+> Since this doesn't affect conforming scripts, I suspect it falls
+> squarely within the "patches welcome as long as they don't make dash
+> bigger" category.
 
-> I suspect it falls squarely within the "patches welcome as long as they
-> don't make dash bigger" category.
-> 
-> Thanks for finding it.
-> 
-> Sincerely,
-> Jonathan
+What are `conforming scripts'?  Scripts without syntax errors?
 
-Thanks,
-  Stefano
+-- 
+``The lyf so short, the craft so long to lerne.'' - Chaucer
+		 ``Ars longa, vita brevis'' - Hippocrates
+Chet Ramey, ITS, CWRU    chet@case.edu    http://cnswww.cns.cwru.edu/~chet/
