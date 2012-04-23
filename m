@@ -1,39 +1,49 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
+From: Stefano Lattarini <stefano.lattarini@gmail.com>
 Subject: Re: [BUG] dash doesn't report syntax error when it should on stray
  "fi"
-Date: Mon, 23 Apr 2012 12:03:39 -0500
-Message-ID: <20120423170339.GA9635@burratino>
-References: <4F958907.9030508@gmail.com>
+Date: Mon, 23 Apr 2012 19:09:40 +0200
+Message-ID: <4F958CD4.5000604@gmail.com>
+References: <4F958907.9030508@gmail.com> <20120423170339.GA9635@burratino>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-ob0-f174.google.com ([209.85.214.174]:46715 "EHLO
-	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751840Ab2DWRDx (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 23 Apr 2012 13:03:53 -0400
-Received: by obbta14 with SMTP id ta14so12915982obb.19
-        for <dash@vger.kernel.org>; Mon, 23 Apr 2012 10:03:53 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <4F958907.9030508@gmail.com>
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:63198 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754391Ab2DWRJr (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 23 Apr 2012 13:09:47 -0400
+Received: by eaaq12 with SMTP id q12so3281256eaa.19
+        for <dash@vger.kernel.org>; Mon, 23 Apr 2012 10:09:45 -0700 (PDT)
+In-Reply-To: <20120423170339.GA9635@burratino>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Stefano Lattarini <stefano.lattarini@gmail.com>
+To: Jonathan Nieder <jrnieder@gmail.com>
 Cc: dash@vger.kernel.org
 
-Hi Stefano,
+Hi Jonathan, thanks for the quick reply.
 
-Stefano Lattarini wrote:
-
-> How to reproduce:
+On 04/23/2012 07:03 PM, Jonathan Nieder wrote:
+> Hi Stefano,
+> 
+> Stefano Lattarini wrote:
+> 
+>> How to reproduce:
+>>
+>>   $ dash -c ':; fi'; echo stat = $?
+>>   stat = 0
+> 
+> Since this doesn't affect conforming scripts,
 >
->   $ dash -c ':; fi'; echo stat = $?
->   stat = 0
+True, it it makes "dash -n" less useful (not that I deeply care, just pointing
+it out).
 
-Since this doesn't affect conforming scripts, I suspect it falls
-squarely within the "patches welcome as long as they don't make dash
-bigger" category.
+> I suspect it falls squarely within the "patches welcome as long as they
+> don't make dash bigger" category.
+> 
+> Thanks for finding it.
+> 
+> Sincerely,
+> Jonathan
 
-Thanks for finding it.
-
-Sincerely,
-Jonathan
+Thanks,
+  Stefano
