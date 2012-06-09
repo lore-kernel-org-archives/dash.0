@@ -1,37 +1,45 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: Command parsing problem and tracefile
-Date: Fri, 8 Jun 2012 16:30:18 -0500
-Message-ID: <20120608213018.GA13550@burratino>
-References: <4FD22F1B.3090208@gmail.com>
- <20120608171730.GG10380@burratino>
- <4FD26CA5.6090602@gmail.com>
+From: Christoph Mathys <eraserix@gmail.com>
+Subject: [PATCH] support ulimit -r
+Date: Sat, 9 Jun 2012 23:00:30 +0200
+Message-ID: <CALqGcGo3ncBKBE6Z5fUHS8aDJ0QuKRV=8+HpczQbN4CBfo8=PA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary=14dae93408ab36ff0104c210688f
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-yw0-f46.google.com ([209.85.213.46]:40612 "EHLO
-	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753651Ab2FHVa2 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 8 Jun 2012 17:30:28 -0400
-Received: by yhmm54 with SMTP id m54so1630988yhm.19
-        for <dash@vger.kernel.org>; Fri, 08 Jun 2012 14:30:27 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <4FD26CA5.6090602@gmail.com>
+Received: from mail-ob0-f174.google.com ([209.85.214.174]:56819 "EHLO
+	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750999Ab2FIVAb (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 9 Jun 2012 17:00:31 -0400
+Received: by obbtb18 with SMTP id tb18so4374991obb.19
+        for <dash@vger.kernel.org>; Sat, 09 Jun 2012 14:00:30 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Richard H Lee <ricardohenrylee@gmail.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Richard H Lee wrote:
+--14dae93408ab36ff0104c210688f
+Content-Type: text/plain; charset=UTF-8
 
-> It didn't occur to me to try other shells. I get the same error with
-> bash. It makes me wonder why it occurs on three different shells?
+I recently found myself in need to have dash support 'ulimit -r' to
+set maximum realtime priority. Attached is a patch that adds the
+parameter to the builtin ulimit command and updates the manpage.
 
-Yes, that's because it's a bug in the configure script, not dash.
+Thanks!
+Christoph
 
-Your best bet is to contact whoever provided that configure script
-and explain that --enable-static is not working for you.  The
-specification that defines POSIX shell script syntax can be found at
-<http://unix.org/2008edition/>.
+--14dae93408ab36ff0104c210688f
+Content-Type: application/octet-stream; name="rtlimit-rtprio.patch"
+Content-Disposition: attachment; filename="rtlimit-rtprio.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_h395xeyy0
 
-Good luck,
-Jonathan
+LS0tIGEvc3JjL2Rhc2guMQorKysgYi9zcmMvZGFzaC4xCkBAIC0yMTYzLDYgKzIxNjMsOCBAQAog
+aGF2ZSBhdCBvbmUgdGltZQogLkl0IEZsIG4KIHNob3cgb3Igc2V0IHRoZSBsaW1pdCBvbiB0aGUg
+bnVtYmVyIGZpbGVzIGEgcHJvY2VzcyBjYW4gaGF2ZSBvcGVuIGF0IG9uY2UKKy5JdCBGbCByCitz
+aG93IG9yIHNldCB0aGUgbGltaXQgb24gdGhlIHJlYWwtdGltZSBzY2hlZHVsaW5nIHByaW9yaXR5
+IG9mIGEgcHJvY2VzcwogLkVsCiAuUHAKIElmIG5vbmUgb2YgdGhlc2UgaXMgc3BlY2lmaWVkLCBp
+dCBpcyB0aGUgbGltaXQgb24gZmlsZSBzaXplIHRoYXQgaXMgc2hvd24KLS0tIGEvc3JjL21pc2Ni
+bHRpbi5jCisrKyBiL3NyYy9taXNjYmx0aW4uYwpAQCAtMzkyLDYgKzM5MiwxMCBAQAogI2lmZGVm
+IFJMSU1JVF9MT0NLUwogCXsgImxvY2tzIiwJCQlSTElNSVRfTE9DS1MsCSAgIDEsICd3JyB9LAog
+I2VuZGlmCisjaWZkZWYgUkxJTUlUX1JUUFJJTworCXsgInJ0cHJpbyIsCQkJUkxJTUlUX1JUUFJJ
+TywJICAgMSwgJ3InIH0sCisjZW5kaWYKKwogCXsgKGNoYXIgKikgMCwJCQkwLAkJICAgMCwgICdc
+MCcgfQogfTsKIAo=
+--14dae93408ab36ff0104c210688f--
