@@ -1,105 +1,135 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: [PATCH] fifo: Do not restart open() if it already found a partner
-Date: Tue, 26 Jun 2012 15:20:09 -0500
-Message-ID: <20120626202009.GA382@burratino>
-References: <1340712298-4583-1-git-send-email-andersk@mit.edu>
+From: Anders Kaseorg <andersk@MIT.EDU>
+Subject: [PATCH v2] fifo: Do not restart open() if it already found a
+ partner
+Date: Tue, 26 Jun 2012 16:59:04 -0400 (EDT)
+Message-ID: <alpine.DEB.2.00.1206261656000.3236@dr-wily.mit.edu>
+References: <1340712298-4583-1-git-send-email-andersk@mit.edu> <20120626202009.GA382@burratino>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: TEXT/PLAIN; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1340712298-4583-1-git-send-email-andersk@mit.edu>
-Sender: linux-fsdevel-owner@vger.kernel.org
-To: Anders Kaseorg <andersk@MIT.EDU>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, dash@vger.kernel.org
+Return-path: <dash-owner@vger.kernel.org>
+Received: from DMZ-MAILSEC-SCANNER-7.MIT.EDU ([18.7.68.36]:45291 "EHLO
+	dmz-mailsec-scanner-7.mit.edu" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750809Ab2FZU7I convert rfc822-to-8bit
+	(ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 26 Jun 2012 16:59:08 -0400
+In-Reply-To: <20120626202009.GA382@burratino>
+Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
+To: Jonathan Nieder <jrnieder@gmail.com>, Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, dash@vger.kernel.org
 
-Hi,
+If a parent and child process open the two ends of a fifo, and the
+child immediately exits, the parent may receive a SIGCHLD before its
+open() returns.  In that case, we need to make sure that open() will
+return successfully after the SIGCHLD handler returns, instead of
+throwing EINTR or being restarted.  Otherwise, the restarted open()
+would incorrectly wait for a second partner on the other end.
 
-Anders Kaseorg wrote:
+The following test demonstrates the EINTR that was wrongly thrown from
+the parent=E2=80=99s open().  Change .sa_flags =3D 0 to .sa_flags =3D S=
+A_RESTART
+to see a deadlock instead, in which the restarted open() waits for a
+second reader that will never come.  (On my systems, this happens
+pretty reliably within about 5 to 500 iterations.  Others report that
+it manages to loop ~forever sometimes; YMMV.)
 
-> The following test demonstrates the EINTR that was wrongly thrown fro=
-m
-> the parent=E2=80=99s open().  Change .sa_flags =3D 0 to .sa_flags =3D=
- SA_RESTART
-> to see a deadlock instead, in which the restarted open() waits for a
-> second reader that will never come.
+  #include <sys/stat.h>
+  #include <sys/types.h>
+  #include <sys/wait.h>
+  #include <fcntl.h>
+  #include <signal.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <unistd.h>
 
-Nice.
+  #define CHECK(x) do if ((x) =3D=3D -1) {perror(#x); abort();} while(0=
+)
 
-To recap, reading a fifo without a writer (resp. when writing a fifo
-without a reader), fifo_open() without O_NONBLOCK waits for the other
-end to be opened:
+  void handler(int signum) {}
 
-	if (!pipe->writers) {
-		if ((filp->f_flags & O_NONBLOCK)) {
-			...
-		} else {
-			wait_for_partner(inode, &pipe->w_counter);
+  int main()
+  {
+      struct sigaction act =3D {.sa_handler =3D handler, .sa_flags =3D =
+0};
+      CHECK(sigaction(SIGCHLD, &act, NULL));
+      CHECK(mknod("fifo", S_IFIFO | S_IRWXU, 0));
+      for (;;) {
+          int fd;
+          pid_t pid;
+          putc('.', stderr);
+          CHECK(pid =3D fork());
+          if (pid =3D=3D 0) {
+              CHECK(fd =3D open("fifo", O_RDONLY));
+              _exit(0);
+          }
+          CHECK(fd =3D open("fifo", O_WRONLY));
+          CHECK(close(fd));
+          CHECK(waitpid(pid, NULL, 0));
+      }
+  }
 
-The wait_for_partner() function waits for the pipe to be opened.
-It is interruptible.  Inlining a little for clarity[*]:
+This is what I suspect was causing the Git test suite to fail in
+t9010-svn-fe.sh:
+http://bugs.debian.org/678852
 
-	int cur =3D pipe->w_counter;
+Signed-off-by: Anders Kaseorg <andersk@mit.edu>
+---
+Changes from v1:
+=E2=80=A2 Change wait_for_partner return from true/false to 0/-ERESTART=
+SYS.
+=E2=80=A2 Mention that the demo program doesn=E2=80=99t always work for=
+ some.
+=E2=80=A2 Remove some unneeded braces from the demo program=E2=80=99s C=
+HECK() macro.
 
-	while (cur =3D=3D pipe->w_counter) {
-		DEFINE_WAIT(wait);
+ fs/fifo.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-		prepare_to_wait(&pipe->wait, &wait, TASK_INTERRUPTIBLE);
-		pipe_unlock(pipe);
-		schedule();
-		finish_wait(&pipe->wait, &wait);
-		pipe_lock(pipe);
+diff --git a/fs/fifo.c b/fs/fifo.c
+index b1a524d..cf6f434 100644
+--- a/fs/fifo.c
++++ b/fs/fifo.c
+@@ -14,7 +14,7 @@
+ #include <linux/sched.h>
+ #include <linux/pipe_fs_i.h>
+=20
+-static void wait_for_partner(struct inode* inode, unsigned int *cnt)
++static int wait_for_partner(struct inode* inode, unsigned int *cnt)
+ {
+ 	int cur =3D *cnt;=09
+=20
+@@ -23,6 +23,7 @@ static void wait_for_partner(struct inode* inode, uns=
+igned int *cnt)
+ 		if (signal_pending(current))
+ 			break;
+ 	}
++	return cur =3D=3D *cnt ? -ERESTARTSYS : 0;
+ }
+=20
+ static void wake_up_partner(struct inode* inode)
+@@ -67,8 +68,7 @@ static int fifo_open(struct inode *inode, struct file=
+ *filp)
+ 				 * seen a writer */
+ 				filp->f_version =3D pipe->w_counter;
+ 			} else {
+-				wait_for_partner(inode, &pipe->w_counter);
+-				if(signal_pending(current))
++				if (wait_for_partner(inode, &pipe->w_counter))
+ 					goto err_rd;
+ 			}
+ 		}
+@@ -90,8 +90,7 @@ static int fifo_open(struct inode *inode, struct file=
+ *filp)
+ 			wake_up_partner(inode);
+=20
+ 		if (!pipe->readers) {
+-			wait_for_partner(inode, &pipe->r_counter);
+-			if (signal_pending(current))
++			if (wait_for_partner(inode, &pipe->r_counter))
+ 				goto err_wr;
+ 		}
+ 		break;
+--=20
+1.7.11.1
 
-		if (signal_pending(current))
-			break;
-	}
-
-In the window while i_mutex is unlocked, it is possible for the fifo
-to be opened for writing and closed again.  That's fine --- open()
-should succeed as long as someone has successfully opened the pipe for
-writing.  And similarly, if a writer opens the pipe and a signal
-arrives, we should let open() succeed.  The rest of fifo_open() is
-quick and the signal will still be promptly delivered afterwards.  So
-this looks like a good patch.
-
-Two small details:
-
- 1. I wasn't able to get your testcase to reliably fail (on 3.0.36).
-    Sometimes it would produce EINTR quickly and sometimes it prefers
-    to spew out dots.  Perhaps a note would help avoid confusing people
-    that want to see if their kernel is affected.
-
- 2. The return value convention surprised me a little:
-
- -static void wait_for_partner(struct inode* inode, unsigned int *cnt)
- +static bool wait_for_partner(struct inode* inode, unsigned int *cnt)
-
-It would be easier to guess the sense at a glance if it returned an
-int (e.g., 0 or -ERESTARTSYS) so the caller could look like
-
-	if (wait_for_partner(inode, &pipe->w_counter))
-		/* wait failed */
-		...
-
-Documentation/CodingStyle says more about that in chapter 16.
-
-Except for those two details,
-Reviewed-by: Jonathan Nieder <jrnieder@gmail.com>
-
-Thanks for a pleasant read.
-
-[*] This is almost the same as
-
-	int dummy;
-	wait_event_interruptible(&pipe->wait, pipe->w_counter !=3D cur, dummy)=
-;
-
-except that we keep i_mutex held when placing the current task on the
-waitqueue.  There's probably some simplification possible, but that's
-a story for another day.
---
-To unsubscribe from this list: send the line "unsubscribe linux-fsdevel=
-" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
