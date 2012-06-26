@@ -1,119 +1,54 @@
-From: Jilles Tjoelker <jilles@stack.nl>
+From: Anders Kaseorg <andersk@MIT.EDU>
 Subject: Re: [PATCH] Set SA_RESTART flag on SIGCHLD handler
-Date: Sat, 23 Jun 2012 00:02:08 +0200
-Message-ID: <20120622220208.GB33407@stack.nl>
-References: <4F665E77.3060102@mit.edu>
- <20120319025201.GA24778@burratino>
- <4F66A6CA.4010002@mit.edu>
- <20120319033751.GA25237@burratino>
- <alpine.DEB.2.00.1206210345050.3236@dr-wily.mit.edu>
- <20120622003628.GD4730@burratino>
+Date: Tue, 26 Jun 2012 06:03:51 -0400
+Message-ID: <4FE98907.4040507@mit.edu>
+References: <4F665E77.3060102@mit.edu> <20120319025201.GA24778@burratino> <4F66A6CA.4010002@mit.edu> <20120319033751.GA25237@burratino> <alpine.DEB.2.00.1206210345050.3236@dr-wily.mit.edu> <20120622003628.GD4730@burratino> <4FE43C8C.2040809@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:59806 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1758872Ab2FVWLg (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 22 Jun 2012 18:11:36 -0400
-Content-Disposition: inline
-In-Reply-To: <20120622003628.GD4730@burratino>
+Received: from DMZ-MAILSEC-SCANNER-7.MIT.EDU ([18.7.68.36]:60293 "EHLO
+	dmz-mailsec-scanner-7.mit.edu" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754103Ab2FZKDy (ORCPT
+	<rfc822;dash@vger.kernel.org>); Tue, 26 Jun 2012 06:03:54 -0400
+In-Reply-To: <4FE43C8C.2040809@mit.edu>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Jonathan Nieder <jrnieder@gmail.com>
-Cc: Anders Kaseorg <andersk@MIT.EDU>, dash@vger.kernel.org, git@packages.debian.org
+Cc: dash@vger.kernel.org, git@packages.debian.org
 
-On Thu, Jun 21, 2012 at 07:36:28PM -0500, Jonathan Nieder wrote:
-> Anders Kaseorg wrote:
-> > On Sun, 18 Mar 2012, Jonathan Nieder wrote:
+I wrote this greatly simplified skeleton of the failing Git test, and=20
+found that I can reproduce what looks like the same problem, fairly=20
+reliably:
 
-> >> --- i/src/trap.c
-> >> +++ w/src/trap.c
-> >> @@ -259,7 +259,7 @@ setsignal(int signo)
-> >>  		act.sa_handler =3D SIG_DFL;
-> >>  	}
-> >>  	*t =3D action;
-> >> -	act.sa_flags =3D 0;
-> >> +	act.sa_flags =3D SA_RESTART;
-> >>  	sigfillset(&act.sa_mask);
-> >>  	sigaction(signo, &act, 0);
-> >>  }
-> [...]
-> > It looks like this was never forwarded to the dash mailing list.  A=
-ny=20
-> > thoughts from upstream?
+$ rm -f fifo
+$ mkfifo fifo
+$ dash -c 'while echo -n .; do : < fifo & : > fifo; wait $!; done'
+=2E..............................dash: 1: cannot create fifo: Interrupt=
+ed=20
+system call
 
-> > Context: http://thread.gmane.org/gmane.comp.version-control.git.deb=
-ian/147
-> > (FTR, it did happen again.)
+After running this through strace, it seems clear what went wrong.  The=
+=20
+parent=E2=80=99s open("fifo", O_WRONLY) is what causes the child=E2=80=99=
+s open("fifo",=20
+O_RDONLY) to return.  If the child exits immediately, the parent may=20
+receive a SIGCHLD before its own open() returns.  Then when its SIGCHLD=
+=20
+handler exits, open() returns EINTR.
 
-> Thanks.  Here's a less invasive patch to experiment with.
+That also explains why the SA_RESTART and restart-on-EINTR patches only=
+=20
+turned it into a deadlock.  If the open() were restarted now, it would=20
+just block to wait for a _second_ reader of the FIFO, which will never=20
+arrive.
 
-> POSIX (XCU =A72.11 "Signals and Error Handling") requires that the "w=
-ait"
-> utility must return immediately when interrupted by a trapped signal,
-> so SA_RESTART is not appropriate for those.
+But if that=E2=80=99s what happened, it seems like a kernel bug to me!=20
+Shouldn=E2=80=99t an open() call only be restarted or return EINTR in t=
+he case=20
+that it hasn=E2=80=99t had any side effects yet and can safely be resta=
+rted?
 
-Same thing for "read", even though that does not make much sense (the
-only thing the trap handler can do is abandon the read, since bytes
-already read but not part of a complete line may be lost).
+Anders
 
-On the other hand, this interruption is not specified to happen with
-signals whose default action is to ignore. Many shells don't do this,
-though (perhaps because of the difficulty of finding what the default
-action is).
-
-> It does not seem to give any advice on whether signals interrupt
-> redirection.
-
-=46or certain situations it certainly does. For simple commands without
-command name, it says any redirections shall be performed in a subshell
-environment; hence, trapped signals are reset to the default action.
-This is what most shells appear to do in all cases. Again, this may not
-be the most useful behaviour but it matches what the Bourne shell did.
-
-> diff --git i/src/redir.c w/src/redir.c
-> index f96a76bc..7fb7748f 100644
-> --- i/src/redir.c
-> +++ w/src/redir.c
-> @@ -206,8 +206,11 @@ openredirect(union node *redir)
->  		/* FALLTHROUGH */
->  	case NCLOBBER:
->  		fname =3D redir->nfile.expfname;
-> -		if ((f =3D open64(fname, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
-> +		while ((f =3D open64(fname, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0) =
-{
-> +			if (errno =3D=3D EINTR)
-> +				continue;
->  			goto ecreate;
-> +		}
->  		break;
->  	case NAPPEND:
->  		fname =3D redir->nfile.expfname;
-
-It looks like this patch breaks interrupting (via SIGINT) a blocking
-open, for example of a fifo. Although the race condition associated wit=
-h
-relying on [EINTR] is very hard to close, I don't think that's reason t=
-o
-give up on it entirely.
-
-I think it is better to rethink commit
-3800d4934391b144fd261a7957aea72ced7d47ea that caused this bug (and some
-others that have been fixed). A signal handler for SIGCHLD was added to
-allow waiting for a trapped signal or a child process at the same time
-(using sigsuspend, as was done, or sigwait). However, leaving the signa=
-l
-handler installed all the time causes unexpected [EINTR] errors, so I
-suggest only installing it during the "wait" builtin or specifying
-SA_RESTART only for this special SIGCHLD handler (while leaving all
-other signal handlers interrupting). In either case, behaviour for
-SIGCHLD handlers installed because of CHLD traps should remain
-unchanged. The former seems safest because SA_RESTART handlers still
-cause visible effects such as short writes.
-
-In case of a script doing 'trap "" CHLD', it is perhaps undesirable for
-"wait" to block forever, given that wait(2) doesn't do that either.
-
---=20
-Jilles Tjoelker
