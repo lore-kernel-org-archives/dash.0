@@ -1,71 +1,29 @@
-From: Isaac Jurado <diptongo@gmail.com>
-Subject: Re: [PATCH] [BUILTIN] Allow SIG* signal names.
-Date: Mon, 2 Jul 2012 21:21:01 +0200
-Message-ID: <CALqPu34mq_J-=nKxri3y1MQcgmPhgdEmgo4ff5yThpqwyTChHA@mail.gmail.com>
-References: <4ff0274f.c54fb40a.47e2.6814@mx.google.com>
-	<4FF1A76F.6020307@redhat.com>
-	<2D2FC58C-ACD5-4113-9A1D-C53A854C3CD7@aim.com>
-	<4FF1AE9C.7040307@redhat.com>
-	<CALqPu34=a629YmEiqk008a7aMF26ObEz=MCGA3vZBKTkr25hQA@mail.gmail.com>
-	<4FF1F16A.7010103@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] support ulimit -r
+Date: Tue, 3 Jul 2012 17:38:15 +0800
+Message-ID: <20120703093815.GA16929@gondor.apana.org.au>
+References: <CALqGcGo3ncBKBE6Z5fUHS8aDJ0QuKRV=8+HpczQbN4CBfo8=PA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-vb0-f46.google.com ([209.85.212.46]:41003 "EHLO
-	mail-vb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752434Ab2GBTVC (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 2 Jul 2012 15:21:02 -0400
-Received: by vbbff1 with SMTP id ff1so3753606vbb.19
-        for <dash@vger.kernel.org>; Mon, 02 Jul 2012 12:21:01 -0700 (PDT)
-In-Reply-To: <4FF1F16A.7010103@redhat.com>
+Received: from sting.hengli.com.au ([178.18.18.71]:45134 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754616Ab2GCJiS (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 3 Jul 2012 05:38:18 -0400
+Content-Disposition: inline
+In-Reply-To: <CALqGcGo3ncBKBE6Z5fUHS8aDJ0QuKRV=8+HpczQbN4CBfo8=PA@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <eblake@redhat.com>
-Cc: Paul Gilmartin <PaulGBoulder@aim.com>, dash <dash@vger.kernel.org>
+To: Christoph Mathys <eraserix@gmail.com>
+Cc: dash@vger.kernel.org
 
-On Mon, Jul 2, 2012 at 9:07 PM, Eric Blake <eblake@redhat.com> wrote:
->
-> I'm not the maintainer, so my decision is not indicative of what the
-> dash maintainer will choose.  But my personal preference would be that
-> we change this area of code, either to:
->
-> 1. be lighter-weight (drop strcasecmp, which is locale-dependent, and
->    replace it with strcmp)
->
-> 2. be more user-friendly (accept optional case-insensitive SIG prefix)
->
-> Both approaches are permitted by POSIX, so it boils down to a judgment
-> call of whether providing useful extensions or providing a minimally
-> compliant shell is more important.
+On Sat, Jun 09, 2012 at 09:00:30PM +0000, Christoph Mathys wrote:
+> I recently found myself in need to have dash support 'ulimit -r' to
+> set maximum realtime priority. Attached is a patch that adds the
+> parameter to the builtin ulimit command and updates the manpage.
 
-Reasonable enough.
-
-> Even one byte larger in the final executable size has been deemed
-> bloat on this list in the past.  Dash prides itself on being
-> minimalistic, but you happened to point out an area of code that is
-> not currently minimal.
-
-But swapping strcasecm with strcmp is not going to affect final binary
-size (well, except for the extra bytes in the PLT), so I deduce that
-bloat for dash also means runtime efficiency.
-
-> Indeed, that would provide faster lookup, but it would also cost more
-> executable size (the storage requirements for a perfect hash table are
-> larger than the size of a loop comparison); I don't know whether the
-> preference is for speed, for minimal size, or for a hybrid of the two
-> (where larger size is okay only if it proves to have more speed).  So
-> hopefully the dash maintainer will chime in on the topic.
-
-I'm looking forward.  Thanks a lot for the explanations.
-
-Cheers
-
-P.S.: I guess the SIG* prefix check may be "minimized" with some ugly
-casts and masks (in a platform dependent way and assuming the string is
-properly aligned, of course).
-
+Patch applied.  Thanks a lot!
 -- 
-Isaac Jurado
-
-"The noblest pleasure is the joy of understanding"
-Leonardo da Vinci
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
