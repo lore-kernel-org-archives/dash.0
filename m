@@ -1,45 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Isaac Jurado <diptongo@gmail.com>
 Subject: Re: [PATCH] [BUILTIN] Allow SIG* signal names.
-Date: Thu, 5 Jul 2012 15:43:55 +0800
-Message-ID: <20120705074355.GA969@gondor.apana.org.au>
+Date: Thu, 5 Jul 2012 23:01:16 +0200
+Message-ID: <CALqPu37DGb7XjZvvAawRA9cYLN0Mex4nWzZQJ6Obs0fgY6aVNQ@mail.gmail.com>
 References: <20120703201334.GA66099@stack.nl>
+	<20120705074355.GA969@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:44761 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754496Ab2GEHoG (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 5 Jul 2012 03:44:06 -0400
-Content-Disposition: inline
-In-Reply-To: <20120703201334.GA66099@stack.nl>
+Received: from mail-vc0-f174.google.com ([209.85.220.174]:55233 "EHLO
+	mail-vc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750836Ab2GEVBR (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 5 Jul 2012 17:01:17 -0400
+Received: by vcbf11 with SMTP id f11so5706778vcb.19
+        for <dash@vger.kernel.org>; Thu, 05 Jul 2012 14:01:16 -0700 (PDT)
+In-Reply-To: <20120705074355.GA969@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: eblake@redhat.com, PaulGBoulder@aim.com, dash@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Jilles Tjoelker <jilles@stack.nl>, eblake@redhat.com, PaulGBoulder@aim.com, dash@vger.kernel.org
 
-Jilles Tjoelker <jilles@stack.nl> wrote:
-> On Mon, Jul 02, 2012 at 08:22:20AM -0600, Eric Blake wrote:
->> On 07/02/2012 08:11 AM, Paul Gilmartin wrote:
->> > On Jul 2, 2012, at 07:51, Eric Blake wrote:
-> 
->> >> ... non-required bloat ...
-> 
->> > The key phrase.  And one value of a shell lacking such
->> > extensions is that it provides an excellent test bed for
->> > code intended to be portable within the POSIX spec.
-> 
->> That argues that we should drop our strcasecmp() for the much simpler
->> strcmp(), in order to remove the bloat we already have.
-> 
-> Such a change would be at odds with the goal of dash to be a usable
-> shell. It is not good to break existing scripts, even if those scripts
-> are not strictly POSIX-compliant, and particularly so if the scripts
-> relied on designed behaviour. Such changes can waste a lot of time.
+On Thu, Jul 5, 2012 at 9:43 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>>
+>>> That argues that we should drop our strcasecmp() for the much simpler
+>>> strcmp(), in order to remove the bloat we already have.
+>>
+>> Such a change would be at odds with the goal of dash to be a usable
+>> shell. It is not good to break existing scripts, even if those
+>> scripts are not strictly POSIX-compliant, and particularly so if the
+>> scripts relied on designed behaviour. Such changes can waste a lot of
+>> time.
+>
+> I agree with Jilles.  I don't think any change is required here.
 
-I agree with Jilles.  I don't think any change is required here.
+That answers directly to the case sensitivity of signal names.  Is it
+also the same answer about supporting the SIG* prefix?
 
-Thanks,
+Cheers.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Isaac Jurado
+
+"The noblest pleasure is the joy of understanding"
+Leonardo da Vinci
