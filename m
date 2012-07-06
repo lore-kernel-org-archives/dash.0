@@ -1,44 +1,72 @@
-From: Isaac Jurado <diptongo@gmail.com>
-Subject: Re: [PATCH] [BUILTIN] Allow SIG* signal names.
-Date: Thu, 5 Jul 2012 23:01:16 +0200
-Message-ID: <CALqPu37DGb7XjZvvAawRA9cYLN0Mex4nWzZQJ6Obs0fgY6aVNQ@mail.gmail.com>
-References: <20120703201334.GA66099@stack.nl>
-	<20120705074355.GA969@gondor.apana.org.au>
+From: Seb <sbb@tuxfamily.org>
+Subject: Can't kill a job
+Date: Fri, 6 Jul 2012 19:53:02 +0200
+Message-ID: <20120706195302.710ced19.sbb@tuxfamily.org>
+Reply-To: dash@vger.kernel.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-vc0-f174.google.com ([209.85.220.174]:55233 "EHLO
-	mail-vc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750836Ab2GEVBR (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 5 Jul 2012 17:01:17 -0400
-Received: by vcbf11 with SMTP id f11so5706778vcb.19
-        for <dash@vger.kernel.org>; Thu, 05 Jul 2012 14:01:16 -0700 (PDT)
-In-Reply-To: <20120705074355.GA969@gondor.apana.org.au>
+Received: from smtpfb2-g21.free.fr ([212.27.42.10]:54994 "EHLO
+	smtpfb2-g21.free.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757859Ab2GFRxu (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 6 Jul 2012 13:53:50 -0400
+Received: from smtp2-g21.free.fr (smtp2-g21.free.fr [212.27.42.2])
+	by smtpfb2-g21.free.fr (Postfix) with ESMTP id 53598D1AA89
+	for <dash@vger.kernel.org>; Fri,  6 Jul 2012 19:53:47 +0200 (CEST)
+Received: from ed.bebop.lan (unknown [88.181.135.123])
+	by smtp2-g21.free.fr (Postfix) with SMTP id 1A6F44B005A
+	for <dash@vger.kernel.org>; Fri,  6 Jul 2012 19:53:00 +0200 (CEST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jilles Tjoelker <jilles@stack.nl>, eblake@redhat.com, PaulGBoulder@aim.com, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Thu, Jul 5, 2012 at 9:43 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->>
->>> That argues that we should drop our strcasecmp() for the much simpler
->>> strcmp(), in order to remove the bloat we already have.
->>
->> Such a change would be at odds with the goal of dash to be a usable
->> shell. It is not good to break existing scripts, even if those
->> scripts are not strictly POSIX-compliant, and particularly so if the
->> scripts relied on designed behaviour. Such changes can waste a lot of
->> time.
->
-> I agree with Jilles.  I don't think any change is required here.
+Hello,
 
-That answers directly to the case sensitivity of signal names.  Is it
-also the same answer about supporting the SIG* prefix?
+I encounter a problem with the "kill" command. If I execute the
+following script:
 
-Cheers.
+  #!/bin/sh
+  sleep 2 &
+  jobs -p %1
+  kill %1
+  wait
 
--- 
-Isaac Jurado
+I get the following result:
 
-"The noblest pleasure is the joy of understanding"
-Leonardo da Vinci
+  2636
+  /tmp/debug.sh: 4: kill: No such process
+
+
+The job is well seen by jobs, but mysteriously not by kill.
+
+I've read the last messages relative to this question on the list.
+These ones state the -m option should then be passed to dash. It
+indeed fixes the problem, but it results in a very verbose output
+useless in a non-interactive environment, and it does not prevent the
+default behaviour to be IMHO somewhat inconsistent ("jobs %1" works,
+"wait %1" works, but not "kill %1"). Moreover, it seems POSIX
+encourages "kill" to work in the same way whatever the state of
+the job control setting is:
+
+ The jobs utility is not dependent on the job control option, as are
+ the seemingly related bg and fg utilities because jobs is useful for
+ examining background jobs, regardless of the condition of job
+ control. When the user has invoked a set +m command and job control
+ has been turned off, jobs can still be used to examine the background
+ jobs associated with that current session. Similarly, kill can then
+ be used to kill background jobs with kill% <background job number>.
+
+ http://pubs.opengroup.org/onlinepubs/009695399/utilities/jobs.html
+ ("RATIONALE" section)
+
+So maybe it might be a good idea to change the default behaviour of
+kill here. It would allow to increase the dash compatibility with the
+other shells without betraying the POSIX standard (at least its
+spirit).
+
+My 2=C2=A2,
+Seb.
+
+P-S. BTW, on the same page (section APPLICATION USAGE), POSIX also
+encourages to allow "$(jobs)" to work in the expected useful way.
