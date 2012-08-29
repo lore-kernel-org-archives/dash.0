@@ -1,54 +1,35 @@
-From: Todor Vlaev <t.vlaev@gmail.com>
+From: Jonathan Nieder <jrnieder@gmail.com>
 Subject: Re: [EXPAND] Nested parameter expansion results in an empty string
  when quoted
-Date: Wed, 29 Aug 2012 16:46:50 +0300
-Message-ID: <CAAv6kGQue_cKF9h6bC0FRZi1t4uD2r+tob05fw-5Aj3xWT5ZFA@mail.gmail.com>
+Date: Wed, 29 Aug 2012 09:35:28 -0700
+Message-ID: <20120829163528.GC168@mannheim-rule.local>
 References: <CAAv6kGS+Cgg2JmRqCeWNZtxpoUuJ0wBSLac0BJJGW8kuiqUgwQ@mail.gmail.com>
  <20120828230024.GA51967@stack.nl>
+ <CAAv6kGQue_cKF9h6bC0FRZi1t4uD2r+tob05fw-5Aj3xWT5ZFA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-qa0-f53.google.com ([209.85.216.53]:46903 "EHLO
-	mail-qa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752785Ab2H2NrL (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 29 Aug 2012 09:47:11 -0400
-Received: by qaas11 with SMTP id s11so392867qaa.19
-        for <dash@vger.kernel.org>; Wed, 29 Aug 2012 06:47:11 -0700 (PDT)
-In-Reply-To: <20120828230024.GA51967@stack.nl>
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:51754 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752483Ab2H2Qee (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 29 Aug 2012 12:34:34 -0400
+Received: by pbbrr13 with SMTP id rr13so1508911pbb.19
+        for <dash@vger.kernel.org>; Wed, 29 Aug 2012 09:34:34 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAAv6kGQue_cKF9h6bC0FRZi1t4uD2r+tob05fw-5Aj3xWT5ZFA@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: dash@vger.kernel.org
+To: Todor Vlaev <t.vlaev@gmail.com>
+Cc: Jilles Tjoelker <jilles@stack.nl>, dash@vger.kernel.org
 
-> The double-quotes here are unnecessary and should be left out for
-> optimal compatibility. Note that this may require a temporary variable
-> if the expansion is in a context where word splitting is performed.
-> However, you are right that the double-quotes are permitted per POSIX.
->
-> On the other hand, some double-quotes that are really necessary are
-> missing:
->
-> my_str=swan; last_char=${my_str#"${my_str%?}"}; echo "${last_char}"
->
-> The inner double-quotes force any wildcard characters in $my_str to be
-> taken literally. This is required to work correctly with the string
-> sw*n, for example.
->
-> It also happens to work around dash's bugs, both the above version and a
-> version with the redundant quotes you like:
->
-> my_str=swan; last_char="${my_str#"${my_str%?}"}"; echo "${last_char}"
+Todor Vlaev wrote:
 
-Thanks for the useful tips!
+> A bit worrying not to have regression tests, indeed.
 
-> Fixing this requires a test suite. Without a test suite, any attempt to
-> fix something is likely to break something else.
+Yes, I'd also like functional tests in the dash.git repo.
 
-A bit worrying not to have regression tests, indeed.
+In the meantime, I think Herbert runs tests that are not in that repo,
+and others reviewing patches use other test suites if I understand
+correctly.
 
-In any case, there are plenty of workarounds to this minor issue, even
-if not fixed there is a reference now for someone else who might
-wonder.
-
-Br,
-Todor
+Jonathan
