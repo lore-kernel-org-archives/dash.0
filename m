@@ -1,36 +1,42 @@
 From: Roy Tam <roytam@gmail.com>
-Subject: [HACK] making dash works in MSYS environment
-Date: Wed, 5 Sep 2012 16:06:13 +0800
-Message-ID: <CAA=zYJaFsQd5ynPRsdqi3ajSHfUFgkUqW9jRaFmvF25S270_HQ@mail.gmail.com>
+Subject: Re: [HACK v2] making dash works in MSYS environment
+Date: Thu, 6 Sep 2012 08:05:31 +0800
+Message-ID: <CAA=zYJbdssJaOMiN26bELCkjbhTMD2-X8BAT9ea+YvGSCMMJZg@mail.gmail.com>
+References: <CAA=zYJaFsQd5ynPRsdqi3ajSHfUFgkUqW9jRaFmvF25S270_HQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:41679 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750765Ab2IEIGe (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 5 Sep 2012 04:06:34 -0400
-Received: by weyx8 with SMTP id x8so200433wey.19
-        for <dash@vger.kernel.org>; Wed, 05 Sep 2012 01:06:33 -0700 (PDT)
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:37703 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755205Ab2IFAFx (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 5 Sep 2012 20:05:53 -0400
+Received: by wicr5 with SMTP id r5so6048569wic.1
+        for <dash@vger.kernel.org>; Wed, 05 Sep 2012 17:05:52 -0700 (PDT)
+In-Reply-To: <CAA=zYJaFsQd5ynPRsdqi3ajSHfUFgkUqW9jRaFmvF25S270_HQ@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Dear all,
+2012/9/5 Roy Tam <roytam@gmail.com>:
+> Dear all,
+>
+> There is a hack for making dash working in MSYS environment.
+> briefly in points:
+> - there is no fnmatch.h in MSYS
+> - ungetc()ing 0x0D is need in MSYS as some MinGW utilities (for
+> example GCC) will return in CRLF line ending
+> - strtoll()/strtoull() is missing in MSYS, inlining
+> http://cygwin.com/ml/cygwin-apps/2011-07/txt00006.txt to mystring.c as
+> a big hack
+>
+> Regards,
+> Roy
+>
 
-There is a hack for making dash working in MSYS environment.
-briefly in points:
-- there is no fnmatch.h in MSYS
-- ungetc()ing 0x0D is need in MSYS as some MinGW utilities (for
-example GCC) will return in CRLF line ending
-- strtoll()/strtoull() is missing in MSYS, inlining
-http://cygwin.com/ml/cygwin-apps/2011-07/txt00006.txt to mystring.c as
-a big hack
-
-Regards,
-Roy
+This patch really processes CRLF only, standalone CR can be kept.
 
 diff --git a/src/expand.c b/src/expand.c
-index ce60fe9..01662e7 100644
+index ce60fe9..c758414 100644
 --- a/src/expand.c
 +++ b/src/expand.c
 @@ -45,7 +45,7 @@
@@ -42,15 +48,26 @@ index ce60fe9..01662e7 100644
  #ifdef HAVE_GLOB
  #include <glob.h>
  #endif
-@@ -557,7 +557,7 @@ read:
+@@ -516,6 +516,7 @@ expbackq(union node *cmd, int flag)
+ {
+ 	struct backcmd in;
+ 	int i;
++	int pc = 0;
+ 	char buf[128];
+ 	char *p;
+ 	char *dest;
+@@ -557,8 +558,8 @@ read:
 
  	/* Eat all trailing newlines */
  	dest = expdest;
 -	for (; dest > (char *)stackblock() && dest[-1] == '\n';)
-+	for (; dest > (char *)stackblock() && (dest[-1] == '\n'||dest[-1] == '\r');)
- 		STUNPUTC(dest);
+-		STUNPUTC(dest);
++	for (; dest > (char *)stackblock() && (dest[-1] == '\n'||(dest[-1]
+== '\r' && pc == '\n'));)
++		pc = dest[-1], STUNPUTC(dest);
  	expdest = dest;
 
+ 	if (!(flag & EXP_QUOTED))
 diff --git a/src/mystring.c b/src/mystring.c
 index 0106bd2..7b70baa 100644
 --- a/src/mystring.c
