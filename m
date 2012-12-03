@@ -1,66 +1,50 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: [PATCH] sleep builtin
-Date: Fri, 2 Nov 2012 17:32:07 +0100
-Message-ID: <20121102163207.GA72967@stack.nl>
-References: <201211011948.48456.geissert@debian.org>
+From: Roy <roytam@gmail.com>
+Subject: [PATCH] printf: use %ll instead of %j
+Date: Mon, 03 Dec 2012 15:42:37 +0800
+Message-ID: <op.woqc1kj2dyj81a@2fprep>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay02.stack.nl ([131.155.140.104]:59878 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752751Ab2KBQlw (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 2 Nov 2012 12:41:52 -0400
-Content-Disposition: inline
-In-Reply-To: <201211011948.48456.geissert@debian.org>
+Received: from plane.gmane.org ([80.91.229.3]:42865 "EHLO plane.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751293Ab2LCHpB (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 3 Dec 2012 02:45:01 -0500
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1TfQi7-0004mp-KQ
+	for dash@vger.kernel.org; Mon, 03 Dec 2012 08:45:03 +0100
+Received: from 203186096001.static.ctinets.com ([203.186.96.1])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Mon, 03 Dec 2012 08:45:03 +0100
+Received: from roytam by 203186096001.static.ctinets.com with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Mon, 03 Dec 2012 08:45:03 +0100
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org, geissert@debian.org
+To: dash@vger.kernel.org
 
-On Thu, Nov 01, 2012 at 07:48:47PM -0600, Raphael Geissert wrote:
-> A while ago I wrote a sleep builtin mainly to test its impact in the boot 
-> process. The non-scientific results were not very impressive: around 1 
-> second.
+MSYS libc does not support %j[dXx] format, only %ll[dXx] is supported.
 
-Anything statistically significant can be impressive, taking into
-account how many other things also happen and are unaffected by the
-change.
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index 893295c..12ce660 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -319,11 +319,12 @@ mklong(const char *str, const char *ch)
+         char *copy;
+         size_t len;
 
-If it is not statistically significant it can just be noise.
+-       len = ch - str + 3;
++       len = ch - str + 4;
+         STARTSTACKSTR(copy);
+         copy = makestrspace(len, copy);
+-       memcpy(copy, str, len - 3);
+-       copy[len - 3] = 'j';
++       memcpy(copy, str, len - 4);
++       copy[len - 4] = 'l';
++       copy[len - 3] = 'l';
+         copy[len - 2] = *ch;
+         copy[len - 1] = '\0';
+         return (copy);
 
-> So, I was cleaning up some directories and found the builtin. Instead
-> of just nuking it, I'm forwarding it in case anyone wants to play with
-> it or even merge it. If merged it will annoy those who are used to
-> GNU's sleep(1) which supports the s/m/h/d suffixes, but not those
-> using fractions as I added support for them.
-
-> Back then, I also payed attention to the resulting size of the binary,
-> which obviously increased by a few KBs. However, I do remember that
-> when switching from gcc 4.4 to 4.6 the resulting binary with the sleep
-> builtin was smaller than the binary built with 4.4 and without sleep.
-
-> (interestingly, Debian's 0.5.7-3 dash is bigger than in 0.5.5.1-7)
-
-> [patch snipped]
-
-POSIX says any utility may be provided as a builtin as long as this is
-not detectable apart from performance (and {ARG_MAX} I guess).
-
-Some ksh variants (ksh93 and mksh) have a sleep builtin, so it is likely
-fairly safe to do this.
-
-However, it will need better handling of [EINTR]. The included patch
-simply exits with status 2 when it happens, which differs from what an
-instance of /bin/sleep would do (assuming the signal is sent to parent
-and child). If the signal is one that is ignored by default such as
-SIGCHLD, /bin/sleep ignores it and the shell only takes the trap when
-sleep is done. If the signal is one that causes termination by default,
-/bin/sleep terminates on it and the shell returns exit status 128 plus
-the signal number after which it takes the trap. Unfortunately,
-determining the default action of a non-standard signal is annoying in a
-portable program.
-
-It is probably acceptable that an interactive sleep command cannot be
-^Z'ed.
-
--- 
-Jilles Tjoelker
