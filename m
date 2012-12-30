@@ -1,31 +1,55 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: [PATCH] printf: use %ll instead of %j
-Date: Mon, 3 Dec 2012 22:38:24 -0800
-Message-ID: <20121204063824.GB7633@elie.Belkin>
-References: <op.woqc1kj2dyj81a@2fprep>
- <50BCDA80.8000705@gigawatt.nl>
- <50BCE839.1060606@gigawatt.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Adam Buchbinder <adam.buchbinder@gmail.com>
+Subject: [PATCH] [MAN] 0 and EXIT both work for exit traps.
+Date: Sun, 30 Dec 2012 10:28:55 -0500
+Message-ID: <1356881335-11024-1-git-send-email-adam.buchbinder@gmail.com>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-da0-f46.google.com ([209.85.210.46]:40517 "EHLO
-	mail-da0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750799Ab2LDGic (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 4 Dec 2012 01:38:32 -0500
-Received: by mail-da0-f46.google.com with SMTP id p5so1663469dak.19
-        for <dash@vger.kernel.org>; Mon, 03 Dec 2012 22:38:31 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <50BCE839.1060606@gigawatt.nl>
+Received: from mail-ye0-f176.google.com ([209.85.213.176]:38863 "EHLO
+	mail-ye0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754680Ab2L3P53 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 30 Dec 2012 10:57:29 -0500
+Received: by mail-ye0-f176.google.com with SMTP id m1so1901525yen.35
+        for <dash@vger.kernel.org>; Sun, 30 Dec 2012 07:57:29 -0800 (PST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Roy <roytam@gmail.com>, dash@vger.kernel.org, Brian Koropoff <bkoropoff@gmail.com>
+To: dash@vger.kernel.org
+Cc: Adam Buchbinder <adam.buchbinder@gmail.com>
 
-Harald van Dijk wrote:
+I saw a discussion in which there was some confusion over whether or not
+you can use a symbolic name, since the manpage doesn't specifically say so.
 
-> Here's a slightly tweaked version of that patch.
+Signed-off-by: Adam Buchbinder <adam.buchbinder@gmail.com>
+---
+ ChangeLog  |    4 ++++
+ src/dash.1 |    4 +++-
+ 2 files changed, 7 insertions(+), 1 deletions(-)
 
-This is easier on the eyes than the version I sent, anyway. :)
+diff --git a/ChangeLog b/ChangeLog
+index d84d3b7..73aa14f 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2012-12-29  Adam Buchbinder <adam.buchbinder@gmail.com>
++
++	* Clarify that 0 and EXIT are both acceptable for exit traps.	
++
+ 2012-06-09  Christoph Mathys <eraserix@gmail.com>
+ 
+ 	* Add support for ulimit -r.
+diff --git a/src/dash.1 b/src/dash.1
+index a9cb491..3a1c274 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -2071,7 +2071,9 @@ The signals are specified by signal number or as the name of the signal.
+ If
+ .Ar signal
+ is
+-.Li 0 ,
++.Li 0
++or
++.Li EXIT ,
+ the action is executed when the shell exits.
+ .Ar action
+ may be null, which cause the specified signals to be ignored.
+-- 
+1.7.7.3
 
-For what it's worth,
-Reviewed-by: Jonathan Nieder <jrnieder@gmail.com>
