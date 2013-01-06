@@ -1,82 +1,46 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: [PATCH] [MAN] 0 and EXIT both work for exit traps.
-Date: Sun, 30 Dec 2012 12:06:15 -0800
-Message-ID: <20121230200615.GC6475@elie.Belkin>
-References: <1356881335-11024-1-git-send-email-adam.buchbinder@gmail.com>
+From: Aleksey Cheusov <vle@gmx.net>
+Subject: patch for dash
+Date: Sun, 06 Jan 2013 19:30:54 +0300
+Message-ID: <87a9sms281.fsf@asrock.chizhovka.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-pb0-f43.google.com ([209.85.160.43]:56301 "EHLO
-	mail-pb0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754872Ab2L3UGV (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 30 Dec 2012 15:06:21 -0500
-Received: by mail-pb0-f43.google.com with SMTP id um15so6734095pbc.16
-        for <dash@vger.kernel.org>; Sun, 30 Dec 2012 12:06:20 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <1356881335-11024-1-git-send-email-adam.buchbinder@gmail.com>
+Received: from mout.gmx.net ([212.227.15.18]:57451 "EHLO mout.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756017Ab3AFQbA (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 6 Jan 2013 11:31:00 -0500
+Received: from mailout-de.gmx.net ([10.1.76.20]) by mrigmx.server.lan
+ (mrigmx001) with ESMTP (Nemesis) id 0Me6KG-1TeE8447gs-00PtX9 for
+ <dash@vger.kernel.org>; Sun, 06 Jan 2013 17:30:59 +0100
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Adam Buchbinder <adam.buchbinder@gmail.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Adam Buchbinder wrote:
+Hi. The following patch fixes dash build failure on Solaris
+where /usr/bin/nl (which is in default PATH) is not POSIX compatible.
+POSIX-ly correct version is in /usr/xpg4/bin but I think it's easier
+to fix use of nl(1).
 
-> I saw a discussion in which there was some confusion over whether or not
-> you can use a symbolic name, since the manpage doesn't specifically say so.
+   [cheusov@pkgsrc-dev]$ /usr/bin/nl -ba -v0 <<< foo
+     0  foo
+   [cheusov@pkgsrc-dev]$ /usr/bin/nl -b a -v 0 <<< foo
+   nl: a: No such file or directory
+   [cheusov@pkgsrc-dev]$ uname -srm
+   SunOS 5.11 i86pc
+   [cheusov@pkgsrc-dev]$
 
-Looks good to me, with one nit:
 
-[...]
-> +	* Clarify that 0 and EXIT are both acceptable for exit traps.	
-
-A trailing tab seems to have snuck in.
-
-How about the following on top (for application with "am --scissors")?
-
--- >8 --
-Subject: [MAN] Clarify "trap '' signals" syntax in manual page
-
-When the manpage states
-
-| <action> may be null, which cause the specified signals to be ignored.
-
-it is not immediately obvious what it means for an action to be
-null.  Clarify by explicitly referring to an empty string, as
-opposed to a NULL pointer or the string "null".
-
-Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
----
- ChangeLog  | 4 ++++
- src/dash.1 | 4 +++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/ChangeLog b/ChangeLog
-index f39999e9..d6536954 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,7 @@
-+2012-12-30  Jonathan Nieder  <jrnieder@gmail.com>
-+
-+	* Clarify "trap '' signals" syntax in manual page.
-+
- 2012-12-29  Adam Buchbinder <adam.buchbinder@gmail.com>
+--- src/mkbuiltins.orig	2011-03-15 07:18:06.000000000 +0000
++++ src/mkbuiltins
+@@ -97,7 +97,7 @@ cat <<\!
+  */
  
- 	* Clarify that 0 and EXIT are both acceptable for exit traps.
-diff --git a/src/dash.1 b/src/dash.1
-index 3a1c2749..b47364d9 100644
---- a/src/dash.1
-+++ b/src/dash.1
-@@ -2076,7 +2076,9 @@ or
- .Li EXIT ,
- the action is executed when the shell exits.
- .Ar action
--may be null, which cause the specified signals to be ignored.
-+may be empty
-+.Li ( "''" ) ,
-+which causes the specified signals to be ignored.
- With
- .Ar action
- omitted or set to `-' the specified signals are set to their default action.
--- 
-1.8.1.rc3
+ !
+-sed 's/	-[a-z]*//' $temp2 | nl -b a -v 0 | LC_COLLATE=C sort -u -k 3,3 |
++sed 's/	-[a-z]*//' $temp2 | nl -ba -v0 | LC_COLLATE=C sort -u -k 3,3 |
+ tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ |
+ 	awk '{	printf "#define %s (builtincmd + %d)\n", $3, $1}'
+ printf '\n#define NUMBUILTINS %d\n' $(wc -l < $temp2)
 
+-- 
+Best regards, Aleksey Cheusov.
