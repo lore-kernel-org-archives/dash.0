@@ -1,81 +1,38 @@
-From: z7z8th <ybzhao1989@gmail.com>
-Subject: Fwd: variable scope bug in while loop when using pipe
-Date: Sun, 20 Jan 2013 16:07:20 +0800
-Message-ID: <CAOEkoLy1j1BECiqZ9NMbi-488tQnHKqB_ZO7qN6xmB7GfOR=VA@mail.gmail.com>
+From: Seb <sbb@tuxfamily.org>
+Subject: Re: Fwd: variable scope bug in while loop when using pipe
+Date: Sun, 20 Jan 2013 11:22:12 +0100
+Message-ID: <20130120112212.c8592b53566496716dc81526@tuxfamily.org>
 References: <CAOEkoLyvfc1-wdqGgUKwC2QLGJcUKVftf24zu_EYyAzPP9y3Gg@mail.gmail.com>
+	<CAOEkoLy1j1BECiqZ9NMbi-488tQnHKqB_ZO7qN6xmB7GfOR=VA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-we0-f169.google.com ([74.125.82.169]:33074 "EHLO
-	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750896Ab3ATIHm (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 20 Jan 2013 03:07:42 -0500
-Received: by mail-we0-f169.google.com with SMTP id t11so1157744wey.0
-        for <dash@vger.kernel.org>; Sun, 20 Jan 2013 00:07:40 -0800 (PST)
-In-Reply-To: <CAOEkoLyvfc1-wdqGgUKwC2QLGJcUKVftf24zu_EYyAzPP9y3Gg@mail.gmail.com>
+Received: from smtpfb2-g21.free.fr ([212.27.42.10]:35841 "EHLO
+	smtpfb2-g21.free.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751249Ab3ATKYH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 20 Jan 2013 05:24:07 -0500
+Received: from smtp2-g21.free.fr (smtp2-g21.free.fr [212.27.42.2])
+	by smtpfb2-g21.free.fr (Postfix) with ESMTP id D2CACD1AEAD
+	for <dash@vger.kernel.org>; Sun, 20 Jan 2013 11:24:03 +0100 (CET)
+In-Reply-To: <CAOEkoLy1j1BECiqZ9NMbi-488tQnHKqB_ZO7qN6xmB7GfOR=VA@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
+Cc: z7z8th <ybzhao1989@gmail.com>
 
----------- Forwarded message ----------
-From: z7z8th <ybzhao1989@gmail.com>
-Date: 2013/1/18
-Subject: variable scope bug in while loop when using pipe
-To: dash@vger.kernel.org
+Hello,
 
+It's not a bug, both are POSIX, placing a pipe member in the current
+environment instead of in a subshell being an extension:
 
-$ ls -l /bin/sh
-lrwxrwxrwx 1 root root 4 Aug 21 08:11 /bin/sh -> dash*
+ Command substitution, commands that are grouped with parentheses, and
+ asynchronous lists shall be executed in a subshell environment.
+ Additionally, each command of a multi-command pipeline is in a
+ subshell environment; as an extension, however, any or all commands
+ in a pipeline may be executed in the current environment.
 
-The script did not work as what I wanted? Do you think it's a bug?
->
-> #!/bin/sh
->
-> abc=99
->
-> echo "1\n2" | while read line; do
->     echo "line=$line"
->     echo "abc=$abc"
->     abc=123
-> done
->
-> echo "abc=$abc"
->
+ http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_12
 
-The output looks like below:
->
-> line=1
-> abc=99
-> line=2
-> abc=123
-> abc=99
-
-
-I think the last line should be abc=123
-
-If the while loop is not after the pipe, it works as what I wanted.
-
-> #!/bin/sh
->
-> abc=99
->
-> line=1
-> while [ $line -lt 3 ]; do
->     echo "line=$line"
->     echo "abc=$abc"
->     abc=123
->     line=$((line+1))
-> done
->
-> echo "abc=$abc"
-
-
-the variable abc is 123 in the end.
-
-Then I found this article talking about this problem.
-http://www.kilala.nl/Sysadmin/index.php?id=741
-It says that old bash has this problem.
-But I found bash-4.2.37 and dash-0.5.7 has this problem too.
-
-I'm using Debian testing.
-Linux 3.2.0-4-amd64 #1 SMP Debian 3.2.35-2 x86_64 GNU/Linux
+++
+Seb.
