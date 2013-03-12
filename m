@@ -1,55 +1,51 @@
 From: Peter Rosin <peda@lysator.liu.se>
-Subject: [PATCH] [DEBUG] Do not attempt to output a NULL message
-Date: Sun, 10 Mar 2013 22:58:38 +0100
-Message-ID: <513D020E.8050704@lysator.liu.se>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH] [DEBUG] Add newline when tracing in poplocalvars
+Date: Tue, 12 Mar 2013 14:22:11 +0100
+Message-ID: <1363094531-48060-1-git-send-email-peda@lysator.liu.se>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.lysator.liu.se ([130.236.254.3]:41976 "EHLO
+Received: from mail.lysator.liu.se ([130.236.254.3]:48583 "EHLO
 	mail.lysator.liu.se" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753231Ab3CJWHE (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 10 Mar 2013 18:07:04 -0400
+	with ESMTP id S1751241Ab3CLNWT (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 12 Mar 2013 09:22:19 -0400
 Received: from mail.lysator.liu.se (localhost [127.0.0.1])
-	by mail.lysator.liu.se (Postfix) with ESMTP id 1576140004
-	for <dash@vger.kernel.org>; Sun, 10 Mar 2013 22:58:39 +0100 (CET)
-Received: from [192.168.0.64] (90-227-119-137-no95.business.telia.com [90.227.119.137])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mail.lysator.liu.se (Postfix) with ESMTPSA id E98AD40003
-	for <dash@vger.kernel.org>; Sun, 10 Mar 2013 22:58:38 +0100 (CET)
+	by mail.lysator.liu.se (Postfix) with ESMTP id 61B5640007
+	for <dash@vger.kernel.org>; Tue, 12 Mar 2013 14:22:16 +0100 (CET)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-
-Prevent future problems, as noone calls exverror with a NULL msg
-at this time.
+Cc: Peter Rosin <peda@lysator.liu.se>
 
 Signed-off-by: Peter Rosin <peda@lysator.liu.se>
 ---
- src/error.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ ChangeLog |    4 ++++
+ src/var.c |    2 +-
+ 2 files changed, 5 insertions(+), 1 deletions(-)
 
-I stumbled on this when reading the code... Or is msg only ever
-NULL when DEBUG is #defined?
-
-Cheers,
-Peter
-
-diff --git a/src/error.c b/src/error.c
-index 9d31989..5ab69c0 100644
---- a/src/error.c
-+++ b/src/error.c
-@@ -151,8 +151,8 @@ exverror(int cond, const char *msg, va_list ap)
- 		TRACE(("\") pid=%d\n", getpid()));
- 	} else
- 		TRACE(("exverror(%d, NULL) pid=%d\n", cond, getpid()));
--	if (msg)
- #endif
-+	if (msg)
- 		exvwarning(-1, msg, ap);
+diff --git a/ChangeLog b/ChangeLog
+index d84d3b7..959dd07 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2013-03-12  Peter Rosin  <peda@lysator.liu.se>
++
++	* Add newline when tracing in poplocalvars.
++
+ 2012-06-09  Christoph Mathys <eraserix@gmail.com>
  
- 	flushall();
+ 	* Add support for ulimit -r.
+diff --git a/src/var.c b/src/var.c
+index dc90249..c35e925 100644
+--- a/src/var.c
++++ b/src/var.c
+@@ -547,7 +547,7 @@ poplocalvars(int keep)
+ 	while ((lvp = next) != NULL) {
+ 		next = lvp->next;
+ 		vp = lvp->vp;
+-		TRACE(("poplocalvar %s", vp ? vp->text : "-"));
++		TRACE(("poplocalvar %s\n", vp ? vp->text : "-"));
+ 		if (keep) {
+ 			int bits = VSTRFIXED;
+ 
 -- 
 1.7.9
 
