@@ -1,205 +1,99 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: Crash on valid input
-Date: Tue, 09 Apr 2013 23:20:52 +0200
-Message-ID: <51648634.4090708@gigawatt.nl>
-References: <CAPF-yOaPfWdK2c556eTcRuf-thaHEzUcMKa+xa8criaS8uFLUw@mail.gmail.com> <51638620.4030603@redhat.com> <CAPF-yOZmkcKSpU+jVMsSi6Q8harUYZ-hS5Ugn7SsbBwm-GzhiQ@mail.gmail.com> <51638AA0.4080701@redhat.com>
+From: Craig Loomis <cploomis@gmail.com>
+Subject: "command -p" does not correctly limit search to a safe PATH
+Date: Wed, 10 Jul 2013 14:18:33 -0400
+Message-ID: <CAL=-wemDL=2-7Rco761LTgGrFeAA_-zvz0ECpk4xZE7QJsGUEg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailfilter.csv-networks.nl ([84.244.149.121]:56284 "EHLO
-	mailfilter.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750943Ab3DIWZj (ORCPT
-	<rfc822;dash@vger.kernel.org>); Tue, 9 Apr 2013 18:25:39 -0400
-In-Reply-To: <51638AA0.4080701@redhat.com>
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:63038 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753767Ab3GJSSz (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 10 Jul 2013 14:18:55 -0400
+Received: by mail-wi0-f171.google.com with SMTP id hj3so11732612wib.10
+        for <dash@vger.kernel.org>; Wed, 10 Jul 2013 11:18:54 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-Cc: Dan Kegel <dank@kegel.com>, Eric Blake <eblake@redhat.com>
 
-On 09/04/13 05:27, Eric Blake wrote:
-> On 04/08/2013 09:12 PM, Dan Kegel wrote:
->> Yes, my script was crap, I've fixed it.
->>
->> Here's the reproducer.  Called with foo unset.  I think it doesn't
->> crash without -x.
->>
->> #!/bin/dash
->> set -x
->> test ! $foo
-> The 'set -x' was indeed the key to reproducing the problem.  In fact,
-> this is the shortest I could make it:
->
-> dash -cx 'test !'
->
-It is not limited to 'set -x'. dash continues reading after the NULL 
-value in argv, and usually that will be followed by another NULL if 'set 
--x' is not used, but not necessarily.
+  I needed to bootstrap a safe shell environment, assuming only a
+minimal "POSIX system" and expecting some peculiar ones (embedded
+systems with unusual paths, etc).
 
-$ dash -c 'test ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !'
-$ dash -c 'test ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !'
-Segmentation fault
-$ dash -c 'test ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !'
-$
+  One modern POSIX prescription to establish a safe PATH is fleshed
+out in OpenGroup's IEEE 1003.1 at
+http://pubs.opengroup.org/onlinepubs/9699919799/utilities/command.html
+(and so 'man 1p command' on some Linux versions).
+  This boils down to (after setting IFS and cleaning out aliases and functions):
 
-When [ ! ] is used, the ! is necessarily followed by two NULLs (one 
-after the ], and one because the ] is replaced by NULL), so the problem 
-is hidden.
+$ PATH="$(command -p getconf PATH):$PATH"
 
-dash should check whether ! is followed by an argument, like bash does, 
-which would give an error message without a segmentation fault for all 
-three forms above.
+  Which works as a bootstrap because:
+    - "command" is a shell builtin (per the standard)
+    - "command -p" limits its search to system-defined locations.
+    - "getconf PATH" uses confstr(3) to get the required
+system-defined _CS_PATH.
 
-This seems to be easily possible by manually inlining primary() into 
-nexpr(), and treating UNOT similarly to STREZ e.a.:
+  The Standard's definition of paths is a bit fuzzy; a paragraph from
+the Rationale helps:
 
-diff --git a/src/bltin/test.c b/src/bltin/test.c
-index 90135e1..5cf4021 100644
---- a/src/bltin/test.c
-+++ b/src/bltin/test.c
-@@ -268,14 +268,6 @@ aexpr(enum token n)
-  static int
-  nexpr(enum token n)
-  {
--       if (n == UNOT)
--               return !nexpr(t_lex(++t_wp));
--       return primary(n);
--}
--
--static int
--primary(enum token n)
--{
-         enum token nn;
-         int res;
-
-@@ -289,11 +281,13 @@ primary(enum token n)
-                         syntax(NULL, "closing paren expected");
-                 return res;
-         }
--       if (t_wp_op && t_wp_op->op_type == UNOP) {
-+       if (t_wp_op && (t_wp_op->op_type == UNOP || t_wp_op->op_type == 
-BUNOP)) {
-                 /* unary expression */
-                 if (*++t_wp == NULL)
-                         syntax(t_wp_op->op_text, "argument expected");
-                 switch (n) {
-+               case UNOT:
-+                       return !nexpr(t_lex(t_wp));
-                 case STREZ:
-                         return strlen(*t_wp) == 0;
-                 case STRNZ:
-
-Unfortunately, this exposes the fact that POSIX test requires special 
-behaviour when called with fewer than five arguments. This change would 
-cause "test !" to start returning an error. Something like
-
-diff --git a/src/bltin/test.c b/src/bltin/test.c
-index 5cf4021..1e84423 100644
---- a/src/bltin/test.c
-+++ b/src/bltin/test.c
-@@ -177,6 +177,7 @@ testcmd(int argc, char **argv)
-  {
-         const struct t_op *op;
-         enum token n;
-+       int not;
-         int res;
-
-         if (*argv[0] == '[') {
-@@ -191,25 +192,44 @@ testcmd(int argc, char **argv)
-         if (argc < 1)
-                 return 1;
-
-+       not = 0;
-+
-         /*
-          * POSIX prescriptions: he who wrote this deserves the Nobel
-          * peace prize.
-          */
--       switch (argc) {
--       case 3:
--               op = getop(argv[1]);
--               if (op && op->op_type == BINOP) {
--                       n = OPERAND;
--                       goto eval;
-+       for (;;) {
-+               switch (argc) {
-+               case 1:
-+                       res = strlen(argv[0]) == 0;
-+                       goto exit;
-+
-+               case 3:
-+                       op = getop(argv[1]);
-+                       if (op && op->op_type == BINOP) {
-+                               n = OPERAND;
-+                               goto eval;
-+                       }
-+                       /* fall through */
-+
-+               case 2:
-+               case 4:
-+                       if (!strcmp(argv[0], "!")) {
-+                               not = !not;
-+                               argv++;
-+                               argc--;
-+                               continue;
-+                       }
-+
-+                       if (!strcmp(argv[0], "(") && !strcmp(argv[argc - 
-1], ")")) {
-+                               argv[--argc] = NULL;
-+                               argv++;
-+                               argc--;
-+                               continue;
-+                       }
-                 }
--               /* fall through */
-
--       case 4:
--               if (!strcmp(argv[0], "(") && !strcmp(argv[argc - 1], ")")) {
--                       argv[--argc] = NULL;
--                       argv++;
--                       argc--;
--               }
-+               break;
-         }
-
-         n = t_lex(argv);
-@@ -222,6 +242,10 @@ eval:
-         if (argv[0] != NULL && argv[1] != NULL)
-                 syntax(argv[0], "unexpected operator");
-
-+exit:
-+       if (not)
-+               res = !res;
-+
-         return res;
-  }
+"The -p option is present because it is useful to be able to ensure a
+safe path search that finds all the standard utilities. This search
+might not be identical to the one that occurs through one of the exec
+functions (as defined in the System Interfaces volume of POSIX.1-2008)
+when PATH is unset. At the very least, this feature is required to
+allow the script to access the correct version of getconf so that the
+value of the default path can be accurately retrieved."
 
 
-Although this is a bit ugly, it gets the right results:
+  Dash (0.5.7 and git master) does not implement 'command -p'
+according to the standard, and opens an intriguing security hole to
+anyone trying this scheme.
 
-$ ./dash -c 'test'; echo $?
-1
-$ ./dash -c 'test !'; echo $?
-0
-$ ./dash -c 'test ! !'; echo $?
-1
-$ ./dash -c 'test ! ! !'; echo $?
-0
-$ ./dash -c 'test ! ! ! !'; echo $?
-1
-$ ./dash -c 'test ! ! ! ! !'; echo $?
-./dash: 1: test: !: argument expected
-2
+  When using 'command -v' to simply print the path to an executable,
+'-p' has no effect:
 
-One comment about this approach: to keep the code slightly simpler, it 
-also removes parentheses in two-argument calls to test. That is not 
-standard behaviour, but the standard leaves the behaviour unspecified, 
-so it is valid. This causes dash to return 1 for "test \( \)", and 
-previous versions of dash already returned 1 for other reasons.
+# Assume that an executable /tmp/evilbin/getconf exists
+$ PATH=/tmp/evilbin:$PATH
 
-Cheers,
-Harald
+$ command -v getconf
+/tmp/evilbin/getconf
+$ command -p -v getconf
+/tmp/evilbin/getconf
+
+  Not good, but most people would call getconf directly. At first
+glance that _appears_ to work better -- /tmp/evilbin/getconf is not
+called:
+
+$ command getconf PATH
+/tmp/evilbin:/bin:/usr/bin
+$ command -p getconf PATH
+/usr/bin:/bin:/usr/sbin:/sbin
+
+  but there are two surprises:
+    a) the behavior of 'command -p cmd' and '$(command -p -v cmd)'
+really should be the same, no?
+    b) the path that 'command -p cmd' uses is a compiled-in constant
+from dash's src/var.c:defpathvar, which starts with
+"/usr/local/sbin:/usr/local/bin". To me, that is both completely
+unexpected and pretty scary -- /usr/local/bin is (very) often less
+well secured or checked than, say, /bin:
+
+# somehow, sometime, 'sudo make install' or a g+w /usr/local/ might get you:
+$ cp evil_getconf /usr/local/bin/getconf
+
+  after which:
+
+$ command -p getconf PATH
+/tmp/evilbin:/bin:/usr/bin
+
+  Ouch.
+
+  src/exec.c and src/eval.c are a bit tricky (see the different
+behavior between 'command cmd' and 'command -v cmd') and too
+fundamental for me to stand behind a quick patch. Sorry.
+
+  FWIW, bash 4.1+ (and maybe earlier) has a posix compliant 'command
+-p'. Fixed sometime after 3.2, from trying that version on OS X 10.8
+and RHEL 5.9.
+
+ - craig
