@@ -1,31 +1,43 @@
-From: =?UTF-8?B?UsOpbWkgRHVwbMOp?= <pinguix40@gmail.com>
-Subject: Re:Hello
-Date: Sun, 14 Jul 2013 21:52:06 +0200
-Message-ID: <51E30166.4090008@gmail.com>
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: dash website (Re: Hello)
+Date: Sun, 14 Jul 2013 13:16:47 -0700
+Message-ID: <20130714201647.GB8564@google.com>
+References: <51E30166.4090008@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
-	format=flowed
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-we0-f175.google.com ([74.125.82.175]:61734 "EHLO
-	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753097Ab3GNTwK (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 14 Jul 2013 15:52:10 -0400
-Received: by mail-we0-f175.google.com with SMTP id t59so9248599wes.6
-        for <dash@vger.kernel.org>; Sun, 14 Jul 2013 12:52:09 -0700 (PDT)
-Received: from [82.65.8.144] (lns-bzn-53-82-65-8-144.adsl.proxad.net. [82.65.8.144])
-        by mx.google.com with ESMTPSA id b14sm16383808wic.8.2013.07.14.12.52.07
-        for <dash@vger.kernel.org>
-        (version=TLSv1 cipher=ECDHE-RSA-RC4-SHA bits=128/128);
-        Sun, 14 Jul 2013 12:52:08 -0700 (PDT)
+Received: from mail-pa0-f45.google.com ([209.85.220.45]:39336 "EHLO
+	mail-pa0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753176Ab3GNUQv (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 14 Jul 2013 16:16:51 -0400
+Received: by mail-pa0-f45.google.com with SMTP id bi5so10518817pad.4
+        for <dash@vger.kernel.org>; Sun, 14 Jul 2013 13:16:50 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <51E30166.4090008@gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Dash <dash@vger.kernel.org>
+To: =?iso-8859-1?Q?R=E9mi_Dupl=E9?= <pinguix40@gmail.com>
+Cc: Dash <dash@vger.kernel.org>
 
-Hello,
-I am writing this mail to propose an overhaul of the current site=20
-without creating another site on another domain. If my idea of =E2=80=8B=
-=E2=80=8B=20
-recasting (free) interest you deprive yourself especially not contact m=
-e.
-Pinguix cordially.
+R=E9mi Dupl=E9 wrote:
+
+> I am writing this mail to propose an overhaul of the current site
+> without creating another site on another domain. If my idea of
+> recasting (free) interest you deprive yourself especially not
+> contact me.
+
+Wow, that got ugly fast.
+
+I don't have anything against trying out website improvements.  As
+usual in free software projects, the best way is to go forward and try
+it out, which would give the kind people in the project a chance to
+look over your work and tell their thoughts.
+
+If you are asking for advice, again, my advice is to show an example
+of what kind of improvements you mean, and then we can give you
+feedback.  If you are asking for assurance in advance that Herbert
+would adopt your changes, I can't offer that, sorry.
+
+Sorry for the lack of clarity,
+Jonathan
