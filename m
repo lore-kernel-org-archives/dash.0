@@ -1,87 +1,99 @@
-From: Luigi Tarenga <luigi.tarenga@gmail.com>
-Subject: possible bug in job control
-Date: Mon, 29 Jul 2013 23:44:42 +0200
-Message-ID: <CAKkO-EgtZw6EuoBz1ishWc-V7LNOzFO98O7A8T=Rqq42DA_T1A@mail.gmail.com>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: possible bug in job control
+Date: Tue, 30 Jul 2013 00:47:40 +0200
+Message-ID: <51F6F10C.4060109@gigawatt.nl>
+References: <CAKkO-EgtZw6EuoBz1ishWc-V7LNOzFO98O7A8T=Rqq42DA_T1A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/mixed;
+ boundary="------------000800050105030302040703"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-ob0-f182.google.com ([209.85.214.182]:53640 "EHLO
-	mail-ob0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755168Ab3G2Vom (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 29 Jul 2013 17:44:42 -0400
-Received: by mail-ob0-f182.google.com with SMTP id wo10so10691976obc.27
-        for <dash@vger.kernel.org>; Mon, 29 Jul 2013 14:44:42 -0700 (PDT)
+Received: from mailfilter.csv-networks.nl ([84.244.149.121]:56347 "EHLO
+	mailfilter.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755681Ab3G2Wr5 (ORCPT
+	<rfc822;dash@vger.kernel.org>); Mon, 29 Jul 2013 18:47:57 -0400
+In-Reply-To: <CAKkO-EgtZw6EuoBz1ishWc-V7LNOzFO98O7A8T=Rqq42DA_T1A@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Luigi Tarenga <luigi.tarenga@gmail.com>
+Cc: dash@vger.kernel.org
 
-hi list,
-while writing a script to execute parallel ssh command on many host I found
-a strange behavior of dash. I can replicate it with a very simple script but
-didn't find any documentation about dash or POSIX that can explain it.
+This is a multi-part message in MIME format.
+--------------000800050105030302040703
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-tested on centos 6.4 (dash 0.5.5.1) and wih dash compiled from source (0.5.7)
-the following script reports error:
+On 29/07/13 23:44, Luigi Tarenga wrote:
+> hi list,
+> while writing a script to execute parallel ssh command on many host I found
+> a strange behavior of dash. I can replicate it with a very simple script but
+> didn't find any documentation about dash or POSIX that can explain it.
+> 
+> tested on centos 6.4 (dash 0.5.5.1) and wih dash compiled from source (0.5.7)
+> the following script reports error:
+> 
+> #!/bin/dash
+> 
+> sleep 3 &
+> sleep 3 &
+> sleep 3 &
+> sleep 3 &
+> 
+> #/bin/true
+> jobs -l
+> 
+> wait %1
+> wait %2
+> wait %3
+> wait %4
+> 
+> [vortex@lizard ~]$ ./dash-0.5.7/src/dash test.sh
+> [4] + 4569 Running
+> [3] - 4568 Running
+> [2]   4567 Running
+> [1]   4566 Running
+> prova: 14: wait: No such job: %4
+> [vortex@lizard ~]$ echo $?
+> 2
 
-#!/bin/dash
+Yes, this looks like a bug to me. The number of allocated jobs is always
+kept as a multiple of four, and the first check in considering whether
+the job number is valid is "if it's greater than or equal to the number
+of allocated job, it's invalid". That doesn't look right. That would
+only be right if jobs were zero-based, but they aren't. If it's exactly
+equal to the number of available jobs, it can still be valid. It works
+when adding /bin/true, because four more more jobs end up allocated
+internally.
 
-sleep 3 &
-sleep 3 &
-sleep 3 &
-sleep 3 &
+The attached patch should fix it.
 
-#/bin/true
-jobs -l
+Cheers,
+Harald
 
-wait %1
-wait %2
-wait %3
-wait %4
+--------------000800050105030302040703
+Content-Type: text/x-patch;
+ name="dash-getjob-off-by-one.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="dash-getjob-off-by-one.patch"
 
-[vortex@lizard ~]$ ./dash-0.5.7/src/dash test.sh
-[4] + 4569 Running
-[3] - 4568 Running
-[2]   4567 Running
-[1]   4566 Running
-prova: 14: wait: No such job: %4
-[vortex@lizard ~]$ echo $?
-2
+commit ddeba5485c3309ffc7010f8924d604a781908e1d
+Author: Harald van Dijk <harald@gigawatt.nl>
+Date:   Tue Jul 30 00:36:53 2013 +0200
 
-if you uncomment /bin/true it works or if you add one more job it work again:
+    getjob: Fix off-by-one error for multiple of four job numbers
 
-#!/bin/dash
+diff --git a/src/jobs.c b/src/jobs.c
+index bf40204..c2c2332 100644
+--- a/src/jobs.c
++++ b/src/jobs.c
+@@ -699,7 +699,7 @@ check:
+ 
+ 	if (is_number(p)) {
+ 		num = atoi(p);
+-		if (num < njobs) {
++		if (num <= njobs) {
+ 			jp = jobtab + num - 1;
+ 			if (jp->used)
+ 				goto gotit;
 
-sleep 3 &
-sleep 3 &
-sleep 3 &
-sleep 3 &
-sleep 3 &
-
-#/bin/true
-jobs -l
-
-wait %1
-wait %2
-wait %3
-wait %4
-wait %5
-
-[vortex@lizard ~]$ ./dash-0.5.7/src/dash prova
-[5] + 4590 Running
-[4] - 4589 Running
-[3]   4588 Running
-[2]   4587 Running
-[1]   4586 Running
-
-
-the script fails with 4 and 8 jobs, works with 1 2 3 5 6 7 9.
-jobs -l have no other efffect than printing job list (this is ok).
-executing one external binary (like /bin/true) between sleeps and wait
-make it works. putting and internal command in backgroup like : &
-(so it spawn another subprocess) make it works. using %% in the last
-wait make it works.
-
-what do you think? it this a bug?
-
-thanks in advance
-Luigi
+--------------000800050105030302040703--
