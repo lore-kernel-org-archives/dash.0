@@ -1,36 +1,30 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: possible bug in job control
-Date: Wed, 31 Jul 2013 17:34:25 +1000
-Message-ID: <20130731073425.GA14063@gondor.apana.org.au>
-References: <51F7E736.8080803@gigawatt.nl>
+From: =?UTF-8?Q?Maur=C3=ADcio_Antunes?= <mauricio.antunes@gmail.com>
+Subject: --with-libedit as default
+Date: Sat, 3 Aug 2013 21:39:33 -0300
+Message-ID: <CAA4sStkyXjKCfZ8O47r6V-aLPXZ5TiTRJDmys92n5W_N6TFnPA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:45597 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755201Ab3GaHe3 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 31 Jul 2013 03:34:29 -0400
-Content-Disposition: inline
-In-Reply-To: <51F7E736.8080803@gigawatt.nl>
+Received: from mail-pa0-f65.google.com ([209.85.220.65]:54664 "EHLO
+	mail-pa0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751521Ab3HDAje convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sat, 3 Aug 2013 20:39:34 -0400
+Received: by mail-pa0-f65.google.com with SMTP id fb10so1396371pad.0
+        for <dash@vger.kernel.org>; Sat, 03 Aug 2013 17:39:33 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: luigi.tarenga@gmail.com, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Harald van Dijk <harald@gigawatt.nl> wrote:
-> 
-> It may take some time for a bugfix to be committed: the last commit in
-> git is from over a year ago, and since then, there have been some other
-> bug reports with patches sent to this list that have not yet been
-> applied, reviewed, or had any other feedback. But the past suggests that
-> that is just the way it works for dash, the mails do get read
-> eventually, they do not simply get discarded.
+Hi,
 
-Sorry about the lack of commits.  Be rest assured your patches
-are in my queue :)
+I would like to suggest this: do you think in its next version dash cou=
+ld
+enable libedit by default, instead of requiring it to be explicitly
+requested when running the configure script? The reason why I think
+it's a good idea is because this is what Posix demands, and many linux
+distributions forget to add that option (maybe because they see dash
+just as an efficient tool for scripts, not as a nice login shell).
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks. Best,
+Maur=C3=ADcio
