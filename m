@@ -1,46 +1,49 @@
-From: Roy Tam <roytam@gmail.com>
+From: Paul Gilmartin <PaulGBoulder@aim.com>
 Subject: Re: --with-libedit as default
-Date: Mon, 5 Aug 2013 06:46:44 +0800
-Message-ID: <CAA=zYJZ8V6YYScpA=eD9rYrVeDdN1L=kPk7X_4Qh3yCXsm710g@mail.gmail.com>
-References: <CAA4sStkyXjKCfZ8O47r6V-aLPXZ5TiTRJDmys92n5W_N6TFnPA@mail.gmail.com>
- <20130804010244.GL2893@elie.Belkin> <CAA4sSt=7K=GXZFnQ741ZBfcUtj3xZ45ir0TCfg9dtekga-DahQ@mail.gmail.com>
- <20130804114350.fc97c50b21f4a63ad5f089d3@tuxfamily.org> <CAA4sStnUN0gQD0anxuTyqGrpa3nUAY2zndJBkVUkqa4=x8N=qA@mail.gmail.com>
- <20130804190918.7d0b790bf779c431e408f817@tuxfamily.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Sun, 4 Aug 2013 18:16:06 -0600
+Message-ID: <8EED643C-0420-4F70-AD19-3816EF9FD05E@aim.com>
+References: <CAA4sStkyXjKCfZ8O47r6V-aLPXZ5TiTRJDmys92n5W_N6TFnPA@mail.gmail.com> <20130804010244.GL2893@elie.Belkin> <CAA4sSt=7K=GXZFnQ741ZBfcUtj3xZ45ir0TCfg9dtekga-DahQ@mail.gmail.com> <20130804114350.fc97c50b21f4a63ad5f089d3@tuxfamily.org> <CAA4sStnUN0gQD0anxuTyqGrpa3nUAY2zndJBkVUkqa4=x8N=qA@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v1085)
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-la0-f45.google.com ([209.85.215.45]:40928 "EHLO
-	mail-la0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753956Ab3HDWrH convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Sun, 4 Aug 2013 18:47:07 -0400
-Received: by mail-la0-f45.google.com with SMTP id fj20so1604457lab.4
-        for <dash@vger.kernel.org>; Sun, 04 Aug 2013 15:47:05 -0700 (PDT)
-In-Reply-To: <20130804190918.7d0b790bf779c431e408f817@tuxfamily.org>
+Received: from omr-m10.mx.aol.com ([64.12.143.86]:38079 "EHLO
+	omr-m10.mx.aol.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754010Ab3HEAYI convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sun, 4 Aug 2013 20:24:08 -0400
+Received: from mtaout-db03.r1000.mx.aol.com (mtaout-db03.r1000.mx.aol.com [172.29.51.195])
+	by omr-m10.mx.aol.com (Outbound Mail Relay) with ESMTP id E3695700F4D12
+	for <dash@vger.kernel.org>; Sun,  4 Aug 2013 20:16:08 -0400 (EDT)
+Received: from [192.168.0.3] (75-166-242-188.hlrn.qwest.net [75.166.242.188])
+	(using TLSv1 with cipher AES128-SHA (128/128 bits))
+	(No client certificate requested)
+	by mtaout-db03.r1000.mx.aol.com (MUA/Third Party Client Interface) with ESMTPSA id 61037E0000B2
+	for <dash@vger.kernel.org>; Sun,  4 Aug 2013 20:16:08 -0400 (EDT)
+In-Reply-To: <CAA4sStnUN0gQD0anxuTyqGrpa3nUAY2zndJBkVUkqa4=x8N=qA@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Seb <sbb@tuxfamily.org>
-Cc: =?ISO-8859-1?Q?Maur=EDcio_Antunes?= <mauricio.antunes@gmail.com>, dash@vger.kernel.org
+To: dash <dash@vger.kernel.org>
 
-2013/8/5 Seb <sbb@tuxfamily.org>:
-> Le Sun, 4 Aug 2013 13:21:37 -0300
-> Maur=EDcio Antunes a =E9crit:
->
->> What would it take to have auto-completion in dash
->> (even if disabled by default)?
->
-> You'll need to implement it, using the libedit API, I think (there
-> are some examples in the "examples" directory, at the root of its
-> source archive). I'm rather a poor C coder, so I can't tell if it
-> will be difficult or not (probably not trivial, as nobody's ever done
-> it).
->
+On 2013-08-04, at 10:21, Maur=EDcio Antunes wrote:
 
-Or try porting function from NetBSD libedit and /bin/sh.
+>>> I would like to use dash as an interactive shell.
+>=20
+>> The problem is that enabling the libedit support does not provide yo=
+u
+>> with auto-completion, AFAIK.
+>=20
+> You're right, just tested it.
+>=20
+> What would it take to have auto-completion in dash
+> (even if disabled by default)?
+> =20
+Here, I'll be a POSIX fanatic.  I believe POSIX requires
+command line editing; not auto-completion.  POSIX provides
+a usually clear although not satisfactory to all line of
+demarcation between standard function and bloat.
 
-> ++
-> Seb.
-> --
-> To unsubscribe from this list: send the line "unsubscribe dash" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+    http://aleksan.wordpress.com/2008/01/07/the-camels-nose-fable-a-fav=
+ourite-for-teaching-about-setting-limits/
+
+-- gil
+
