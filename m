@@ -1,49 +1,278 @@
-From: Paul Gilmartin <PaulGBoulder@aim.com>
-Subject: Re: --with-libedit as default
-Date: Sun, 4 Aug 2013 18:16:06 -0600
-Message-ID: <8EED643C-0420-4F70-AD19-3816EF9FD05E@aim.com>
-References: <CAA4sStkyXjKCfZ8O47r6V-aLPXZ5TiTRJDmys92n5W_N6TFnPA@mail.gmail.com> <20130804010244.GL2893@elie.Belkin> <CAA4sSt=7K=GXZFnQ741ZBfcUtj3xZ45ir0TCfg9dtekga-DahQ@mail.gmail.com> <20130804114350.fc97c50b21f4a63ad5f089d3@tuxfamily.org> <CAA4sStnUN0gQD0anxuTyqGrpa3nUAY2zndJBkVUkqa4=x8N=qA@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v1085)
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: Tavis Ormandy <taviso@google.com>
+Subject: [PATCH] implement privmode support in dash
+Date: Thu, 22 Aug 2013 10:59:36 -0700
+Message-ID: <20130822175936.GA1260@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from omr-m10.mx.aol.com ([64.12.143.86]:38079 "EHLO
-	omr-m10.mx.aol.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754010Ab3HEAYI convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Sun, 4 Aug 2013 20:24:08 -0400
-Received: from mtaout-db03.r1000.mx.aol.com (mtaout-db03.r1000.mx.aol.com [172.29.51.195])
-	by omr-m10.mx.aol.com (Outbound Mail Relay) with ESMTP id E3695700F4D12
-	for <dash@vger.kernel.org>; Sun,  4 Aug 2013 20:16:08 -0400 (EDT)
-Received: from [192.168.0.3] (75-166-242-188.hlrn.qwest.net [75.166.242.188])
-	(using TLSv1 with cipher AES128-SHA (128/128 bits))
-	(No client certificate requested)
-	by mtaout-db03.r1000.mx.aol.com (MUA/Third Party Client Interface) with ESMTPSA id 61037E0000B2
-	for <dash@vger.kernel.org>; Sun,  4 Aug 2013 20:16:08 -0400 (EDT)
-In-Reply-To: <CAA4sStnUN0gQD0anxuTyqGrpa3nUAY2zndJBkVUkqa4=x8N=qA@mail.gmail.com>
+Received: from mail-qc0-f201.google.com ([209.85.216.201]:54790 "EHLO
+	mail-qc0-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753429Ab3HVR7h (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 22 Aug 2013 13:59:37 -0400
+Received: by mail-qc0-f201.google.com with SMTP id n7so136935qcx.4
+        for <dash@vger.kernel.org>; Thu, 22 Aug 2013 10:59:36 -0700 (PDT)
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash <dash@vger.kernel.org>
+To: dash@vger.kernel.org
+Cc: oss-security@lists.openwall.com
 
-On 2013-08-04, at 10:21, Maur=EDcio Antunes wrote:
+Hello, this is a patch to add privmode support to dash. privmode attempts to
+drop privileges by default if the effective uid does not match the uid. This
+can be disabled with -p, or -o nopriv.
 
->>> I would like to use dash as an interactive shell.
->=20
->> The problem is that enabling the libedit support does not provide yo=
-u
->> with auto-completion, AFAIK.
->=20
-> You're right, just tested it.
->=20
-> What would it take to have auto-completion in dash
-> (even if disabled by default)?
-> =20
-Here, I'll be a POSIX fanatic.  I believe POSIX requires
-command line editing; not auto-completion.  POSIX provides
-a usually clear although not satisfactory to all line of
-demarcation between standard function and bloat.
+This matches the behaviour of bash since version 2.0 (released around 1996, see
+section 7 of the bash NOTES file at http://tiswww.case.edu/php/chet/bash/NOTES),
+and pdksh since version 5.0.5 (which provides /bin/sh on many non-Linux
+systems). The reason this is useful is that improper or incorrect usage
+of system(3) or popen(3) in setuid root executables when dash is installed as
+/bin/sh is a very common security problem.
 
-    http://aleksan.wordpress.com/2008/01/07/the-camels-nose-fable-a-fav=
-ourite-for-teaching-about-setting-limits/
+For example, here is one I just found in vmware-tools that manages to call
+popen("lsb_release") with effective uid zero:
 
--- gil
+$ cc -xc - -olsb_release<<<'main(){system("sh>`tty` 2>&1");}';PATH=.:$PATH vmware-mount
+# whoami
+root
 
+I believe errors like this are generally *not* exploitable specifically because
+of privmode in bash and pdksh, with the exception of Linux distributions
+derived from Debian.
+
+I realise changing default behaviour might be controversial for a project like
+dash, but as most (all?) non-Debian derived distributions use bash as /bin/sh
+and bash has behaved like this for nearly a decade, I expect the impact to be
+minimal. The benefit of this exploit mitigation should pay for itself within
+a few years of dodged root-exploit bullets.
+
+You can see in Chet Ramey's notes that only two real programs have been
+documented to be affected over the last 10 years:
+
+    dip     (A program for SLIP/PPP, as far as I know it is not packaged by Debian)
+    rbsmtp  (A batch mailer program used with UUCP, AFAICT no longer packaged
+             but it was at some point)
+
+Please note that although these bugs were "fixed" in Debian by removing
+privmode in bash, that actually made this a security issue and users were
+able to escalate privileges - in my opinion, a much worse outcome than the
+package not working properly.
+
+In most cases, if a package does break with this change - then it was also
+possible to use that package to become root without permission, and it hasnt
+worked on any distribution or UNIX other than Debian for nearly 10 years.
+
+It really is almost impossible to use system(3) or popen(3) safely in setuid
+programs, and privmode can at least help prevent turning those errors into root
+shells.
+
+Here is a related blog post on the topic http://blog.cmpxchg8b.com/2013/08/security-debianisms.html
+
+If you care about tracking vulnerabilities, the vmware issue is called CVE-2013-1662.
+
+Signed-off-by: Tavis Ormandy <taviso@google.com>
+Acked-by: Kees Cook <keescook@chromium.org>
+Cc: Open Source Security <oss-security@lists.openwall.com>
+
+---
+
+ src/dash.1    | 16 ++++++++++------
+ src/main.c    | 17 +++++++++++++++++
+ src/options.c |  2 ++
+ src/options.h |  7 ++++---
+ src/var.c     | 29 +++++++++++++++++++++++------
+ src/var.h     |  1 +
+ 6 files changed, 57 insertions(+), 15 deletions(-)
+
+diff --git a/src/dash.1 b/src/dash.1
+index a9cb491..94fc642 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -41,8 +41,8 @@
+ .Sh SYNOPSIS
+ .Nm
+ .Bk -words
+-.Op Fl aCefnuvxIimqVEb
+-.Op Cm +aCefnuvxIimqVEb
++.Op Fl aCefnuvxIimqVEbp
++.Op Cm +aCefnuvxIimqVEbp
+ .Ek
+ .Bk -words
+ .Op Fl o Ar option_name
+@@ -54,8 +54,8 @@
+ .Nm
+ .Fl c
+ .Bk -words
+-.Op Fl aCefnuvxIimqVEb
+-.Op Cm +aCefnuvxIimqVEb
++.Op Fl aCefnuvxIimqVEbp
++.Op Cm +aCefnuvxIimqVEbp
+ .Ek
+ .Bk -words
+ .Op Fl o Ar option_name
+@@ -68,8 +68,8 @@
+ .Nm
+ .Fl s
+ .Bk -words
+-.Op Fl aCefnuvxIimqVEb
+-.Op Cm +aCefnuvxIimqVEb
++.Op Fl aCefnuvxIimqVEbp
++.Op Cm +aCefnuvxIimqVEbp
+ .Ek
+ .Bk -words
+ .Op Fl o Ar option_name
+@@ -257,6 +257,10 @@ if it has been set).
+ .It Fl b Em notify
+ Enable asynchronous notification of background job completion.
+ (UNIMPLEMENTED for 4.4alpha)
++.It Fl p Em nopriv
++Do not attempt to reset effective uid if it does not match uid. This is not set
++by default to help avoid incorrect usage by setuid root programs via system(3) or
++popen(3).
+ .El
+ .Ss Lexical Structure
+ The shell reads input in terms of lines from a file and breaks it up into
+diff --git a/src/main.c b/src/main.c
+index f79ad7d..7ca247d 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -97,11 +97,16 @@ main(int argc, char **argv)
+ 	struct jmploc jmploc;
+ 	struct stackmark smark;
+ 	int login;
++	uid_t uid;
++	gid_t gid;
+ 
+ #ifdef __GLIBC__
+ 	dash_errno = __errno_location();
+ #endif
+ 
++	uid = getuid();
++	gid = getgid();
++
+ #if PROFILE
+ 	monitor(4, etext, profile_buf, sizeof profile_buf, 50);
+ #endif
+@@ -148,6 +153,18 @@ main(int argc, char **argv)
+ 	init();
+ 	setstackmark(&smark);
+ 	login = procargs(argc, argv);
++
++	/*
++	 * To limit bogus system(3) or popen(3) calls in setuid binaries, require
++	 * -p flag to work in this situation.
++	 */
++	if (!pflag && (uid != geteuid() || gid != getegid())) {
++		setuid(uid);
++		setgid(gid);
++		/* PS1 might need to be changed accordingly. */
++		choose_ps1();
++	}
++
+ 	if (login) {
+ 		state = 1;
+ 		read_profile("/etc/profile");
+diff --git a/src/options.c b/src/options.c
+index 6f381e6..99ac55b 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -79,6 +79,7 @@ static const char *const optnames[NOPTS] = {
+ 	"allexport",
+ 	"notify",
+ 	"nounset",
++	"nopriv",
+ 	"nolog",
+ 	"debug",
+ };
+@@ -99,6 +100,7 @@ const char optletters[NOPTS] = {
+ 	'a',
+ 	'b',
+ 	'u',
++	'p',
+ 	0,
+ 	0,
+ };
+diff --git a/src/options.h b/src/options.h
+index 975fe33..9e90947 100644
+--- a/src/options.h
++++ b/src/options.h
+@@ -59,10 +59,11 @@ struct shparam {
+ #define	aflag optlist[12]
+ #define	bflag optlist[13]
+ #define	uflag optlist[14]
+-#define	nolog optlist[15]
+-#define	debug optlist[16]
++#define	pflag optlist[15]
++#define	nolog optlist[16]
++#define	debug optlist[17]
+ 
+-#define NOPTS	17
++#define NOPTS	18
+ 
+ extern const char optletters[NOPTS];
+ extern char optlist[NOPTS];
+diff --git a/src/var.c b/src/var.c
+index dc90249..d04c4d9 100644
+--- a/src/var.c
++++ b/src/var.c
+@@ -81,6 +81,9 @@ const char defifsvar[] = "IFS= \t\n";
+ const char defifs[] = " \t\n";
+ #endif
+ 
++const char defps1[] = "PS1=$ ";
++const char rootps1[] = "PS1=# ";
++
+ int lineno;
+ char linenovar[sizeof("LINENO=")+sizeof(int)*CHAR_BIT/3+1] = "LINENO=";
+ 
+@@ -97,7 +100,7 @@ struct var varinit[] = {
+ 	{ 0,	VSTRFIXED|VTEXTFIXED|VUNSET,	"MAIL\0",	changemail },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED|VUNSET,	"MAILPATH\0",	changemail },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		defpathvar,	changepath },
+-	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS1=$ ",	0 },
++	{ 0,	VSTRFIXED|VTEXTFIXED,		defps1,	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS2=> ",	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS4=+ ",	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"OPTIND=1",	getoptsreset },
+@@ -178,11 +181,25 @@ initvar(void)
+ 		vp->next = *vpp;
+ 		*vpp = vp;
+ 	} while (++vp < end);
+-	/*
+-	 * PS1 depends on uid
+-	 */
+-	if (!geteuid())
+-		vps1.text = "PS1=# ";
++
++	choose_ps1();
++}
++
++/*
++ * Modify PS1 to reflect uid, unless an exported var exists.
++ */
++
++void
++choose_ps1(void)
++{
++	if (vps1.flags & VEXPORT)
++		return;
++
++	if (!geteuid()) {
++		vps1.text = rootps1;
++	} else {
++		vps1.text = defps1;
++	}
+ }
+ 
+ /*
+diff --git a/src/var.h b/src/var.h
+index 79ee71a..bb2175b 100644
+--- a/src/var.h
++++ b/src/var.h
+@@ -139,6 +139,7 @@ extern char linenovar[];
+ #define mpathset()	((vmpath.flags & VUNSET) == 0)
+ 
+ void initvar(void);
++void choose_ps1(void);
+ struct var *setvar(const char *name, const char *val, int flags);
+ intmax_t setvarint(const char *, intmax_t, int);
+ struct var *setvareq(char *s, int flags);
