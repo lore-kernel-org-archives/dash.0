@@ -1,49 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Fwd: bug? Spawned childs always remain in zombie state
-Date: Fri, 23 Aug 2013 20:44:44 +1000
-Message-ID: <20130823104444.GE10632@gondor.apana.org.au>
-References: <CAMqPLXWsMhPBjYa3JnCmuO=M6m2F=hSdiEfRx390VKdgC5qxZg@mail.gmail.com>
- <CAMqPLXX4GtCXcfrOnBkhPw+PEFRXh0x9X54H9paqm6b7vDnzNA@mail.gmail.com>
+Subject: Re: Parameter substitution bug
+Date: Fri, 23 Aug 2013 20:49:17 +1000
+Message-ID: <20130823104917.GF10632@gondor.apana.org.au>
+References: <CAPnksqRxUvwGGQwXBPVj-yrA8a18nmLctZGD0BtBnh_vC-Muhg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:46106 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:39439 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755054Ab3HWKos (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 23 Aug 2013 06:44:48 -0400
+	with ESMTP id S1754164Ab3HWKtU (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 23 Aug 2013 06:49:20 -0400
 Content-Disposition: inline
-In-Reply-To: <CAMqPLXX4GtCXcfrOnBkhPw+PEFRXh0x9X54H9paqm6b7vDnzNA@mail.gmail.com>
+In-Reply-To: <CAPnksqRxUvwGGQwXBPVj-yrA8a18nmLctZGD0BtBnh_vC-Muhg@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Sjon Hortensius <Sjon@hortensius.net>
+To: Mark Lentczner <mark@glyphic.com>
 Cc: dash@vger.kernel.org
 
-On Sun, Jan 20, 2013 at 12:04:04PM +0000, Sjon Hortensius wrote:
-> Hi. I'm trying to create a script which monitors a directory using
-> inotify and spawns a background process for all events. However I
-> found that all childs will remain in zombie state until the script
-> quits and I am unable to find a proper fix.
+On Mon, Jan 21, 2013 at 09:36:07PM +0000, Mark Lentczner wrote:
+> Strangely I ran across this issue in the real world: A doubly nested
+> parameter substitution with an inner glob pattern (breath) fails /only
+> when in double quotes/! That is, these two expressions produce
+> different results:
 > 
-> A minimal testcase:
+> ${f%${f#?}}   --vs--  "${f%${f#?}}"
 > 
-> #!/bin/dash
-> while true
-> do
->     sleep 1 &
-> #    jobs >/dev/null
-> done
+> Strangely, that is the simplest case I get to fail.
 > 
-> If you open a second terminal you'll see that all the 'sleep'
-> processes end up being defunct. I have tried playing with `set -ma`
-> but the only workaround I found is the commented 'jobs' line.
-> Uncommenting that line will result in expected behavior where childs
-> are properly reaped. Is this a bug, or is there an alternative
-> solution I'm missing?
+> The following script walks through the issue, and if run with bash,
+> ksh, or busybox exhibits those two expressions as producing the same
+> result.
 
-You need to wait on them as otherwise dash has to keep them around
-in case you call wait(1) later on.
+This should be fixed now.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
