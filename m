@@ -1,85 +1,119 @@
-From: jca+dash@wxcvbn.org (=?utf-8?Q?J=C3=A9r=C3=A9mie_Courr=C3=A8ges-Angl?=
-	=?utf-8?Q?as?=)
-Subject: Re: [PATCH] implement privmode support in dash
-Date: Fri, 23 Aug 2013 13:40:31 +0200
-Message-ID: <87txig63f4.fsf@shannon.wxcvbn.org>
-References: <20130822175936.GA1260@google.com> <52166DA8.1000201@gigawatt.nl>
-	<20130822203500.GA21467@stack.nl>
-	<CAJ_zFkJEb02d8Xs=RcWnRT7JbgDUYiAwMUUc3WFAfXr1ZN-0DQ@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crash on valid input
+Date: Fri, 23 Aug 2013 21:59:10 +1000
+Message-ID: <20130823115910.GI10632@gondor.apana.org.au>
+References: <CAPF-yOaPfWdK2c556eTcRuf-thaHEzUcMKa+xa8criaS8uFLUw@mail.gmail.com>
+ <51638620.4030603@redhat.com>
+ <CAPF-yOZmkcKSpU+jVMsSi6Q8harUYZ-hS5Ugn7SsbBwm-GzhiQ@mail.gmail.com>
+ <51638AA0.4080701@redhat.com>
+ <51648634.4090708@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from coloc.wxcvbn.org ([80.67.177.44]:44131 "EHLO coloc.wxcvbn.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754599Ab3HWLkv (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 23 Aug 2013 07:40:51 -0400
-In-Reply-To: <CAJ_zFkJEb02d8Xs=RcWnRT7JbgDUYiAwMUUc3WFAfXr1ZN-0DQ@mail.gmail.com>
-	(Tavis Ormandy's message of "Thu, 22 Aug 2013 13:42:32 -0700")
+Received: from ringil.hengli.com.au ([178.18.16.133]:35749 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755282Ab3HWL7Q (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 23 Aug 2013 07:59:16 -0400
+Content-Disposition: inline
+In-Reply-To: <51648634.4090708@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Tavis Ormandy <taviso@google.com>
-Cc: Jilles Tjoelker <jilles@stack.nl>, Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org, oss-security@lists.openwall.com
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: dash@vger.kernel.org, Dan Kegel <dank@kegel.com>, Eric Blake <eblake@redhat.com>
 
+On Tue, Apr 09, 2013 at 09:20:52PM +0000, Harald van Dijk wrote:
+> On 09/04/13 05:27, Eric Blake wrote:
+> >On 04/08/2013 09:12 PM, Dan Kegel wrote:
+> >>Yes, my script was crap, I've fixed it.
+> >>
+> >>Here's the reproducer.  Called with foo unset.  I think it doesn't
+> >>crash without -x.
+> >>
+> >>#!/bin/dash
+> >>set -x
+> >>test ! $foo
+> >The 'set -x' was indeed the key to reproducing the problem.  In fact,
+> >this is the shortest I could make it:
+> >
+> >dash -cx 'test !'
+> >
+> It is not limited to 'set -x'. dash continues reading after the NULL
+> value in argv, and usually that will be followed by another NULL if
+> 'set -x' is not used, but not necessarily.
+> 
+> $ dash -c 'test ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+> ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !'
+> $ dash -c 'test ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+> ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+> !'
+> Segmentation fault
+> $ dash -c 'test ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+> ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+> ! !'
+> $
+> 
+> When [ ! ] is used, the ! is necessarily followed by two NULLs (one
+> after the ], and one because the ] is replaced by NULL), so the
+> problem is hidden.
+> 
+> dash should check whether ! is followed by an argument, like bash
+> does, which would give an error message without a segmentation fault
+> for all three forms above.
+> 
+> This seems to be easily possible by manually inlining primary() into
+> nexpr(), and treating UNOT similarly to STREZ e.a.:
 
-Also,
+Thanks for the patch.  However, I've decided to fix it like this:
 
-Tavis Ormandy <taviso@google.com> writes:
+commit b34499f5c851d1a70db95b56bd02eff0329d4a1a
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Fri Aug 23 21:58:55 2013 +1000
 
-[...]
+    [BUILTIN] Fixed argument parsing crash in test
+    
+    When nexpr gets an unexpected EOI, this may cause crashes further
+    up the call chain because we've advanced t_wp too far.  Fix it by
+    checking for EOI in nexpr and only advancing t_wp if we've got more
+    arguments.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
->> Apart from that, it is better to check the return value from setuid()
->> and similar functions. In particular, some versions of Linux may fail
->> setuid() for [EAGAIN], leaving the process running with the same
->> privileges.
->
-> I don't think this is true anymore, but I have no strong objection to
-> adding it, so long as it's noted that bash and pdksh do not do this.
+diff --git a/ChangeLog b/ChangeLog
+index 4276676..2a39e34 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -2,6 +2,7 @@
+ 
+ 	* Propagate EXP_QPAT in subevalvar.
+ 	* Initialise OPTIND after importing environment.
++	* Fixed argument parsing crash in test.
+ 
+ 2013-03-12  Peter Rosin <peda@lysator.liu.se>
+ 
+diff --git a/src/bltin/test.c b/src/bltin/test.c
+index 90135e1..baa91a5 100644
+--- a/src/bltin/test.c
++++ b/src/bltin/test.c
+@@ -268,9 +268,13 @@ aexpr(enum token n)
+ static int
+ nexpr(enum token n)
+ {
+-	if (n == UNOT)
+-		return !nexpr(t_lex(++t_wp));
+-	return primary(n);
++	if (n != UNOT)
++		return primary(n);
++
++	n = t_lex(t_wp + 1);
++	if (n != EOI)
++		t_wp++;
++	return !nexpr(n);
+ }
+ 
+ static int
 
-Just for reference, from mksh:
-
-[...]
-
-#ifdef SETUID_CAN_FAIL_WITH_EAGAIN
-/* we don't need to check for other codes, EPERM won't happen */
-#define DO_SETUID(func, argvec) do {					\
-	if ((func argvec) && errno == EAGAIN)				\
-		errorf("%s failed with EAGAIN, probably due to a"	\
-		    " too low process limit; aborting", #func);		\
-} while (/* CONSTCOND */ 0)
-#else
-#define DO_SETUID(func, argvec) func argvec
-#endif
-
-[...]
-
-	  if (f == FPRIVILEGED && oldval && !newval) {
-		/* Turning off -p? */
-
-		/*XXX this can probably be optimised */
-		kshegid = kshgid = getgid();
-#if HAVE_SETRESUGID
-		DO_SETUID(setresgid, (kshegid, kshegid, kshegid));
-#if HAVE_SETGROUPS
-		/* setgroups doesn't EAGAIN on Linux */
-		setgroups(1, &kshegid);
-#endif
-		DO_SETUID(setresuid, (ksheuid, ksheuid, ksheuid));
-#else
-		/* seteuid, setegid, setgid don't EAGAIN on Linux */
-		ksheuid = kshuid = getuid();
-#ifndef MKSH__NO_SETEUGID
-		seteuid(ksheuid);
-#endif
-		DO_SETUID(setuid, (ksheuid));
-#ifndef MKSH__NO_SETEUGID
-		setegid(kshegid);
-#endif
-		setgid(kshegid);
-#endif
-	} [...]
-
-
-> Tavis.
-
+Cheers,
 -- 
-jca | PGP: 0x06A11494 / 61DB D9A0 00A4 67CF 2A90  8961 6191 8FBF 06A1 1494
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
