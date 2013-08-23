@@ -1,77 +1,85 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: OPTIND
-Date: Fri, 23 Aug 2013 21:28:21 +1000
-Message-ID: <20130823112820.GH10632@gondor.apana.org.au>
-References: <alpine.LMD.2.00.1303222137440.10619@cfa.johnson>
+From: jca+dash@wxcvbn.org (=?utf-8?Q?J=C3=A9r=C3=A9mie_Courr=C3=A8ges-Angl?=
+	=?utf-8?Q?as?=)
+Subject: Re: [PATCH] implement privmode support in dash
+Date: Fri, 23 Aug 2013 13:40:31 +0200
+Message-ID: <87txig63f4.fsf@shannon.wxcvbn.org>
+References: <20130822175936.GA1260@google.com> <52166DA8.1000201@gigawatt.nl>
+	<20130822203500.GA21467@stack.nl>
+	<CAJ_zFkJEb02d8Xs=RcWnRT7JbgDUYiAwMUUc3WFAfXr1ZN-0DQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:57671 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755159Ab3HWL2X (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 23 Aug 2013 07:28:23 -0400
-Content-Disposition: inline
-In-Reply-To: <alpine.LMD.2.00.1303222137440.10619@cfa.johnson>
+Received: from coloc.wxcvbn.org ([80.67.177.44]:44131 "EHLO coloc.wxcvbn.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754599Ab3HWLkv (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 23 Aug 2013 07:40:51 -0400
+In-Reply-To: <CAJ_zFkJEb02d8Xs=RcWnRT7JbgDUYiAwMUUc3WFAfXr1ZN-0DQ@mail.gmail.com>
+	(Tavis Ormandy's message of "Thu, 22 Aug 2013 13:42:32 -0700")
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "Chris F.A. Johnson" <dash@cfajohnson.com>
-Cc: dash@vger.kernel.org
+To: Tavis Ormandy <taviso@google.com>
+Cc: Jilles Tjoelker <jilles@stack.nl>, Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org, oss-security@lists.openwall.com
 
-commit a14c418aee9d4ccd7cf888024e318b300173099f
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri Aug 23 21:27:42 2013 +1000
 
-    [VAR] Initialise OPTIND after importing environment
-    
-    On Sat, Mar 23, 2013 at 01:46:20AM +0000, Chris F.A. Johnson wrote:
-    >
-    >   According to both the dash man page and the POSIX spec, "When the
-    >   shell is invoked, OPTIND is initialized to 1."
-    >
-    >   However, it actually takes the value of the environment variable
-    >   if it exists:
-    >
-    > $ OPTIND=4 dash -c 'echo "$OPTIND"'
-    > 4
-    > $ OPTIND=4 bash -c 'echo "$OPTIND"'
-    > 1
-    > $ OPTIND=4 ksh -c 'echo "$OPTIND"'
-    > 1
-    > $ OPTIND=4 ksh93 -c 'echo "$OPTIND"'
-    > 1
-    
-    This patch fixes this by initialising OPTIND after importing the
-    environment.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Also,
 
-diff --git a/ChangeLog b/ChangeLog
-index 9500c87..4276676 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,6 +1,7 @@
- 2013-08-23  Herbert Xu <herbert@gondor.apana.org.au>
- 
- 	* Propagate EXP_QPAT in subevalvar.
-+	* Initialise OPTIND after importing environment.
- 
- 2013-03-12  Peter Rosin <peda@lysator.liu.se>
- 
-diff --git a/src/var.c b/src/var.c
-index c35e925..fa24854 100644
---- a/src/var.c
-+++ b/src/var.c
-@@ -142,6 +142,8 @@ INIT {
- 		}
- 	}
- 
-+	setvarint("OPTIND", 1, 0);
-+
- 	fmtstr(ppid + 5, sizeof(ppid) - 5, "%ld", (long) getppid());
- 	setvareq(ppid, VTEXTFIXED);
+Tavis Ormandy <taviso@google.com> writes:
 
-Thanks,
+[...]
+
+>> Apart from that, it is better to check the return value from setuid()
+>> and similar functions. In particular, some versions of Linux may fail
+>> setuid() for [EAGAIN], leaving the process running with the same
+>> privileges.
+>
+> I don't think this is true anymore, but I have no strong objection to
+> adding it, so long as it's noted that bash and pdksh do not do this.
+
+Just for reference, from mksh:
+
+[...]
+
+#ifdef SETUID_CAN_FAIL_WITH_EAGAIN
+/* we don't need to check for other codes, EPERM won't happen */
+#define DO_SETUID(func, argvec) do {					\
+	if ((func argvec) && errno == EAGAIN)				\
+		errorf("%s failed with EAGAIN, probably due to a"	\
+		    " too low process limit; aborting", #func);		\
+} while (/* CONSTCOND */ 0)
+#else
+#define DO_SETUID(func, argvec) func argvec
+#endif
+
+[...]
+
+	  if (f == FPRIVILEGED && oldval && !newval) {
+		/* Turning off -p? */
+
+		/*XXX this can probably be optimised */
+		kshegid = kshgid = getgid();
+#if HAVE_SETRESUGID
+		DO_SETUID(setresgid, (kshegid, kshegid, kshegid));
+#if HAVE_SETGROUPS
+		/* setgroups doesn't EAGAIN on Linux */
+		setgroups(1, &kshegid);
+#endif
+		DO_SETUID(setresuid, (ksheuid, ksheuid, ksheuid));
+#else
+		/* seteuid, setegid, setgid don't EAGAIN on Linux */
+		ksheuid = kshuid = getuid();
+#ifndef MKSH__NO_SETEUGID
+		seteuid(ksheuid);
+#endif
+		DO_SETUID(setuid, (ksheuid));
+#ifndef MKSH__NO_SETEUGID
+		setegid(kshegid);
+#endif
+		setgid(kshegid);
+#endif
+	} [...]
+
+
+> Tavis.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+jca | PGP: 0x06A11494 / 61DB D9A0 00A4 67CF 2A90  8961 6191 8FBF 06A1 1494
