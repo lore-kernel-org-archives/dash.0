@@ -1,119 +1,75 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crash on valid input
-Date: Fri, 23 Aug 2013 21:59:10 +1000
-Message-ID: <20130823115910.GI10632@gondor.apana.org.au>
-References: <CAPF-yOaPfWdK2c556eTcRuf-thaHEzUcMKa+xa8criaS8uFLUw@mail.gmail.com>
- <51638620.4030603@redhat.com>
- <CAPF-yOZmkcKSpU+jVMsSi6Q8harUYZ-hS5Ugn7SsbBwm-GzhiQ@mail.gmail.com>
- <51638AA0.4080701@redhat.com>
- <51648634.4090708@gigawatt.nl>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: Fwd: bug? Spawned childs always remain in zombie state
+Date: Fri, 23 Aug 2013 14:20:20 +0200
+Message-ID: <20130823122020.GA31555@stack.nl>
+References: <CAMqPLXWsMhPBjYa3JnCmuO=M6m2F=hSdiEfRx390VKdgC5qxZg@mail.gmail.com>
+ <CAMqPLXX4GtCXcfrOnBkhPw+PEFRXh0x9X54H9paqm6b7vDnzNA@mail.gmail.com>
+ <20130823104444.GE10632@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:35749 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755282Ab3HWL7Q (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 23 Aug 2013 07:59:16 -0400
+Received: from relay04.stack.nl ([131.155.140.107]:55336 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753475Ab3HWMUY (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 23 Aug 2013 08:20:24 -0400
 Content-Disposition: inline
-In-Reply-To: <51648634.4090708@gigawatt.nl>
+In-Reply-To: <20130823104444.GE10632@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org, Dan Kegel <dank@kegel.com>, Eric Blake <eblake@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Sjon Hortensius <Sjon@hortensius.net>, dash@vger.kernel.org
 
-On Tue, Apr 09, 2013 at 09:20:52PM +0000, Harald van Dijk wrote:
-> On 09/04/13 05:27, Eric Blake wrote:
-> >On 04/08/2013 09:12 PM, Dan Kegel wrote:
-> >>Yes, my script was crap, I've fixed it.
-> >>
-> >>Here's the reproducer.  Called with foo unset.  I think it doesn't
-> >>crash without -x.
-> >>
-> >>#!/bin/dash
-> >>set -x
-> >>test ! $foo
-> >The 'set -x' was indeed the key to reproducing the problem.  In fact,
-> >this is the shortest I could make it:
-> >
-> >dash -cx 'test !'
-> >
-> It is not limited to 'set -x'. dash continues reading after the NULL
-> value in argv, and usually that will be followed by another NULL if
-> 'set -x' is not used, but not necessarily.
-> 
-> $ dash -c 'test ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-> ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !'
-> $ dash -c 'test ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-> ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-> !'
-> Segmentation fault
-> $ dash -c 'test ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-> ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-> ! !'
-> $
-> 
-> When [ ! ] is used, the ! is necessarily followed by two NULLs (one
-> after the ], and one because the ] is replaced by NULL), so the
-> problem is hidden.
-> 
-> dash should check whether ! is followed by an argument, like bash
-> does, which would give an error message without a segmentation fault
-> for all three forms above.
-> 
-> This seems to be easily possible by manually inlining primary() into
-> nexpr(), and treating UNOT similarly to STREZ e.a.:
+On Fri, Aug 23, 2013 at 08:44:44PM +1000, Herbert Xu wrote:
+> On Sun, Jan 20, 2013 at 12:04:04PM +0000, Sjon Hortensius wrote:
+> > Hi. I'm trying to create a script which monitors a directory using
+> > inotify and spawns a background process for all events. However I
+> > found that all childs will remain in zombie state until the script
+> > quits and I am unable to find a proper fix.
 
-Thanks for the patch.  However, I've decided to fix it like this:
+> > A minimal testcase:
 
-commit b34499f5c851d1a70db95b56bd02eff0329d4a1a
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri Aug 23 21:58:55 2013 +1000
+> > #!/bin/dash
+> > while true
+> > do
+> >     sleep 1 &
+> > #    jobs >/dev/null
+> > done
 
-    [BUILTIN] Fixed argument parsing crash in test
-    
-    When nexpr gets an unexpected EOI, this may cause crashes further
-    up the call chain because we've advanced t_wp too far.  Fix it by
-    checking for EOI in nexpr and only advancing t_wp if we've got more
-    arguments.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> > If you open a second terminal you'll see that all the 'sleep'
+> > processes end up being defunct. I have tried playing with `set -ma`
+> > but the only workaround I found is the commented 'jobs' line.
+> > Uncommenting that line will result in expected behavior where childs
+> > are properly reaped. Is this a bug, or is there an alternative
+> > solution I'm missing?
 
-diff --git a/ChangeLog b/ChangeLog
-index 4276676..2a39e34 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -2,6 +2,7 @@
- 
- 	* Propagate EXP_QPAT in subevalvar.
- 	* Initialise OPTIND after importing environment.
-+	* Fixed argument parsing crash in test.
- 
- 2013-03-12  Peter Rosin <peda@lysator.liu.se>
- 
-diff --git a/src/bltin/test.c b/src/bltin/test.c
-index 90135e1..baa91a5 100644
---- a/src/bltin/test.c
-+++ b/src/bltin/test.c
-@@ -268,9 +268,13 @@ aexpr(enum token n)
- static int
- nexpr(enum token n)
- {
--	if (n == UNOT)
--		return !nexpr(t_lex(++t_wp));
--	return primary(n);
-+	if (n != UNOT)
-+		return primary(n);
-+
-+	n = t_lex(t_wp + 1);
-+	if (n != EOI)
-+		t_wp++;
-+	return !nexpr(n);
- }
- 
- static int
+> You need to wait on them as otherwise dash has to keep them around
+> in case you call wait(1) later on.
 
-Cheers,
+The shell need not remember the processes indefinitely. Per POSIX (XCU
+2.9.3.1 Asynchronous Lists), the application must reference $! before
+starting another asynchronous list if it wants to use the wait builtin
+for that particular process later on. (Note that this means that jobs -p
+is not good enough even when the job consists of a single process, and
+that printing $! can add memory leaks to a script.)
+
+POSIX also restricts an operandless wait builtin to "known process IDs".
+This seems inappropriate: there are many scripts that start multiple
+asynchronous lists without referencing $! and expect operandless wait to
+wait for all of them. Therefore, all jobs must be remembered while they
+are running. However, if $! was not referenced for them and they are not
+the most recent asynchronous list, they can be discarded when they
+terminate. I implemented this in FreeBSD sh and it appears to work well.
+
+An additional issue occurs when multiple asynchronous lists are started
+without a foreground process, here-document that requires a fork,
+operandless jobs builtin or wait builtin in between. In that case, dash
+never calls wait3() and zombies accumulate. Although the example could
+be considered a fork bomb and relies on the child processes getting CPU
+time often enough, this may legitimately happen if the loop contains a
+read builtin. In FreeBSD sh, I added a check for zombies before forking
+the first process of a background job. Some other shells call waitpid()
+or similar from a SIGCHLD handler; this reaps zombies faster at the cost
+of more complex code (signal handler performing non-trivial work).
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jilles Tjoelker
