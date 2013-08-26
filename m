@@ -1,70 +1,70 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: test incorrectly rejecting valid expression with confusing ! placement
-Date: Sat, 24 Aug 2013 16:01:17 +0200
-Message-ID: <5218BCAD.2010107@gigawatt.nl>
+From: Thorsten Glaser <tg@mirbsd.de>
+Subject: Re: test incorrectly rejecting valid expression with confusing !
+ placement
+Date: Mon, 26 Aug 2013 11:19:51 +0000
+Message-ID: <Pine.BSM.4.64L.1308261117200.19888@herc.mirbsd.org>
+References: <5218BCAD.2010107@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailfilter.csv-networks.nl ([84.244.149.121]:58380 "EHLO
-	mailfilter.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754358Ab3HXOBc (ORCPT
-	<rfc822;dash@vger.kernel.org>); Sat, 24 Aug 2013 10:01:32 -0400
-Received: from hosting12.csv-networks.nl ([84.244.151.141])
-	by mailfilter.csv-networks.nl with esmtps (TLSv1:AES256-SHA:256)
-	(Exim 4.63)
-	(envelope-from <harald@gigawatt.nl>)
-	id 1VDEPC-0007Re-8l
-	for dash@vger.kernel.org; Sat, 24 Aug 2013 16:01:30 +0200
-Received: from 541b2160.cm-5-4a.dynamic.ziggo.nl ([84.27.33.96] helo=[10.0.1.200])
-	by hosting12.csv-networks.nl with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.68)
-	(envelope-from <harald@gigawatt.nl>)
-	id 1VDEPC-000270-2l
-	for dash@vger.kernel.org; Sat, 24 Aug 2013 16:01:30 +0200
+Received: from plane.gmane.org ([80.91.229.3]:41360 "EHLO plane.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751596Ab3HZLpH convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Mon, 26 Aug 2013 07:45:07 -0400
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1VDvEG-0003Yh-4i
+	for dash@vger.kernel.org; Mon, 26 Aug 2013 13:45:04 +0200
+Received: from static-87-79-237-121.netcologne.de ([87.79.237.121])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Mon, 26 Aug 2013 13:45:04 +0200
+Received: from tg by static-87-79-237-121.netcologne.de with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Mon, 26 Aug 2013 13:45:04 +0200
+In-Reply-To: <5218BCAD.2010107@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash <dash@vger.kernel.org>
+To: dash@vger.kernel.org
 
-Hi,
+Harald van Dijk dixit:
 
-Now that Herbert fixed the reported crash in test (in a far simpler
-manner than I had suggested, which I like), I did some more testing, and
-came across one case that does not currently work, and did not work in
-the past, but is perfectly valid:
+>$ src/dash -c 'test ! ! =3D !'
+>src/dash: 1: test: =3D: unexpected operator
+>
+>POSIX requires special behaviour for four-argument tests:
 
-$ src/dash -c 'test ! ! = !'
-src/dash: 1: test: =: unexpected operator
+Right but=E2=80=A6
 
-POSIX requires special behaviour for four-argument tests:
+>There are also some cases where test gives incorrect results when
+>combining ! with -o
 
-4 arguments:
-  If $1 is '!', negate the three-argument test of $2, $3, and $4.
-  [...]
+=E2=80=A6 =E2=80=98-o=E2=80=99 is XSI, not POSIX. Do not expect=E2=80=A6
 
-so this is supposed to evaluate as the negation of test ! = !. That test
-does work properly in dash.
+>$ src/dash -c 'test ! "" -o !'; echo $?
 
-There are also some cases where test gives incorrect results when
-combining ! with -o, but ( ), -a and -o have been obsoleted in favour of
-the built-in shell operators ( ), && and ||, so I am not sure if that is
-worth fixing. Details anyway:
+=E2=80=A6 this to work.
 
-$ src/dash -c 'test ! -o !'
-src/dash: 1: test: -o: unexpected operator
+>This is covered by the special rule for four arguments, there ! as the
+>first argument evaluates the remaining three-argument test and negates
+>the result. In this special case, ! does not have higher precedence th=
+an
+>-o, so the correct exit status is 1, which bash's test gives.
 
-This is covered by the special rule for three arguments, where the
-second argument is a binary operator. -o is a boolean binary operator,
-but a binary operator nonetheless, so this should test whether the two !
-arguments are empty strings.
+Only for a shell implementing the XSI =E2=80=98-o=E2=80=99 for POSIX te=
+st.
+You shouldn=E2=80=99t use -o anyway as it=E2=80=99s deprecated.
 
-$ src/dash -c 'test ! "" -o !'; echo $?
-0
+bye,
+//mirabilos
+--=20
+=46WIW, I'm quite impressed with mksh interactively. I thought it was m=
+uch
+*much* more bare bones. But it turns out it beats the living hell out o=
+f
+ksh93 in that respect. I'd even consider it for my daily use if I hadn'=
+t
+wasted half my life on my zsh setup. :-) -- Frank Terbeck in #!/bin/mks=
+h
 
-This is covered by the special rule for four arguments, there ! as the
-first argument evaluates the remaining three-argument test and negates
-the result. In this special case, ! does not have higher precedence than
--o, so the correct exit status is 1, which bash's test gives.
-
-Cheers,
-Harald
