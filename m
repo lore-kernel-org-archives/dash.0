@@ -1,70 +1,77 @@
-From: Thorsten Glaser <tg@mirbsd.de>
+From: Harald van Dijk <haraldvdijk@gmail.com>
 Subject: Re: test incorrectly rejecting valid expression with confusing !
  placement
-Date: Mon, 26 Aug 2013 11:19:51 +0000
-Message-ID: <Pine.BSM.4.64L.1308261117200.19888@herc.mirbsd.org>
-References: <5218BCAD.2010107@gigawatt.nl>
+Date: Mon, 26 Aug 2013 18:24:00 +0200
+Message-ID: <521B8120.8010407@gigawatt.nl>
+References: <5218BCAD.2010107@gigawatt.nl> <Pine.BSM.4.64L.1308261117200.19888@herc.mirbsd.org>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from plane.gmane.org ([80.91.229.3]:41360 "EHLO plane.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751596Ab3HZLpH convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 26 Aug 2013 07:45:07 -0400
-Received: from list by plane.gmane.org with local (Exim 4.69)
-	(envelope-from <gcsd-dash@m.gmane.org>)
-	id 1VDvEG-0003Yh-4i
-	for dash@vger.kernel.org; Mon, 26 Aug 2013 13:45:04 +0200
-Received: from static-87-79-237-121.netcologne.de ([87.79.237.121])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Mon, 26 Aug 2013 13:45:04 +0200
-Received: from tg by static-87-79-237-121.netcologne.de with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Mon, 26 Aug 2013 13:45:04 +0200
-In-Reply-To: <5218BCAD.2010107@gigawatt.nl>
+Received: from mail-ee0-f43.google.com ([74.125.83.43]:57908 "EHLO
+	mail-ee0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752133Ab3HZQYQ (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 26 Aug 2013 12:24:16 -0400
+Received: by mail-ee0-f43.google.com with SMTP id e52so1736503eek.30
+        for <dash@vger.kernel.org>; Mon, 26 Aug 2013 09:24:15 -0700 (PDT)
+In-Reply-To: <Pine.BSM.4.64L.1308261117200.19888@herc.mirbsd.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: dash <dash@vger.kernel.org>
 
-Harald van Dijk dixit:
-
->$ src/dash -c 'test ! ! =3D !'
->src/dash: 1: test: =3D: unexpected operator
+On 26/08/13 13:19, Thorsten Glaser wrote:
+> Harald van Dijk dixit:
+>=20
+>> $ src/dash -c 'test ! ! =3D !'
+>> src/dash: 1: test: =3D: unexpected operator
+>>
+>> POSIX requires special behaviour for four-argument tests:
+>=20
+> Right but=E2=80=A6
+>=20
+>> There are also some cases where test gives incorrect results when
+>> combining ! with -o
+>=20
+> =E2=80=A6 =E2=80=98-o=E2=80=99 is XSI, not POSIX. Do not expect=E2=80=
+=A6
 >
->POSIX requires special behaviour for four-argument tests:
+>> $ src/dash -c 'test ! "" -o !'; echo $?
+>=20
+> =E2=80=A6 this to work.
+>
+>> This is covered by the special rule for four arguments, there ! as t=
+he
+>> first argument evaluates the remaining three-argument test and negat=
+es
+>> the result. In this special case, ! does not have higher precedence =
+than
+>> -o, so the correct exit status is 1, which bash's test gives.
+>=20
+> Only for a shell implementing the XSI =E2=80=98-o=E2=80=99 for POSIX =
+test.
 
-Right but=E2=80=A6
+That is correct, but dash is such a shell. It attempts to implement -o,
+-a, and \( ... \), and does so mostly correctly.
 
->There are also some cases where test gives incorrect results when
->combining ! with -o
+> You shouldn=E2=80=99t use -o anyway as it=E2=80=99s deprecated.
 
-=E2=80=A6 =E2=80=98-o=E2=80=99 is XSI, not POSIX. Do not expect=E2=80=A6
+Indeed. I made a note that it has been obsoleted. I wrote:
+> There are also some cases where test gives incorrect results when
+> combining ! with -o, but ( ), -a and -o have been obsoleted in favour=
+ of
+> the built-in shell operators ( ), && and ||, so I am not sure if that=
+ is
+> worth fixing.
 
->$ src/dash -c 'test ! "" -o !'; echo $?
+Even if it had not been obsoleted, it would be better not to use -a and
+-o. In fact, I have trouble imagining why ! has not also been obsoleted
+in favour of a simple logical negation of the test (test x !=3D y inste=
+ad
+of test ! x =3D=3D y, which is only possible for some of the tests), or=
+ the
+shell's built-in ! (! test x =3D=3D y instead of test ! x =3D=3D y, whi=
+ch is
+always possible).
 
-=E2=80=A6 this to work.
-
->This is covered by the special rule for four arguments, there ! as the
->first argument evaluates the remaining three-argument test and negates
->the result. In this special case, ! does not have higher precedence th=
-an
->-o, so the correct exit status is 1, which bash's test gives.
-
-Only for a shell implementing the XSI =E2=80=98-o=E2=80=99 for POSIX te=
-st.
-You shouldn=E2=80=99t use -o anyway as it=E2=80=99s deprecated.
-
-bye,
-//mirabilos
---=20
-=46WIW, I'm quite impressed with mksh interactively. I thought it was m=
-uch
-*much* more bare bones. But it turns out it beats the living hell out o=
-f
-ksh93 in that respect. I'd even consider it for my daily use if I hadn'=
-t
-wasted half my life on my zsh setup. :-) -- Frank Terbeck in #!/bin/mks=
-h
-
+Cheers,
+Harald
