@@ -1,62 +1,64 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
+From: Eric Blake <eblake@redhat.com>
 Subject: Re: sed script fails to run in dash
-Date: Fri, 22 Nov 2013 11:25:59 -0800
-Message-ID: <20131122192559.GH4212@google.com>
+Date: Fri, 22 Nov 2013 12:26:03 -0700
+Message-ID: <528FAFCB.5090807@redhat.com>
 References: <528F9E5E.4020807@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="iH5QCMsqfXvH5FAXlAskF637co1mirmMB"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-yh0-f43.google.com ([209.85.213.43]:39310 "EHLO
-	mail-yh0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755588Ab3KVT0D (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 22 Nov 2013 14:26:03 -0500
-Received: by mail-yh0-f43.google.com with SMTP id a41so557290yho.30
-        for <dash@vger.kernel.org>; Fri, 22 Nov 2013 11:26:02 -0800 (PST)
-Content-Disposition: inline
+Received: from mx1.redhat.com ([209.132.183.28]:50189 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755588Ab3KVT0F (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 22 Nov 2013 14:26:05 -0500
 In-Reply-To: <528F9E5E.4020807@gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Tormen <quickhelp@gmail.com>
-Cc: dash@vger.kernel.org
+To: Tormen <quickhelp@gmail.com>, dash@vger.kernel.org
 
-Hi Tormen,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iH5QCMsqfXvH5FAXlAskF637co1mirmMB
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Tormen wrote:
+On 11/22/2013 11:11 AM, Tormen wrote:
 
 >     sed -e 1$'{w/dev/stdout\n;d}' -i /tmp/x
->
+>=20
 > in a dash script will yield the error message:
->
+>=20
 >     sed: -e expression #1, char 2: unknown command: `$'
->
+>=20
 > But why ? :(
 
-POSIX sayeth[1]:
+Because $'' is not (yet) in POSIX.  It will be required in a future
+release, but dash hasn't implemented it yet.
 
-  The '$' character is used to introduce parameter expansion, command
-  substitution, or arithmetic evaluation. If an unquoted '$' is
-  followed by a character that is not one of the following:
+http://austingroupbugs.net/view.php?id=3D249
 
-  * A numeric character
-  * The name of one of the special parameters (see 2.5.2 Special
-    Parameters)
-  * A valid first character of a variable name
-  * A <left-curly-bracket> ( '{' )
-  * A <left-parenthesis>
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-  the result is unspecified.
 
-A single-quote is not the name of a special parameter nor valid as the
-first character of a variable name, so this is unspecified behavior
-and should be avoided in scripts meant to run on an arbitrary POSIX
-shell.
+--iH5QCMsqfXvH5FAXlAskF637co1mirmMB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-However the next major version of POSIX is likely to mandate support
-for $'' string handling[2].  Work towards an implementation in dash would
-be very welcome.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (GNU/Linux)
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Thanks and hope that helps,
-Jonathan
+iQEcBAEBCAAGBQJSj6/LAAoJEKeha0olJ0Nqp/sIAIOuIapT1mVQBIF0IrSQ9Z9M
+16/AfXZ7iP6uZpC7ZxUYPDvDJKvs9Q3CRWiSFraEq2DiBkJkhK/UW6PhKyhiw6AH
+zlBslHG8CisJLo+GWWm4d1OkUIIw0MVcqfpgdK29dONAQLy5SYYV8TEIUzT4hTuK
+jBbl19bRKSWvfthdR78tRjgPexDokvgAroedhgPTRrB0wFbHtfkIz/CMvQ0t6v3u
+/9Rfi9hxnGeVQSjHRN0MO5Fv8V8ksPJSlGRpBGUdZ2spvV74Figkq8pYf5V5FVw2
+7BRGkpz/682JyQYBZ1nD9q9qyK4ItzVAJ1LZQ3bccEcUWMVG5/mJLnovKPwCoCg=
+=qaAj
+-----END PGP SIGNATURE-----
 
-[1] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06
-[2] http://austingroupbugs.net/view.php?id=249
+--iH5QCMsqfXvH5FAXlAskF637co1mirmMB--
