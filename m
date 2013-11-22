@@ -1,45 +1,57 @@
-From: Tormen <quickhelp@gmail.com>
-Subject: sed script fails to run in dash
-Date: Fri, 22 Nov 2013 19:11:42 +0100
-Message-ID: <528F9E5E.4020807@gmail.com>
+From: Seb <sbb@tuxfamily.org>
+Subject: Re: sed script fails to run in dash
+Date: Fri, 22 Nov 2013 20:20:20 +0100
+Message-ID: <20131122202020.823e130b486def83e9ecbda5@tuxfamily.org>
+References: <528F9E5E.4020807@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:57524 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755526Ab3KVSLp (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 22 Nov 2013 13:11:45 -0500
-Received: by mail-wg0-f47.google.com with SMTP id n12so439877wgh.2
-        for <dash@vger.kernel.org>; Fri, 22 Nov 2013 10:11:44 -0800 (PST)
+Received: from smtpfb2-g21.free.fr ([212.27.42.10]:36974 "EHLO
+	smtpfb2-g21.free.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756150Ab3KVTVG (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 22 Nov 2013 14:21:06 -0500
+Received: from smtp6-g21.free.fr (smtp6-g21.free.fr [212.27.42.6])
+	by smtpfb2-g21.free.fr (Postfix) with ESMTP id EBC85CA9949
+	for <dash@vger.kernel.org>; Fri, 22 Nov 2013 20:21:01 +0100 (CET)
+In-Reply-To: <528F9E5E.4020807@gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Tormen <quickhelp@gmail.com>
+Cc: dash@vger.kernel.org
 
-Hi,
+Le Fri, 22 Nov 2013 19:11:42 +0100
+Tormen a =C3=A9crit:
 
-I am puzzled and don't know why this command does not work with dash (I
-am currently using the debian stable (v7.2) version of dash (v0.5.7-3)):
-
-echo 1>/tmp/x; reponse=$( sed -e $(wc -l </tmp/x)$'{w/dev/stdout\n;d}'
--i /tmp/x ); echo "reponse='$reponse'"
-
-but also just this line:
-
-    sed -e 1$'{w/dev/stdout\n;d}' -i /tmp/x
-
-in a dash script will yield the error message:
-
-    sed: -e expression #1, char 2: unknown command: `$'
-
-But why ? :(
-
-I would be really grateful for any explanation.
-Thanks a lot in advance for any hint!
+Hello,
 
 
-Tormen
+> but also just this line:
+>=20
+>     sed -e 1$'{w/dev/stdout\n;d}' -i /tmp/x
+>=20
+> in a dash script will yield the error message:
+>=20
+>     sed: -e expression #1, char 2: unknown command: `$'
+>=20
+> But why ? :(
+
+It seems dash strictly passes what you have given and which is
+sed-speaking incorrect:
+
+$ dash -c "strace sed -e 1$'{w/dev/stdout\n;d}' -i /tmp/x"
+execve("/usr/bin/sed", ["sed", "-e", "1${w/dev/stdout\\n;d}", ...
+                                      ^^^
+Bash does not, and so passes something sed understands:
+
+$ bash -c "strace sed -e 1$'{w/dev/stdout\n;d}' -i /tmp/x"
+execve("/usr/bin/sed", ["sed", "-e", "1{w/dev/stdout \n;d}", ...
+                                      ^^^
+If you escape the "$" with bash, you will get your kitten back:
+
+$ bash -c "sed -e 1\\$'{w/dev/stdout\n;d}' -i /tmp/x"
+sed: -e expression #1, char 2: unknown command: `$'
 
 
-P.S.: The source for the above line is:
-http://stackoverflow.com/questions/13804967/bash-pop-lines-in-a-file
+Take care,
+Seb.
