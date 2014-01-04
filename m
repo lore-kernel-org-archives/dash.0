@@ -1,43 +1,56 @@
-From: Dan Kegel <dank@kegel.com>
-Subject: circumflex in character ranges in filename expansion and case statements?
-Date: Wed, 18 Dec 2013 11:49:33 -0800
-Message-ID: <CAPF-yOZSDep=Rii2jU3mxnzRqjSQF13BAvMsfR9GYiuu-ER0jw@mail.gmail.com>
+From: Julien Moutinho <julm+dash@autogeree.net>
+Subject: dash 0.5.7-3 segfaults on eval then negative test
+Date: Sat, 4 Jan 2014 08:24:07 +0100
+Message-ID: <20140104072407.GB28159@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5vNYLRcllDrimb99"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:65450 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751336Ab3LRTtf (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 18 Dec 2013 14:49:35 -0500
-Received: by mail-wi0-f180.google.com with SMTP id hm19so1173081wib.13
-        for <dash@vger.kernel.org>; Wed, 18 Dec 2013 11:49:34 -0800 (PST)
+Received: from chomsky.autogeree.net ([91.216.110.36]:36987 "EHLO
+	chomsky.autogeree.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750953AbaADHbG (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 4 Jan 2014 02:31:06 -0500
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-I just ran into this in a real script.
 
-http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_13
-says that character ranges in filename expansion and case statements
-use ! instead of ^, but bash and zsh accept either ! or ^ equally,
-whereas dash and ash accept only what the standard demands, !.
+--5vNYLRcllDrimb99
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-e.g.
+% dash -c 'eval x=; test ! $x'
+zsh: segmentation fault  dash -c 'eval x=; test ! $x'
 
-case x in
-[^x]) echo "bug: x is not recognized as being in character range";;
-esac
+% dash -c 'eval :; test !'
+zsh: segmentation fault  dash -c 'eval :; test !'
 
-outputs "bug..." on dash (both as shipped in ubuntu 12.04, and from git)
-and ash (ubuntu 12.04),
-and does not output anything on bash or zsh from ubuntu 12.04.
+cheers
+--julm
 
-The conforming script
+--5vNYLRcllDrimb99
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-case x in
-[!x]) echo "bug: x is not recognized as being in character range";;
-esac
+-----BEGIN PGP SIGNATURE-----
 
-behaves properly in all four shells.
+iQKpBAEBCgCTBQJSx7cXMBSAAAAAABUAEnBrYS1hZGRyZXNzQGdudXBnLm9yZ2p1
+bG1AYXV0b2dlcmVlLm5ldFsUgAAAAAAqAChpc3N1ZXItZnByQG5vdGF0aW9ucy5v
+cGVucGdwLmF1dG9nZXJlZS5uZXRGQkU3MDQ4RjAwMDUxNzA2MEMzMDBGRkU1RTI3
+MTlDRjcwRkU4QTlFAAoJEF4nGc9w/oqeVA4QAKaIbxolxr7OWGcGByUHcEkHLAKS
+1IRjF94Hu1JsX3LhXHLuc3DOZaYg0KgJdXR9VCK35V47EiWs8a8r7R68JGfxtYL9
+qklXGXkLezFwqqL6ifyTwmEz8vYGfO1RwqLqBfRqZB3i7+05im9f0OdjIi+CJ/My
+pxfAgvsxgOzipiFJKfhS3yDLBgnjunt4C3DbhtTpgQ6mC7sxxnsfjkSPYS7CHoB1
+vW0XAP6fpADUnadrlSh3XOfpmITKwxnCjwkXDWi7bKCM4WU3tSltux/xP6ZfXHXy
+uv9dH3183eUBK8FwWJS7laQzz+sIyi79aH3XAq6TqQsLfGAZy2bWpEvVqt5pBwJM
+LTMD2Mn4JxWo6GWem5EgyB+03ojhMzY+qPSVL6J/uLqQNH7PxamHbp3Y0QJWkMPV
+7SSRs8w5S9gwX2w1UjSvgdGuHorYzVDqrGKKEQP6zLkjiGGAGrTtjsAidfZOrIEV
+KlGpHIvSLh9XcCI6pUTQseCzJa2Ax2+ETvyg4/pV1YDCT8W31Kh02ua/Um3ujz6V
+IlwCQRLJZoJkYlzXjzH7snGbeul/VaVeGjUSQeTbt/oDq3nopWIQW12ispSRnLAf
+uTgAax7uHoxykQPqp+OJG/XaXiyYR0z/cDandXBY3yxdr8wDj+y9n3xnIi8+TWVc
+FRGzIgbB9BPraqLW
+=oVmR
+-----END PGP SIGNATURE-----
 
-So... I'll fix my script.  But jeez.
+--5vNYLRcllDrimb99--
