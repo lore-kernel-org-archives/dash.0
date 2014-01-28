@@ -1,56 +1,34 @@
-From: Julien Moutinho <julm+dash@autogeree.net>
-Subject: dash 0.5.7-3 segfaults on eval then negative test
-Date: Sat, 4 Jan 2014 08:24:07 +0100
-Message-ID: <20140104072407.GB28159@localhost>
+From: =?UTF-8?B?0JzQsNGA0Log0JrQvtGA0LXQvdCx0LXRgNCz?=
+	<socketpair@gmail.com>
+Subject: exec command and error checking
+Date: Tue, 28 Jan 2014 18:16:23 +0600
+Message-ID: <CAEmTpZGqBfdBQDnmw-TozGTXpUxShCC=rWObhaP4zmKFJu4jUw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5vNYLRcllDrimb99"
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from chomsky.autogeree.net ([91.216.110.36]:36987 "EHLO
-	chomsky.autogeree.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750953AbaADHbG (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 4 Jan 2014 02:31:06 -0500
-Content-Disposition: inline
+Received: from mail-qc0-f178.google.com ([209.85.216.178]:38297 "EHLO
+	mail-qc0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750855AbaA1MQY (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 28 Jan 2014 07:16:24 -0500
+Received: by mail-qc0-f178.google.com with SMTP id m20so366065qcx.37
+        for <dash@vger.kernel.org>; Tue, 28 Jan 2014 04:16:23 -0800 (PST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
+$ dpkg -l | fgrep dash
+ii  dash                                   0.5.7-2ubuntu2
+                POSIX-compliant shell
 
---5vNYLRcllDrimb99
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+$ exec 9<no_such_file && echo TEST
+dash: 1: cannot open no_such_file: No such file
 
-% dash -c 'eval x=; test ! $x'
-zsh: segmentation fault  dash -c 'eval x=; test ! $x'
+$ exec 9<no_such_file || echo TEST
+dash: 2: cannot open no_such_file: No such file
 
-% dash -c 'eval :; test !'
-zsh: segmentation fault  dash -c 'eval :; test !'
+So, I cannot test this operation without using $?
 
-cheers
---julm
+in BASH this works as expected (even in sh mode)
 
---5vNYLRcllDrimb99
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQKpBAEBCgCTBQJSx7cXMBSAAAAAABUAEnBrYS1hZGRyZXNzQGdudXBnLm9yZ2p1
-bG1AYXV0b2dlcmVlLm5ldFsUgAAAAAAqAChpc3N1ZXItZnByQG5vdGF0aW9ucy5v
-cGVucGdwLmF1dG9nZXJlZS5uZXRGQkU3MDQ4RjAwMDUxNzA2MEMzMDBGRkU1RTI3
-MTlDRjcwRkU4QTlFAAoJEF4nGc9w/oqeVA4QAKaIbxolxr7OWGcGByUHcEkHLAKS
-1IRjF94Hu1JsX3LhXHLuc3DOZaYg0KgJdXR9VCK35V47EiWs8a8r7R68JGfxtYL9
-qklXGXkLezFwqqL6ifyTwmEz8vYGfO1RwqLqBfRqZB3i7+05im9f0OdjIi+CJ/My
-pxfAgvsxgOzipiFJKfhS3yDLBgnjunt4C3DbhtTpgQ6mC7sxxnsfjkSPYS7CHoB1
-vW0XAP6fpADUnadrlSh3XOfpmITKwxnCjwkXDWi7bKCM4WU3tSltux/xP6ZfXHXy
-uv9dH3183eUBK8FwWJS7laQzz+sIyi79aH3XAq6TqQsLfGAZy2bWpEvVqt5pBwJM
-LTMD2Mn4JxWo6GWem5EgyB+03ojhMzY+qPSVL6J/uLqQNH7PxamHbp3Y0QJWkMPV
-7SSRs8w5S9gwX2w1UjSvgdGuHorYzVDqrGKKEQP6zLkjiGGAGrTtjsAidfZOrIEV
-KlGpHIvSLh9XcCI6pUTQseCzJa2Ax2+ETvyg4/pV1YDCT8W31Kh02ua/Um3ujz6V
-IlwCQRLJZoJkYlzXjzH7snGbeul/VaVeGjUSQeTbt/oDq3nopWIQW12ispSRnLAf
-uTgAax7uHoxykQPqp+OJG/XaXiyYR0z/cDandXBY3yxdr8wDj+y9n3xnIi8+TWVc
-FRGzIgbB9BPraqLW
-=oVmR
------END PGP SIGNATURE-----
-
---5vNYLRcllDrimb99--
+-- 
+Segmentation fault
