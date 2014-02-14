@@ -1,35 +1,49 @@
-From: Chet Ramey <chet.ramey@case.edu>
-Subject: Re: exec command and error checking
-Date: Tue, 28 Jan 2014 22:19:51 -0500
-Message-ID: <52E87357.4020103@case.edu>
-References: <CAEmTpZGqBfdBQDnmw-TozGTXpUxShCC=rWObhaP4zmKFJu4jUw@mail.gmail.com> <20140128131759.GA17217@hal.lan> <20140128215916.GA59221@stack.nl>
-Reply-To: chet.ramey@case.edu
+From: Dan Kegel <dank@kegel.com>
+Subject: eval and export behave differently together in dash and ash than in
+ bash, zsh, and ksh
+Date: Fri, 14 Feb 2014 10:29:59 -0800
+Message-ID: <CAPF-yOaxN0b3t-H8Vi3HirpAuV0gsdu9XWROws4o02JXAEdzAA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mpv1.tis.CWRU.Edu ([129.22.105.36]:11385 "EHLO
-	mpv1.tis.cwru.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755732AbaA2D0e (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 28 Jan 2014 22:26:34 -0500
-In-Reply-To: <20140128215916.GA59221@stack.nl>
+Received: from mail-lb0-f170.google.com ([209.85.217.170]:36902 "EHLO
+	mail-lb0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752851AbaBNSaB (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 14 Feb 2014 13:30:01 -0500
+Received: by mail-lb0-f170.google.com with SMTP id u14so9778213lbd.29
+        for <dash@vger.kernel.org>; Fri, 14 Feb 2014 10:29:59 -0800 (PST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>, dash@vger.kernel.org
-Cc: chet.ramey@case.edu
+To: dash@vger.kernel.org
 
-On 1/28/14, 4:59 PM, Jilles Tjoelker wrote:
+The script
 
->> That's either a bug or an intended deviation from the POSIX
->> standard, you'll have to ask on the bug-bash list about that.
+eval export dir=~$LOGNAME
+echo $dir
 
-It's a bug in bash.  Bash doesn't exit when the command is on the LHS
-of a || or &&.
+eval dir2=~$LOGNAME
+echo $dir2
 
-Chet
+produces different results on different shells.
 
+bash  (4.2-2ubuntu2.1) (with and without --posix)
+zsh (4.3.17-1ubuntu1)
+ksh (93u-1)
+produce
 
--- 
-``The lyf so short, the craft so long to lerne.'' - Chaucer
-		 ``Ars longa, vita brevis'' - Hippocrates
-Chet Ramey, ITS, CWRU    chet@case.edu    http://cnswww.cns.cwru.edu/~chet/
+/home/buildbot
+/home/buildbot
+
+dash (0.5.7-2ubuntu2)
+ash (0.5.7-2ubuntu2)
+produce
+
+~buildbot
+/home/buildbot
+
+The easy workaround is to use the older form
+
+eval dir=~$LOGNAME
+export dir
+
+but it'd be nice if that weren't needed.
