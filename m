@@ -1,86 +1,67 @@
-From: Eric Blake <eblake@redhat.com>
-Subject: Re: eval and export behave differently together in dash and ash than
- in bash, zsh, and ksh
-Date: Fri, 14 Feb 2014 11:46:31 -0700
-Message-ID: <52FE6487.7000202@redhat.com>
-References: <CAPF-yOaxN0b3t-H8Vi3HirpAuV0gsdu9XWROws4o02JXAEdzAA@mail.gmail.com>
+From: Alex Waite <alexqw85@gmail.com>
+Subject: dash and ANSI escape sequences
+Date: Tue, 18 Feb 2014 12:54:29 +0100
+Message-ID: <ldvhl7$ns2$1@ger.gmane.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="0iOm77643NBiLdxkJm2XNWUU7Iau9ISOR"
+Content-Type: text/plain; charset=windows-1252;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:30224 "EHLO mx1.redhat.com"
+Received: from plane.gmane.org ([80.91.229.3]:45613 "EHLO plane.gmane.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751385AbaBNSqf (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 14 Feb 2014 13:46:35 -0500
-In-Reply-To: <CAPF-yOaxN0b3t-H8Vi3HirpAuV0gsdu9XWROws4o02JXAEdzAA@mail.gmail.com>
+	id S1754110AbaBRMKJ (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 18 Feb 2014 07:10:09 -0500
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1WFjUz-0005mF-3m
+	for dash@vger.kernel.org; Tue, 18 Feb 2014 13:10:05 +0100
+Received: from 141.44.98.41 ([141.44.98.41])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Tue, 18 Feb 2014 13:10:05 +0100
+Received: from alexqw85 by 141.44.98.41 with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Tue, 18 Feb 2014 13:10:05 +0100
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Dan Kegel <dank@kegel.com>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0iOm77643NBiLdxkJm2XNWUU7Iau9ISOR
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+I come here in search of someone who understands dash/portable scriptin=
+g=20
+better than I do. Today, my Google-foo is failing me.
 
-On 02/14/2014 11:29 AM, Dan Kegel wrote:
-> The script
->=20
-> eval export dir=3D~$LOGNAME
-> echo $dir
+I am in the process of cleaning up someone else's semi-portable shell=20
+script (originally written on FreeBSD). The original script uses colors=
+,=20
+in the form of
 
-This has been discussed by the POSIX folks.  See:
-http://austingroupbugs.net/view.php?id=3D351
+echo -e "\e[1;32mpassed\e[0m"
 
-The standard added the definition of a 'declaration utility', which can
-evaluate its arguments in assignment context, and marked that 'export'
-is one such utility:
+"echo" should be avoided in general and any option passed to "echo" is=20
+non-portable. In bash, I can easily port this to printf
 
->> At line 74276 (XCU export DESCRIPTION), add:
->> The export special built-in shall be a declaration utility. Therefore,=
+printf '%b' "\x1b[32;1mpassed\x1b[0m\n"
 
->> if export is recognized as the command word of a simple command, then
->> subsequent words of the form name=3Dword shall be expanded in an
->> assignment context. See Section 2.9.1.
+However, this approach does not work in dash. I have read both the echo=
+=20
+and printf sections of the dash manual, and it seems that both "\e" and=
+=20
+"\x" are unsupported. Using "%b" allows additional backslash-escape=20
+sequences, but only \c and \0.
 
-Meanwhile, 'eval' is not allowed to be a declaration utility.  Thus,
-once this POSIX interpretation is made live in Issue 8 (currently still
-unreleased), a conforming shell would have to evaluate this as:
+I know the purpose of dash is to provide an efficient POSIX compliant=20
+shell. Is there really no POSIX compliant way to use color? It seems=20
+so... 80s. Dash's manpage does state that it supports "backslash=20
+notation as defined in ANSI X3.159-1989 (=93ANSI C89=94)", but I can't =
+find=20
+a copy of ANSI C89 online to confirm whether it includes display=20
+attributes. ANSI C89 is old, but still... too old for color?
 
-eval export dir=3D~$LOGNAME      # not in assignment context
-eval 'export' 'dir=3D~buildbot'  # actual arguments passed to eval
-export dir=3D~buildbot           # declaration context, do tilde expansio=
-n
-dir gets /home/buildbot
+Am I somehow missing some hidden functionality in printf, or is there=20
+really no POSIX compliant method of printing colors, or is Dash simply=20
+incomplete with its POSIX support in this regard?
 
-ksh and bash are compliant, dash needs to be patched.
+Any insight is most appreciated.
 
-However, as Issue 8 POSIX is not yet released, dash is not yet
-non-compliant, and you are correct that workarounds exist while waiting
-for someone to write the patch for dash.
+---Alex
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---0iOm77643NBiLdxkJm2XNWUU7Iau9ISOR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJS/mSIAAoJEKeha0olJ0NqkcUIAIpxPVD4s77Id/xXxFhnD+Yu
-H5Pp0+LmOwIzPC8bVqjI+DqCTiqPSk3+nLm0u0tbgyOOCbx9wUrx0Atbi3zUtzOW
-yFF1rFAyfc9yzrGIw4yYSseMboF06Tj8uv1b5YKV2s4H2dt7cB1BZPhSAbgu2EDT
-hWvUnQMsNbd2oDWQixQWqTqf0BkJUwcqAcuXd0wD0Uyykgsd4blfWnwSrFlU5jST
-LyP16ys7qADnybpl3ssgazuSCCjWzRszR43Bb6LP/znnQxMiL6bKNKBGzgigDxnm
-WXbbDzATsZtRlbv1RV9Y9gDuBHSUa3YqHi5CYert0gl/GMUhdhfrrsasxQoUZPw=
-=hEFh
------END PGP SIGNATURE-----
-
---0iOm77643NBiLdxkJm2XNWUU7Iau9ISOR--
