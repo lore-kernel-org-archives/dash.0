@@ -1,50 +1,75 @@
-From: Jason Miller <jason@milr.com>
-Subject: command lookup and POSIX
-Date: Fri, 7 Mar 2014 11:43:19 -0800
-Message-ID: <20140307194318.GA2317@home.jasonmmiller.org>
+From: Eric Blake <eblake@redhat.com>
+Subject: Re: command lookup and POSIX
+Date: Fri, 07 Mar 2014 14:53:38 -0700
+Message-ID: <531A3FE2.8050109@redhat.com>
+References: <20140307194318.GA2317@home.jasonmmiller.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="2UI4beHFijWpKJCGhQ8cdoThQMavrPigi"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from fed1rmfepi108.cox.net ([68.230.241.139]:46384 "EHLO
-	fed1rmfepi108.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751016AbaCGVny (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 7 Mar 2014 16:43:54 -0500
-Received: from fed1rmimpo210 ([68.230.241.161]) by fed1rmfepo102.cox.net
-          (InterMail vM.8.01.05.15 201-2260-151-145-20131218) with ESMTP
-          id <20140307194352.TGBM3107.fed1rmfepo102.cox.net@fed1rmimpo210>
-          for <dash@vger.kernel.org>; Fri, 7 Mar 2014 14:43:52 -0500
-Content-Disposition: inline
+Received: from mx1.redhat.com ([209.132.183.28]:28302 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753528AbaCGVxl (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 7 Mar 2014 16:53:41 -0500
+In-Reply-To: <20140307194318.GA2317@home.jasonmmiller.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Jason Miller <jason@milr.com>, dash@vger.kernel.org
 
-Reading this:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2UI4beHFijWpKJCGhQ8cdoThQMavrPigi
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_09_01_01
+On 03/07/2014 12:43 PM, Jason Miller wrote:
+> Reading this:
+>=20
+> http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.htm=
+l#tag_02_09_01_01
+>=20
+> Any built-in other than the special built-ins, or listed in the table
+> there should not be run unless it is present in the PATH.
+>=20
+> dash however doesn't follow that:
+>=20
+> PS1=3D"% " dash
+>=20
+>     % PATH=3D
 
-Any built-in other than the special built-ins, or listed in the table
-there should not be run unless it is present in the PATH.
+Stop right there.
 
-dash however doesn't follow that:
+http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#t=
+ag_08
 
-PS1="% " dash
+"If PATH is unset or is set to null, the path search is
+implementation-defined."
 
-    % PATH=
-    % /usr/bin/which [
-    /usr/bin/which: no [ in ()
-    % [ -x f ]
-    % 
+Therefore, you have triggered implementation-defined behavior, rather
+than exposing a bug in dash.
 
-Of course I can't find a single shell that follows this, even when
-enabling its respective strict POSIX mode.  I'm guessing it was added to
-prevent changes in behaviors of existing scripts as shells add more
-builtins.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-However, changing dash to comply also seems of dubious value since there
-are many shell scripts out there that depend on common built-ins not
-listed in POSIX.
 
-However DASH claims POSIX compliance so I thought I would at least
-mention it now that I found it.
+--2UI4beHFijWpKJCGhQ8cdoThQMavrPigi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--Jason
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJTGj/iAAoJEKeha0olJ0NqfkAH/3ngs7CEOqC4Pp19rjI/qQ6q
+4L7gqSFQxhKna6CRwHrjcyAGTmcc+GvZiuHHQEIJyjXKyZEeB5pWvG3InPgDemZX
+hPSsZpWxoe088a55eNBVK7cxpZ4gSIYkzQC1PvaV0oS/2ozO/4kDAx6GNedaf9x4
+aWP78w3/K8wMVUmQrgkvE5uGJlbzHKitnybE80/RHjXAZ5ALC6kSIPYLEHfwa+jg
+RPVDlB3Ti8RyKXUbOIlNgu89vOmBzwDxdo4UJouzM5IZoV/vTwnKlTdhO3gXLg1X
+a4jKgtCcxynlFglZnMDnT7/7bgRujW8tnntJbaevbPsNVwne924GNlBuBndBdXI=
+=nJ+/
+-----END PGP SIGNATURE-----
+
+--2UI4beHFijWpKJCGhQ8cdoThQMavrPigi--
