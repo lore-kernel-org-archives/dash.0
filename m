@@ -1,54 +1,50 @@
-From: Alex Waite <alexqw85@gmail.com>
-Subject: Re: dash and ANSI escape sequences
-Date: Tue, 18 Feb 2014 14:27:55 +0100
-Message-ID: <ldvn4d$pi$1@ger.gmane.org>
-References: <ldvhl7$ns2$1@ger.gmane.org> <20140218131132.GA30525@hal.lan>
+From: Jason Miller <jason@milr.com>
+Subject: command lookup and POSIX
+Date: Fri, 7 Mar 2014 11:43:19 -0800
+Message-ID: <20140307194318.GA2317@home.jasonmmiller.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from plane.gmane.org ([80.91.229.3]:42812 "EHLO plane.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755016AbaBRN2J (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 18 Feb 2014 08:28:09 -0500
-Received: from list by plane.gmane.org with local (Exim 4.69)
-	(envelope-from <gcsd-dash@m.gmane.org>)
-	id 1WFkiV-0004w9-6f
-	for dash@vger.kernel.org; Tue, 18 Feb 2014 14:28:07 +0100
-Received: from 141.44.98.41 ([141.44.98.41])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Tue, 18 Feb 2014 14:28:07 +0100
-Received: from alexqw85 by 141.44.98.41 with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Tue, 18 Feb 2014 14:28:07 +0100
-In-Reply-To: <20140218131132.GA30525@hal.lan>
+Received: from fed1rmfepi108.cox.net ([68.230.241.139]:46384 "EHLO
+	fed1rmfepi108.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751016AbaCGVny (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 7 Mar 2014 16:43:54 -0500
+Received: from fed1rmimpo210 ([68.230.241.161]) by fed1rmfepo102.cox.net
+          (InterMail vM.8.01.05.15 201-2260-151-145-20131218) with ESMTP
+          id <20140307194352.TGBM3107.fed1rmfepo102.cox.net@fed1rmimpo210>
+          for <dash@vger.kernel.org>; Fri, 7 Mar 2014 14:43:52 -0500
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-On 02/18/2014 02:11 PM, Guido Berhoerster wrote:
->> [snip]
->> Am I somehow missing some hidden functionality in printf, or is
->> there really no POSIX compliant method of printing colors, or is
->> Dash simply incomplete with its POSIX support in this regard?
->
-> dash, POSIX, or C89 have nothing to do with colors, it depends on
-> your terminal whether it interprets certain escape sequences as
-> color attributes.
+Reading this:
 
-Ahh. Ok.
+http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_09_01_01
 
-> You can print arbitrary bytes in a portable way (i.e. as
-> specified by POSIX) by using octal notation, e.g. escape is 033
-> in octal:
->
-> printf "\033[1;32mpassed\033[0m\n"
+Any built-in other than the special built-ins, or listed in the table
+there should not be run unless it is present in the PATH.
 
-Understood; I get how this all fits together now.
+dash however doesn't follow that:
 
-Thanks for your example and explanation!
+PS1="% " dash
 
----Alex
+    % PATH=
+    % /usr/bin/which [
+    /usr/bin/which: no [ in ()
+    % [ -x f ]
+    % 
 
+Of course I can't find a single shell that follows this, even when
+enabling its respective strict POSIX mode.  I'm guessing it was added to
+prevent changes in behaviors of existing scripts as shells add more
+builtins.
 
+However, changing dash to comply also seems of dubious value since there
+are many shell scripts out there that depend on common built-ins not
+listed in POSIX.
+
+However DASH claims POSIX compliance so I thought I would at least
+mention it now that I found it.
+
+-Jason
