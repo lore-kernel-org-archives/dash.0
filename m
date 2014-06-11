@@ -1,19 +1,19 @@
 From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH 1/2] [MAN] 0 and EXIT both work for exit traps.
-Date: Wed, 11 Jun 2014 16:20:44 -0700
-Message-ID: <20140611232043.GI8557@google.com>
+Subject: [PATCH 2/2] [MAN] Clarify "trap '' signals" syntax in manual page
+Date: Wed, 11 Jun 2014 16:21:37 -0700
+Message-ID: <20140611232137.GJ8557@google.com>
 References: <1402528126-27427-1-git-send-email-adam.buchbinder@gmail.com>
  <20140611231305.GG8557@google.com>
  <20140611231738.GH8557@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-pa0-f45.google.com ([209.85.220.45]:39834 "EHLO
-	mail-pa0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752625AbaFKXUr (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 11 Jun 2014 19:20:47 -0400
-Received: by mail-pa0-f45.google.com with SMTP id hz1so313333pad.32
-        for <dash@vger.kernel.org>; Wed, 11 Jun 2014 16:20:46 -0700 (PDT)
+Received: from mail-pb0-f42.google.com ([209.85.160.42]:53470 "EHLO
+	mail-pb0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754285AbaFKXVl (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 11 Jun 2014 19:21:41 -0400
+Received: by mail-pb0-f42.google.com with SMTP id ma3so56837pbc.1
+        for <dash@vger.kernel.org>; Wed, 11 Jun 2014 16:21:39 -0700 (PDT)
 Content-Disposition: inline
 In-Reply-To: <20140611231738.GH8557@google.com>
 Sender: dash-owner@vger.kernel.org
@@ -21,12 +21,14 @@ List-Id: dash@vger.kernel.org
 To: Adam Buchbinder <abuchbinder@google.com>
 Cc: dash@vger.kernel.org, Adam Buchbinder <adam.buchbinder@gmail.com>
 
-From: Adam Buchbinder <adam.buchbinder@gmail.com>
+When the manpage states
 
-I saw a discussion in which there was some confusion over whether or not
-you can use a symbolic name, since the manpage doesn't specifically say so.
+| <action> may be null, which cause the specified signals to be ignored.
 
-Signed-off-by: Adam Buchbinder <adam.buchbinder@gmail.com>
+it is not immediately obvious what it means for an action to be
+null.  Clarify by explicitly referring to an empty string, as
+opposed to a NULL pointer or the string "null".
+
 Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
 ---
  ChangeLog  | 4 ++++
@@ -34,32 +36,32 @@ Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
  2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/ChangeLog b/ChangeLog
-index 2a39e34..3f59ac2 100644
+index 3f59ac2..765b9b6 100644
 --- a/ChangeLog
 +++ b/ChangeLog
 @@ -1,3 +1,7 @@
-+2014-06-11  Adam Buchbinder <adam.buchbinder@gmail.com>
++2014-06-11  Jonathan Nieder <jrnieder@gmail.com>
 +
-+	* Clarify that 0 and EXIT are both acceptable for exit traps.
++	* Clarify "trap '' signals" syntax in manual page.
 +
- 2013-08-23  Herbert Xu <herbert@gondor.apana.org.au>
+ 2014-06-11  Adam Buchbinder <adam.buchbinder@gmail.com>
  
- 	* Propagate EXP_QPAT in subevalvar.
+ 	* Clarify that 0 and EXIT are both acceptable for exit traps.
 diff --git a/src/dash.1 b/src/dash.1
-index 6241a61..a07a52d 100644
+index a07a52d..68bd5fe 100644
 --- a/src/dash.1
 +++ b/src/dash.1
-@@ -2071,7 +2071,9 @@ The signals are specified by signal number or as the name of the signal.
- If
- .Ar signal
- is
--.Li 0 ,
-+.Li 0
-+or
-+.Li EXIT ,
+@@ -2076,7 +2076,9 @@ or
+ .Li EXIT ,
  the action is executed when the shell exits.
  .Ar action
- may be null, which cause the specified signals to be ignored.
+-may be null, which cause the specified signals to be ignored.
++may be empty
++.Li ( "''" ) ,
++which causes the specified signals to be ignored.
+ With
+ .Ar action
+ omitted or set to `-' the specified signals are set to their default action.
 -- 
 2.0.0.526.g5318336
 
