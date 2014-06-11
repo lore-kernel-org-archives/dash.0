@@ -1,73 +1,55 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: Bug in man page
-Date: Fri, 14 Mar 2014 13:09:19 +0100
-Message-ID: <20140314120919.GA5792@stack.nl>
-References: <B9BC530A-2542-409D-AA48-2B9E3B7906A1@vandijke.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: Adam Buchbinder <abuchbinder@google.com>
+Subject: [PATCH 1/2] [MAN] 0 and EXIT both work for exit traps.
+Date: Wed, 11 Jun 2014 16:08:45 -0700
+Message-ID: <1402528126-27427-1-git-send-email-adam.buchbinder@gmail.com>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay02.stack.nl ([131.155.140.104]:52483 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753722AbaCNMPr (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 14 Mar 2014 08:15:47 -0400
-Content-Disposition: inline
-In-Reply-To: <B9BC530A-2542-409D-AA48-2B9E3B7906A1@vandijke.net>
+Received: from mail-pd0-f172.google.com ([209.85.192.172]:53248 "EHLO
+	mail-pd0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751898AbaFKXI6 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 11 Jun 2014 19:08:58 -0400
+Received: by mail-pd0-f172.google.com with SMTP id fp1so291532pdb.31
+        for <dash@vger.kernel.org>; Wed, 11 Jun 2014 16:08:58 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jeroen van Dijke <jeroen@vandijke.net>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
+Cc: jrnieder@gmail.com, Adam Buchbinder <adam.buchbinder@gmail.com>
 
-On Sun, Mar 09, 2014 at 12:11:43PM +0100, Jeroen van Dijke wrote:
-> There seems to be a bug in the dash man page, at least in 0.5.7. It
-> reads:
+I saw a discussion in which there was some confusion over whether or not
+you can use a symbolic name, since the manpage doesn't specifically say so.
 
->             Precision:
->                     An optional period, `.', followed by an optional
-> digit string giving a precision which specifies the number of digits
-> to appear after the decimal point, for e and f formats, or the maximu=
-m
-> number of *characters* to be printed from a string (b and s formats);
-> if the digit string is missing, the precision is treated as zero;
+Signed-off-by: Adam Buchbinder <adam.buchbinder@gmail.com>
+---
+ ChangeLog  | 4 ++++
+ src/dash.1 | 4 +++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-> dash behaves cuts to the number of bytes
+diff --git a/ChangeLog b/ChangeLog
+index 2a39e34..81df8d1 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2014-06-11  Adam Buchbinder <adam.buchbinder@gmail.com>
++
++	* Clarify that 0 and EXIT are both acceptable for exit traps.	
++
+ 2013-08-23  Herbert Xu <herbert@gondor.apana.org.au>
+ 
+ 	* Propagate EXP_QPAT in subevalvar.
+diff --git a/src/dash.1 b/src/dash.1
+index 6241a61..a07a52d 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -2071,7 +2071,9 @@ The signals are specified by signal number or as the name of the signal.
+ If
+ .Ar signal
+ is
+-.Li 0 ,
++.Li 0
++or
++.Li EXIT ,
+ the action is executed when the shell exits.
+ .Ar action
+ may be null, which cause the specified signals to be ignored.
+-- 
+2.0.0.526.g5318336
 
-> $ length=3D10; printf "%.${length}s\n" "eeeeeeeeeeeeeeeeeeeeeeeee"
-> eeeeeeeeee
-> $ length=3D10; printf "%.${length}s\n" "=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=
-=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=
-=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=E2=80=9D
-> =C3=AB=C3=AB=C3=AB=C3=AB=C3=AB
-
-> The  POSIX specification (2008) says:
-
-> precision Gives the minimum number of digits to appear for the d, o,
-> i, u, x, or X conversion specifiers (the field is padded with leading
-> zeros), the number of digits to appear after the radix character for
-> the e and f conversion specifiers, the maximum number of significant
-> digits for the g conversion specifier; or the maximum number of
-> *bytes* to be written from a string in the s conversion specifier. Th=
-e
-> precision shall take the form of a ( '.' ) followed by a decimal digi=
-t
-> string; a null digit string is treated as zero.
-
-> So it seems to me that =E2=80=9Ccharacters=E2=80=9D should be changed=
- to =E2=80=9Cbytes=E2=80=9D.
-
-Indeed, and the same applies to the field width. This behaviour may not
-be the most useful, but it is standard and widely implemented.
-
-Likewise, the sequences \num (in the format string) and \0num (in
-arguments for %b) generate bytes, not characters.
-
-On another note, the format string is said to be a "character string";
-this may be a C'ism (meaning that it is not a wide character string).
-
-Note that a "byte" in POSIX terminology is a "character" in C standard
-terminology. I think the former is less ambiguous in general and should
-be the preferred term in man pages where a unit of 8 bits is referred
-to. A POSIX "character" may be more than one byte long.
-
---=20
-Jilles Tjoelker
