@@ -1,67 +1,44 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH 2/2] [MAN] Clarify "trap '' signals" syntax in manual page
-Date: Wed, 11 Jun 2014 16:21:37 -0700
-Message-ID: <20140611232137.GJ8557@google.com>
-References: <1402528126-27427-1-git-send-email-adam.buchbinder@gmail.com>
- <20140611231305.GG8557@google.com>
- <20140611231738.GH8557@google.com>
+From: =?UTF-8?q?Petr=20=C5=A0abata?= <contyk@redhat.com>
+Subject: [PATCH] Fix build failure with gcc -Werror=format-security
+Date: Tue, 24 Jun 2014 14:40:57 +0200
+Message-ID: <1403613657-5859-1-git-send-email-contyk@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-pb0-f42.google.com ([209.85.160.42]:53470 "EHLO
-	mail-pb0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754285AbaFKXVl (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 11 Jun 2014 19:21:41 -0400
-Received: by mail-pb0-f42.google.com with SMTP id ma3so56837pbc.1
-        for <dash@vger.kernel.org>; Wed, 11 Jun 2014 16:21:39 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20140611231738.GH8557@google.com>
+Received: from mx1.redhat.com ([209.132.183.28]:57850 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752802AbaFXMlG (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 24 Jun 2014 08:41:06 -0400
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com (int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	by mx1.redhat.com (8.14.4/8.14.4) with ESMTP id s5OCf4QO026092
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <dash@vger.kernel.org>; Tue, 24 Jun 2014 08:41:05 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Adam Buchbinder <abuchbinder@google.com>
-Cc: dash@vger.kernel.org, Adam Buchbinder <adam.buchbinder@gmail.com>
+To: dash@vger.kernel.org
+Cc: =?UTF-8?q?Petr=20=C5=A0abata?= <contyk@redhat.com>
 
-When the manpage states
+This fix lets dash build with the abovementioned option.
 
-| <action> may be null, which cause the specified signals to be ignored.
-
-it is not immediately obvious what it means for an action to be
-null.  Clarify by explicitly referring to an empty string, as
-opposed to a NULL pointer or the string "null".
-
-Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
+Signed-off-by: Petr =C5=A0abata <contyk@redhat.com>
 ---
- ChangeLog  | 4 ++++
- src/dash.1 | 4 +++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ src/jobs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/ChangeLog b/ChangeLog
-index 3f59ac2..765b9b6 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,7 @@
-+2014-06-11  Jonathan Nieder <jrnieder@gmail.com>
-+
-+	* Clarify "trap '' signals" syntax in manual page.
-+
- 2014-06-11  Adam Buchbinder <adam.buchbinder@gmail.com>
- 
- 	* Clarify that 0 and EXIT are both acceptable for exit traps.
-diff --git a/src/dash.1 b/src/dash.1
-index a07a52d..68bd5fe 100644
---- a/src/dash.1
-+++ b/src/dash.1
-@@ -2076,7 +2076,9 @@ or
- .Li EXIT ,
- the action is executed when the shell exits.
- .Ar action
--may be null, which cause the specified signals to be ignored.
-+may be empty
-+.Li ( "''" ) ,
-+which causes the specified signals to be ignored.
- With
- .Ar action
- omitted or set to `-' the specified signals are set to their default action.
--- 
-2.0.0.526.g5318336
+diff --git a/src/jobs.c b/src/jobs.c
+index bf40204..f3af44d 100644
+--- a/src/jobs.c
++++ b/src/jobs.c
+@@ -427,7 +427,7 @@ sprint_status(char *s, int status, int sigonly)
+ 				goto out;
+ #endif
+ 		}
+-		col =3D fmtstr(s, 32, strsignal(st));
++		col =3D fmtstr(s, 32, "%s", strsignal(st));
+ #ifdef WCOREDUMP
+ 		if (WCOREDUMP(status)) {
+ 			col +=3D fmtstr(s + col, 16, " (core dumped)");
+--=20
+1.9.3
 
