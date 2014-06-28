@@ -1,44 +1,92 @@
-From: =?UTF-8?q?Petr=20=C5=A0abata?= <contyk@redhat.com>
-Subject: [PATCH] Fix build failure with gcc -Werror=format-security
-Date: Tue, 24 Jun 2014 14:40:57 +0200
-Message-ID: <1403613657-5859-1-git-send-email-contyk@redhat.com>
+From: Adam Borowski <kilobyte@angband.pl>
+Subject: [PATCH] \e in "echo" and "printf" builtins
+Date: Sat, 28 Jun 2014 06:56:53 +0200
+Message-ID: <20140628045653.GA5097@angband.pl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: multipart/mixed; boundary="sm4nu43k4a2Rpi4c"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57850 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752802AbaFXMlG (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 24 Jun 2014 08:41:06 -0400
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com (int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	by mx1.redhat.com (8.14.4/8.14.4) with ESMTP id s5OCf4QO026092
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <dash@vger.kernel.org>; Tue, 24 Jun 2014 08:41:05 -0400
+Received: from tartarus.angband.pl ([89.206.35.136]:60860 "EHLO
+	tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750727AbaF1FR7 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 28 Jun 2014 01:17:59 -0400
+Received: from kilobyte by tartarus.angband.pl with local (Exim 4.80)
+	(envelope-from <kilobyte@tartarus.angband.pl>)
+	id 1X0kh3-0001PS-Di
+	for dash@vger.kernel.org; Sat, 28 Jun 2014 06:56:53 +0200
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-Cc: =?UTF-8?q?Petr=20=C5=A0abata?= <contyk@redhat.com>
 
-This fix lets dash build with the abovementioned option.
 
-Signed-off-by: Petr =C5=A0abata <contyk@redhat.com>
+--sm4nu43k4a2Rpi4c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi!
+
+I'm not sure what's your policy towards extensions, but \e as \033 is
+something ubiquitous in the Unix world.  C compilers (gcc, clang, icc and
+tcc -- but not MSVC), perl, shells (bash and zsh -- but not dash), etc.
+
+What about supporting it in dash as well?
+Patch attached.
+
+-- 
+Gnome 3, Windows 8, Slashdot Beta, now Firefox Ribbon^WAustralis.  WTF is going
+on with replacing usable interfaces with tabletized ones?
+
+--sm4nu43k4a2Rpi4c
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="0001-Support-e-in-echo-and-printf-builtins.patch"
+
+From a6e6e7b6f3a725b4ca0514f22e9ee4cfe2c225e2 Mon Sep 17 00:00:00 2001
+From: Adam Borowski <kilobyte@angband.pl>
+Date: Sat, 28 Jun 2014 06:29:56 +0200
+Subject: [PATCH] Support \e in "echo" and "printf" builtins.
+
+Signed-off-by: Adam Borowski <kilobyte@angband.pl>
 ---
- src/jobs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/bltin/printf.c | 1 +
+ src/dash.1         | 4 ++++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/src/jobs.c b/src/jobs.c
-index bf40204..f3af44d 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -427,7 +427,7 @@ sprint_status(char *s, int status, int sigonly)
- 				goto out;
- #endif
- 		}
--		col =3D fmtstr(s, 32, strsignal(st));
-+		col =3D fmtstr(s, 32, "%s", strsignal(st));
- #ifdef WCOREDUMP
- 		if (WCOREDUMP(status)) {
- 			col +=3D fmtstr(s + col, 16, " (core dumped)");
---=20
-1.9.3
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index 893295c..98d954c 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -300,6 +300,7 @@ conv_escape(char *str, int *conv_ch)
+ 	case '\\':	value = '\\';	break;	/* backslash */
+ 	case 'a':	value = '\a';	break;	/* alert */
+ 	case 'b':	value = '\b';	break;	/* backspace */
++	case 'e':	value = '\e';	break;  /* escape */
+ 	case 'f':	value = '\f';	break;	/* form-feed */
+ 	case 'n':	value = '\n';	break;	/* newline */
+ 	case 'r':	value = '\r';	break;	/* carriage-return */
+diff --git a/src/dash.1 b/src/dash.1
+index 3847d98..7107faa 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -1199,6 +1199,8 @@ Subsequent output is suppressed.  This is normally used at the end of the
+ last argument to suppress the trailing newline that
+ .Ic echo
+ would otherwise output.
++.It Li \ee
++Outputs an escape character (ESC).
+ .It Li \ef
+ Output a form feed.
+ .It Li \en
+@@ -1573,6 +1575,8 @@ The characters and their meanings are as follows:
+ Write a \*[Lt]bell\*[Gt] character.
+ .It Cm \eb
+ Write a \*[Lt]backspace\*[Gt] character.
++.It Cm \ee
++Write an \*[Lt]escape\*[Gt] (ESC) character.
+ .It Cm \ef
+ Write a \*[Lt]form-feed\*[Gt] character.
+ .It Cm \en
+-- 
+2.0.0
 
+
+--sm4nu43k4a2Rpi4c--
