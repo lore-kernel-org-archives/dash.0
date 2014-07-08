@@ -1,61 +1,157 @@
-From: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH] \e in "echo" and "printf" builtins
-Date: Mon, 30 Jun 2014 07:08:34 -0600
-Message-ID: <53B16152.6040408@redhat.com>
-References: <20140628045653.GA5097@angband.pl> <53AEF2E3.5080205@gigawatt.nl> <3DBAFEEE-9555-483E-8260-7D5E9B47F9AD@aim.com>
+From: Luigi Tarenga <luigi.tarenga@gmail.com>
+Subject: bug in dash compile with buildroot
+Date: Tue, 08 Jul 2014 16:23:07 +0200
+Message-ID: <53BBFECB.6070003@gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="xNFowE93Tl7DdNGJUArUDx75ingOv4RAu"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46225 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750944AbaF3NKO (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 30 Jun 2014 09:10:14 -0400
-In-Reply-To: <3DBAFEEE-9555-483E-8260-7D5E9B47F9AD@aim.com>
+Received: from mail-we0-f182.google.com ([74.125.82.182]:45809 "EHLO
+	mail-we0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750834AbaGHOWy (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 8 Jul 2014 10:22:54 -0400
+Received: by mail-we0-f182.google.com with SMTP id q59so6053336wes.13
+        for <dash@vger.kernel.org>; Tue, 08 Jul 2014 07:22:53 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Paul Gilmartin <PaulGBoulder@aim.com>, Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
+To: buildroot@buildroot.org, dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xNFowE93Tl7DdNGJUArUDx75ingOv4RAu
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+hi,
+I send this bug report to both list because I'm not sure who will find 
+this relevant.
 
-On 06/28/2014 11:33 AM, Paul Gilmartin wrote:
->=20
-> OTOH, there's a POSIX requirement that builtins be indistinguishable
-> (except in performance) from the corresponding executables.=20
+I compiled a buildroot image for a laptop with atom so the build is for 
+x86_64
+architecture. In the build configuration I flagged to include dash and 
+this get
+compiled as static (this let me test the bug even on the host system).
+
+While writing some test script (actually a init process written in dash) 
+I hit this
+strange bug:
+
+# dash -c "( echo ciao) &)"
+ciao
+Segmentation fault
+
+# dash -c "(echo ciao; /bin/true)&"
+ciao
+
+# dash -c "(echo ciao; /bin/true; echo ciao)&"
+ciao
+ciao
+Segmentation fault
 
 
-The POSIX requirement only applies to portable uses of the builtin - ie.
-those that are prescribed by POSIX.  Since POSIX does not require \e,
-dash is not failing compliance, even if it differs from extensions
-provided by corresponding executables.  I do not think dash needs to
-bloat for \e unless POSIX standardizes it first.
+As you see if I put a subshell in background it dump. If in the same 
+subshell I execute
+an external command as last command it works.
+I write this bug even to the buildroot team because if I rebuild dash 
+from the same source
+without using the crosscompile the same bug do not happen.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+I enable DEBUG in the dash source and tried to narrow it a little , this 
+is what I found:
+
+this is the trace with some little more messages inserted by me:
+Tracing started.
+token "("
+pipeline: entered
+reread token "("
+reread token "("
+pipeline: entered
+token word echo
+reread token word echo
+reread token word echo
+token word ciao
+token ")"
+reread token ")"
+reread token ")"
+reread token ")"
+reread token ")"
+token "&"
+reread token "&"
+reread token "&"
+reread token "&"
+token end of file
+reread token end of file
+evaltree called
+pid 1006, evaltree(0x806b438: 3, 1) called
+evalsubshell called
+check 2
+evaltree called
+pid 1006, evaltree(0x806b3e0: 4, 1) called
+evalsubshell called
+check nofork
+check 2
+evaltree called
+pid 1006, evaltree(0x806b420: 0, 1) called
+evalcommand(0x806b420, 1) called
+evalcommand arg: echo
+evalcommand arg: ciao
+redirectsafe after setjmp
+check 4
+check 6
 
 
---xNFowE93Tl7DdNGJUArUDx75ingOv4RAu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I modified exraise with 2 check:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+void
+exraise(int e)
+{
+#ifdef DEBUG
+         if (handler == NULL)
+                 abort();
+#endif
+         INTOFF;
 
-iQEcBAEBCAAGBQJTsWFeAAoJEKeha0olJ0NqhPoH+gL0arrpk4v0chSjfE9ot9hA
-GR46bwo5OuvQiJ2HQDN/dBUKH/2njacJp3d/F56a/V+8lbvWrD+D8lexZkdv8aBz
-9AJX0h+7mSJvWQV7Mx3bRYDotLWYJTSiT8qBWQkI7pHxfLojVfYpvxY7l3mMC22Z
-oSJusGZE25cl8ePxyBxaTli4xNKH19xNZIe5vtvxqMpZkuXgxBCULZt8kTHH7WJE
-SPvQNz4U7JzyOZK5Iui25ZS9RBtMQTDvWPBde5o/D5GCE9invu2ZZ2HP1iSk8kE6
-DwRtuoq+o4vZ6ykHmC4EJJlpY4UJMWnDJZCc3OWwEcZS1vFYaavkko9Uf2tG9sU=
-=iH70
------END PGP SIGNATURE-----
+         exception = e;
+         TRACE(("check 6\n"));
+         longjmp(handler->loc, 1);
+         TRACE(("check 7\n"));
+}
 
---xNFowE93Tl7DdNGJUArUDx75ingOv4RAu--
+as you can see check 7 is never reached (ok it's obvious), but I cannot 
+find
+if the longjmp land correctly somewhere or it's the function that 
+trigger the
+segfault (I suspect the handler->loc point to nowhere...).
+I tried to put a TRACE after every setjmp but didn't find the one that 
+is the
+target of that longjmp...
+
+maybe the correct one is the one in exitshell() ???
+
+here some info on my setup:
+
+host:
+centos 6.5
+
+buildroot version 2014.05
+
+buildroot configuration:
+BR2_x86_atom=y
+BR2_UCLIBC_CONFIG="board/pinky/uclibc.config"
+BR2_TARGET_GENERIC_HOSTNAME="pinky"
+BR2_TARGET_GENERIC_GETTY_PORT="tty1"
+BR2_TARGET_GENERIC_GETTY_TERM="linux"
+BR2_ROOTFS_OVERLAY="board/pinky/overlay"
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="board/pinky/linux.config"
+BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+BR2_PACKAGE_HOSTAPD=y
+BR2_PACKAGE_HOSTAPD_EAP=y
+BR2_PACKAGE_IW=y
+BR2_PACKAGE_OPKG=y
+BR2_PACKAGE_OPKG_GPG_SIGN=y
+BR2_PACKAGE_DASH=y
+BR2_PACKAGE_JOE=y
+BR2_TARGET_GRUB=y
+
+(dash version 0.5.7, downloaded from buildroot, some patches from debian,
+it seems version 0.5.7-3)
+I hope you can reproduce this bug on your system with those info.
+
+regards
+Luigi
