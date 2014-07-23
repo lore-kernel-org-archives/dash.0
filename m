@@ -1,240 +1,106 @@
-From: Luigi Tarenga <luigi.tarenga-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: bug in dash compile with buildroot
-Date: Fri, 11 Jul 2014 10:44:54 +0200
-Message-ID: <53BFA406.7080408@gmail.com>
-References: <53BBFECB.6070003@gmail.com>
+From: Adam Borowski <kilobyte@angband.pl>
+Subject: Re: [PATCH] \e in "echo" and "printf" builtins
+Date: Wed, 23 Jul 2014 11:11:17 +0200
+Message-ID: <20140723091117.GA30150@angband.pl>
+References: <20140628045653.GA5097@angband.pl>
+ <53AEF2E3.5080205@gigawatt.nl>
+ <20140628172722.GA13451@angband.pl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <buildroot-bounces-9GAsQqxh4YTR7s880joybQ@public.gmane.org>
-In-Reply-To: <53BBFECB.6070003-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Unsubscribe: <http://lists.busybox.net/mailman/options/buildroot>,
- <mailto:buildroot-request-9GAsQqxh4YTR7s880joybQ@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.busybox.net/pipermail/buildroot>
-List-Post: <mailto:buildroot-9GAsQqxh4YTR7s880joybQ@public.gmane.org>
-List-Help: <mailto:buildroot-request-9GAsQqxh4YTR7s880joybQ@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.busybox.net/mailman/listinfo/buildroot>,
- <mailto:buildroot-request-9GAsQqxh4YTR7s880joybQ@public.gmane.org?subject=subscribe>
-Errors-To: buildroot-bounces-9GAsQqxh4YTR7s880joybQ@public.gmane.org
-Sender: buildroot-bounces-9GAsQqxh4YTR7s880joybQ@public.gmane.org
-To: buildroot-9GAsQqxh4YTR7s880joybQ@public.gmane.org, dash-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: multipart/mixed; boundary="FCuugMFkClbJLl1L"
+Return-path: <dash-owner@vger.kernel.org>
+Received: from tartarus.angband.pl ([89.206.35.136]:38621 "EHLO
+	tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757580AbaGWJLS (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 23 Jul 2014 05:11:18 -0400
+Received: from kilobyte by tartarus.angband.pl with local (Exim 4.80)
+	(envelope-from <kilobyte@tartarus.angband.pl>)
+	id 1X9sZx-0007ry-GO
+	for dash@vger.kernel.org; Wed, 23 Jul 2014 11:11:17 +0200
+Content-Disposition: inline
+In-Reply-To: <20140628172722.GA13451@angband.pl>
+Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-
-Hi lists,
-for the buildroot mailing list: I tried to post this bug report but I 
-wasn't subscribed.
-Below you can see my original bug report.
-
-I did some more test and the dash source looks good, the longjmp 
-destination is
-correct (actually it jump to main()). The problem seems the longjmp 
-implementation.
-In the case of command like dash -c "(echo ciao; /bin/true)&" a longjmp 
-is not
-performed and so no segfault is triggered.
-
-as a POC I tried this little c code:
-[vortex@lizard ~]$ cat longjmptest.c
-#include <stdio.h>
-#include <setjmp.h>
-
-static jmp_buf env1;
-
-long int func2 () {
-    long int b;
-    b=1000;
-    longjmp(env1,1);
-    return b;
-}
-
-long int func1 () {
-    long int a;
-    a = func2 () ;
-    return a;
-}
-
-int main() {
-     long int num;
-     num=0;
-
-     printf("\nstart jump test\n");
-
-     if (setjmp(env1)) {
-        printf("jumped to env1\n");
-     } else {
-         num = func1 ();
-     }
-
-     printf("check 1 num=%ld\n",num);
-     printf("finish\n");
-     return 0;
-}
+To: dash@vger.kernel.org
 
 
-If I compile with my stock gcc on centos 6.5 (64bit):
-[vortex@lizard ~]$ gcc -Wall -static longjmptest.c
-[vortex@lizard ~]$ ./a.out
+--FCuugMFkClbJLl1L
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-start jump test
-jumped to env1
-check 1 num=0
-finish
+On Sat, Jun 28, 2014 at 07:27:22PM +0200, Adam Borowski wrote:
+> On Sat, Jun 28, 2014 at 06:52:51PM +0200, Harald van Dijk wrote:
+> > On 28/06/14 06:56, Adam Borowski wrote:
+> > > I'm not sure what's your policy towards extensions, but \e as \033 is
+> > > something ubiquitous in the Unix world.  C compilers (gcc, clang, icc and
+> > > tcc -- but not MSVC), perl, shells (bash and zsh -- but not dash), etc.
+> > 
+> > No comment on whether dash itself should accept \e, but [...]
 
-while if I compile with the crosscompile in buildroot (32bit):
-[vortex@lizard ~]$ 
-/data/misc/buildroot-2014.05/output/host/usr/bin/i686-buildroot-linux-uclibc-gcc 
--Wall -static longjmptest.c
-[vortex@lizard ~]$ ./a.out
-
-start jump test
-Segmentation fault
-
-
-looks like some stack problem... I never learned to use gdb (my bad!) so 
-I cannot check the stack
-status... Is there any known problem with the longjmp in uclibc?
-
-thank you in advance
-Luigi
+So... can I has an answer whether dash should indeed accept \e ?
+Being told "no" or "go away, we hate you" is fine, I just dislike having
+patches rot forever.  And not having this shorthand is annoying if you
+like using colour for highlights -- it works in perl and bash, then
+suddenly Oops! not in /bin/sh = dash.
 
 
-On 07/08/2014 04:23 PM, Luigi Tarenga wrote:
-> hi,
-> I send this bug report to both list because I'm not sure who will find 
-> this relevant.
->
-> I compiled a buildroot image for a laptop with atom so the build is 
-> for x86_64
-> architecture. In the build configuration I flagged to include dash and 
-> this get
-> compiled as static (this let me test the bug even on the host system).
->
-> While writing some test script (actually a init process written in 
-> dash) I hit this
-> strange bug:
->
-> # dash -c "( echo ciao) &)"
-> ciao
-> Segmentation fault
->
-> # dash -c "(echo ciao; /bin/true)&"
-> ciao
->
-> # dash -c "(echo ciao; /bin/true; echo ciao)&"
-> ciao
-> ciao
-> Segmentation fault
->
->
-> As you see if I put a subshell in background it dump. If in the same 
-> subshell I execute
-> an external command as last command it works.
-> I write this bug even to the buildroot team because if I rebuild dash 
-> from the same source
-> without using the crosscompile the same bug do not happen.
->
-> I enable DEBUG in the dash source and tried to narrow it a little , 
-> this is what I found:
->
-> this is the trace with some little more messages inserted by me:
-> Tracing started.
-> token "("
-> pipeline: entered
-> reread token "("
-> reread token "("
-> pipeline: entered
-> token word echo
-> reread token word echo
-> reread token word echo
-> token word ciao
-> token ")"
-> reread token ")"
-> reread token ")"
-> reread token ")"
-> reread token ")"
-> token "&"
-> reread token "&"
-> reread token "&"
-> reread token "&"
-> token end of file
-> reread token end of file
-> evaltree called
-> pid 1006, evaltree(0x806b438: 3, 1) called
-> evalsubshell called
-> check 2
-> evaltree called
-> pid 1006, evaltree(0x806b3e0: 4, 1) called
-> evalsubshell called
-> check nofork
-> check 2
-> evaltree called
-> pid 1006, evaltree(0x806b420: 0, 1) called
-> evalcommand(0x806b420, 1) called
-> evalcommand arg: echo
-> evalcommand arg: ciao
-> redirectsafe after setjmp
-> check 4
-> check 6
->
->
-> I modified exraise with 2 check:
->
-> void
-> exraise(int e)
-> {
-> #ifdef DEBUG
->         if (handler == NULL)
->                 abort();
-> #endif
->         INTOFF;
->
->         exception = e;
->         TRACE(("check 6\n"));
->         longjmp(handler->loc, 1);
->         TRACE(("check 7\n"));
-> }
->
-> as you can see check 7 is never reached (ok it's obvious), but I 
-> cannot find
-> if the longjmp land correctly somewhere or it's the function that 
-> trigger the
-> segfault (I suspect the handler->loc point to nowhere...).
-> I tried to put a TRACE after every setjmp but didn't find the one that 
-> is the
-> target of that longjmp...
->
-> maybe the correct one is the one in exitshell() ???
->
-> here some info on my setup:
->
-> host:
-> centos 6.5
->
-> buildroot version 2014.05
->
-> buildroot configuration:
-> BR2_x86_atom=y
-> BR2_UCLIBC_CONFIG="board/pinky/uclibc.config"
-> BR2_TARGET_GENERIC_HOSTNAME="pinky"
-> BR2_TARGET_GENERIC_GETTY_PORT="tty1"
-> BR2_TARGET_GENERIC_GETTY_TERM="linux"
-> BR2_ROOTFS_OVERLAY="board/pinky/overlay"
-> BR2_LINUX_KERNEL=y
-> BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
-> BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="board/pinky/linux.config"
-> BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
-> BR2_PACKAGE_HOSTAPD=y
-> BR2_PACKAGE_HOSTAPD_EAP=y
-> BR2_PACKAGE_IW=y
-> BR2_PACKAGE_OPKG=y
-> BR2_PACKAGE_OPKG_GPG_SIGN=y
-> BR2_PACKAGE_DASH=y
-> BR2_PACKAGE_JOE=y
-> BR2_TARGET_GRUB=y
->
-> (dash version 0.5.7, downloaded from buildroot, some patches from debian,
-> it seems version 0.5.7-3)
-> I hope you can reproduce this bug on your system with those info.
->
-> regards
-> Luigi
+Meow!
+-- 
+// If you believe in so-called "intellectual property", please immediately
+// cease using counterfeit alphabets.  Instead, contact the nearest temple
+// of Amon, whose priests will provide you with scribal services for all
+// your writing needs, for Reasonable and Non-Discriminatory prices.
+
+--FCuugMFkClbJLl1L
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="0001-Support-e-in-echo-and-printf-builtins.patch"
+
+From a6e6e7b6f3a725b4ca0514f22e9ee4cfe2c225e2 Mon Sep 17 00:00:00 2001
+From: Adam Borowski <kilobyte@angband.pl>
+Date: Sat, 28 Jun 2014 06:29:56 +0200
+Subject: [PATCH] Support \e in "echo" and "printf" builtins.
+
+Signed-off-by: Adam Borowski <kilobyte@angband.pl>
+---
+ src/bltin/printf.c | 1 +
+ src/dash.1         | 4 ++++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index 893295c..98d954c 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -300,6 +300,7 @@ conv_escape(char *str, int *conv_ch)
+ 	case '\\':	value = '\\';	break;	/* backslash */
+ 	case 'a':	value = '\a';	break;	/* alert */
+ 	case 'b':	value = '\b';	break;	/* backspace */
++	case 'e':	value = '\033';	break;  /* escape */
+ 	case 'f':	value = '\f';	break;	/* form-feed */
+ 	case 'n':	value = '\n';	break;	/* newline */
+ 	case 'r':	value = '\r';	break;	/* carriage-return */
+diff --git a/src/dash.1 b/src/dash.1
+index 3847d98..7107faa 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -1199,6 +1199,8 @@ Subsequent output is suppressed.  This is normally used at the end of the
+ last argument to suppress the trailing newline that
+ .Ic echo
+ would otherwise output.
++.It Li \ee
++Outputs an escape character (ESC).
+ .It Li \ef
+ Output a form feed.
+ .It Li \en
+@@ -1573,6 +1575,8 @@ The characters and their meanings are as follows:
+ Write a \*[Lt]bell\*[Gt] character.
+ .It Cm \eb
+ Write a \*[Lt]backspace\*[Gt] character.
++.It Cm \ee
++Write an \*[Lt]escape\*[Gt] (ESC) character.
+ .It Cm \ef
+ Write a \*[Lt]form-feed\*[Gt] character.
+ .It Cm \en
+-- 
+2.0.0
+
+
+--FCuugMFkClbJLl1L--
