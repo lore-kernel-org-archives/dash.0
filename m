@@ -1,91 +1,48 @@
 From: Chema Gonzalez <chema@google.com>
-Subject: [PATCH dash v2] [BUILTIN] ensure LC_COLLATE is not overriden
-Date: Fri, 22 Aug 2014 16:08:16 -0700
-Message-ID: <1408748896-27824-1-git-send-email-chema@google.com>
+Subject: Re: [PATCH dash] [BUILTIN] ensure LC_COLLATE is not overriden
+Date: Fri, 22 Aug 2014 16:08:49 -0700
+Message-ID: <CA+ZOOTP5-yygPphpBArwyw+xzgDr_zGHNW+MdaPs_Y+6_MAC6A@mail.gmail.com>
 References: <1407256813-30944-1-git-send-email-chema@google.com>
+	<53E10FBA.5070905@redhat.com>
+	<CA+ZOOTOU31MTtLm13J2hiCmwMWMPPrvx6zjqZ_NQahjU31SqpA@mail.gmail.com>
+	<53E1110D.7050309@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-ob0-f201.google.com ([209.85.214.201]:61866 "EHLO
-	mail-ob0-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752326AbaHVXIv (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 22 Aug 2014 19:08:51 -0400
-Received: by mail-ob0-f201.google.com with SMTP id va2so1746100obc.0
-        for <dash@vger.kernel.org>; Fri, 22 Aug 2014 16:08:50 -0700 (PDT)
-In-Reply-To: <1407256813-30944-1-git-send-email-chema@google.com>
+Received: from mail-ig0-f170.google.com ([209.85.213.170]:40728 "EHLO
+	mail-ig0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752188AbaHVXIu (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 22 Aug 2014 19:08:50 -0400
+Received: by mail-ig0-f170.google.com with SMTP id h3so1858274igd.3
+        for <dash@vger.kernel.org>; Fri, 22 Aug 2014 16:08:49 -0700 (PDT)
+In-Reply-To: <53E1110D.7050309@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Eric Blake <eblake@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Jeremie <jca@wxcvbn.org>, dash@vger.kernel.org, Chema Gonzalez <chema@google.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
 
-If the user environment has either LC_ALL or LANG defined, the setting
-of LC_COLLATE in src/mkbuiltins is overriden. With a non-POSIX locale,
-the orders of dotcmd (remember that '.' is 0x2e in ascii) and truecmd
-(':' is 0x3a in ascii) are reversed, which makes the ":" command fail
-in the bsearch.
+I finally managed to test a FreeBSD 10.0 host, and it seems to respect
+LC_ALL before LANG.
 
-Tested:
+Next patch includes just setting LC_ALL (which trumps LC_COLLATE).
 
-Before this patch:
+-Chema
 
-$ env |grep -e LANG -e LC_ALL
-LC_ALL=en_US.ISO8859-15
-LANG=en_US.iso885915
-$ ./autogen.sh
-...
-$ ./configure
-...
-$ make clean; make -j 40
-...
-$ ./src/dash -c ":"
-./src/dash: 1: :: not found
-$ grep -A 3 'struct builtincmd builtincmd' src/builtins.c
-const struct builtincmd builtincmd[] = {
-        { ":", truecmd, 3 },
-        { ".", dotcmd, 3 },
-        { "[", testcmd, 0 },
-$ make clean; LC_ALL= LANG= make -j 40
-...
-$ ./src/dash -c ":"
-$ grep -A 3 'struct builtincmd builtincmd' src/builtins.c
-const struct builtincmd builtincmd[] = {
-        { ".", dotcmd, 3 },
-        { ":", truecmd, 3 },
-        { "[", testcmd, 0 },
 
-After this patch:
-
-$ env |grep -e LANG -e LC_ALL
-LC_ALL=en_US.ISO8859-15
-LANG=en_US.iso885915
-$ ./autogen.sh
-$ ./configure
-...
-$ make clean; make -j 40
-...
-$ ./src/dash -c ":"
-$ grep -A 3 'struct builtincmd builtincmd' src/builtins.c
-const struct builtincmd builtincmd[] = {
-        { ".", dotcmd, 3 },
-        { ":", truecmd, 3 },
-        { "[", testcmd, 0 },
-
-Signed-off-by: Chema Gonzalez <chema@google.com>
----
- src/mkbuiltins | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/mkbuiltins b/src/mkbuiltins
-index f562ae2..70308bd 100644
---- a/src/mkbuiltins
-+++ b/src/mkbuiltins
-@@ -78,7 +78,7 @@ awk '{	for (i = 2 ; i <= NF ; i++) {
- 		if ($i ~ /^-/)
- 			line = $(++i) "\t" line
- 		print line
--	}}' $temp | LC_COLLATE=C sort -k 1,1 | tee $temp2 | awk '{
-+	}}' $temp | LC_ALL=C sort -k 1,1 | tee $temp2 | awk '{
- 		opt = ""
- 		if (NF > 2) {
- 			opt = substr($2, 2)
--- 
-2.1.0.rc2.206.gedb03e5
-
+On Tue, Aug 5, 2014 at 10:14 AM, Eric Blake <eblake@redhat.com> wrote:
+> On 08/05/2014 11:12 AM, Chema Gonzalez wrote:
+>>> Setting LC_ALL= to the empty string risks implementation-defined
+>>> behavior.  Also, LC_ALL overrides LANG and LC_COLLATE.  It should be
+>>> sufficient to merely do:
+>>>
+>>>         }}' $temp | LC_ALL=C sort -k 1,1 | tee $temp2 | awk '{
+>>
+>> Maybe:
+>>     }}' $temp | LC_ALL=C LANG=C sort -k 1,1 | tee $temp2 | awk '{
+>
+> No need to specify LANG=C when LC_ALL is set.  I stand by my shorter line.
+>
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+>
