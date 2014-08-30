@@ -1,101 +1,81 @@
-From: Eric Blake <eblake@redhat.com>
-Subject: Re: Line continuation and variables
-Date: Tue, 26 Aug 2014 06:34:42 -0600
-Message-ID: <53FC7EE2.7000309@redhat.com>
-References: <1554581409055304@web13g.yandex.ru>
+From: Gerrit Pape <pape@smarden.org>
+Subject: Debian jessy freeze
+Date: Sat, 30 Aug 2014 21:23:15 +0000
+Message-ID: <20140830212315.3450.qmail@2d0634a0e38d6b.315fe32.mid.smarden.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="lQex1ewtAiIoLu2KSh00Tkiwigo4AATuI"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45473 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751006AbaHZMet (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 26 Aug 2014 08:34:49 -0400
-In-Reply-To: <1554581409055304@web13g.yandex.ru>
+Received: from smarden.org ([176.74.58.109]:60739 "HELO a.mx.smarden.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1752016AbaH3V35 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 30 Aug 2014 17:29:57 -0400
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Oleg Bulatov <oleg@bulatov.me>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lQex1ewtAiIoLu2KSh00Tkiwigo4AATuI
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hi Herbert, current Debian testing 'jessy' is about to be frozen on
+2014-11-05.  Currently I have version 0.5.7-4 in jessy, which is a bit
+derived from your v0.5.7 and current master branch, see below.
 
-On 08/26/2014 06:15 AM, Oleg Bulatov wrote:
-> Hi!
->=20
-> While playing with sh generators I found that dash and bash have differ=
-ent
-> interpretations for <slash><newline> sequence.
->=20
-> $ dash -c 'EDIT=3Dxxx; echo $EDIT\
->> OR'
-> xxxOR
+My repository is available through http://smarden.org/git/dash.git
+(branch release+patches)
 
-Buggy.
+Do you have any plans to release a version v0.5.8 soon?  I'd be happy t=
+o
+sync with it and give it broader testing in Debian unstable.
 
-> $ bash -c 'EDIT=3Dxxx; echo $EDIT\
-> OR'
-> /usr/bin/vim
-
-Correct behavior.
-
->=20
-> $ dash -c 'echo "$\
-> (pwd)"'
-> $(pwd)
->=20
-> Is it undefined behaviour in POSIX?
-
-No, it's well-defined, and dash is buggy.  POSIX says:
-
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#=
-tag_18_03
-
-"the shell shall break its input into tokens by applying the first
-applicable rule below to the next character in its input"
-
-Rule 4 covers backslash handling, while rule 5 covers locating the end
-of a word to be subject to $ expansion.  Therefore, rule 4 should happen
-first.  Rule 4 defers to the section on quoting, with the caveat that
-<newline> joining is the only substitution that happens immediately as
-part of the parsing:
-
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#=
-tag_18_02
-
-"If a <newline> follows the <backslash>, the shell shall interpret this
-as line continuation. The <backslash> and <newline> shall be removed
-before splitting the input into tokens. Since the escaped <newline> is
-removed entirely from the input and is not replaced by any white space,
-it cannot serve as a token separator."
-
-So the fact that dash is treating the elided backslash-newline as a
-token separator, and parsing your input as if ${EDIT}OR instead of
-${EDITOR} is a bug in dash.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Regards, Gerrit.
 
 
---lQex1ewtAiIoLu2KSh00Tkiwigo4AATuI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+$ git shortlog origin/master..release+patches
+Gerrit Pape (10):
+      import contents of upstream dash-0.5.3.tar.gz archive.
+      import contents of upstream dash-0.5.4.tar.gz archive.
+      Merge commit 'v0.5.4' into upstream
+      import contents of upstream dash-0.5.5.1.tar.gz archive.
+      Merge commit '6045fe25078345074f027312d106d3fc19df56e5' into rele=
+ase
+      Merge commit 'v0.5.6.1' into candidate
+      import contents of upstream dash-0.5.6.1.tar.gz archive
+      [SHELL] print \n upon EOF (CTRL-D) when run interactively
+      [JOBS] address format-security build error
+      [EVAL] Report I/O error on stdout
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Herbert Xu (5):
+      [EVAL] Fix command -- crash
+      [EXPAND] Fix corruption of redirections with byte 0x81
+      [JOBS] Fix wait regression where it does not wait for all jobs
+      [BUILTIN] Continue after EINTR in read(1) with no pending signals
+      Release 0.5.6.1.
 
-iQEcBAEBCAAGBQJT/H7iAAoJEKeha0olJ0NqMs4H/Rg6/TeHVqS7Xy185U8jRXMK
-JXIBHGdDAIYk62oy1mz+FBax0gk1eZvsyl6WoQF2FBdx5lmeT8ag1VXJGY6NT6Lq
-AhW7EQl0NoOtJ46WFMNznyyaoGgQR4DImsEO/Khkb/OIeuCOWu/ra27vzI1gIPC7
-m0lPP44Myt8b0e56csYGendjNmDIDv+3N4mUgN3o4lZ6XR0aye/lYe24er4bua3J
-fPhyhfqcyHo2RZtMWgBCrh/ysGoQJckHW4MS4NrfM2FMi+4+9cCknmdfZq2i2Ysb
-UsAyfqVjT4gAq58v6Cea8Pe4IETHOkBrxmZYJ63mtS3CYv2IMXuKArS8O3FKv30=
-=b5pZ
------END PGP SIGNATURE-----
+Jilles Tjoelker (1):
+      [PARSER] Remove backslash before } in double-quotes in variable
 
---lQex1ewtAiIoLu2KSh00Tkiwigo4AATuI--
+Jonathan Nieder (3):
+      import contents of upstream dash-0.5.7.tar.gz archive
+      [VAR] Disable LINENO support
+      [BUILTIN] Fix "test -x" as root on platforms with old-fashioned f=
+accessat()
+
+St=E9phane Glondu (1):
+      [SHELL] Disable sh -c "command" -> sh -c "exec command" optimizat=
+ion
+
+$ git shortlog v0.5.7..origin/master
+David S. Miller (2):
+      [SHELL] Allow building without LINEO support
+      [SHELL] Add top-level autogen.sh
+
+Harald van Dijk (1):
+      [ARITH] Avoid imaxdiv when only one of the results is wanted
+
+Herbert Xu (1):
+      [BUILTIN] Merge SKIPFUNC/SKIPFILE and only clear SKIPFUNC when le=
+aving dotcmd
+
+maximilian attems (1):
+      [SHELL] Fix klibc DEBUG compilation
+
+$=20
