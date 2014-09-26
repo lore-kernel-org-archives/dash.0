@@ -1,79 +1,108 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: possible bug in job control
-Date: Fri, 26 Sep 2014 17:28:50 +0800
-Message-ID: <20140926092850.GC14940@gondor.apana.org.au>
-References: <CAKkO-EgtZw6EuoBz1ishWc-V7LNOzFO98O7A8T=Rqq42DA_T1A@mail.gmail.com>
- <51F6F10C.4060109@gigawatt.nl>
+Subject: Re: Bug in man page
+Date: Fri, 26 Sep 2014 22:17:21 +0800
+Message-ID: <20140926141720.GD14940@gondor.apana.org.au>
+References: <B9BC530A-2542-409D-AA48-2B9E3B7906A1@vandijke.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41664 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:57898 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753275AbaIZJ2y (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 26 Sep 2014 05:28:54 -0400
+	with ESMTP id S1751753AbaIZORY (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 26 Sep 2014 10:17:24 -0400
 Content-Disposition: inline
-In-Reply-To: <51F6F10C.4060109@gigawatt.nl>
+In-Reply-To: <B9BC530A-2542-409D-AA48-2B9E3B7906A1@vandijke.net>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Luigi Tarenga <luigi.tarenga@gmail.com>, dash@vger.kernel.org
+To: Jeroen van Dijke <jeroen@vandijke.net>
+Cc: dash@vger.kernel.org
 
-On Mon, Jul 29, 2013 at 10:47:40PM +0000, Harald van Dijk wrote:
-> On 29/07/13 23:44, Luigi Tarenga wrote:
-> > hi list,
-> > while writing a script to execute parallel ssh command on many host I found
-> > a strange behavior of dash. I can replicate it with a very simple script but
-> > didn't find any documentation about dash or POSIX that can explain it.
-> > 
-> > tested on centos 6.4 (dash 0.5.5.1) and wih dash compiled from source (0.5.7)
-> > the following script reports error:
-> > 
-> > #!/bin/dash
-> > 
-> > sleep 3 &
-> > sleep 3 &
-> > sleep 3 &
-> > sleep 3 &
-> > 
-> > #/bin/true
-> > jobs -l
-> > 
-> > wait %1
-> > wait %2
-> > wait %3
-> > wait %4
-> > 
-> > [vortex@lizard ~]$ ./dash-0.5.7/src/dash test.sh
-> > [4] + 4569 Running
-> > [3] - 4568 Running
-> > [2]   4567 Running
-> > [1]   4566 Running
-> > prova: 14: wait: No such job: %4
-> > [vortex@lizard ~]$ echo $?
-> > 2
-> 
-> Yes, this looks like a bug to me. The number of allocated jobs is always
-> kept as a multiple of four, and the first check in considering whether
-> the job number is valid is "if it's greater than or equal to the number
-> of allocated job, it's invalid". That doesn't look right. That would
-> only be right if jobs were zero-based, but they aren't. If it's exactly
-> equal to the number of available jobs, it can still be valid. It works
-> when adding /bin/true, because four more more jobs end up allocated
-> internally.
-> 
-> The attached patch should fix it.
-> 
-> Cheers,
-> Harald
+commit 63ab7ea86d12ff87f311e9a59dffdc4f1d47ff33
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Fri Sep 26 22:16:26 2014 +0800
 
-> commit ddeba5485c3309ffc7010f8924d604a781908e1d
-> Author: Harald van Dijk <harald@gigawatt.nl>
-> Date:   Tue Jul 30 00:36:53 2013 +0200
-> 
->     getjob: Fix off-by-one error for multiple of four job numbers
+    [MAN] Change characters for printf precision to bytes
+   =20
+    On Sun, Mar 09, 2014 at 11:11:43AM +0000, Jeroen van Dijke wrote:
+    >
+    > There seems to be a bug in the dash man page, at least in 0.5.7. =
+It reads:
+    >
+    >             Precision:
+    >                     An optional period, `.', followed by an optio=
+nal digit string giving a precision which specifies the number of digit=
+s to appear after the decimal point, for e and f formats, or the maximu=
+m number of *characters* to be printed from a string (b and s for-
+    >                     mats); if the digit string is missing, the pr=
+ecision is treated as zero;
+    >
+    > dash behaves cuts to the number of bytes
+    >
+    > $ length=3D10; printf "%.${length}s\n" "eeeeeeeeeeeeeeeeeeeeeeeee=
+"
+    > eeeeeeeeee
+    > $ length=3D10; printf "%.${length}s\n" "=C3=AB=C3=AB=C3=AB=C3=AB=C3=
+=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=
+=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=C3=AB=E2=80=9D
+    > =C3=AB=C3=AB=C3=AB=C3=AB=C3=AB
+    >
+    >
+    > The  POSIX specification (2008) says:
+    >
+    > precision Gives the minimum number of digits to appear for the d,=
+ o, i, u, x, or X conversion specifiers (the field is padded with leadi=
+ng zeros), the number of digits to appear after the radix character for=
+ the e and f conversion specifiers, the maximum number of significant d=
+igits for the g conversion specifier; or the maximum number of *bytes* =
+to be written from a string in the s conversion specifier. The precisio=
+n shall take the form of a ( '.' ) followed by a decimal digit string; =
+a null digit string is treated as zero.
+    >
+    > So it seems to me that =E2=80=9Ccharacters=E2=80=9D should be cha=
+nged to =E2=80=9Cbytes=E2=80=9D.
+   =20
+    Indeed and this patch makes that change.
+   =20
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Patch applied.  Thanks!
--- 
+diff --git a/ChangeLog b/ChangeLog
+index 7b67c0c..6f27fd7 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -2,6 +2,7 @@
+=20
+ 	* Small optimisation of command -pv change.
+ 	* Set command -p path to /usr/sbin:/usr/bin:/sbin:/bin.
++	* Change "characters" for printf precision to "bytes".
+=20
+ 2014-09-26  Harald van Dijk <harald@gigawatt.nl>
+=20
+diff --git a/src/dash.1 b/src/dash.1
+index 6241a61..6ceb16a 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -1670,7 +1670,7 @@ for
+ .Cm e
+ and
+ .Cm f
+-formats, or the maximum number of characters to be printed
++formats, or the maximum number of bytes to be printed
+ from a string
+ .Sm off
+ .Pf ( Cm b
+@@ -1758,7 +1758,7 @@ is printed.
+ .It Cm s
+ Characters from the string
+ .Ar argument
+-are printed until the end is reached or until the number of characters
++are printed until the end is reached or until the number of bytes
+ indicated by the precision specification is reached; if the
+ precision is omitted, all characters in the string are printed.
+ .It Cm \&%
+
+Thanks,
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
