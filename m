@@ -1,81 +1,109 @@
-From: Gerrit Pape <pape@smarden.org>
-Subject: Debian jessy freeze
-Date: Sat, 30 Aug 2014 21:23:15 +0000
-Message-ID: <20140830212315.3450.qmail@2d0634a0e38d6b.315fe32.mid.smarden.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: "command -p" does not correctly limit search to a safe PATH
+Date: Fri, 26 Sep 2014 16:44:43 +0800
+Message-ID: <20140926084443.GA14940@gondor.apana.org.au>
+References: <CAL=-wemDL=2-7Rco761LTgGrFeAA_-zvz0ECpk4xZE7QJsGUEg@mail.gmail.com>
+ <51E30212.3030901@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smarden.org ([176.74.58.109]:60739 "HELO a.mx.smarden.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1752016AbaH3V35 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 30 Aug 2014 17:29:57 -0400
+Received: from helcar.apana.org.au ([209.40.204.226]:47300 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754103AbaIZIot (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 26 Sep 2014 04:44:49 -0400
 Content-Disposition: inline
+In-Reply-To: <51E30212.3030901@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: Craig Loomis <cploomis@gmail.com>, dash@vger.kernel.org
 
-Hi Herbert, current Debian testing 'jessy' is about to be frozen on
-2014-11-05.  Currently I have version 0.5.7-4 in jessy, which is a bit
-derived from your v0.5.7 and current master branch, see below.
+On Sun, Jul 14, 2013 at 07:54:58PM +0000, Harald van Dijk wrote:
+>
+> commit 475e328589fd2e843c138d49fb96699a2a66151d
+> Author: Harald van Dijk <harald@gigawatt.nl>
+> Date:   Sun Jul 14 21:23:01 2013 +0200
+> 
+>     command: allow combining -p with -v
 
-My repository is available through http://smarden.org/git/dash.git
-(branch release+patches)
+Patch applied.  Thanks a lot!
 
-Do you have any plans to release a version v0.5.8 soon?  I'd be happy t=
-o
-sync with it and give it broader testing in Debian unstable.
+I've also added a little optimisation patch on top to minimise
+the size impact.
 
-Regards, Gerrit.
+commit d813a572d94455f1d0d43ccad49edfacd13ee2e3
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Fri Sep 26 16:42:18 2014 +0800
 
+    [BUILTIN] Small optimisation of command -pv change
+    
+    This patch moves the pathval call into the describe_command
+    function and also eliminates an unnecessary branch when DEBUG
+    is off.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-$ git shortlog origin/master..release+patches
-Gerrit Pape (10):
-      import contents of upstream dash-0.5.3.tar.gz archive.
-      import contents of upstream dash-0.5.4.tar.gz archive.
-      Merge commit 'v0.5.4' into upstream
-      import contents of upstream dash-0.5.5.1.tar.gz archive.
-      Merge commit '6045fe25078345074f027312d106d3fc19df56e5' into rele=
-ase
-      Merge commit 'v0.5.6.1' into candidate
-      import contents of upstream dash-0.5.6.1.tar.gz archive
-      [SHELL] print \n upon EOF (CTRL-D) when run interactively
-      [JOBS] address format-security build error
-      [EVAL] Report I/O error on stdout
+diff --git a/ChangeLog b/ChangeLog
+index 2fbc628..a8d5fa2 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2014-09-26  Herbert Xu <herbert@gondor.apana.org.au>
++
++	* Small optimisation to command -pv change.
++
+ 2014-09-26  Harald van Dijk <harald@gigawatt.nl>
+ 
+ 	* command: allow combining -p with -v.
+diff --git a/src/exec.c b/src/exec.c
+index e56e3f6..ec0eadd 100644
+--- a/src/exec.c
++++ b/src/exec.c
+@@ -727,7 +727,7 @@ typecmd(int argc, char **argv)
+ 	int err = 0;
+ 
+ 	for (i = 1; i < argc; i++) {
+-		err |= describe_command(out1, argv[i], pathval(), 1);
++		err |= describe_command(out1, argv[i], NULL, 1);
+ 	}
+ 	return err;
+ }
+@@ -743,6 +743,8 @@ describe_command(out, command, path, verbose)
+ 	struct tblentry *cmdp;
+ 	const struct alias *ap;
+ 
++	path = path ?: pathval();
++
+ 	if (verbose) {
+ 		outstr(command, out);
+ 	}
+@@ -840,19 +842,19 @@ commandcmd(argc, argv)
+ 		VERIFY_BRIEF = 1,
+ 		VERIFY_VERBOSE = 2,
+ 	} verify = 0;
+-	const char *path = pathval();
++	const char *path = NULL;
+ 
+ 	while ((c = nextopt("pvV")) != '\0')
+ 		if (c == 'V')
+ 			verify |= VERIFY_VERBOSE;
+ 		else if (c == 'v')
+ 			verify |= VERIFY_BRIEF;
+-		else if (c == 'p')
+-			path = defpath;
+ #ifdef DEBUG
+-		else
++		else if (c != 'p')
+ 			abort();
+ #endif
++		else
++			path = defpath;
+ 
+ 	cmd = *argptr;
+ 	if (verify && cmd)
 
-Herbert Xu (5):
-      [EVAL] Fix command -- crash
-      [EXPAND] Fix corruption of redirections with byte 0x81
-      [JOBS] Fix wait regression where it does not wait for all jobs
-      [BUILTIN] Continue after EINTR in read(1) with no pending signals
-      Release 0.5.6.1.
-
-Jilles Tjoelker (1):
-      [PARSER] Remove backslash before } in double-quotes in variable
-
-Jonathan Nieder (3):
-      import contents of upstream dash-0.5.7.tar.gz archive
-      [VAR] Disable LINENO support
-      [BUILTIN] Fix "test -x" as root on platforms with old-fashioned f=
-accessat()
-
-St=E9phane Glondu (1):
-      [SHELL] Disable sh -c "command" -> sh -c "exec command" optimizat=
-ion
-
-$ git shortlog v0.5.7..origin/master
-David S. Miller (2):
-      [SHELL] Allow building without LINEO support
-      [SHELL] Add top-level autogen.sh
-
-Harald van Dijk (1):
-      [ARITH] Avoid imaxdiv when only one of the results is wanted
-
-Herbert Xu (1):
-      [BUILTIN] Merge SKIPFUNC/SKIPFILE and only clear SKIPFUNC when le=
-aving dotcmd
-
-maximilian attems (1):
-      [SHELL] Fix klibc DEBUG compilation
-
-$=20
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
