@@ -1,71 +1,78 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: "command -p" does not correctly limit search to a safe PATH
-Date: Fri, 26 Sep 2014 17:19:42 +0800
-Message-ID: <20140926091942.GB14940@gondor.apana.org.au>
-References: <CAL=-wemDL=2-7Rco761LTgGrFeAA_-zvz0ECpk4xZE7QJsGUEg@mail.gmail.com>
- <51E30212.3030901@gigawatt.nl>
- <51E9B46B.10401@gigawatt.nl>
+Subject: Re: possible bug in job control
+Date: Fri, 26 Sep 2014 17:28:50 +0800
+Message-ID: <20140926092850.GC14940@gondor.apana.org.au>
+References: <CAKkO-EgtZw6EuoBz1ishWc-V7LNOzFO98O7A8T=Rqq42DA_T1A@mail.gmail.com>
+ <51F6F10C.4060109@gigawatt.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:59960 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:41664 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753059AbaIZJTq (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 26 Sep 2014 05:19:46 -0400
+	with ESMTP id S1753275AbaIZJ2y (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 26 Sep 2014 05:28:54 -0400
 Content-Disposition: inline
-In-Reply-To: <51E9B46B.10401@gigawatt.nl>
+In-Reply-To: <51F6F10C.4060109@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Craig Loomis <cploomis@gmail.com>, dash <dash@vger.kernel.org>
+Cc: Luigi Tarenga <luigi.tarenga@gmail.com>, dash@vger.kernel.org
 
-On Fri, Jul 19, 2013 at 09:49:31PM +0000, Harald van Dijk wrote:
->
-> So, how about this, to be applied on top of my previous patch? It
-> defaults to using confstr() if available and reporting a hard error at
-> run time if that fails, but it can be configured to not use confstr(),
-> and/or fall back to a path specified at configuration time:
+On Mon, Jul 29, 2013 at 10:47:40PM +0000, Harald van Dijk wrote:
+> On 29/07/13 23:44, Luigi Tarenga wrote:
+> > hi list,
+> > while writing a script to execute parallel ssh command on many host I found
+> > a strange behavior of dash. I can replicate it with a very simple script but
+> > didn't find any documentation about dash or POSIX that can explain it.
+> > 
+> > tested on centos 6.4 (dash 0.5.5.1) and wih dash compiled from source (0.5.7)
+> > the following script reports error:
+> > 
+> > #!/bin/dash
+> > 
+> > sleep 3 &
+> > sleep 3 &
+> > sleep 3 &
+> > sleep 3 &
+> > 
+> > #/bin/true
+> > jobs -l
+> > 
+> > wait %1
+> > wait %2
+> > wait %3
+> > wait %4
+> > 
+> > [vortex@lizard ~]$ ./dash-0.5.7/src/dash test.sh
+> > [4] + 4569 Running
+> > [3] - 4568 Running
+> > [2]   4567 Running
+> > [1]   4566 Running
+> > prova: 14: wait: No such job: %4
+> > [vortex@lizard ~]$ echo $?
+> > 2
+> 
+> Yes, this looks like a bug to me. The number of allocated jobs is always
+> kept as a multiple of four, and the first check in considering whether
+> the job number is valid is "if it's greater than or equal to the number
+> of allocated job, it's invalid". That doesn't look right. That would
+> only be right if jobs were zero-based, but they aren't. If it's exactly
+> equal to the number of available jobs, it can still be valid. It works
+> when adding /bin/true, because four more more jobs end up allocated
+> internally.
+> 
+> The attached patch should fix it.
+> 
+> Cheers,
+> Harald
 
-Thanks for the patch.  But until someone who needs this complexity
-steps up, I'm going to stick with the simpler version below:
+> commit ddeba5485c3309ffc7010f8924d604a781908e1d
+> Author: Harald van Dijk <harald@gigawatt.nl>
+> Date:   Tue Jul 30 00:36:53 2013 +0200
+> 
+>     getjob: Fix off-by-one error for multiple of four job numbers
 
-commit 842050da1c14d7dbe365cd750032fcd8eaaa1db2
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri Sep 26 17:18:35 2014 +0800
-
-    [BUILTIN] Set command -p path to /usr/sbin:/usr/bin:/sbin:/bin
-    
-    Exclude /usr/local from command -p PATH.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/ChangeLog b/ChangeLog
-index eb3bbc3..ba67b6e 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,6 +1,7 @@
- 2014-09-26  Herbert Xu <herbert@gondor.apana.org.au>
- 
- 	* Small optimisation of command -pv change.
-+	* Set command -p path to /usr/sbin:/usr/bin:/sbin:/bin.
- 
- 2014-09-26  Harald van Dijk <harald@gigawatt.nl>
- 
-diff --git a/src/var.h b/src/var.h
-index 79ee71a..872e2db 100644
---- a/src/var.h
-+++ b/src/var.h
-@@ -107,7 +107,7 @@ extern const char defifsvar[];
- extern const char defifs[];
- #endif
- extern const char defpathvar[];
--#define defpath (defpathvar + 5)
-+#define defpath (defpathvar + 36)
- 
- extern int lineno;
- extern char linenovar[];
-
-Cheers,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
