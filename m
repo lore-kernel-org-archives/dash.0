@@ -1,114 +1,106 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: test incorrectly rejecting valid expression with confusing !
- placement
-Date: Sun, 28 Sep 2014 18:42:51 +0800
-Message-ID: <20140928104251.GA27782@gondor.apana.org.au>
-References: <5218BCAD.2010107@gigawatt.nl>
- <20130904015629.GA19007@gondor.apana.org.au>
+Subject: Kill pgetc_macro
+Date: Mon, 29 Sep 2014 17:08:50 +0800
+Message-ID: <20140929090850.GA1343@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:53192 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:49732 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753559AbaI1KnA (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 28 Sep 2014 06:43:00 -0400
+	with ESMTP id S1750911AbaI2JIy (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 29 Sep 2014 05:08:54 -0400
 Content-Disposition: inline
-In-Reply-To: <20130904015629.GA19007@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Wed, Sep 04, 2013 at 11:56:29AM +1000, Herbert Xu wrote:
-> Harald van Dijk <harald@gigawatt.nl> wrote:
-> > Hi,
-> > 
-> > Now that Herbert fixed the reported crash in test (in a far simpler
-> > manner than I had suggested, which I like), I did some more testing, and
-> > came across one case that does not currently work, and did not work in
-> > the past, but is perfectly valid:
-> > 
-> > $ src/dash -c 'test ! ! = !'
-> > src/dash: 1: test: =: unexpected operator
-> 
-> Agreed.
+While looking at the backslash newline bug it occured to me that
+pgetc_macro is vestigial and should be removed.  I've run some
+speed tests on the result and the difference appears to be in the
+noise.  But if anyone sees a big regression please let me know.
 
-This case is now fixed by the following patch:
-
-commit 4f7e4c8201e580b9d31c09d8a484741072033c01
+commit 339b9c0781cca7afb0964c6a655cda8ad9cf9fc2
 Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Sun Sep 28 18:40:18 2014 +0800
+Date:   Mon Sep 29 17:05:53 2014 +0800
 
-    [BUILTIN] Correctly handle test ! ! = !
+    [INPUT] Kill pgetc_macro
     
-    This patch adds a special case in testcmd for the 4-argument
-    expression beginning with a !.  Without this ! ! = ! is deemed
-    a syntax error, which breaks POSIX.
-    
-    Note that this special case does not extend down into subexpressions
-    so if ! ! = ! is used inside parentheses then a syntax error will
-    still occur as before.
+    pgetc_macro is identical to pgetc except that it's a macro and
+    pgetc isn't.  Since there is very little performance difference
+    on modern systems it's time to kill pgetc_macro.
     
     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/ChangeLog b/ChangeLog
-index a466a7f..7345144 100644
+index 7345144..0fbc514 100644
 --- a/ChangeLog
 +++ b/ChangeLog
 @@ -1,3 +1,7 @@
-+2014-09-28  Herbert Xu <herbert@gondor.apana.org.au>
++2014-09-29  Herbert Xu <herbert@gondor.apana.org.au>
 +
-+	* Correctly handle test ! ! = !.
++	* Kill pgetc_macro.
 +
- 2014-09-26  Herbert Xu <herbert@gondor.apana.org.au>
+ 2014-09-28  Herbert Xu <herbert@gondor.apana.org.au>
  
- 	* Small optimisation of command -pv change.
-diff --git a/src/bltin/test.c b/src/bltin/test.c
-index baa91a5..458e9f5 100644
---- a/src/bltin/test.c
-+++ b/src/bltin/test.c
-@@ -177,7 +177,7 @@ testcmd(int argc, char **argv)
+ 	* Correctly handle test ! ! = !.
+diff --git a/src/input.c b/src/input.c
+index d31c45b..9e533a4 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -134,7 +134,10 @@ RESET {
+ int
+ pgetc(void)
  {
- 	const struct t_op *op;
- 	enum token n;
--	int res;
-+	int res = 1;
+-	return pgetc_macro();
++	if (--parsenleft >= 0)
++		return (signed char)*parsenextc++;
++	else
++		return preadbuffer();
+ }
  
- 	if (*argv[0] == '[') {
- 		if (*argv[--argc] != ']')
-@@ -185,11 +185,12 @@ testcmd(int argc, char **argv)
- 		argv[argc] = NULL;
+ 
+@@ -147,7 +150,7 @@ pgetc2()
+ {
+ 	int c;
+ 	do {
+-		c = pgetc_macro();
++		c = pgetc();
+ 	} while (c == PEOA);
+ 	return c;
+ }
+diff --git a/src/input.h b/src/input.h
+index 50a7797..775291b 100644
+--- a/src/input.h
++++ b/src/input.h
+@@ -61,6 +61,3 @@ void setinputstring(char *);
+ void popfile(void);
+ void popallfiles(void);
+ void closescript(void);
+-
+-#define pgetc_macro() \
+-	(--parsenleft >= 0 ? (signed char)*parsenextc++ : preadbuffer())
+diff --git a/src/parser.c b/src/parser.c
+index 572cbcd..c4eaae2 100644
+--- a/src/parser.c
++++ b/src/parser.c
+@@ -775,7 +775,7 @@ xxreadtoken(void)
+ 		setprompt(2);
  	}
- 
-+recheck:
- 	argv++;
- 	argc--;
- 
- 	if (argc < 1)
--		return 1;
-+		return res;
- 
- 	/*
- 	 * POSIX prescriptions: he who wrote this deserves the Nobel
-@@ -209,6 +210,9 @@ testcmd(int argc, char **argv)
- 			argv[--argc] = NULL;
- 			argv++;
- 			argc--;
-+		} else if (!strcmp(argv[0], "!")) {
-+			res = 0;
-+			goto recheck;
+ 	for (;;) {	/* until token or start of word found */
+-		c = pgetc_macro();
++		c = pgetc();
+ 		switch (c) {
+ 		case ' ': case '\t':
+ 		case PEOA:
+@@ -1009,7 +1009,7 @@ quotemark:
+ 					USTPUTC(c, out);
+ 				}
+ 			}
+-			c = pgetc_macro();
++			c = pgetc();
  		}
  	}
- 
-@@ -216,7 +220,7 @@ testcmd(int argc, char **argv)
- 
- eval:
- 	t_wp = argv;
--	res = !oexpr(n);
-+	res ^= oexpr(n);
- 	argv = t_wp;
- 
- 	if (argv[0] != NULL && argv[1] != NULL)
+ endword:
 
 Cheers,
 -- 
