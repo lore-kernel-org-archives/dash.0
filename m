@@ -1,96 +1,74 @@
 From: Eric Blake <eblake@redhat.com>
-Subject: 'set' leaks garbage from environment
-Date: Tue, 30 Sep 2014 09:01:27 -0600
-Message-ID: <542AC5C7.5090307@redhat.com>
+Subject: Re: 'set' leaks garbage from environment
+Date: Tue, 30 Sep 2014 09:20:52 -0600
+Message-ID: <542ACA54.50201@redhat.com>
+References: <542AC5C7.5090307@redhat.com> <20140930151449.GB22440@brutus.ethup.se>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="KSsoi9gb5OpeL9Ho3TSi6ldLc4J5C35JR"
+ boundary="krS20hbobmkgOnx1uRgo5RTKMLdnSnmDQ"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33861 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:4980 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752090AbaI3PB2 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 30 Sep 2014 11:01:28 -0400
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com (int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	by mx1.redhat.com (8.14.4/8.14.4) with ESMTP id s8UF1Sid005725
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
-	for <dash@vger.kernel.org>; Tue, 30 Sep 2014 11:01:28 -0400
-Received: from [10.3.113.28] (ovpn-113-28.phx2.redhat.com [10.3.113.28])
-	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP id s8UF1SL2019916
-	for <dash@vger.kernel.org>; Tue, 30 Sep 2014 11:01:28 -0400
+	id S1750782AbaI3PUz (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 30 Sep 2014 11:20:55 -0400
+In-Reply-To: <20140930151449.GB22440@brutus.ethup.se>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Olof Johansson <olof@ethup.se>
+Cc: dash@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KSsoi9gb5OpeL9Ho3TSi6ldLc4J5C35JR
+--krS20hbobmkgOnx1uRgo5RTKMLdnSnmDQ
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-The recent changes in bash have prompted me to look closer at dash's
-behavior with unusual name/value settings in the environment.  I found
-at least two bugs:
+On 09/30/2014 09:14 AM, Olof Johansson wrote:
+> On 2014-09-30 09:01 -0600, Eric Blake wrote:
+>> $ dash -c 'unset "a|b"
+>> $ echo $?
+>> 0
+>=20
+> Works for me (tested on both Debian package versions 0.5.7-3 (wheezy)
+> and 0.5.7-4 (unstable)):
 
-Per the documentation of set,
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#=
-set
-"If no options or arguments are specified, set shall write the names and
-values of all shell variables in the collation sequence of the current
-locale.... The output shall be suitable for reinput to the shell,
-setting or resetting, as far as possible, the variables that are
-currently set;"
+Serves me right from testing on multiple machines :(
+I mixed up my test results.
 
-Elsewhere,
-http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html
-"Environment variable names used by the utilities in the Shell and
-Utilities volume of IEEE Std 1003.1-2001 consist solely of uppercase
-letters, digits, and the '_' (underscore) from the characters defined in
-Portable Character Set and do not begin with a digit. Other characters
-may be permitted by an implementation; applications shall tolerate the
-presence of such names."
+Fedora 20 using dash 0.5.7 works:
 
-Here's the behavior I observe with dash 0.5.7 (as built for Fedora 20):
+$ dash -c 'unset "a|b"'
+dash: 1: unset: a|b: bad variable name
+$ rpm -q dash
+dash-0.5.7-8.fc20.x86_64
 
-$ env 'a|b=3D' dash -c 'set | grep a"."b'
-a|b=3D''
+But RHEL 6 fails:
 
-Oops - set is claiming that 'a|b' is the name of a current shell
-variable; but this is impossible.  Worse, the text quoted from POSIX
-means that I should be able to safely do:
+$ dash -c 'unset "a|b"'
+$ rpm -q dash
+dash-0.5.5.1-4.el6.x86_64
 
-$ dash -c 'eval "$(set)"'
+so this is at least one bug that has already been fixed upstream.
 
-but if "a|b=3D' is in the environment, this will try to invoke the comman=
-d
-named 'a', rather than set a variable named a|b.  This is NOT as severe
-as the bash Shell Shock bug (Shell Shock only required control over
-values, while this requires control over arbitrary names in the
-environment), but I still wonder if someone might be able to exploit
-this into causing some dash script into executing code of the caller's
-choice under the elevated permissions that the script is running under.
+>> $ env 'a|b=3D' dash -c 'set | grep a"."b'
+>> a|b=3D''
+>=20
+> This I can reproduce though.
 
-Dash should follow the lead of bash, and refuse to list any inherited
-environment variable that is not a valid variable name.  However, it's
-probably up to you to either remove those non-names from the environment
-entirely, or to act like bash and merely hang on to those name-value
-pairs to hand on to the child process even though it is untouchable from
-within dash.
+Meanwhile, I just tested the latest dash.git (commit f21016a12) and this
+behavior is no longer present:
 
-Next bug:
+$ env 'a|b=3D' ./src/dash -c 'set | grep a"."b'
 
-$ dash -c 'unset "a|b"
-$ echo $?
-0
-
-This should fail (as in bash and ksh), rather than silently succeeding,
-since it is not possible to unset a non-valid name.
+so it has also been fixed in the meantime.  Sorry for not doing my
+homework; nothing to fix here...
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---KSsoi9gb5OpeL9Ho3TSi6ldLc4J5C35JR
+--krS20hbobmkgOnx1uRgo5RTKMLdnSnmDQ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -99,13 +77,13 @@ Content-Disposition: attachment; filename="signature.asc"
 Version: GnuPG v1
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 
-iQEcBAEBCAAGBQJUKsXHAAoJEKeha0olJ0NqphQH/iRWrQYj0JHyle+95LGdHNPl
-ZciqauA1oUXOUHrJwmvyTRH0gXufzyiumm877V6NlNuKT2RRYYGwC3hz3A7cvFEP
-OGHGTGyOcc26/lZGkmKCOHsw9YnjoPgsa6aPAVTvvOrldILXu4Gg7rzuzQWQXh3i
-NBEmDUQA8dHTejJv+nE1HpQRYuB8P2iAzbUWDsfafhrwObXMj3+xz63oP6H4UCBx
-szMHW/yiREmy1X71+muPhG5BEv8U2u6e3QPcdjrNhJS/8tegOOyJddAF3Ojd1nGQ
-vjxLof/Ve/C1ipFjd2jDBTBJ0v5bnQ4g0em+zbZoosDJUhjIc8GMEn0ORpWy6zI=
-=TZmB
+iQEcBAEBCAAGBQJUKspUAAoJEKeha0olJ0Nq37MH/39l4cpNjOo2HHreqcmgGN13
+P6mJO7UwY2+gp9zE61FBGRjh/Lx/8rAaojL6uiw1z9PBnNFV5K877W2qi3zOVm67
+7Q3EQqbHwsU+L13r0v/bpzcea3E1TKG13s8RWVnaIjIKgrxhv0ulXx5QYi+fVroV
+2gvlEIlUS2bXtEWENd20MUFG5lddoamW68bQOIluamTFBt2uAbPuuOOk6OTcuLAu
+cgHKeOA0ibjwKx1mmkQFcjVh7XJ3mHYU0CIqV7Z3zps4EkYXRn7Y/ol+b5CKaFyz
+qMpGJ+VyXOliO8waj432T4QJJr9Vntbh2b5iXn9vxQz3sBjf7NimKy1CDKPsFes=
+=Oo5F
 -----END PGP SIGNATURE-----
 
---KSsoi9gb5OpeL9Ho3TSi6ldLc4J5C35JR--
+--krS20hbobmkgOnx1uRgo5RTKMLdnSnmDQ--
