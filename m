@@ -1,53 +1,76 @@
-From: Paul Smith <paul@mad-scientist.net>
-Subject: Failure of nested substring processing inside double-quotes
-Date: Mon, 06 Oct 2014 16:03:13 -0400
-Message-ID: <1412625793.29340.94.camel@mad-scientist.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [VAR] Use setvareq to set OPTIND initially
+Date: Tue, 7 Oct 2014 22:27:37 +0800
+Message-ID: <20141007142737.GA31218@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from gproxy5-pub.mail.unifiedlayer.com ([67.222.38.55]:43980 "HELO
-	gproxy5-pub.mail.unifiedlayer.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1750720AbaJFUKJ (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 6 Oct 2014 16:10:09 -0400
-Received: from [173.9.45.73] (port=51809 helo=pdsdesk)
-	by box531.bluehost.com with esmtpsa (TLSv1.2:DHE-RSA-AES128-SHA:128)
-	(Exim 4.82)
-	(envelope-from <paul@mad-scientist.net>)
-	id 1XbEVB-0000LG-WE
-	for dash@vger.kernel.org; Mon, 06 Oct 2014 14:03:26 -0600
+Received: from helcar.apana.org.au ([209.40.204.226]:38240 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752368AbaJGO1l (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 7 Oct 2014 10:27:41 -0400
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Hi all.  I recently found a bug in dash's handling of substring
-processing, when the variable is contained within quotes.
+commit f20dcdd0948d7ebb7d462a0288ea218468ad4f6c
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Oct 7 22:24:42 2014 +0800
 
-In bash, this works:
+    [VAR] Use setvareq to set OPTIND initially
+    
+    There is no need to setvarint to set the initial value of OPTIND
+    of one.  This patch switchs to setvareq which also lets us avoid
+    an unnecessary memory allocation.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-  bash$ echo $PWD
-  /home/psmith
+diff --git a/ChangeLog b/ChangeLog
+index aa230ab..b990628 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2014-10-07  Herbert Xu <herbert@gondor.apana.org.au>
++
++	* Use setvareq to set OPTIND initially.
++
+ 2014-10-06  Herbert Xu <herbert@gondor.apana.org.au>
+ 
+ 	* Exit without arguments in a trap should use status outside traps.
+diff --git a/src/var.c b/src/var.c
+index fa24854..cc6f7f2 100644
+--- a/src/var.c
++++ b/src/var.c
+@@ -80,6 +80,7 @@ const char defifsvar[] = "IFS= \t\n";
+ #else
+ const char defifs[] = " \t\n";
+ #endif
++MKINIT char defoptindvar[] = "OPTIND=1";
+ 
+ int lineno;
+ char linenovar[sizeof("LINENO=")+sizeof(int)*CHAR_BIT/3+1] = "LINENO=";
+@@ -100,7 +101,7 @@ struct var varinit[] = {
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS1=$ ",	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS2=> ",	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS4=+ ",	0 },
+-	{ 0,	VSTRFIXED|VTEXTFIXED,		"OPTIND=1",	getoptsreset },
++	{ 0,	VSTRFIXED|VTEXTFIXED,		defoptindvar,	getoptsreset },
+ #ifdef WITH_LINENO
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		linenovar,	0 },
+ #endif
+@@ -142,7 +143,7 @@ INIT {
+ 		}
+ 	}
+ 
+-	setvarint("OPTIND", 1, 0);
++	setvareq(defoptindvar, VTEXTFIXED);
+ 
+ 	fmtstr(ppid + 5, sizeof(ppid) - 5, "%ld", (long) getppid());
+ 	setvareq(ppid, VTEXTFIXED);
 
-  bash$ echo ${PWD%${PWD##*/}}.
-  /home/.
-
-  bash$ echo "${PWD%${PWD##*/}}."
-  /home/.
-
-which is what I expect.  However, in dash we get:
-
-  dash$ echo $PWD
-  /home/psmith
-
-  dash$ echo ${PWD%${PWD##*/}}.
-  /home/.
-
-  dash$ echo "${PWD%${PWD##*/}}."
-  .
-
-Whoops!  Inside double-quotes dash is mishandling the nested string
-substitution.  If I break it up into two steps it works OK, regardless
-of whether or not it's quoted.
-
-This is dash 0.5.7-4ubuntu1 (from Ubuntu GNOME 14.04).
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
