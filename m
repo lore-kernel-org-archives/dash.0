@@ -1,129 +1,92 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [EXPAND] Optimise nulonly away and just use quoted as before
-Date: Wed, 8 Oct 2014 20:11:44 +0800
-Message-ID: <20141008121144.GA9340@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Eric Blake <eblake@redhat.com>
+Subject: [PATCH] [BUILTIN] cd: support drive letters on Cygwin
+Date: Mon, 13 Oct 2014 12:59:17 -0600
+Message-ID: <1413226757-4311-1-git-send-email-eblake@redhat.com>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:59224 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755492AbaJHMLr (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 8 Oct 2014 08:11:47 -0400
-Content-Disposition: inline
+Received: from resqmta-ch2-11v.sys.comcast.net ([69.252.207.43]:54194 "EHLO
+	resqmta-ch2-11v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754326AbaJMTHf (ORCPT
+	<rfc822;dash@vger.kernel.org>); Mon, 13 Oct 2014 15:07:35 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-commit ab657e36b68f4a7e9ddb0f36c455c98d1c069a2c
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Wed Oct 8 20:09:56 2014 +0800
+The Cygwin platform supports DOS style drive-letter paths such
+as "C:\\dir", even though the preferred form is a POSIX-style
+"/cygdrive/c/dir".  This can be seen by doing things such as
+chdir("c:") (which succeeds) followed by getcwd(NULL, 0) (which
+returns the normalized "/cygdrive/c").  However, dash was trying
+to perform local manipulations on the argument to 'cd' prior to
+calling into libc, in order to update the state of $PWD and
+friends; these manipulations were assuming that the user meant
+to change to a relative subdirectory of the current location,
+as in './c:', instead of honoring the drive letter.  None of
+the other dash builtins take a filename and manipulate it to
+affect shell state (some, like 'test', take a file name, but as
+stat("c:") works just fine, there is no need to normalize).
 
-    [EXPAND] Optimise nulonly away and just use quoted as before
-    
-    This patch makes a small optimisation by using the same value for
-    quoted between evalvar and varvalue by eliminating nulonly and
-    passing along quoted instead.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+This patch has no impact outside of cygwin; on cygwin, it takes
+advantage of a native function call to canonicalize any
+incoming name into preferred form before updating shell state.
+
+Pre-patch:
+$ dash -c 'cd c: && echo $PWD'
+dash: 1: cd: can't cd to c:
+
+Post-patch:
+$ dash -c 'cd c: && echo $PWD'
+/cygdrive/c
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ ChangeLog |  4 ++++
+ src/cd.c  | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+)
 
 diff --git a/ChangeLog b/ChangeLog
-index e981a43..5f033df 100644
+index a466a7f..a745fe7 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -2,6 +2,7 @@
- 
- 	* Split unquoted $@/$* correctly when IFS is set but empty.
- 	* Do not split quoted VSLENGTH and VSTRIM.
-+	* Optimise nulonly away and just use quoted as before.
- 
- 2014-10-07  Herbert Xu <herbert@gondor.apana.org.au>
- 
-diff --git a/src/expand.c b/src/expand.c
-index dc8ae47..dfb3f0e 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -722,7 +722,6 @@ evalvar(char *p, int flag)
- 	ssize_t varlen;
- 	int easy;
- 	int quoted;
--	int nulonly;
- 
- 	varflags = *p++;
- 	subtype = varflags & VSTYPE;
-@@ -733,12 +732,11 @@ evalvar(char *p, int flag)
- 	quoted = flag & EXP_QUOTED;
- 	var = p;
- 	easy = (!quoted || (*var == '@' && shellparam.nparam));
--	nulonly = easy;
- 	startloc = expdest - (char *)stackblock();
- 	p = strchr(p, '=') + 1;
- 
- again:
--	varlen = varvalue(var, varflags, flag, &nulonly);
-+	varlen = varvalue(var, varflags, flag, &quoted);
- 	if (varflags & VSNUL)
- 		varlen--;
- 
-@@ -783,7 +781,7 @@ vsplus:
- record:
- 		if (!easy)
- 			goto end;
--		recordregion(startloc, expdest - (char *)stackblock(), nulonly);
-+		recordregion(startloc, expdest - (char *)stackblock(), quoted);
- 		goto end;
- 	}
- 
-@@ -888,7 +886,7 @@ strtodest(p, syntax, quotes)
-  */
- 
- STATIC ssize_t
--varvalue(char *name, int varflags, int flags, int *nulonly)
-+varvalue(char *name, int varflags, int flags, int *quotedp)
- {
- 	int num;
- 	char *p;
-@@ -897,14 +895,12 @@ varvalue(char *name, int varflags, int flags, int *nulonly)
- 	char sepc;
- 	char **ap;
- 	char const *syntax;
--	int quoted = flags & EXP_QUOTED;
-+	int quoted = *quotedp;
- 	int subtype = varflags & VSTYPE;
- 	int discard = subtype == VSPLUS || subtype == VSLENGTH;
- 	int quotes = (discard ? 0 : (flags & QUOTES_ESC)) | QUOTES_KEEPNUL;
- 	ssize_t len = 0;
- 
--	sep = *nulonly ? (flags & EXP_FULL) << CHAR_BIT : 0;
--	*nulonly = 0;
- 	syntax = quoted ? DQSYNTAX : BASESYNTAX;
- 
- 	switch (*name) {
-@@ -935,16 +931,20 @@ numvar:
- 		expdest = p;
- 		break;
- 	case '@':
-+		sep = 0;
- 		if (quoted)
- 			goto param;
- 		/* fall through */
- 	case '*':
--		sep |= ifsset() ? ifsval()[0] : ' ';
-+		sep = ifsset() ? ifsval()[0] : ' ';
-+		if (!quoted) {
- param:
-+			sep |= (flags & EXP_FULL) << CHAR_BIT;
-+		}
-+		sepc = sep;
-+		*quotedp = !sepc;
- 		if (!(ap = shellparam.p))
- 			return -1;
--		sepc = sep;
--		*nulonly = !sepc;
- 		while ((p = *ap++)) {
- 			len += strtodest(p, syntax, quotes);
+@@ -1,3 +1,7 @@
++2014-10-13  Eric Blake  <eblake@redhat.com>
++
++	* cd: support drive letters on Cygwin.
++
+ 2014-09-26  Herbert Xu <herbert@gondor.apana.org.au>
 
-Cheers,
+ 	* Small optimisation of command -pv change.
+diff --git a/src/cd.c b/src/cd.c
+index 2d9d4b5..a4e024d 100644
+--- a/src/cd.c
++++ b/src/cd.c
+@@ -38,6 +38,9 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <limits.h>
++#ifdef __CYGWIN__
++#include <sys/cygwin.h>
++#endif
+
+ /*
+  * The cd and pwd commands.
+@@ -194,6 +197,17 @@ updatepwd(const char *dir)
+ 	char *cdcomppath;
+ 	const char *lim;
+
++#ifdef __CYGWIN__
++	/* On cygwin, thanks to drive letters, some absolute paths do
++	   not begin with slash; but cygwin includes a function that
++	   forces normalization to the posix form */
++	char pathbuf[PATH_MAX];
++	if (cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE, dir, pathbuf,
++			     sizeof(pathbuf)) < 0)
++		sh_error("can't normalize %s", dir);
++	dir = pathbuf;
++#endif
++
+ 	cdcomppath = sstrdup(dir);
+ 	STARTSTACKSTR(new);
+ 	if (*dir != '/') {
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.3
+
