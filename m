@@ -1,92 +1,56 @@
-From: Eric Blake <eblake@redhat.com>
-Subject: [PATCH] [BUILTIN] cd: support drive letters on Cygwin
-Date: Mon, 13 Oct 2014 12:59:17 -0600
-Message-ID: <1413226757-4311-1-git-send-email-eblake@redhat.com>
+From: Stephane Chazelas <stephane.chazelas@gmail.com>
+Subject: Re: [EXPAND] Split unquoted $@/$* correctly when IFS is set but empty
+Date: Mon, 20 Oct 2014 22:59:40 +0100
+Message-ID: <20141020215940.GB20449@chaz.gmail.com>
+References: <20141008072636.GA7524@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from resqmta-ch2-11v.sys.comcast.net ([69.252.207.43]:54194 "EHLO
-	resqmta-ch2-11v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754326AbaJMTHf (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 13 Oct 2014 15:07:35 -0400
+Received: from plane.gmane.org ([80.91.229.3]:55222 "EHLO plane.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751680AbaJTWKH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 20 Oct 2014 18:10:07 -0400
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1XgL9Q-0000Ly-OM
+	for dash@vger.kernel.org; Tue, 21 Oct 2014 00:10:04 +0200
+Received: from 4e5660b2.skybroadband.com ([78.86.96.178])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Tue, 21 Oct 2014 00:10:04 +0200
+Received: from stephane.chazelas by 4e5660b2.skybroadband.com with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Tue, 21 Oct 2014 00:10:04 +0200
+Content-Disposition: inline
+In-Reply-To: <20141008072636.GA7524@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-The Cygwin platform supports DOS style drive-letter paths such
-as "C:\\dir", even though the preferred form is a POSIX-style
-"/cygdrive/c/dir".  This can be seen by doing things such as
-chdir("c:") (which succeeds) followed by getcwd(NULL, 0) (which
-returns the normalized "/cygdrive/c").  However, dash was trying
-to perform local manipulations on the argument to 'cd' prior to
-calling into libc, in order to update the state of $PWD and
-friends; these manipulations were assuming that the user meant
-to change to a relative subdirectory of the current location,
-as in './c:', instead of honoring the drive letter.  None of
-the other dash builtins take a filename and manipulate it to
-affect shell state (some, like 'test', take a file name, but as
-stat("c:") works just fine, there is no need to normalize).
+2014-10-08 15:26:36 +0800, Herbert Xu:
+> commit 3c06acdac0b1ba0e0acdda513a57ee6e31385dce
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Wed Oct 8 15:24:23 2014 +0800
+> 
+>     [EXPAND] Split unquoted $@/$* correctly when IFS is set but empty
+>     
+>     Currently we do not field-split $@/$* when it isn't quoted and IFS
+>     is set but empty.  This is obviously wrong.  This patch fixes this.
+[...]
 
-This patch has no impact outside of cygwin; on cygwin, it takes
-advantage of a native function call to canonicalize any
-incoming name into preferred form before updating shell state.
+Well, if IFS is empty, field splitting is disabled. There's
+nothing in POSIX that clearly says that $@ and $* should expand
+to the positional parameters *as separate arguments in list
+contexts*. yash and the Bourne shell behave like dash. Only
+shells with array support behave differently.
 
-Pre-patch:
-$ dash -c 'cd c: && echo $PWD'
-dash: 1: cd: can't cd to c:
+The whole $*/$@ expansion is rather unclear in the POSIX spec.
+I've just raised the problem on the Austin group mailing list.
 
-Post-patch:
-$ dash -c 'cd c: && echo $PWD'
-/cygdrive/c
+See also
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- ChangeLog |  4 ++++
- src/cd.c  | 14 ++++++++++++++
- 2 files changed, 18 insertions(+)
+http://thread.gmane.org/gmane.linux.debian.devel.general/197901
 
-diff --git a/ChangeLog b/ChangeLog
-index a466a7f..a745fe7 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,7 @@
-+2014-10-13  Eric Blake  <eblake@redhat.com>
-+
-+	* cd: support drive letters on Cygwin.
-+
- 2014-09-26  Herbert Xu <herbert@gondor.apana.org.au>
-
- 	* Small optimisation of command -pv change.
-diff --git a/src/cd.c b/src/cd.c
-index 2d9d4b5..a4e024d 100644
---- a/src/cd.c
-+++ b/src/cd.c
-@@ -38,6 +38,9 @@
- #include <string.h>
- #include <unistd.h>
- #include <limits.h>
-+#ifdef __CYGWIN__
-+#include <sys/cygwin.h>
-+#endif
-
- /*
-  * The cd and pwd commands.
-@@ -194,6 +197,17 @@ updatepwd(const char *dir)
- 	char *cdcomppath;
- 	const char *lim;
-
-+#ifdef __CYGWIN__
-+	/* On cygwin, thanks to drive letters, some absolute paths do
-+	   not begin with slash; but cygwin includes a function that
-+	   forces normalization to the posix form */
-+	char pathbuf[PATH_MAX];
-+	if (cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE, dir, pathbuf,
-+			     sizeof(pathbuf)) < 0)
-+		sh_error("can't normalize %s", dir);
-+	dir = pathbuf;
-+#endif
-+
- 	cdcomppath = sstrdup(dir);
- 	STARTSTACKSTR(new);
- 	if (*dir != '/') {
--- 
-1.9.3
+Cheers,
+Stephane
 
