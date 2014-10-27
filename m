@@ -1,83 +1,71 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 9/9] [BUILTIN] Simplify echo command
-Date: Mon, 27 Oct 2014 16:27:00 +0800
-Message-ID: <E1Xifdk-0001iq-B7@gondolin.me.apana.org.au>
-References: <20141027082546.GA6447@gondor.apana.org.au>
+Subject: [BUILTIN] Handle -- in dotcmd
+Date: Mon, 27 Oct 2014 16:57:41 +0800
+Message-ID: <20141027085741.GA6948@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:58584 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:60449 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751868AbaJ0I1E (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 27 Oct 2014 04:27:04 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by fornost.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1Xifdm-0006Jo-84
-	for <dash@vger.kernel.org>; Mon, 27 Oct 2014 19:27:02 +1100
+	with ESMTP id S1752230AbaJ0I5p (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 27 Oct 2014 04:57:45 -0400
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
+Cc: 503840@bugs.debian.org, 503840-submitter@bugs.debian.org
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+commit 12ad48bb31b003eb6d3106478b7760a031969a36
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Mon Oct 27 16:56:46 2014 +0800
 
- ChangeLog          |    1 +
- src/bltin/printf.c |   28 ++++++++--------------------
- 2 files changed, 9 insertions(+), 20 deletions(-)
+    [BUILTIN] Handle -- in dotcmd
+    
+    This patch adds a nextopt call in dotcmd in order to handle --.
+    
+    Reported-by: Stephane Chazelas <stephane_chazelas@yahoo.fr>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/ChangeLog b/ChangeLog
-index 60fd4b6..f015066 100644
+index f015066..5212a9a 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -9,6 +9,7 @@
- 	* Remove getintmax in printf.
+@@ -10,6 +10,7 @@
  	* Use error instead of warnx for fatal errors in printf.
  	* Optimise handling of backslash octals in printf.
-+	* Simplify echo command.
+ 	* Simplify echo command.
++	* Handle -- in dotcmd.
  
  2014-10-13  Eric Blake <eblake@redhat.com>
  
-diff --git a/src/bltin/printf.c b/src/bltin/printf.c
-index 6f39526..9673e10 100644
---- a/src/bltin/printf.c
-+++ b/src/bltin/printf.c
-@@ -442,33 +442,21 @@ check_conversion(const char *s, const char *ep)
- int
- echocmd(int argc, char **argv)
+diff --git a/src/main.c b/src/main.c
+index 00c5e00..985e8c4 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -321,15 +321,19 @@ dotcmd(int argc, char **argv)
  {
--	int nonl = 0;
--	struct output *outs = out1;
--
--	if (!*++argv)
--		goto end;
--	if (equal(*argv, "-n")) {
--		nonl = ~nonl;
--		if (!*++argv)
--			goto end;
--	}
-+	int nonl;
+ 	int status = 0;
+ 
+-	if (argc >= 2) {		/* That's what SVR2 does */
++	nextopt(nullstr);
++	argv = argptr;
 +
-+	nonl = *++argv ? equal(*argv, "-n") : 0;
-+	argv += nonl;
++	if (*argv) {
+ 		char *fullname;
  
- 	do {
- 		int c;
- 
--		nonl += print_escape_str("%s", NULL, NULL, *argv);
-+		if (likely(*argv))
-+			nonl += print_escape_str("%s", NULL, NULL, *argv++);
- 		if (nonl > 0)
- 			break;
- 
--		c = ' ';
--		if (!*++argv) {
--end:
--			if (nonl) {
--				break;
--			}
--			c = '\n';
--		}
--		outc(c, outs);
-+		c = *argv ? ' ' : '\n';
-+		out1c(c);
- 	} while (*argv);
- 	return 0;
+-		fullname = find_dot_file(argv[1]);
++		fullname = find_dot_file(*argv);
+ 		setinputfile(fullname, INPUT_PUSH_FILE);
+ 		commandname = fullname;
+ 		status = cmdloop(0);
+ 		popfile();
+ 	}
++
+ 	return status;
  }
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
