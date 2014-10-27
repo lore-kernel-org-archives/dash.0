@@ -1,56 +1,53 @@
-From: Stephane Chazelas <stephane.chazelas@gmail.com>
-Subject: Re: [EXPAND] Split unquoted $@/$* correctly when IFS is set but empty
-Date: Mon, 20 Oct 2014 22:59:40 +0100
-Message-ID: <20141020215940.GB20449@chaz.gmail.com>
-References: <20141008072636.GA7524@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] [BUILTIN] cd: support drive letters on Cygwin
+Date: Mon, 27 Oct 2014 11:40:10 +0800
+Message-ID: <20141027034010.GA5128@gondor.apana.org.au>
+References: <1413226757-4311-1-git-send-email-eblake@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from plane.gmane.org ([80.91.229.3]:55222 "EHLO plane.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751680AbaJTWKH (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 20 Oct 2014 18:10:07 -0400
-Received: from list by plane.gmane.org with local (Exim 4.69)
-	(envelope-from <gcsd-dash@m.gmane.org>)
-	id 1XgL9Q-0000Ly-OM
-	for dash@vger.kernel.org; Tue, 21 Oct 2014 00:10:04 +0200
-Received: from 4e5660b2.skybroadband.com ([78.86.96.178])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Tue, 21 Oct 2014 00:10:04 +0200
-Received: from stephane.chazelas by 4e5660b2.skybroadband.com with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Tue, 21 Oct 2014 00:10:04 +0200
+Received: from helcar.apana.org.au ([209.40.204.226]:40847 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752215AbaJ0DkR (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 26 Oct 2014 23:40:17 -0400
 Content-Disposition: inline
-In-Reply-To: <20141008072636.GA7524@gondor.apana.org.au>
+In-Reply-To: <1413226757-4311-1-git-send-email-eblake@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Eric Blake <eblake@redhat.com>
+Cc: dash@vger.kernel.org
 
-2014-10-08 15:26:36 +0800, Herbert Xu:
-> commit 3c06acdac0b1ba0e0acdda513a57ee6e31385dce
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Wed Oct 8 15:24:23 2014 +0800
+On Mon, Oct 13, 2014 at 06:59:17PM +0000, Eric Blake wrote:
+> The Cygwin platform supports DOS style drive-letter paths such
+> as "C:\\dir", even though the preferred form is a POSIX-style
+> "/cygdrive/c/dir".  This can be seen by doing things such as
+> chdir("c:") (which succeeds) followed by getcwd(NULL, 0) (which
+> returns the normalized "/cygdrive/c").  However, dash was trying
+> to perform local manipulations on the argument to 'cd' prior to
+> calling into libc, in order to update the state of $PWD and
+> friends; these manipulations were assuming that the user meant
+> to change to a relative subdirectory of the current location,
+> as in './c:', instead of honoring the drive letter.  None of
+> the other dash builtins take a filename and manipulate it to
+> affect shell state (some, like 'test', take a file name, but as
+> stat("c:") works just fine, there is no need to normalize).
 > 
->     [EXPAND] Split unquoted $@/$* correctly when IFS is set but empty
->     
->     Currently we do not field-split $@/$* when it isn't quoted and IFS
->     is set but empty.  This is obviously wrong.  This patch fixes this.
-[...]
+> This patch has no impact outside of cygwin; on cygwin, it takes
+> advantage of a native function call to canonicalize any
+> incoming name into preferred form before updating shell state.
+> 
+> Pre-patch:
+> $ dash -c 'cd c: && echo $PWD'
+> dash: 1: cd: can't cd to c:
+> 
+> Post-patch:
+> $ dash -c 'cd c: && echo $PWD'
+> /cygdrive/c
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Well, if IFS is empty, field splitting is disabled. There's
-nothing in POSIX that clearly says that $@ and $* should expand
-to the positional parameters *as separate arguments in list
-contexts*. yash and the Bourne shell behave like dash. Only
-shells with array support behave differently.
-
-The whole $*/$@ expansion is rather unclear in the POSIX spec.
-I've just raised the problem on the Austin group mailing list.
-
-See also
-
-http://thread.gmane.org/gmane.linux.debian.devel.general/197901
-
-Cheers,
-Stephane
-
+Patch applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
