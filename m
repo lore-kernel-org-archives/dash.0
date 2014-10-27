@@ -1,52 +1,62 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [BUILTIN] cd: support drive letters on Cygwin
-Date: Mon, 27 Oct 2014 11:40:10 +0800
-Message-ID: <20141027034010.GA5128@gondor.apana.org.au>
-References: <1413226757-4311-1-git-send-email-eblake@redhat.com>
+Subject: [BUILTIN] Add printf support for format string a, A, and F
+Date: Mon, 27 Oct 2014 11:46:29 +0800
+Message-ID: <20141027034628.GA5220@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:40847 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:57224 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752215AbaJ0DkR (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 26 Oct 2014 23:40:17 -0400
+	with ESMTP id S1752096AbaJ0Dqd (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 26 Oct 2014 23:46:33 -0400
 Content-Disposition: inline
-In-Reply-To: <1413226757-4311-1-git-send-email-eblake@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <eblake@redhat.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Mon, Oct 13, 2014 at 06:59:17PM +0000, Eric Blake wrote:
-> The Cygwin platform supports DOS style drive-letter paths such
-> as "C:\\dir", even though the preferred form is a POSIX-style
-> "/cygdrive/c/dir".  This can be seen by doing things such as
-> chdir("c:") (which succeeds) followed by getcwd(NULL, 0) (which
-> returns the normalized "/cygdrive/c").  However, dash was trying
-> to perform local manipulations on the argument to 'cd' prior to
-> calling into libc, in order to update the state of $PWD and
-> friends; these manipulations were assuming that the user meant
-> to change to a relative subdirectory of the current location,
-> as in './c:', instead of honoring the drive letter.  None of
-> the other dash builtins take a filename and manipulate it to
-> affect shell state (some, like 'test', take a file name, but as
-> stat("c:") works just fine, there is no need to normalize).
-> 
-> This patch has no impact outside of cygwin; on cygwin, it takes
-> advantage of a native function call to canonicalize any
-> incoming name into preferred form before updating shell state.
-> 
-> Pre-patch:
-> $ dash -c 'cd c: && echo $PWD'
-> dash: 1: cd: can't cd to c:
-> 
-> Post-patch:
-> $ dash -c 'cd c: && echo $PWD'
-> /cygdrive/c
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+commit c77265b4ea89359c164346e400914bb24a3716d1
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Mon Oct 27 11:45:01 2014 +0800
 
-Patch applied.  Thanks!
+    [BUILTIN] Add printf support for format string a, A, and F
+    
+    This patch adds the format string characters a, A and F to the
+    supported set of the built-in printf command.  They're already
+    supported by the underlying printf function.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/ChangeLog b/ChangeLog
+index 2155764..46ef4c2 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2014-10-27  Herbert Xu <herbert@gondor.apana.org.au>
++
++	* Add printf support for format string a, A, and F.
++
+ 2014-10-13  Eric Blake <eblake@redhat.com>
+ 
+ 	* cd: support drive letters on Cygwin.
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index 5f9e81c..e0ef912 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -191,9 +191,12 @@ pc:
+ 				PF(f, p);
+ 				break;
+ 			}
++			case 'a':
++			case 'A':
+ 			case 'e':
+ 			case 'E':
+ 			case 'f':
++			case 'F':
+ 			case 'g':
+ 			case 'G': {
+ 				double p = getdouble();
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
