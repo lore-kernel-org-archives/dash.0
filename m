@@ -1,71 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [BUILTIN] Handle -- in dotcmd
-Date: Mon, 27 Oct 2014 16:57:41 +0800
-Message-ID: <20141027085741.GA6948@gondor.apana.org.au>
+From: annette26932@googlemail.com
+Subject: Fix Penguin Penalty 17th October2014 ( mail-archive.com )
+Date: Thu, 30 Oct 2014 02:51:27 +0530
+Message-ID: <54515a57.49e1440a.6e0f.fffffd78@mx.google.com>
+Reply-To: sexpert277@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: TEXT/PLAIN; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60449 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752230AbaJ0I5p (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 27 Oct 2014 04:57:45 -0400
-Content-Disposition: inline
+Received: from mail-pd0-f193.google.com ([209.85.192.193]:61999 "EHLO
+	mail-pd0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756704AbaJ2VV2 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 29 Oct 2014 17:21:28 -0400
+Received: by mail-pd0-f193.google.com with SMTP id fp1so2036107pdb.4
+        for <dash@vger.kernel.org>; Wed, 29 Oct 2014 14:21:28 -0700 (PDT)
+Received: from localhost.localdomain ([27.255.203.170])
+        by mx.google.com with ESMTPSA id ri9sm5175113pbc.5.2014.10.29.14.21.26
+        for <dash@vger.kernel.org>
+        (version=TLSv1 cipher=RC4-SHA bits=128/128);
+        Wed, 29 Oct 2014 14:21:27 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-Cc: 503840@bugs.debian.org, 503840-submitter@bugs.debian.org
 
-commit 12ad48bb31b003eb6d3106478b7760a031969a36
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Mon Oct 27 16:56:46 2014 +0800
+Dear Sir
 
-    [BUILTIN] Handle -- in dotcmd
-    
-    This patch adds a nextopt call in dotcmd in order to handle --.
-    
-    Reported-by: Stephane Chazelas <stephane_chazelas@yahoo.fr>
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Did your website get hit by Google Penguin update on October 17th 2014?=
+ What basically is Google Penguin Update? It is actually a code name fo=
+r Google algorithm which aims at decreasing your websites search engine=
+ rankings that violate Google=92s guidelines by using black hat SEO tec=
+hniques to rank your webpage by giving number of spammy links to the pa=
+ge.
+=20
+We are one of those few SEO companies that can help you avoid penalties=
+ from Google Updates like Penguin and Panda. Our clients have survived =
+all the previous and present updates with ease. They have never been hi=
+t because we use 100% white hat SEO techniques to rank Webpages.  Simpl=
+e thing that we do to keep websites away from any Penguin or Panda pena=
+lties is follow Google guidelines and we give Google users the best ans=
+wers to their queries.
 
-diff --git a/ChangeLog b/ChangeLog
-index f015066..5212a9a 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -10,6 +10,7 @@
- 	* Use error instead of warnx for fatal errors in printf.
- 	* Optimise handling of backslash octals in printf.
- 	* Simplify echo command.
-+	* Handle -- in dotcmd.
- 
- 2014-10-13  Eric Blake <eblake@redhat.com>
- 
-diff --git a/src/main.c b/src/main.c
-index 00c5e00..985e8c4 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -321,15 +321,19 @@ dotcmd(int argc, char **argv)
- {
- 	int status = 0;
- 
--	if (argc >= 2) {		/* That's what SVR2 does */
-+	nextopt(nullstr);
-+	argv = argptr;
-+
-+	if (*argv) {
- 		char *fullname;
- 
--		fullname = find_dot_file(argv[1]);
-+		fullname = find_dot_file(*argv);
- 		setinputfile(fullname, INPUT_PUSH_FILE);
- 		commandname = fullname;
- 		status = cmdloop(0);
- 		popfile();
- 	}
-+
- 	return status;
- }
+If you are looking to increase the quality of your websites and to get =
+more targeted traffic or save your websites from these Google penalties=
+ email us back with your interest.=20
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+We will be glad to serve you and help you grow your business.
+
+Regards
+
+Vince G
+
+SEO Manager ( TOB )
+B7 Green Avenue, Amritsar 143001 Punjab
+____________________________
+NO CLICK in the subject to STOP EMAILS
