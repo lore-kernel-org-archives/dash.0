@@ -1,77 +1,81 @@
-From: John Keeping <john@keeping.me.uk>
-Subject: [PATCH] [BUILTIN] Require leading '0' on octal escapes in echo
-Date: Sat,  1 Nov 2014 17:14:06 +0000
-Message-ID: <53785239c041de620223d4a7beba523e1627b65a.1414861984.git.john@keeping.me.uk>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: [PATCH] [BUILTIN] Require leading '0' on octal escapes in echo
+Date: Sat, 01 Nov 2014 18:58:47 +0100
+Message-ID: <54551F57.6090708@gigawatt.nl>
+References: <53785239c041de620223d4a7beba523e1627b65a.1414861984.git.john@keeping.me.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from jackal.aluminati.org ([72.9.247.210]:33235 "EHLO
-	jackal.aluminati.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752464AbaKARWi (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 1 Nov 2014 13:22:38 -0400
+Received: from hosting12.csv-networks.nl ([84.244.151.217]:50744 "EHLO
+	hosting12.csv-networks.nl" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1758762AbaKAR6y (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sat, 1 Nov 2014 13:58:54 -0400
+In-Reply-To: <53785239c041de620223d4a7beba523e1627b65a.1414861984.git.john@keeping.me.uk>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
-Cc: John Keeping <john@keeping.me.uk>
+To: John Keeping <john@keeping.me.uk>, dash@vger.kernel.org
 
-printf(1) supports octal escape sequences in its format argument which
-are specified as (from POSIX):
+On 11/1/2014 6:14 PM, John Keeping wrote:
+> printf(1) supports octal escape sequences in its format argument which
+> are specified as (from POSIX):
+>
+> 	"\ddd", where ddd is a one, two, or three-digit octal number
+>
+> But the argument to the "%b" format specifier allows:
+>
+> 	"\0ddd", where ddd is a zero, one, two, or three-digit octal
+> 	number
+>
+> which is similar to the wording for echo(1) (for XSI-conformant
+> systems):
+>
+> 	\0num	Write an 8-bit value that is the zero, one, two, or
+> 		three-digit octal number num.
+>
+> Because conv_escape() handles the first case, applying the second
+> behaviour in conv_escape_str() must also catch the characters '1'-'7' so
+> that they are not converted as octal numbers.
 
-	"\ddd", where ddd is a one, two, or three-digit octal number
+Your patch seems to have addressed the clear bugs of the patch in that 
+other thread. Let me attempt to summarise the status:
 
-But the argument to the "%b" format specifier allows:
+- POSIX does not specify the behaviour of \1 in echo and in printf %b.
 
-	"\0ddd", where ddd is a zero, one, two, or three-digit octal
-	number
+POSIX does not define the behaviour of escape sequences other than the 
+ones it explicitly specifies. It does not require \1 to be handled as 
+\\1. It allows it, but it allows the current dash behaviour too.
 
-which is similar to the wording for echo(1) (for XSI-conformant
-systems):
+To quote from the echo specification: "if any of the operands contain a 
+backslash ( '\' ) character, the results are implementation-defined", 
+and the bit about XSI doesn't include an exception for \1.
 
-	\0num	Write an 8-bit value that is the zero, one, two, or
-		three-digit octal number num.
+To quote from the printf %b specification: "The interpretation of a 
+backslash followed by any other sequence of characters is unspecified."
 
-Because conv_escape() handles the first case, applying the second
-behaviour in conv_escape_str() must also catch the characters '1'-'7' so
-that they are not converted as octal numbers.
+- bash treats \1 as \\1 in echo, but as \01 in printf %b.
 
-Signed-off-by: John Keeping <john@keeping.me.uk>
----
-This was reported several years ago [1] but the patch proposed in that
-case seems to have been a bit aggressive and breaks the handling of
-"%b".
+- dash treats \1 as \01 in both echo and in printf %b.
 
-[1] http://thread.gmane.org/gmane.comp.shells.dash/664
+- Your patch makes dash treat \1 as \01 in both echo and printf %b.
 
- ChangeLog          | 4 ++++
- src/bltin/printf.c | 5 +++++
- 2 files changed, 9 insertions(+)
+- The aim of the patch in the other thread was to make dash be more like 
+bash.
 
-diff --git a/ChangeLog b/ChangeLog
-index 2155764..3212995 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,7 @@
-+2014-11-01  John Keeping <john@keeping.me.uk>
-+
-+	* Require leading '0' on octal escapes in echo.
-+
- 2014-10-13  Eric Blake <eblake@redhat.com>
- 
- 	* cd: support drive letters on Cygwin.
-diff --git a/src/bltin/printf.c b/src/bltin/printf.c
-index 5f9e81c..b17e6dc 100644
---- a/src/bltin/printf.c
-+++ b/src/bltin/printf.c
-@@ -260,6 +260,11 @@ conv_escape_str(char *str)
- 				ch += k;
- 			} while (--i);
- 			continue;
-+		} else if ('1' <= ch && ch < '8') {
-+			/* Stop conv_escape handling these as octal. */
-+			ch = '\\';
-+			str--;
-+			continue;
- 		}
- 
- 		/* Finally test for sequences valid in the format string */
--- 
-2.1.0.374.g390713e
+If that is your aim too, if you want dash to behave like bash, in order 
+to achieve that the code must no longer be shared between echo and 
+printf %b. Here is a simple test you can run, where dash is without your 
+patch, and ./src/dash is with your patch:
 
+$ bash -c 'printf "%b" "\1"' | cat -v
+^A
+$ dash -c 'printf "%b" "\1"' | cat -v
+^A
+$ ./src/dash -c 'printf "%b" "\1"' | cat -v
+\1
+
+If that isn't your aim, if your aim is only to make dash meet POSIX 
+requirements, then don't worry, it already does so.
+
+Cheers,
+Harald van Dijk
