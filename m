@@ -1,37 +1,47 @@
-From: =?utf-8?B?U3TDqXBoYW5l?= Aulery <saulery@free.fr>
-Subject: Re: dash: details of redirection/duplication in manpage are reversed
-Date: Mon, 10 Nov 2014 14:49:57 +0100
-Message-ID: <20141110134957.GA5664@free.fr>
-References: <20141110111951.GA4185@free.fr>
- <20141110132409.GA8416@gondor.apana.org.au>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: dash.1 - Confusion between two pages c[h]sh
+Date: Mon, 10 Nov 2014 16:02:41 +0100
+Message-ID: <5460D391.2090603@gigawatt.nl>
+References: <20141110132742.GA8481@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252;
+	format=flowed
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp3-g21.free.fr ([212.27.42.3]:48565 "EHLO smtp3-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751523AbaKJNvc (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 10 Nov 2014 08:51:32 -0500
-Content-Disposition: inline
-In-Reply-To: <20141110132409.GA8416@gondor.apana.org.au>
+Received: from hosting12.csv-networks.nl ([84.244.151.217]:36002 "EHLO
+	hosting12.csv-networks.nl" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752723AbaKJPC6 (ORCPT
+	<rfc822;dash@vger.kernel.org>); Mon, 10 Nov 2014 10:02:58 -0500
+In-Reply-To: <20141110132742.GA8481@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org, 501566@bugs.debian.org, 501566-submitter@bugs.debian.org
+Cc: =?windows-1252?Q?St=E9phane_Aulery?= <saulery@free.fr>, dash@vger.kernel.org, 646847@bugs.debian.org, 646847-submitter@bugs.debian.org
 
-Le lundi 10 novembre 2014 =C3=A0 09:24:09, Herbert Xu a =C3=A9crit :
-> St=C3=A9phane Aulery <saulery@free.fr> wrote:
-> >=20
-> > [1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D501566
-> >=20
->=20
-> I'm sorry but this patch looks wrong and the text looks correct
-> to me as is.
+On 11/10/2014 2:27 PM, Herbert Xu wrote:
+> St=E9phane Aulery <saulery@free.fr> wrote:
+>> [-- text/plain, encoding 8bit, charset: utf-8, 12 lines --]
+>>
+>> Hello,
+>>
+>> Here is a small patch reported by a user of Debian [1]. Could you pl=
+ease
+>> integrate? Thank you for your help.
+>>
+>> [1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D646847
+>
+> This patch also appears bogus as csh is an alternative to dash.
 
-Ok. I passed the information but I'm not really able to judge its
-pertinence. In this case I close this bug.
+Even if csh is intentionally in the "See also" section despite not bein=
+g=20
+referenced anywhere else, is it also intentional that chsh is not in=20
+that section despite the earlier reference? Would a patch that leaves=20
+csh but also adds chsh be more appropriate, or do you prefer to leave i=
+t=20
+as it is now?
 
-Thank you for your help.
+Cheers,
+Harald van Dijk
 
---=20
-St=C3=A9phane Aulery
+> Cheers,
+
