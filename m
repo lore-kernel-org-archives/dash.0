@@ -1,53 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: (none)
-Date: Mon, 10 Nov 2014 21:31:07 +0800
-Message-ID: <20141110133107.GA8515@gondor.apana.org.au>
+From: =?utf-8?B?U3TDqXBoYW5l?= Aulery <saulery@free.fr>
+Subject: Redirection: interval file descriptor (0-9)
+Date: Mon, 10 Nov 2014 14:33:19 +0100
+Message-ID: <20141110133319.GA5382@free.fr>
 References: <20141110121200.GA4725@free.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: multipart/mixed; boundary="EeQfGwPcQSOJBaQU"
+Content-Transfer-Encoding: 8bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48303 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751228AbaKJNbL (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 10 Nov 2014 08:31:11 -0500
+Received: from smtp3-g21.free.fr ([212.27.42.3]:7131 "EHLO smtp3-g21.free.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751523AbaKJNe4 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 10 Nov 2014 08:34:56 -0500
 Content-Disposition: inline
 In-Reply-To: <20141110121200.GA4725@free.fr>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: =?iso-8859-1?Q?St=E9phane?= Aulery <saulery@free.fr>
-Cc: dash@vger.kernel.org, 646847@bugs.debian.org
+To: dash@vger.kernel.org
+Cc: control@bugs.debian.org
 
-St=E9phane Aulery <saulery@free.fr> wrote:
-> [-- text/plain, encoding 8bit, charset: utf-8, 19 lines --]
->=20
-> Subject Redirection: interval file descriptor (0-9)
-> Reply-To:=20
->=20
-> forwarded 646847 dash@vger.kernel.org
-> stop
-> -------------------------------------------------------
->=20
-> Hello,
->=20
-> Here is a small patch reported by a user of Debian [1]. Could you ple=
-ase
-> integrate? Thank you for your help.
->=20
-> [1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D646847
 
-Please resubmit the patch with a valid Subject.
+--EeQfGwPcQSOJBaQU
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Dash now has a patchwork project at
+Hello,
 
-	https://patchwork.kernel.org/project/dash/list/
+Here is a small patch reported by a user of Debian [1]. Could you please
+integrate? Thank you for your help.
 
-if anyone is interested.
+[1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=646847
 
-=46WIW patchwork does not like empty Subjects.
+Regards,
 
-Thanks,
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-- 
+Stéphane Aulery
+
+--EeQfGwPcQSOJBaQU
+Content-Type: text/x-diff; charset=utf-8
+Content-Disposition: attachment; filename="dash.1.fix-redirection-file-descriptor.diff"
+
+--- dash.1.old	2014-11-10 12:30:45.305874210 +0100
++++ dash.1.new	2014-11-10 13:08:26.996931055 +0100
+@@ -385,7 +385,7 @@
+ Following is a list of the possible redirections.
+ The
+ .Bq n
+-is an optional number, as in
++is an optional number between 0 and 9, as in
+ .Sq 3
+ (not
+ .Sq Bq 3 ) ,
+
+--EeQfGwPcQSOJBaQU--
