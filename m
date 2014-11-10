@@ -1,55 +1,37 @@
 From: =?utf-8?B?U3TDqXBoYW5l?= Aulery <saulery@free.fr>
-Subject: Redirection: interval file descriptor (0-9)
-Date: Mon, 10 Nov 2014 14:33:19 +0100
-Message-ID: <20141110133319.GA5382@free.fr>
-References: <20141110121200.GA4725@free.fr>
+Subject: Re: dash.1 - Confusion between two pages c[h]sh
+Date: Mon, 10 Nov 2014 14:45:54 +0100
+Message-ID: <20141110134554.GA5549@free.fr>
+References: <20141110113500.GA4401@free.fr>
+ <20141110132742.GA8481@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="EeQfGwPcQSOJBaQU"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp3-g21.free.fr ([212.27.42.3]:7131 "EHLO smtp3-g21.free.fr"
+Received: from smtp3-g21.free.fr ([212.27.42.3]:38746 "EHLO smtp3-g21.free.fr"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751523AbaKJNe4 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 10 Nov 2014 08:34:56 -0500
+	id S1753068AbaKJNrc (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 10 Nov 2014 08:47:32 -0500
 Content-Disposition: inline
-In-Reply-To: <20141110121200.GA4725@free.fr>
+In-Reply-To: <20141110132742.GA8481@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
-Cc: control@bugs.debian.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org, 646847@bugs.debian.org, 646847-submitter@bugs.debian.org
 
+Le lundi 10 novembre 2014 =C3=A0 09:27:42, Herbert Xu a =C3=A9crit :
+> St=C3=A9phane Aulery <saulery@free.fr> wrote:
+> >=20
+> > [1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D646847
+>=20
+> This patch also appears bogus as csh is an alternative to dash.
 
---EeQfGwPcQSOJBaQU
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+That's what I say too. Then I told myself that it was more interesting
+than csh or ksh information. Otherwise it would add sh, bash ...
 
-Hello,
+As you want, at least I know if I close this bug has waited too long.
 
-Here is a small patch reported by a user of Debian [1]. Could you please
-integrate? Thank you for your help.
+Thanks for yours help.
 
-[1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=646847
-
-Regards,
-
--- 
-Stéphane Aulery
-
---EeQfGwPcQSOJBaQU
-Content-Type: text/x-diff; charset=utf-8
-Content-Disposition: attachment; filename="dash.1.fix-redirection-file-descriptor.diff"
-
---- dash.1.old	2014-11-10 12:30:45.305874210 +0100
-+++ dash.1.new	2014-11-10 13:08:26.996931055 +0100
-@@ -385,7 +385,7 @@
- Following is a list of the possible redirections.
- The
- .Bq n
--is an optional number, as in
-+is an optional number between 0 and 9, as in
- .Sq 3
- (not
- .Sq Bq 3 ) ,
-
---EeQfGwPcQSOJBaQU--
+--=20
+St=C3=A9phane Aulery
