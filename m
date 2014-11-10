@@ -1,47 +1,73 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: dash.1 - Confusion between two pages c[h]sh
-Date: Mon, 10 Nov 2014 16:02:41 +0100
-Message-ID: <5460D391.2090603@gigawatt.nl>
-References: <20141110132742.GA8481@gondor.apana.org.au>
+From: Stephane Chazelas <stephane.chazelas@gmail.com>
+Subject: Re: % in $PATH
+Date: Mon, 10 Nov 2014 21:30:48 +0000
+Message-ID: <20141110213048.GA3938@chaz.gmail.com>
+References: <20141105115946.GA4029@chaz.gmail.com>
+ <20141110132002.GA8372@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from hosting12.csv-networks.nl ([84.244.151.217]:36002 "EHLO
-	hosting12.csv-networks.nl" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752723AbaKJPC6 (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 10 Nov 2014 10:02:58 -0500
-In-Reply-To: <20141110132742.GA8481@gondor.apana.org.au>
+Received: from plane.gmane.org ([80.91.229.3]:59300 "EHLO plane.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751218AbaKJVfR (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 10 Nov 2014 16:35:17 -0500
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1XnwcF-0004sE-GF
+	for dash@vger.kernel.org; Mon, 10 Nov 2014 22:35:15 +0100
+Received: from 5ec33b79.skybroadband.com ([94.195.59.121])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Mon, 10 Nov 2014 22:35:15 +0100
+Received: from stephane.chazelas by 5ec33b79.skybroadband.com with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Mon, 10 Nov 2014 22:35:15 +0100
+Content-Disposition: inline
+In-Reply-To: <20141110132002.GA8372@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: =?windows-1252?Q?St=E9phane_Aulery?= <saulery@free.fr>, dash@vger.kernel.org, 646847@bugs.debian.org, 646847-submitter@bugs.debian.org
+To: dash@vger.kernel.org
 
-On 11/10/2014 2:27 PM, Herbert Xu wrote:
-> St=E9phane Aulery <saulery@free.fr> wrote:
->> [-- text/plain, encoding 8bit, charset: utf-8, 12 lines --]
->>
->> Hello,
->>
->> Here is a small patch reported by a user of Debian [1]. Could you pl=
-ease
->> integrate? Thank you for your help.
->>
->> [1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D646847
->
-> This patch also appears bogus as csh is an alternative to dash.
+2014-11-10 21:20:02 +0800, Herbert Xu:
+> On Wed, Nov 05, 2014 at 11:59:47AM +0000, Stephane Chazelas wrote:
+> > Hello,
+> > 
+> > ash/dash have a nice feature that allows to have:
+> > 
+> > PATH=/bin:%builtin:/usr/bin:/some/dir%func:/sbin
+> > 
+> > To have commands in /bin take precedence over builtins and
+> > files in /some/dir being looked up for autoloaded functions (a
+> > bit like FPATH in ksh/zsh).
+> > 
+> > That's nice but the way it is implemented, that means that %
+> > characters in $PATH cause problems. See for instance:
+> > 
+> > http://unix.stackexchange.com/questions/126955/percent-in-path-environment-variable
+> 
+> I'm inclined to just kill this feature, or at least make it a
+> configuration option that's disabled by default.
+[...]
 
-Even if csh is intentionally in the "See also" section despite not bein=
-g=20
-referenced anywhere else, is it also intentional that chsh is not in=20
-that section despite the earlier reference? Would a patch that leaves=20
-csh but also adds chsh be more appropriate, or do you prefer to leave i=
-t=20
-as it is now?
+Though I'd agree there's little chance of many people using it as
+the documentation about it has been removed in dash, I don't
+think there's any harm in leaving it in but implemented the way
+I suggest.
 
-Cheers,
-Harald van Dijk
+It's useful as an equivalent to bash's exported functions (and
+is a better/safer approach IMO) as an instrumentation tool.
 
-> Cheers,
+Example: redefine "echo" as a Unix conformant one before running
+something that expects a Unix conformant "echo":
+
+$ printf '%s\n' 'echo() { local IFS=" "; printf "%b\n" "$*"; }' > echo
+$ PATH=$PWD%func:%builtins:$PATH dash -c 'echo "-n\c"; echo x'
+-nx
+
+I don't see the point in keeping it if it's to make it disabled
+by default though (unless we add an equivalent of BASHOPTS which
+can be used to turn it on via the environment)
+
+-- 
+Stephane
 
