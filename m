@@ -1,59 +1,60 @@
-From: Stephen Shirley <diamond@nonado.net>
+From: Stephane Chazelas <stephane.chazelas@gmail.com>
 Subject: Re: Bug#501566: dash: details of redirection/duplication in manpage
  are reversed
-Date: Tue, 11 Nov 2014 14:23:21 +0100
-Message-ID: <CAEuPzf47pS0u+uY9-RUjOgGOuuGb6o9htY5Quu-B6dMuOVWA3Q@mail.gmail.com>
-References: <20141110111951.GA4185@free.fr> <20141110132409.GA8416@gondor.apana.org.au>
+Date: Tue, 11 Nov 2014 14:19:11 +0000
+Message-ID: <20141111141911.GC4343@chaz.gmail.com>
+References: <20141110111951.GA4185@free.fr>
+ <20141110132409.GA8416@gondor.apana.org.au>
  <20141110134957.GA5664@free.fr>
+ <CAEuPzf47pS0u+uY9-RUjOgGOuuGb6o9htY5Quu-B6dMuOVWA3Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-ig0-f172.google.com ([209.85.213.172]:36226 "EHLO
-	mail-ig0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751413AbaKKNXm convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Tue, 11 Nov 2014 08:23:42 -0500
-Received: by mail-ig0-f172.google.com with SMTP id a13so929373igq.17
-        for <dash@vger.kernel.org>; Tue, 11 Nov 2014 05:23:41 -0800 (PST)
-In-Reply-To: <20141110134957.GA5664@free.fr>
+Received: from plane.gmane.org ([80.91.229.3]:52377 "EHLO plane.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752498AbaKKOUS (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 11 Nov 2014 09:20:18 -0500
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1XoCIp-0008AN-No
+	for dash@vger.kernel.org; Tue, 11 Nov 2014 15:20:15 +0100
+Received: from 5ec33b79.skybroadband.com ([94.195.59.121])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Tue, 11 Nov 2014 15:20:15 +0100
+Received: from stephane.chazelas by 5ec33b79.skybroadband.com with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Tue, 11 Nov 2014 15:20:15 +0100
+Content-Disposition: inline
+In-Reply-To: <CAEuPzf47pS0u+uY9-RUjOgGOuuGb6o9htY5Quu-B6dMuOVWA3Q@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: =?UTF-8?Q?St=C3=A9phane_Aulery?= <saulery@free.fr>, 501566-quiet@bugs.debian.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org, 501566@bugs.debian.org, 501566-submitter@bugs.debian.org
+To: dash@vger.kernel.org
 
-Hi,
+2014-11-11 14:23:21 +0100, Stephen Shirley:
+[...]
+> "[n1]>&n2    Redirect standard output (or n1) to n2."
+> 
+> It doesn't cover the case where n2 is later changed, and how n1 does
+> not follow this, but it's the simplest fix i see.
+[...]
 
-On 10 November 2014 14:49, St=C3=A9phane Aulery <saulery@free.fr> wrote=
-:
-> Le lundi 10 novembre 2014 =C3=A0 09:24:09, Herbert Xu a =C3=A9crit :
->> St=C3=A9phane Aulery <saulery@free.fr> wrote:
->> >
->> > [1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D501566
->> >
->>
->> I'm sorry but this patch looks wrong and the text looks correct
->> to me as is.
->
-> Ok. I passed the information but I'm not really able to judge its
-> pertinence. In this case I close this bug.
+That's ambiguous.
 
-So, i finally managed to figure out what the problem is. The wording
-is ambiguous (or maybe just insufficiently clear).
+Maybe:
 
-"[n1]>&n2    Duplicate standard output (or n1) to n2."
+[n1]>&n2    Redirect standard output (or fd n1) to the same "open
+            file description" as on fd n2.
 
-How i read it (6 years ago :P) was that meant dup2(n1, n2), because
-the only actual /duplication/ is of file descriptors. I've just
-realised that the intended meaning is "redirect n1 to where n2 is
-currently", i.e. dup2(n2, n1), as expected. Can i suggest a simple
-fix:
+[n1]>&n2    Redirect standard output (or fd n1) to the same
+            resource as open on fd n2.
 
-"[n1]>&n2    Redirect standard output (or n1) to n2."
+[n1]>&n2    Copy fd n2 as stdout (or fd n1)
 
-It doesn't cover the case where n2 is later changed, and how n1 does
-not follow this, but it's the simplest fix i see.
+?
 
-Steve
---=20
-"You are technically correct, the best kind of correct."
-- Bureaucrat 1.0, Futurama
+-- 
+Stephane
+
+
+
