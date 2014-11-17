@@ -1,36 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Redirection: interval file descriptor (0-9)
-Date: Mon, 17 Nov 2014 13:11:04 +0800
-Message-ID: <20141117051104.GA30918@gondor.apana.org.au>
-References: <20141110133319.GA5382@free.fr>
+From: =?utf-8?B?U3TDqXBoYW5l?= Aulery <saulery@free.fr>
+Subject: Re: 'man dash' typo: "the shell .... proceed onto"
+Date: Mon, 17 Nov 2014 10:33:10 +0100
+Message-ID: <20141117093310.GA1889@free.fr>
+References: <20141110112045.GB4185@free.fr>
+ <20141117051009.GA30888@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:53992 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752625AbaKQFLH (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 17 Nov 2014 00:11:07 -0500
+Received: from smtp3-g21.free.fr ([212.27.42.3]:15170 "EHLO smtp3-g21.free.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751636AbaKQJfI (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 17 Nov 2014 04:35:08 -0500
 Content-Disposition: inline
-In-Reply-To: <20141110133319.GA5382@free.fr>
+In-Reply-To: <20141117051009.GA30888@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: =?iso-8859-1?Q?St=E9phane?= Aulery <saulery@free.fr>
-Cc: dash@vger.kernel.org, 646847@bugs.debian.org, 646847-submitter@bugs.debian.org
+To: 576503@bugs.debian.org
+Cc: dash@vger.kernel.org
 
-St=E9phane Aulery <saulery@free.fr> wrote:
-> [-- text/plain, encoding 8bit, charset: utf-8, 12 lines --]
+Le lundi 17 novembre 2014 =C3=A0 01:10:09, Herbert Xu a =C3=A9crit :
+> St=C3=A9phane Aulery <saulery@free.fr> wrote:
+> >=20
+> > Here is a small patch reported by a user of Debian [1]. Could you p=
+lease
+> > integrate? Thank you for your help.
+> >=20
+> Patch applied.  However, I had to manually apply it because you did
+> not generate the patch from the top of the source tree with -p1.
 >=20
-> Hello,
->=20
-> Here is a small patch reported by a user of Debian [1]. Could you ple=
-ase
-> integrate? Thank you for your help.
->=20
-> [1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D646847
+> Please ensure future submissions are generated correctly.
 
-Applied.
+Sorry. I did the first by hand with:
+
+$diff -u
+
+for others:
+
+$git-format patch -k -s -1
+
 --=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+St=C3=A9phane Aulery
