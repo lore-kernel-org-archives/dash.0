@@ -1,54 +1,51 @@
-From: =?iso-8859-1?Q?St=E9phane?= CHAZELAS <stephane.chazelas@gmail.com>
-Subject: Re: Bug#501566: dash: details of redirection/duplication in manpage
- are reversed
-Date: Wed, 19 Nov 2014 00:00:08 +0000
-Message-ID: <20141119000008.GC3963@chaz.gmail.com>
-References: <20141110111951.GA4185@free.fr>
- <20141110132409.GA8416@gondor.apana.org.au>
- <20141110134957.GA5664@free.fr>
- <CAEuPzf47pS0u+uY9-RUjOgGOuuGb6o9htY5Quu-B6dMuOVWA3Q@mail.gmail.com>
- <20141118232718.GA9223@free.fr>
- <20141118234603.GA9586@free.fr>
+From: saulery@free.fr
+Subject: [MAN] Clarify two redirection mechanisms
+Date: Fri, 21 Nov 2014 12:52:34 +0100
+Message-ID: <1416570754-9998-1-git-send-email-saulery@free.fr>
+References: <20141112021204.GA23275@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:37070 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932865AbaKSAAL (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 18 Nov 2014 19:00:11 -0500
-Received: by mail-wi0-f182.google.com with SMTP id h11so63329wiw.15
-        for <dash@vger.kernel.org>; Tue, 18 Nov 2014 16:00:10 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <20141118234603.GA9586@free.fr>
+Received: from smtp3-g21.free.fr ([212.27.42.3]:29539 "EHLO smtp3-g21.free.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753877AbaKULym (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 21 Nov 2014 06:54:42 -0500
+In-Reply-To: <20141112021204.GA23275@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: =?iso-8859-1?Q?St=E9phane?= Aulery <saulery@free.fr>
-Cc: Stephen Shirley <diamond@nonado.net>, Herbert Xu <herbert@gondor.apana.org.au>, 501566@bugs.debian.org, dash@vger.kernel.org
+To: dash@vger.kernel.org
+Cc: saulery@free.fr
 
-2014-11-19 00:46:03 +0100, St=E9phane Aulery:
-> Hello Stephen and Herbert,
->=20
-> St=E9phane Chazelas just made a complete proposal:
->=20
->=20
-> 1) [n1]<&n2    Redirect standard input (or fd n1) from the same
->                resource as open on fd n2.
->=20
-> 2b) [n1]>&n2   Redirect standard output (or fd n1) to
->                the same resource as open on fd n2.
->=20
->=20
-> What do you think about?
-[...]
+=46rom: St=C3=A9phane Aulery <saulery@free.fr>
 
-A final touch (add "currently").
+Close Debian Bug #501566
+---
+ src/dash.1 | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
- [n1]<&n2    Redirect standard input (or fd n1) from the same
-             resource as currently open on fd n2.
-=20
- [n1]>&n2   Redirect standard output (or fd n1) to
-            the same resource as currently open on fd n2.
-
+diff --git a/src/dash.1 b/src/dash.1
+index d782882..429657a 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -402,11 +402,13 @@ Append standard output (or n) to file.
+ .It [n] Ns \*[Lt] file
+ Redirect standard input (or n) from file.
+ .It [n1] Ns \*[Lt]& Ns n2
+-Duplicate standard input (or n1) from file descriptor n2.
++Redirect standard input (or fd n1) from the same resource as currently=
+ open on
++fd n2.
+ .It [n] Ns \*[Lt]&-
+ Close standard input (or n).
+ .It [n1] Ns \*[Gt]& Ns n2
+-Duplicate standard output (or n1) to n2.
++Redirect standard output (or fd n1) to the same resource as currently =
+open on
++fd n2.
+ .It [n] Ns \*[Gt]&-
+ Close standard output (or n).
+ .It [n] Ns \*[Lt]\*[Gt] file
 --=20
-Stephane
+2.1.3
+
