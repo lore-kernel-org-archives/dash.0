@@ -1,49 +1,41 @@
-From: saulery@free.fr
-Subject: [MAN] Clarify two redirection mechanisms
-Date: Thu, 11 Dec 2014 10:03:06 +0100
-Message-ID: <1418288586-1587-1-git-send-email-saulery@free.fr>
-References: <20141209165431.GB5708@chaz.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: <kabe@sra-tohoku.co.jp>
+Subject: [PATCH] create builtins.c properly on old cpp
+Date: Mon, 22 Dec 2014 14:50:23 +0900
+Message-ID: <2410222201414.mjQV5WR4491251$@sra-tohoku.co.jp.msg>
+Content-Type: text/plain
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp1-g21.free.fr ([212.27.42.1]:28724 "EHLO smtp1-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932531AbaLKJGR (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 11 Dec 2014 04:06:17 -0500
-In-Reply-To: <20141209165431.GB5708@chaz.gmail.com>
+Received: from vega.sra-tohoku.jp ([58.12.125.173]:58631 "EHLO
+	vega.sra-tohoku.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751024AbaLVGGE (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 22 Dec 2014 01:06:04 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Cc: dash@vger.kernel.org, =?UTF-8?q?St=C3=A9phane=20Aulery?= <saulery@free.fr>
+To: dash@vger.kernel.org
+Cc: kabe@sra-tohoku.co.jp
 
-=46rom: St=C3=A9phane Aulery <saulery@free.fr>
+Encontered this on ancient gcc-2.95.3 environment;
+src/builtins.def.in -> src/builtins.def generation emitted
+^ $
+lines (likely by /* */), which where NOT ignored by 
+src/mkbuiltins and generating bogus builtins.c.
 
-Close Debian Bug #501566
----
- src/dash.1 | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/src/dash.1 b/src/dash.1
-index d782882..429657a 100644
---- a/src/dash.1
-+++ b/src/dash.1
-@@ -402,11 +402,13 @@ Append standard output (or n) to file.
- .It [n] Ns \*[Lt] file
- Redirect standard input (or n) from file.
- .It [n1] Ns \*[Lt]& Ns n2
--Duplicate standard input (or n1) from file descriptor n2.
-+Copy file descriptor n2 as stdout (or fd n1).
-+fd n2.
- .It [n] Ns \*[Lt]&-
- Close standard input (or n).
- .It [n1] Ns \*[Gt]& Ns n2
--Duplicate standard output (or n1) to n2.
-+Copy file descriptor n2 as stdin (or fd n1).
-+fd n2.
- .It [n] Ns \*[Gt]&-
- Close standard output (or n).
- .It [n] Ns \*[Lt]\*[Gt] file
---=20
-2.1.3
-
+-- kabe
+
+diff -U6 -p dash-0.5.8/src/mkbuiltins.dist dash-0.5.8/src/mkbuiltins
+--- dash-0.5.8/src/mkbuiltins.dist	Sun Sep 28 17:19:32 2014
++++ dash-0.5.8/src/mkbuiltins	Mon Dec 22 14:36:43 2014
+@@ -66,13 +66,13 @@ cat <<\!
+  */
+ 
+ #include "shell.h"
+ #include "builtins.h"
+ 
+ !
+-< $builtins sed '/^#/d; /^$/d' > $temp
++< $builtins sed '/^#/d; /^ *$/d' > $temp
+ awk '{	printf "int %s(int, char **);\n", $1}' $temp
+ echo '
+ const struct builtincmd builtincmd[] = {'
+ awk '{	for (i = 2 ; i <= NF ; i++) {
+ 		line = $i "\t" $1
+ 		if ($i ~ /^-/)
