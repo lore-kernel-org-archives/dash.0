@@ -1,90 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [EXPAND] Fixed "$@" expansion when EXP_FULL is false
-Date: Thu, 1 Jan 2015 07:56:05 +1100
-Message-ID: <20141231205605.GA32563@gondor.apana.org.au>
-References: <20141231180330.GA32534@jue.netz>
+Subject: [0/4] input: Allow two consecutive calls to pungetc
+Date: Mon, 5 Jan 2015 23:00:30 +1100
+Message-ID: <20150105120030.GA6101@gondor.apana.org.au>
+References: <1554581409055304@web13g.yandex.ru>
+ <53FC7EE2.7000309@redhat.com>
+ <20140929145507.GA3670@gondor.apana.org.au>
+ <20141029215230.GA48394@stack.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:55121 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:56177 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751296AbaLaU4J (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 31 Dec 2014 15:56:09 -0500
+	with ESMTP id S1753349AbbAEMAt (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 5 Jan 2015 07:00:49 -0500
 Content-Disposition: inline
-In-Reply-To: <20141231180330.GA32534@jue.netz>
+In-Reply-To: <20141029215230.GA48394@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Juergen Daubert <jue@jue.li>
-Cc: dash@vger.kernel.org
+To: Jilles Tjoelker <jilles@stack.nl>
+Cc: Eric Blake <eblake@redhat.com>, Oleg Bulatov <oleg@bulatov.me>, dash@vger.kernel.org, Juergen Daubert <jue@jue.li>
 
-On Wed, Dec 31, 2014 at 07:03:30PM +0100, Juergen Daubert wrote:
-> Hi,
-> 
-> today I tried to use dash from git as /bin/sh and run in a lot of
-> problem I don't see with stable version 0.5.8. 
-> After some investigations I narrowed it down to commit 
-> 
-> 3c06acdac0b1ba0e0acdda513a57ee6e31385dce 
-> [EXPAND] Split unquoted $@/$* correctly when IFS is set but empty
-> 
-> and related following to expand.c
-> 
-> 
-> It seems that the changes to dash triggers, among others, some problem 
-> with libtool.
-> 
-> As examples I've attached build logs for libpixman and kbd, there are a
-> lot other builds that failed as well. If you need more, please let me 
-> know.
+On Wed, Oct 29, 2014 at 10:52:30PM +0100, Jilles Tjoelker wrote:
+>
+> This implementation of pgetc_eatbnl() does not allow pushing back a
+> backslash, since that would call pungetc() twice without an intervening
+> pgetc(). However, some places do attempt to push back a backslash. As a
+> result, a script file containing many repeated  ${w#\#}  will not be
+> parsed correctly. There is a similar bug with repeated  $\#  but this is
+> not specified by POSIX.
 
-Thanks for the report.  This patch should fix the problem.
+I finally got around to fixing this.  I've decided to do things
+a little differently by making it possible to do two pungetc's in
+a row.
 
--- >8 --
-The commit 3c06acdac0b1ba0e0acdda513a57ee6e31385dce ([EXPAND]
-Split unquoted $@/$* correctly when IFS is set but empty) broke
-the case where $@ is in quotes and EXP_FULL is false.
-    
-In that case we should still emit IFS as field splitting is not
-performed.
-    
-Reported-by: Juergen Daubert <jue@jue.li>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+When I get some spare time I would like to make the parser reentrant
+so we can do PS4 properly and fix some other corner cases.
 
-diff --git a/src/expand.c b/src/expand.c
-index dfb3f0e..b2d710d 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -901,6 +901,7 @@ varvalue(char *name, int varflags, int flags, int *quotedp)
- 	int quotes = (discard ? 0 : (flags & QUOTES_ESC)) | QUOTES_KEEPNUL;
- 	ssize_t len = 0;
- 
-+	sep = (flags & EXP_FULL) << CHAR_BIT;
- 	syntax = quoted ? DQSYNTAX : BASESYNTAX;
- 
- 	switch (*name) {
-@@ -931,16 +932,14 @@ numvar:
- 		expdest = p;
- 		break;
- 	case '@':
--		sep = 0;
--		if (quoted)
-+		if (quoted && sep)
- 			goto param;
- 		/* fall through */
- 	case '*':
--		sep = ifsset() ? ifsval()[0] : ' ';
--		if (!quoted) {
-+		if (quoted)
-+			sep = 0;
-+		sep |= ifsset() ? ifsval()[0] : ' ';
- param:
--			sep |= (flags & EXP_FULL) << CHAR_BIT;
--		}
- 		sepc = sep;
- 		*quotedp = !sepc;
- 		if (!(ap = shellparam.p))
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
