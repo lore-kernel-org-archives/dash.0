@@ -1,160 +1,90 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/4] input: Allow two consecutive calls to pungetc
-Date: Mon, 05 Jan 2015 23:01:56 +1100
-Message-ID: <E1Y86M8-0001nI-D5@gondolin.me.apana.org.au>
-References: <20150105120030.GA6101@gondor.apana.org.au>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: [PATCH] Fix variable assignments in function invocations
+Date: Fri, 09 Jan 2015 18:17:42 +0100
+Message-ID: <54B00D36.7070707@gigawatt.nl>
+Mime-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="------------090506020800010008010100"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:35813 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753370AbbAEMCL (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 5 Jan 2015 07:02:11 -0500
+Received: from hosting12.csv-networks.nl ([84.244.151.217]:48294 "EHLO
+	hosting12.csv-networks.nl" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752002AbbAIRRq (ORCPT
+	<rfc822;dash@vger.kernel.org>); Fri, 9 Jan 2015 12:17:46 -0500
+Received: from home.gigawatt.nl ([83.163.3.213] helo=[192.168.178.26])
+	by hosting12.csv-networks.nl with esmtpsa (TLSv1:DHE-RSA-AES128-SHA:128)
+	(Exim 4.80)
+	(envelope-from <harald@gigawatt.nl>)
+	id 1Y9dBs-0005lv-Bp
+	for dash@vger.kernel.org; Fri, 09 Jan 2015 18:17:40 +0100
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>, Eric Blake <eblake@redhat.com>, Oleg Bulatov <oleg@bulatov.me>, dash@vger.kernel.org, Juergen Daubert <jue@jue.li>
+To: dash <dash@vger.kernel.org>
 
-The commit ef91d3d6a4c39421fd3a391e02cd82f9f3aee4a8 ([PARSER]
-Handle backslash newlines properly after dollar sign) created
-cases where we make two consecutive calls to pungetc.  As we
-don't explicitly support that there are corner cases where you
-end up with garbage input leading to undefined behaviour.
+This is a multi-part message in MIME format.
+--------------090506020800010008010100
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This patch adds explicit support for two consecutive calls to
-pungetc.
+Hello all,
 
-Reported-by: Jilles Tjoelker <jilles@stack.nl>
-Reported-by: Juergen Daubert <jue@jue.li>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+A long-standing problem with dash has been how it deals with variable 
+assignments in function invocations, and several packages are affected 
+by it, two I've come across recently being autogen and pkg-config (only 
+their test suites, luckily).
 
- src/input.c |   30 ++++++++++++++++++++++--------
- src/input.h |   12 ++++++++++++
- 2 files changed, 34 insertions(+), 8 deletions(-)
+A short test script:
 
-diff --git a/src/input.c b/src/input.c
-index 6223a73..06c08d4 100644
---- a/src/input.c
-+++ b/src/input.c
-@@ -102,10 +102,20 @@ RESET {
- int
- pgetc(void)
- {
-+	int c;
-+
-+	if (parsefile->unget)
-+		return parsefile->lastc[--parsefile->unget];
-+
- 	if (--parsefile->nleft >= 0)
--		return (signed char)*parsefile->nextc++;
-+		c = (signed char)*parsefile->nextc++;
- 	else
--		return preadbuffer();
-+		c = preadbuffer();
-+
-+	parsefile->lastc[1] = parsefile->lastc[0];
-+	parsefile->lastc[0] = c;
-+
-+	return c;
- }
- 
- 
-@@ -194,7 +204,7 @@ static int preadbuffer(void)
- #endif
- 	char savec;
- 
--	while (unlikely(parsefile->strpush)) {
-+	if (unlikely(parsefile->strpush)) {
- 		if (
- 			parsefile->nleft == -1 &&
- 			parsefile->strpush->ap &&
-@@ -204,8 +214,7 @@ static int preadbuffer(void)
- 			return PEOA;
- 		}
- 		popstring();
--		if (--parsefile->nleft >= 0)
--			return (signed char)*parsefile->nextc++;
-+		return pgetc();
- 	}
- 	if (unlikely(parsefile->nleft == EOF_NLEFT ||
- 		     parsefile->buf == NULL))
-@@ -290,15 +299,14 @@ again:
- }
- 
- /*
-- * Undo the last call to pgetc.  Only one character may be pushed back.
-+ * Undo a call to pgetc.  Only two characters may be pushed back.
-  * PEOF may be pushed back.
-  */
- 
- void
- pungetc(void)
- {
--	parsefile->nleft++;
--	parsefile->nextc--;
-+	parsefile->unget++;
- }
- 
- /*
-@@ -322,6 +330,8 @@ pushstring(char *s, void *ap)
- 		sp = parsefile->strpush = &(parsefile->basestrpush);
- 	sp->prevstring = parsefile->nextc;
- 	sp->prevnleft = parsefile->nleft;
-+	sp->unget = parsefile->unget;
-+	memcpy(sp->lastc, parsefile->lastc, sizeof(sp->lastc));
- 	sp->ap = (struct alias *)ap;
- 	if (ap) {
- 		((struct alias *)ap)->flag |= ALIASINUSE;
-@@ -329,6 +339,7 @@ pushstring(char *s, void *ap)
- 	}
- 	parsefile->nextc = s;
- 	parsefile->nleft = len;
-+	parsefile->unget = 0;
- 	INTON;
- }
- 
-@@ -353,6 +364,8 @@ popstring(void)
- 	}
- 	parsefile->nextc = sp->prevstring;
- 	parsefile->nleft = sp->prevnleft;
-+	parsefile->unget = sp->unget;
-+	memcpy(parsefile->lastc, sp->lastc, sizeof(sp->lastc));
- /*dprintf("*** calling popstring: restoring to '%s'\n", parsenextc);*/
- 	parsefile->strpush = sp->prev;
- 	if (sp != &(parsefile->basestrpush))
-@@ -439,6 +452,7 @@ pushfile(void)
- 	pf->fd = -1;
- 	pf->strpush = NULL;
- 	pf->basestrpush.prev = NULL;
-+	pf->unget = 0;
- 	parsefile = pf;
- }
- 
-diff --git a/src/input.h b/src/input.h
-index ad8b463..ec97c1d 100644
---- a/src/input.h
-+++ b/src/input.h
-@@ -49,6 +49,12 @@ struct strpush {
- 	int prevnleft;
- 	struct alias *ap;	/* if push was associated with an alias */
- 	char *string;		/* remember the string since it may change */
-+
-+	/* Remember last two characters for pungetc. */
-+	int lastc[2];
-+
-+	/* Number of outstanding calls to pungetc. */
-+	int unget;
- };
- 
- /*
-@@ -66,6 +72,12 @@ struct parsefile {
- 	char *buf;		/* input buffer */
- 	struct strpush *strpush; /* for pushing strings at this level */
- 	struct strpush basestrpush; /* so pushing one is fast */
-+
-+	/* Remember last two characters for pungetc. */
-+	int lastc[2];
-+
-+	/* Number of outstanding calls to pungetc. */
-+	int unget;
- };
- 
- extern struct parsefile *parsefile;
+   f() {
+     echo inside f, VAR is $VAR
+     sh -c 'echo inside sh called from f, VAR is $VAR'
+   }
+
+   VAR=value f
+   echo after returning from f, VAR is $VAR
+
+Assuming VAR was not already set, this should print (and does with bash):
+
+   inside f, VAR is value
+   inside sh called from f, VAR is value
+   after returning from f, VAR is
+
+With dash, this actually prints:
+
+   inside f, VAR is value
+   inside sh called from f, VAR is
+   after returning from f, VAR is value
+
+The first problem with that is that VAR does not get exported, the 
+second is that VAR's assigned value is kept after the function has returned.
+
+Quoting SUSv4 Shell Command Language 2.9.1 Simple Commands:
+
+   If no command name results, variable assignments shall affect the
+   current execution environment. Otherwise, the variable assignments
+   shall be exported for the execution environment of the command and
+   shall not affect the current execution environment (except for
+   special built-ins).
+
+In `VAR=value f`, f is found as the command name. No exception is made 
+for function invocations, so I believe this disallows dash's current 
+behaviour, and requires it to print the same thing bash does.
+
+Fixing this seems trivial, see the attachment, and the test suites of 
+both autogen and pkg-config pass with this change. Does this look correct?
+
+Cheers,
+Harald van Dijk
+
+--------------090506020800010008010100
+Content-Type: text/plain; charset=windows-1252;
+ name="funcvars.patch"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="funcvars.patch"
+
+LS0tIGEvc3JjL2V2YWwuYworKysgYi9zcmMvZXZhbC5jCkBAIC04NzUsNyArODc1LDcgQEAg
+cmFpc2U6CiAJCWJyZWFrOwogCiAJY2FzZSBDTURGVU5DVElPTjoKLQkJcG9wbG9jYWx2YXJz
+KDEpOworCQlsaXN0c2V0dmFyKHZhcmxpc3QubGlzdCwgVkVYUE9SVHxWU1RBQ0spOwogCQlp
+ZiAoZXZhbGZ1bihjbWRlbnRyeS51LmZ1bmMsIGFyZ2MsIGFyZ3YsIGZsYWdzKSkKIAkJCWdv
+dG8gcmFpc2U7CiAJCWJyZWFrOwo=
+--------------090506020800010008010100--
