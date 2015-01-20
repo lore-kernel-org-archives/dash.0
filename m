@@ -1,46 +1,65 @@
 From: Damian Wrobel <dwrobel@ertelnet.rybnik.pl>
-Subject: Inconsistent behaviour between 'jobs' and 'echo "$(jobs)"'
-Date: Mon, 19 Jan 2015 19:01:53 +0100
-Message-ID: <54BD4691.7050906@ertelnet.rybnik.pl>
+Subject: Re: Inconsistent behaviour between 'jobs' and 'echo "$(jobs)"'
+Date: Tue, 20 Jan 2015 18:01:10 +0100
+Message-ID: <54BE89D6.7040101@ertelnet.rybnik.pl>
+References: <54BD4691.7050906@ertelnet.rybnik.pl> <20150120084438.GA751@ein.free.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2; format=flowed
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp.ertel.com.pl ([62.182.231.178]:23438 "EHLO
+Received: from smtp.ertel.com.pl ([62.182.231.178]:32493 "EHLO
 	smtp.ertel.com.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751954AbbASSLr (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 19 Jan 2015 13:11:47 -0500
-Received: from wrobel.no-ip.org (public64144.xdsl.centertel.pl [79.163.250.144])
-	(Authenticated sender: dwrobel@ertelnet.rybnik.pl)
-	by smtp.ertel.com.pl (Postfix) with ESMTPSA id 7A0D840718ED0
-	for <dash@vger.kernel.org>; Mon, 19 Jan 2015 19:10:07 +0100 (CET)
+	with ESMTP id S1754952AbbATRBM (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 20 Jan 2015 12:01:12 -0500
+In-Reply-To: <20150120084438.GA751@ein.free.fr>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
+Cc: Seb <sbb@tuxfamily.org>
 
-Hi,
+On 01/20/2015 09:44 AM, Seb wrote:
+> On Mon, Jan 19, 2015 at 07:01:53PM +0100, Damian Wrobel wrote:
+>
+> Hello,
+>
+>> I'm observing an inconsistent behaviour between:
+>>   jobs
+>> and
+>>   echo "$(jobs)"
+>
+> It's because the command is ran in a sub-shell, where there is indeed no
+> running job.
+>
+> Bash has a special mechanism to handle this and get the current shell
+> context returned, that's why you may feel some inconsistency here (like
+> I myself did :)
 
-I'm observing an inconsistent behaviour between:
-  jobs
-and
-  echo "$(jobs)"
+There is an application usage [1] where this case is specifically mentioned with 
+a suggestion that: "For this reason, jobs is generally implemented as a shell 
+regular built-in."
 
-Here is the short example:
+I basically planned to use the following construction to kill all running jobs:
 
-$ rpm -qv dash
-dash-0.5.8-1.fc21.i686
-$ /bin/dash
-$ sleep 1000 &
-$ jobs
-[1] + Running                    sleep 1000
-$ echo "$(jobs)"
+$ kill $(jobs -p)
 
-$ echo `jobs`
+Now it looks that even the following doesn't work in a dash:
 
-$ jobs 2>/dev/null
-[1] + Running                    sleep 1000
-$
+$ jobs -p | xargs kill
 
--- 
+I would prefer not to code something like the following:
+
+$ jobs -p >/tmp/jobs-$$ && kill $(cat /tmp/jobs-$$); rm /tmp/jobs-$$
+
+
 Have a nice day,
 Damian
+
+[1] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/jobs.html
+
+>
+> ++
+> Seb.
+>
+>
+>
+
