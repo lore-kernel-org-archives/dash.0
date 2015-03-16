@@ -1,36 +1,26 @@
-From: Seb <sbb@tuxfamily.org>
-Subject: Re: Inconsistent behaviour between 'jobs' and 'echo "$(jobs)"'
-Date: Wed, 21 Jan 2015 14:42:25 +0100
-Message-ID: <20150121134225.GA708@ein.free.fr>
-References: <54BD4691.7050906@ertelnet.rybnik.pl>
- <20150120084438.GA751@ein.free.fr>
- <54BE89D6.7040101@ertelnet.rybnik.pl>
+From: "Dr. Henry Cheng Kar-Shun" <ingdirk@outlook.com>
+Subject: Dr. Henry Cheng Kar-shun
+Date: Mon, 16 Mar 2015 16:54:07 -0600
+Message-ID: <20150316225421.0D0BB470F6@mail.bacgiang.gov.vn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp5-g21.free.fr ([212.27.42.5]:62090 "EHLO smtp5-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751777AbbAUNmZ (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 21 Jan 2015 08:42:25 -0500
-Content-Disposition: inline
-In-Reply-To: <54BE89D6.7040101@ertelnet.rybnik.pl>
+Received: from mail.bacgiang.gov.vn ([123.30.49.4]:38441 "EHLO
+	mail.bacgiang.gov.vn" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751874AbbCPXjV convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Mon, 16 Mar 2015 19:39:21 -0400
+Content-Description: Mail message body
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
-Cc: Damian Wrobel <dwrobel@ertelnet.rybnik.pl>
+To: Recipients <ingdirk@outlook.com>
 
-On Tue, Jan 20, 2015 at 06:01:10PM +0100, Damian Wrobel wrote:
-> I would prefer not to code something like the following:
-> 
-> $ jobs -p >/tmp/jobs-$$ && kill $(cat /tmp/jobs-$$); rm /tmp/jobs-$$
+Dear Friend,
 
-As a better alternative, you could maybe try this:
-  
-  trap : TERM # in case we have something to do after...
-  /bin/kill -s TERM -$$
+Good Day, I am Dr. Henry Cheng Kar-shun a Director of Non Independent Non-executive Board Hang Seng Bank Limited, Hong Kong. I have funds worth $17,500.000.00 to secretly secure (Transfer) 
+to your account in your country from our affiliated bank for our benefit. 
 
-Just an idea...
+Please if you are interested to help me, do and write me for more details. Here is my Email: (henrychengkar@gmail.com)
 
-++
-Seb.
-
+Regards,
+Dr. Henry Cheng Kar-shun
