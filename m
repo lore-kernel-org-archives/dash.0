@@ -1,26 +1,54 @@
-From: "Dr. Henry Cheng Kar-Shun" <ingdirk@outlook.com>
-Subject: Dr. Henry Cheng Kar-shun
-Date: Mon, 16 Mar 2015 16:54:07 -0600
-Message-ID: <20150316225421.0D0BB470F6@mail.bacgiang.gov.vn>
+From: Alex Waite <alexqw85@gmail.com>
+Subject: Pattern matching faster than math
+Date: Wed, 25 Mar 2015 14:51:56 +0100
+Message-ID: <meuehs$n4e$1@ger.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.bacgiang.gov.vn ([123.30.49.4]:38441 "EHLO
-	mail.bacgiang.gov.vn" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751874AbbCPXjV convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 16 Mar 2015 19:39:21 -0400
-Content-Description: Mail message body
+Received: from plane.gmane.org ([80.91.229.3]:42650 "EHLO plane.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752468AbbCYNwH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 25 Mar 2015 09:52:07 -0400
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1Yalj2-0007DO-MZ
+	for dash@vger.kernel.org; Wed, 25 Mar 2015 14:52:04 +0100
+Received: from 141.44.98.42 ([141.44.98.42])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Wed, 25 Mar 2015 14:52:04 +0100
+Received: from alexqw85 by 141.44.98.42 with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Wed, 25 Mar 2015 14:52:04 +0100
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Recipients <ingdirk@outlook.com>
+To: dash@vger.kernel.org
 
-Dear Friend,
+Hello,
 
-Good Day, I am Dr. Henry Cheng Kar-shun a Director of Non Independent Non-executive Board Hang Seng Bank Limited, Hong Kong. I have funds worth $17,500.000.00 to secretly secure (Transfer) 
-to your account in your country from our affiliated bank for our benefit. 
+This isn't a problem per-se, but I'm curious if anyone can shed some 
+light on why this is so.
 
-Please if you are interested to help me, do and write me for more details. Here is my Email: (henrychengkar@gmail.com)
+I have a script where I'm checking if the contents of a variable is an 
+integer. An easy/hacky way to do this is
 
-Regards,
-Dr. Henry Cheng Kar-shun
+[ "$var" -ge 0 2> /dev/null ] || echo "is not int"
+
+But this caused posh to segfault, so I went for a pattern matching 
+solution instead:
+
+[ -z "${var##*[!0-9]*}" ] && echo "is not int"
+
+This works well, and it makes posh happy. But what's surprising to me is 
+that it's faster.
+
+I have more of a write-up in a commit message: 
+https://github.com/zfsnap/zfsnap/commit/ed6326f0006ed18b7d8bb79d5ee8f06142847f41
+
+Any thoughts or insight? Am I making some faulty assumption here?
+
+Thanks for your time.
+
+---Alex
+
