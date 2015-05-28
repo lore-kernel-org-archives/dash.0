@@ -1,142 +1,196 @@
-From: Martijn Dekker <martijn@inlv.org>
-Subject: getopts doesn't properly update OPTIND when called from function
-Date: Thu, 28 May 2015 20:54:07 +0200
-Message-ID: <5567644F.3080909@inlv.org>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: getopts doesn't properly update OPTIND when called from function
+Date: Fri, 29 May 2015 00:39:10 +0200
+Message-ID: <5567990E.3090902@gigawatt.nl>
+References: <5567644F.3080909@inlv.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed;
+ boundary="------------030806080205060008060703"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from kahlil.inlv.org ([37.59.109.123]:36334 "EHLO kahlil.inlv.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752299AbbE1TEf (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 28 May 2015 15:04:35 -0400
-Received: from breedzicht.local (inlv.demon.nl [212.238.240.159])
-	(authenticated bits=0)
-	by kahlil.inlv.org (8.14.9/8.14.4) with ESMTP id t4SIs7qh003022
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO)
-	for <dash@vger.kernel.org>; Thu, 28 May 2015 20:54:08 +0200
+Received: from hosting12.csv-networks.nl ([84.244.151.217]:41096 "EHLO
+	hosting12.csv-networks.nl" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1755116AbbE1XGf (ORCPT
+	<rfc822;dash@vger.kernel.org>); Thu, 28 May 2015 19:06:35 -0400
+In-Reply-To: <5567644F.3080909@inlv.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Martijn Dekker <martijn@inlv.org>
+Cc: dash@vger.kernel.org
 
-I'm writing a shell function that extends the functionality of the
-'getopts' builtin. For that to work, it is necessary to call the
-'getopts' builtin from the shell function.
+This is a multi-part message in MIME format.
+--------------030806080205060008060703
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The POSIX standard specifies that OPTIND and OPTARG are global
-variables, even though the positional parameters are local to the
-function.[*] This makes it possible to call 'getopts' from a function by
-simply passing the global positional parameters along by adding "$@".
+On 28/05/2015 20:54, Martijn Dekker wrote:
+> I'm writing a shell function that extends the functionality of the
+> 'getopts' builtin. For that to work, it is necessary to call the
+> 'getopts' builtin from the shell function.
+>
+> The POSIX standard specifies that OPTIND and OPTARG are global
+> variables, even though the positional parameters are local to the
+> function.[*] This makes it possible to call 'getopts' from a function by
+> simply passing the global positional parameters along by adding "$@".
+>
+> My problem is that dash does not properly update the global OPTIND
+> variable when getopts is called from a function, which defeats my
+> function on dash. It updates the global OPTIND for the first option but
+> not for subsequent options, so OPTIND gets stuck on 3. (It does
+> accurately update the global OPTARG variable, though.)
 
-My problem is that dash does not properly update the global OPTIND
-variable when getopts is called from a function, which defeats my
-function on dash. It updates the global OPTIND for the first option but
-not for subsequent options, so OPTIND gets stuck on 3. (It does
-accurately update the global OPTARG variable, though.)
+That isn't the problem, not exactly anyway. The problem is that getopts 
+is required to keep internal state separately from the OPTIND variable 
+(a single integer is insufficient to track the progress when multiple 
+options are combined in a single word), and that internal state is 
+stored along with the positional parameters. The positional parameters 
+are saved just before a function call, and restored when the function 
+returns. The internal state of getopts should not be saved the same way. 
+It should probably just be global to dash.
 
-I made a little test program that demonstrates this; see below the
-footnote. It succeeds on bash, ksh93, pdksh, mksh, and yash, but not
-(d)ash or zsh[*2].
+A quick patch to make sure it is global, and isn't reset when it 
+shouldn't or doesn't need to be, is attached. You can experiment with 
+it, if you like. Your script runs as expected with this patch. However, 
+I should warn that I have done far too little investigation to actually 
+submit this patch for inclusion at this point. I'll do more extensive 
+checking, and testing, later. If someone else can check whether the 
+patch is okay, and if not, in what cases it fails, that would be very 
+welcome too.
 
-The output of my test script seems consistent with the hypothesis that
-OPTIND is reinitialized to 1 whenever a function is called. It should
-only be initialized when the shell is initialized.
+Note that any changes could break existing scripts, that (incorrectly) 
+rely on dash's current behaviour of implicitly resetting the state, and 
+don't bother setting OPTIND to explicitly reset it when they want to 
+parse a new set of arguments.
 
-I suspect this is an old bug as other versions of ash, including Busybox
-ash and NetBSD's /bin/sh, share it.
+Cheers,
+Harald van Dijk
 
-Thanks,
+--------------030806080205060008060703
+Content-Type: text/plain; charset=windows-1252;
+ name="getopts.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="getopts.patch"
 
-- Martijn
+diff --git a/src/eval.c b/src/eval.c
+index 071fb1b..59e7506 100644
+--- a/src/eval.c
++++ b/src/eval.c
+@@ -953,8 +953,6 @@ evalfun(struct funcnode *func, int argc, char **argv, int flags)
+ 	INTON;
+ 	shellparam.nparam = argc - 1;
+ 	shellparam.p = argv + 1;
+-	shellparam.optind = 1;
+-	shellparam.optoff = -1;
+ 	pushlocalvars();
+ 	evaltree(func->n.ndefun.body, flags & EV_TESTED);
+ 	poplocalvars(0);
+diff --git a/src/options.c b/src/options.c
+index 6f381e6..5b24eeb 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -163,8 +163,8 @@ setarg0:
+ 	}
+ 
+ 	shellparam.p = xargv;
+-	shellparam.optind = 1;
+-	shellparam.optoff = -1;
++	shoptind = 1;
++	shoptoff = -1;
+ 	/* assert(shellparam.malloc == 0 && shellparam.nparam == 0); */
+ 	while (*xargv) {
+ 		shellparam.nparam++;
+@@ -316,8 +316,6 @@ setparam(char **argv)
+ 	shellparam.malloc = 1;
+ 	shellparam.nparam = nparam;
+ 	shellparam.p = newparam;
+-	shellparam.optind = 1;
+-	shellparam.optoff = -1;
+ }
+ 
+ 
+@@ -362,8 +360,6 @@ shiftcmd(int argc, char **argv)
+ 	}
+ 	ap2 = shellparam.p;
+ 	while ((*ap2++ = *ap1++) != NULL);
+-	shellparam.optind = 1;
+-	shellparam.optoff = -1;
+ 	INTON;
+ 	return 0;
+ }
+@@ -394,8 +390,8 @@ void
+ getoptsreset(value)
+ 	const char *value;
+ {
+-	shellparam.optind = number(value) ?: 1;
+-	shellparam.optoff = -1;
++	shoptind = number(value) ?: 1;
++	shoptoff = -1;
+ }
+ 
+ /*
+@@ -412,20 +408,10 @@ getoptscmd(int argc, char **argv)
+ 
+ 	if (argc < 3)
+ 		sh_error("Usage: getopts optstring var [arg]");
+-	else if (argc == 3) {
++	else if (argc == 3)
+ 		optbase = shellparam.p;
+-		if ((unsigned)shellparam.optind > shellparam.nparam + 1) {
+-			shellparam.optind = 1;
+-			shellparam.optoff = -1;
+-		}
+-	}
+-	else {
++	else
+ 		optbase = &argv[3];
+-		if ((unsigned)shellparam.optind > argc - 2) {
+-			shellparam.optind = 1;
+-			shellparam.optoff = -1;
+-		}
+-	}
+ 
+ 	return getopts(argv[1], argv[2], optbase);
+ }
+@@ -438,10 +424,10 @@ getopts(char *optstr, char *optvar, char **optfirst)
+ 	int done = 0;
+ 	char s[2];
+ 	char **optnext;
+-	int ind = shellparam.optind;
+-	int off = shellparam.optoff;
++	int ind = shoptind;
++	int off = shoptoff;
+ 
+-	shellparam.optind = -1;
++	shoptind = -1;
+ 	optnext = optfirst + ind - 1;
+ 
+ 	if (ind <= 1 || off < 0 || strlen(optnext[-1]) < off)
+@@ -509,8 +495,8 @@ out:
+ 	s[1] = '\0';
+ 	setvar(optvar, s, 0);
+ 
+-	shellparam.optoff = p ? p - *(optnext - 1) : -1;
+-	shellparam.optind = ind;
++	shoptoff = p ? p - *(optnext - 1) : -1;
++	shoptind = ind;
+ 
+ 	return done;
+ }
+diff --git a/src/options.h b/src/options.h
+index 975fe33..8295eb9 100644
+--- a/src/options.h
++++ b/src/options.h
+@@ -38,9 +38,9 @@ struct shparam {
+ 	int nparam;		/* # of positional parameters (without $0) */
+ 	unsigned char malloc;	/* if parameter list dynamically allocated */
+ 	char **p;		/* parameter list */
+-	int optind;		/* next parameter to be processed by getopts */
+-	int optoff;		/* used by getopts */
+ };
++int shoptind;		/* next parameter to be processed by getopts */
++int shoptoff;		/* used by getopts */
+ 
+ 
+ 
 
-[*] The POSIX standard specifies:
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/getopts.html
-"The shell variable specified by the name operand, OPTIND, and OPTARG
-shall affect the current shell execution environment", which implies
-that they are global variables.
-    Confusingly, that same page also says: "The shell variables OPTIND
-and OPTARG shall be local to the caller of getopts and shall not be
-exported by default."
-    But I believe that "caller" here means the program that calls
-getopts, not the function; POSIX does not support function-local
-variables. This interpretation is supported by the added phrase "... and
-shall not be exported by default" and by the evidence that the majority
-of popular shells pass my test script. Also, it is in fact global in
-dash; after all, it does get updated just once...
-    (Of course it should be possible to explicitly make OPTIND and
-OPTARG local using the non-standard 'local' keyword.)
-
-[*2] In zsh, OPTIND appears to be local to the function as the
-positional parameters are, so in my test script OPTIND is stuck at 1. I
-submitted a bug report to zsh-workers and a patch was posted in less
-than an hour!
-
-#### begin test script ####
-
-#! /bin/sh
-
-expect() {
-    if [ "X$2" = "X$3" ]; then
-        printf '%s: OK, got "%s"\n' "$1" "$2"
-    else
-        printf '%s: BUG: expected "%s", got "%s"\n' "$1" "$2" "$3"
-        return 1
-    fi
-}
-
-callgetopts() {
-    getopts 'D:ln:vhL' opt "$@"
-}
-
-testfn() {
-    expect OPTIND 1 "$OPTIND"
-
-    callgetopts "$@"
-    expect opt D "$opt"
-    expect OPTARG 'test' "$OPTARG"
-
-    callgetopts "$@"
-    expect opt h "$opt"
-    expect OPTARG '' "$OPTARG"
-
-    callgetopts "$@"
-    expect OPTIND 5 "$OPTIND"
-    expect opt n "$opt"
-    expect OPTARG 1 "$OPTARG"
-
-    callgetopts "$@"
-    expect OPTIND 5 "$OPTIND"
-
-    callgetopts "$@"
-    expect OPTIND 5 "$OPTIND"
-}
-
-testfn -D test -hn 1 test arguments
-
-#### end test script ####
-
-Output on dash 0.5.6 and current dash git version:
-
-OPTIND: OK, got "1"
-opt: OK, got "D"
-OPTARG: OK, got "test"
-opt: BUG: expected "h", got "D"
-OPTARG: BUG: expected "", got "test"
-OPTIND: BUG: expected "5", got "3"
-opt: BUG: expected "n", got "D"
-OPTARG: BUG: expected "1", got "test"
-OPTIND: BUG: expected "5", got "3"
-OPTIND: BUG: expected "5", got "3"
-
-Expected output (on bash, *ksh*, yash):
-
-OPTIND: OK, got "1"
-opt: OK, got "D"
-OPTARG: OK, got "test"
-opt: OK, got "h"
-OPTARG: OK, got ""
-OPTIND: OK, got "5"
-opt: OK, got "n"
-OPTARG: OK, got "1"
-OPTIND: OK, got "5"
-OPTIND: OK, got "5"
+--------------030806080205060008060703--
