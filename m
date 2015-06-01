@@ -1,62 +1,43 @@
-From: Harald van Dijk <harald@gigawatt.nl>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: getopts doesn't properly update OPTIND when called from function
-Date: Fri, 29 May 2015 07:50:09 +0200
-Message-ID: <5567FE11.8060103@gigawatt.nl>
+Date: Mon, 1 Jun 2015 14:29:05 +0800
+Message-ID: <20150601062905.GB10460@gondor.apana.org.au>
 References: <20150529025809.GA16240@gondor.apana.org.au>
+ <5567FE11.8060103@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from hosting12.csv-networks.nl ([84.244.151.217]:45943 "EHLO
-	hosting12.csv-networks.nl" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752789AbbE2FuT (ORCPT
-	<rfc822;dash@vger.kernel.org>); Fri, 29 May 2015 01:50:19 -0400
-In-Reply-To: <20150529025809.GA16240@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:40787 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751764AbbFAG3S (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 1 Jun 2015 02:29:18 -0400
+Content-Disposition: inline
+In-Reply-To: <5567FE11.8060103@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald van Dijk <harald@gigawatt.nl>
 Cc: martijn@inlv.org, dash@vger.kernel.org
 
-On 29/05/2015 04:58, Herbert Xu wrote:
-> Harald van Dijk <harald@gigawatt.nl> wrote:
->> That isn't the problem, not exactly anyway. The problem is that getopts
->> is required to keep internal state separately from the OPTIND variable
->> (a single integer is insufficient to track the progress when multiple
->> options are combined in a single word), and that internal state is
->> stored along with the positional parameters. The positional parameters
->> are saved just before a function call, and restored when the function
->> returns. The internal state of getopts should not be saved the same way.
->> It should probably just be global to dash.
->
-> I think the current behaviour is fine as far as POSIX is concerned.
-> It says:
->
-> http://pubs.opengroup.org/onlinepubs/9699919799/utilities/getopts.html
->
-> : APPLICATION USAGE
->
-> ...
->
-> : Note that shell functions share OPTIND with the calling shell
-> : even though the positional parameters are changed. If the calling
-> : shell and any of its functions uses getopts to parse arguments,
-> : the results are unspecified.
+On Fri, May 29, 2015 at 07:50:09AM +0200, Harald van Dijk wrote:
+> 
+> But the test script in this thread does invoke getopts with
+> parameters that are the same in all invocations, and without
+> modifying OPTIND. I don't see anything else in the normative
+> sections that would make the result undefined or unspecified either.
+> I do think the script is valid, and the results in dash should match
+> those of other shells.
 
-The Application usage sections are informative and aren't worded as 
-precisely as the other sections. If a script uses getopts at the global 
-level, and it calls a shell function that too uses getopts, then it is 
-very easy to be covered by
+The bash behaviour makes it impossible to call shell functions
+that invoke getopts while in the middle of an getopts loop.
 
- > Any other attempt to invoke getopts multiple times in a single shell 
-execution environment with parameters (positional parameters or arg 
-operands) that are not the same in all invocations, or with an OPTIND 
-value modified to be a value other than 1, produces unspecified results.
-
-But the test script in this thread does invoke getopts with parameters 
-that are the same in all invocations, and without modifying OPTIND. I 
-don't see anything else in the normative sections that would make the 
-result undefined or unspecified either. I do think the script is valid, 
-and the results in dash should match those of other shells.
+IMHO the dash behaviour makes a lot more sense since a function
+always brings with it a new set of parameters.  That plus the
+fact that this behaviour has been there since day one makes me
+reluctant to change it since the POSIX wording is not all that
+clear.
 
 Cheers,
-Harald van Dijk
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
