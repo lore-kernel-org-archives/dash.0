@@ -1,251 +1,85 @@
-From: Stephane Chazelas <stephane.chazelas@gmail.com>
-Subject: Re: [BUG] ${#var} returns length in bytes, not characters
-Date: Wed, 3 Jun 2015 12:45:19 +0100
-Message-ID: <20150603114519.GB4767@chaz.gmail.com>
-References: <556EE51D.8080100@inlv.org>
+From: Martijn Dekker <martijn@inlv.org>
+Subject: Re: getopts doesn't properly update OPTIND when called from function
+Date: Thu, 04 Jun 2015 21:56:20 +0200
+Message-ID: <5570AD64.6030303@inlv.org>
+References: <5567644F.3080909@inlv.org> <5567990E.3090902@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="Nq2Wo0NMKNjxTN9z"
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from plane.gmane.org ([80.91.229.3]:51602 "EHLO plane.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755224AbbFCLup (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 3 Jun 2015 07:50:45 -0400
-Received: from list by plane.gmane.org with local (Exim 4.69)
-	(envelope-from <gcsd-dash@m.gmane.org>)
-	id 1Z07Bk-0002l9-Lt
-	for dash@vger.kernel.org; Wed, 03 Jun 2015 13:50:28 +0200
-Received: from 05448b1b.skybroadband.com ([5.68.139.27])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Wed, 03 Jun 2015 13:50:28 +0200
-Received: from stephane.chazelas by 05448b1b.skybroadband.com with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Wed, 03 Jun 2015 13:50:28 +0200
-Content-Disposition: inline
-In-Reply-To: <556EE51D.8080100@inlv.org>
+Received: from lb1-smtp-cloud3.xs4all.net ([194.109.24.22]:49130 "EHLO
+	lb1-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753027AbbFDT40 (ORCPT
+	<rfc822;dash@vger.kernel.org>); Thu, 4 Jun 2015 15:56:26 -0400
+In-Reply-To: <5567990E.3090902@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
+Harald van Dijk schreef op 29-05-15 om 00:39:
+> A quick patch to make sure it is global, and isn't reset when it
+> shouldn't or doesn't need to be, is attached. You can experiment with
+> it, if you like.
 
---Nq2Wo0NMKNjxTN9z
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I've been using dash with this patch since you posted it, and it works
+like a charm (including my function that extends getopts'
+functionality). No issues encountered. Thanks.
 
-2015-06-03 13:29:33 +0200, Martijn Dekker:
-> POSIX:
-> http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02
-> > ${#parameter}
-> > String Length. The length in characters of the value of parameter
-> > shall be substituted. [...]
-> 
-> dash does not expand the length in characters; it expands the length in
-> bytes instead. That is invalid for locales that include multi-byte
-> characters, such as the now ubiquitous UTF-8 set.
-[...]
+Further discussion in this thread shows that the patch may conflict with
+existing usage of 'getopts' for parsing the options within a function (a
+usage that would make the script quite shell-specific, by the way,
+because it would rely on Almquist-specific behaviour).
 
-See also:
+The issue, as I understand it, is that 'getopts' keeps not just the
+OPTIND variable but also an additional invisible internal variable to
+maintain its state. This is necessary to keep track of combined short
+options.[*]
 
-http://thread.gmane.org/gmane.comp.standards.posix.austin.general/9972/focus=10040
+There appear to be two possible use cases for calling 'getopts' within a
+function:
 
-For a few UTF-8 related variations in behaviour between shells
-(including this one), though many of them are about "unspecified
-behaviour".
+1. The option parsing loop is in the function, parsing the function's
+options. This requires a function-local internal state of 'getopts',
+otherwise calling a function using getopts from a main getopts loop
+couldn't possibly work, because there is no way to directly save or
+restore the unnamed internal state variable of getopts.
 
-The script mentioned there is also attached here.
+2. The option parsing loop is in the main shell environment, but instead
+of calling getopts directly, the option parsing loop calls a function,
+passing on the main positional parameters, and that function then calls
+'getopts' and does additional things (in my case, re-parse GNU-style
+--long options in terms of a special short option '--' with argument;
+but of course it could be anything). This requires a global internal
+'getopts' state.
 
--- 
-Stephane
+Use case 1 requires a global internal 'getopts' state and use case 2
+requires a local one, so they are mutually incompatible.
 
---Nq2Wo0NMKNjxTN9z
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename=u8-tests
+But I'm thinking that perhaps there is a way for the shell to
+distinguish between these two use cases so that they can be reconciled.
 
-euro=$(printf '\342\202\254')
-o342=$(printf '\342')
-o202=$(printf '\202')
-o254=$(printf '\254')
+The standard says that OPTIND is a global variable in any case, so use
+case 1 above could only work if, before starting the function's option
+parsing loop, OPTIND is either explicitly declared a function-local
+variable using the non-standard 'local' keyword or is reinitialized
+using an assignment.
 
-test_shell=$1
+On the other hand, use case 2 could only work if OPTIND is completely
+left alone by the function, allowing a 'getopts' with a global state to
+do its thing without interference.
 
-n=0
-case $test_shell in
-  zsh) emulate sh;;
-  zsh5) setopt shwordsplit;;
-  [lm]ksh) set -o utf8-mode;;
-esac
+So I would suggest the following might reconcile both use cases: By
+default, make the 'getopts' internal state global. However, whenever
+OPTIND is either assigned a value within a function or declared local
+within a function, automatically make the 'getopts' internal state local
+to the function.
 
-if [ -n "$test_shell" ]; then
-  printf '%8s:' "$test_shell"
-  testing() {
-    n=$(($n + 1))
-    test
-    ret=$?
-    [ "$ret" -eq "$na" ] && ret=-
-    printf ' %2s' "$ret"
-    [ "$ret" = "$1" ] && printf '\342\203\235'
-  }
-else
-  testing() {
-    n=$(($n + 1))
-    printf '%2d: %s (expected: %d)\n' "$n" "$2" "$1"
-  }
-fi
+Comments?
 
-na=99
-if_accept_invalid() { [ "$o254" ] || exit "$na"; }
-if_printf_builtin() {
-  case $(type printf 2> /dev/null) in
-    *builtin*);;
-    (*) exit "$na"
-  esac
-}
+- M.
 
-################################################################
-test() (
-  exit "${#euro}"
-)
-testing 1 '${#utf8-character}'
-################################################################
-test() (
-  if_accept_invalid
-  exit "${#o254}"
-)
-testing 1 '${#single byte, invalid char}'
-################################################################
-test() (
-  if_accept_invalid
-  t=$o342$o202
-  exit "${#t}"
-)
-testing 2 '${truncated character, 2 bytes}'
-################################################################
-test() (
-  if_accept_invalid
-  case $euro in
-    *"$o254"*) true;;
-    *) false
-  esac
-)
-testing 0 '$char contains byte component'
-################################################################
-test() (
-  if_accept_invalid
-  t=+$euro-
-  [ "${t##*"$o254"}" = - ]
-)
-testing 0 '${##} matching with byte components of $mbchar'
-################################################################
-test() (
-  if_accept_invalid
-  t=+$o254$euro-
-  [ "${t##*"$euro"}" = - ]
-)
-testing 0 '${##} works in invalid strings'
-################################################################
-test() (
-  if_accept_invalid
-  IFS=$o254
-  t=+$euro+
-  set -- $t
-  exit "$#"
-)
-testing 2 'byte component found in $mbchar by IFS'
-################################################################
-test() (
-  if_accept_invalid
-  IFS=$o342$o202
-  t=+$euro+
-  set -- $t
-  exit "$#"
-)
-testing 3 'byte component found in $mbchar by IFS'
-################################################################
-test() (
-  if_accept_invalid
-  IFS=$o254
-  t=+$o254+
-  set -- $t
-  exit "$#"
-)
-testing 2 'IFS works with bytes'
-################################################################
-test() (
-  IFS=$euro
-  t=+$euro+
-  set -- $t
-  exit "$#"
-)
-testing 2 'IFS works with mbchars'
-################################################################
-test() (
-  if_accept_invalid
-  IFS=$euro
-  t=+$o254$o342$euro+
-  set -- $t
-  exit "$#"
-)
-testing 2 'IFS works with mbchars in invalid strings'
-################################################################
-test() (
-  if_accept_invalid
-  IFS=$o342$o202
-  set / /
-  [ "$*" = "/$o342/" ]
-)
-testing 0 'Joining $* with byte forming invalid char'
-################################################################
-test() (
-  IFS=$euro
-  set / /
-  [ "$*" = "/$euro/" ]
-)
-testing 0 'Joining $* with mbchar'
-################################################################
-test() (
-  if_printf_builtin
-  exit "$(printf '%4s' "$euro" | wc -c | tr -cd 0-9)"
-)
-testing 6 'byte length of 4-padded euro'
-################################################################
-test() (
-  if_accept_invalid
-  if_printf_builtin
-  exit "$(printf '%4s' "$o342$o202" | wc -c | tr -cd 0-9)"
-)
-testing 4 'byte length of 4-padded truncated mbchar'
-################################################################
-test() (
-  case $euro in
-    ?) true;;
-    (*) false
-  esac
-)
-testing 0 '? matches mbchar'
-################################################################
-test() (
-  if_accept_invalid
-  case $o342$o202 in
-    ??) true;;
-    (*) false
-  esac
-)
-testing 0 '?? matches 2-byte truncated mbchar'
-################################################################
-
-
-echo
-if [ -z "$test_shell" ]; then
-  printf '%8s:' tests
-  i=1; while [ "$i" -le "$n" ]; do
-    printf ' %2d' "$i"
-    i=$(($i + 1))
-  done
-  printf '\n\n'
-  for test_shell in dash zsh yash bash lksh mksh ksh93 zsh5 posh; do
-    "$test_shell" "$0" "$test_shell"
-  done
-fi
-
---Nq2Wo0NMKNjxTN9z--
+[*] Just as a datapoint, I found that yash has a different strategy for
+this: it stores both values in OPTIND, separated by a semicolon -- e.g.
+an $OPTIND of 3:2 means getopts is at the second option in the third
+argument.
 
