@@ -1,38 +1,42 @@
-From: Martijn Dekker <martijn@inlv.org>
+From: Parke <parke.nexus@gmail.com>
 Subject: Re: dash unset idiosyncrasies
-Date: Mon, 06 Jul 2015 05:23:16 +0200
-Message-ID: <5599F4A4.2040403@inlv.org>
+Date: Mon, 6 Jul 2015 09:02:57 -0700
+Message-ID: <CAPxz1+bDwhGNBzv-b5cD6iML6jTkNbRLjJT-hsVCgk3pOWVsYw@mail.gmail.com>
 References: <CAPxz1+Zuye=Oj=tWvto9_ir5XcgazBY=2asesR77qRrFuTbc2A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from lb3-smtp-cloud2.xs4all.net ([194.109.24.29]:40983 "EHLO
-	lb3-smtp-cloud2.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753149AbbGFDXT (ORCPT
-	<rfc822;dash@vger.kernel.org>); Sun, 5 Jul 2015 23:23:19 -0400
+Received: from mail-la0-f44.google.com ([209.85.215.44]:35627 "EHLO
+	mail-la0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751769AbbGFQDi convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Mon, 6 Jul 2015 12:03:38 -0400
+Received: by labgy5 with SMTP id gy5so8736311lab.2
+        for <dash@vger.kernel.org>; Mon, 06 Jul 2015 09:03:36 -0700 (PDT)
 In-Reply-To: <CAPxz1+Zuye=Oj=tWvto9_ir5XcgazBY=2asesR77qRrFuTbc2A@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Parke schreef op 06-07-15 om 04:18:
-> The man page does not say what happens if the given name corresponds
-> only to a function.
+On Sun, Jul 5, 2015 at 7:18 PM, Parke <parke.nexus@gmail.com> wrote:
 
-Neither does POSIX, as you've found out: "[...] if a variable by that
-name does not exist, it is unspecified whether a function by that name,
-if any, shall be unset." I agree the dash man page could do with
-clarifying this.
+> Based on my experiments, I would recommend the dash man page be
+> changed as follows.  Changes are in capital letters.
+>
+>      unset [-fv] name ...
+>             The specified VARIABLES OR FUNCITONS
+>             (BUT NOT BOTH) are
+>             unset and unexported.  If -f or -v is speci=E2=80=90
+>             fied, the corresponding functionS or variableS
+>             ARE unset, respectively.  IF NEITHER OPTION
+>             IS GIVEN, ONLY THE NAMED VARIABLES
+>             ARE UNSET.
 
-I've found it best, to avoid bugs and confusion, to always use 'unset'
-with either the -v or the -f option (but not both). This should work
-consistently on all POSIXly shells.
+I just realized that, perhaps most importantly, the first line should
+be changed to:
 
-FYI, other shells produce similar output for your test script (except
-AT&T ksh halts execution on 'unset' without parameters.) There seem to
-be no shells that support unsetting both variables and functions with a
-single 'unset' command.
+unset [ -f | -v ] name ...
 
-- Martijn
+Cheers,
 
+Parke
