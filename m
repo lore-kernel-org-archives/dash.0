@@ -1,42 +1,51 @@
-From: Parke <parke.nexus@gmail.com>
-Subject: Re: dash unset idiosyncrasies
-Date: Mon, 6 Jul 2015 09:02:57 -0700
-Message-ID: <CAPxz1+bDwhGNBzv-b5cD6iML6jTkNbRLjJT-hsVCgk3pOWVsYw@mail.gmail.com>
-References: <CAPxz1+Zuye=Oj=tWvto9_ir5XcgazBY=2asesR77qRrFuTbc2A@mail.gmail.com>
+From: Martijn Dekker <martijn@inlv.org>
+Subject: [BUG] test: -gt: unexpected operator
+Date: Mon, 13 Jul 2015 01:30:18 +0200
+Message-ID: <55A2F88A.4090908@inlv.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-la0-f44.google.com ([209.85.215.44]:35627 "EHLO
-	mail-la0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751769AbbGFQDi convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 6 Jul 2015 12:03:38 -0400
-Received: by labgy5 with SMTP id gy5so8736311lab.2
-        for <dash@vger.kernel.org>; Mon, 06 Jul 2015 09:03:36 -0700 (PDT)
-In-Reply-To: <CAPxz1+Zuye=Oj=tWvto9_ir5XcgazBY=2asesR77qRrFuTbc2A@mail.gmail.com>
+Received: from grey-smtp-cloud6.xs4all.net ([194.109.24.45]:56748 "EHLO
+	grey-smtp-cloud6.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751200AbbGLXhg (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sun, 12 Jul 2015 19:37:36 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-On Sun, Jul 5, 2015 at 7:18 PM, Parke <parke.nexus@gmail.com> wrote:
+I found a bug in dash that affects checking the exit status of '[' or
+'test' for failure.
 
-> Based on my experiments, I would recommend the dash man page be
-> changed as follows.  Changes are in capital letters.
->
->      unset [-fv] name ...
->             The specified VARIABLES OR FUNCITONS
->             (BUT NOT BOTH) are
->             unset and unexported.  If -f or -v is speci=E2=80=90
->             fied, the corresponding functionS or variableS
->             ARE unset, respectively.  IF NEITHER OPTION
->             IS GIVEN, ONLY THE NAMED VARIABLES
->             ARE UNSET.
+After feeding an illegal number to 'test -t', 'test' will not accept any
+operator (or at least not -gt or -lt) for the next invocation.
 
-I just realized that, perhaps most importantly, the first line should
-be changed to:
+Confirmed in dash 0.5.7, 0.5.8 and current git version.
 
-unset [ -f | -v ] name ...
+$ [ -t 12323454234578326584376438 ]
+src/dash: 7: [: Illegal number: 12323454234578326584376438
+$ [ "$?" -gt 1 ] && echo error
+src/dash: 8: [: -gt: unexpected operator
+$ [ "$?" -gt 1 ] && echo error
+error
+$ test -t 12323454234578326584376438
+src/dash: 10: test: Illegal number: 12323454234578326584376438
+$ test "$?" -gt 1 && echo error
+src/dash: 11: test: -gt: unexpected operator
+$ test "$?" -gt 1 && echo error
+error
+$ test -t 12323454234578326584376438
+src/dash: 13: test: Illegal number: 12323454234578326584376438
+$ test 2 -gt 1
+src/dash: 14: test: -gt: unexpected operator
+$ test 2 -gt 1
+$ test -t 12323454234578326584376438
+src/dash: 16: test: Illegal number: 12323454234578326584376438
+$ test 2 -lt 1
+src/dash: 17: test: -lt: unexpected operator
+$ test 2 -lt 1
+$
 
-Cheers,
+Thanks,
 
-Parke
+- Martijn
