@@ -1,28 +1,28 @@
-From: Martijn Dekker <martijn@inlv.org>
-Subject: Re: [BUG] test: -gt: unexpected operator
-Date: Mon, 13 Jul 2015 09:17:54 +0200
-Message-ID: <55A36622.9050708@inlv.org>
-References: <20150713060635.GA8106@gondor.apana.org.au>
+From: "KPM098893" <kpm098893@datt.hk>
+Subject: Reply Me For Details
+Date: Sat, 18 Jul 2015 13:03:24 -0700
+Message-ID: <auto-000045961248@mail.tnt.be>
+Reply-To: <wa60shu@qq.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain;
+	charset="Windows-1251"
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from grey-smtp-cloud3.xs4all.net ([194.109.24.44]:42396 "EHLO
-	grey-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751214AbbGMHR7 (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 13 Jul 2015 03:17:59 -0400
-In-Reply-To: <20150713060635.GA8106@gondor.apana.org.au>
+Received: from mail.tnt.be ([188.93.103.100]:56709 "EHLO mail.tnt.be"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751240AbbGRVSk (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 18 Jul 2015 17:18:40 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
 
-Herbert Xu schreef op 13-07-15 om 08:06:
-> Thanks for the report.  Does this patch help?
+Good day,
 
-Yes, it does.
+I wish to contact you personally for an important proposal that might be 
+of interest to you. I am sending this mail just to know if this email address
+is functional.
 
-Thanks,
+I have something absolutely essential to discuss with you. Contact me for 
+details through my private email: wa60shu@qq.com
 
-- M.
-
+Regards,
+wa60shu@qq.com
