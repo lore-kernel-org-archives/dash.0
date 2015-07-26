@@ -1,59 +1,54 @@
-From: Rusty Bird <rustybird@openmailbox.org>
-Subject: Ignored alias inside for loop
-Date: Sun, 26 Jul 2015 09:23:52 +0000
-Message-ID: <55B4A728.9080303@openmailbox.org>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: Ignored alias inside for loop
+Date: Sun, 26 Jul 2015 17:26:02 +0200
+Message-ID: <20150726152602.GA4346@stack.nl>
+References: <55B4A728.9080303@openmailbox.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp10.openmailbox.org ([62.4.1.44]:58453 "EHLO
-	smtp10.openmailbox.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752346AbbGZJba convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Sun, 26 Jul 2015 05:31:30 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail2.openmailbox.org (Postfix) with ESMTP id 9007E20220C
-	for <dash@vger.kernel.org>; Sun, 26 Jul 2015 11:24:44 +0200 (CEST)
-Received: from mail2.openmailbox.org ([62.4.1.33])
-	by localhost (mail.openmailbox.org [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id PwrAFTGpi3R5 for <dash@vger.kernel.org>;
-	Sun, 26 Jul 2015 11:24:43 +0200 (CEST)
+Received: from relay02.stack.nl ([131.155.140.104]:64059 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1755153AbbGZPeu (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 26 Jul 2015 11:34:50 -0400
+Content-Disposition: inline
+In-Reply-To: <55B4A728.9080303@openmailbox.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Rusty Bird <rustybird@openmailbox.org>
+Cc: dash@vger.kernel.org
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+On Sun, Jul 26, 2015 at 09:23:52AM +0000, Rusty Bird wrote:
+> Why does this ...
 
-Hi,
+> #!/bin/sh
+> for i in 1; do
+>     alias foobarbaz='echo ok'
+>     foobarbaz
+> done
 
-Why does this ...
+> ... result in "foobarbaz: not found", but without the for loop it works?
+> Maybe I'm missing something in the spec, because bash-as-sh behaves
+> the same.
 
-#!/bin/sh
-for i in 1; do
-    alias foobarbaz='echo ok'
-    foobarbaz
-done
+Aliases are expanded during parsing, not during execution (like
+functions are). The for loop is parsed completely before it is executed.
 
-... result in "foobarbaz: not found", but without the for loop it works?
-Maybe I'm missing something in the spec, because bash-as-sh behaves
-the same.
+Using a function instead of an alias, or using eval will do what you
+want.
 
-Rusty
------BEGIN PGP SIGNATURE-----
+Note that some parts of the parse/execute split are not specified by
+POSIX. In particular, ksh93 and the real Bourne shell parse dot scripts
+completely before executing anything, while most other shells parse as
+needed. Example: given the file alias1.sh below:
 
-iQJ8BAEBCgBmBQJVtKcoXxSAAAAAAC4AKGlzc3Vlci1mcHJAbm90YXRpb25zLm9w
-ZW5wZ3AuZmlmdGhob3JzZW1hbi5uZXQ4NEI1OUJDRkM2MkIxMjlGRTFCMDZEMDQ0
-NjlENzhGNDdBQUYyQURGAAoJEEadePR6ryrfWacQAI0/zf4f4K0oJ+xM0wprmtiq
-4aj5UfOasXZji6cPvc0VGZcSK+rVFdT8EW6XIoMlkU8Lxp9aVLuaQtjcez9JhwIM
-k0V7cNhAGuyIAPNL/t6CHPb92MXSfHXf0SFZ6oDilMMtc9i38GDvAeA1RuS0bhrl
-W2kolIWeaaeQk2q5bMN66Mj86509NC9aXVBXatvCUHgqpNNDu2elgGOs/Isd2KVC
-TDk4qqDgm5wTLuQ0DMZ6KF4Odut8pW7HDhJMO82Y2ghqp5WH3OTgcgR+XTXeN/9Y
-Kp1Rix3Lse+7q6cMq7CdYhcGTh0eiDJxGaCNY7ho0klOH3MAvoQmEjJucXUpRB9T
-wOCliQOtppyA9rvsDqLfHbPFp8EHYUaLc9vpNUatURa44GyU/ks2LPexrMDg9mgC
-CmttZZVjDIe8L8mJ4Ot99dLmCsB2dIcJfM8lMTufFaWr5CrYNDCXx85dDHNYP416
-3t4FHPh3WNk43KbAVfc4VvXn77Ao1HUVRhambxmux4B0fudqTFERtZv+u2EmHE5a
-krp42fho4G65BC9Gewsy1lwUj3FRum5gXYzEoMV3gWFyLFVa1v+v8sC3DQbk8waq
-cvv9XuUUTky1Ksudpo7WJboY50H36hlbdHVwrhQIX8SWN44IvAW6ceJ4r+VBBq+C
-heQEjK/iUn0hkhtt8MdZ
-=H2bf
------END PGP SIGNATURE-----
+alias foobarbaz='echo ok'
+foobarbaz
+
+The result is ok when running  dash -c '. ./alias1.sh'  but a command
+not found error message when running  ksh93 -c '. ./alias1.sh'.
+
+Similarly, a string as passed to the -c option or eval or trap builtins
+may or may not be parsed fully before execution.
+
+-- 
+Jilles Tjoelker
