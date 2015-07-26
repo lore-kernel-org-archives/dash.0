@@ -1,73 +1,42 @@
-From: Rusty Bird <rustybird@openmailbox.org>
+From: Jilles Tjoelker <jilles@stack.nl>
 Subject: Re: Ignored alias inside for loop
-Date: Sun, 26 Jul 2015 16:09:12 +0000
-Message-ID: <55B50628.5090901@openmailbox.org>
-References: <55B4A728.9080303@openmailbox.org> <20150726152602.GA4346@stack.nl>
+Date: Sun, 26 Jul 2015 20:41:59 +0200
+Message-ID: <20150726184159.GB4346@stack.nl>
+References: <55B4A728.9080303@openmailbox.org>
+ <20150726152602.GA4346@stack.nl>
+ <55B50628.5090901@openmailbox.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp3.openmailbox.org ([62.4.1.37]:42429 "EHLO
-	smtp3.openmailbox.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755189AbbGZQKA convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Sun, 26 Jul 2015 12:10:00 -0400
-In-Reply-To: <20150726152602.GA4346@stack.nl>
+Received: from relay02.stack.nl ([131.155.140.104]:52686 "EHLO mx1.stack.nl"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753856AbbGZSmB (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 26 Jul 2015 14:42:01 -0400
+Content-Disposition: inline
+In-Reply-To: <55B50628.5090901@openmailbox.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
-Cc: Jilles Tjoelker <jilles@stack.nl>
+To: Rusty Bird <rustybird@openmailbox.org>
+Cc: dash@vger.kernel.org
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+On Sun, Jul 26, 2015 at 04:09:12PM +0000, Rusty Bird wrote:
+> > Aliases are expanded during parsing, not during execution (like 
+> > functions are). The for loop is parsed completely before it is
+> > executed.
 
-Hi Jilles,
+> Ah, what confused me was that I wrongly remembered it working inside
+> an if (instead of for) block. But looking again now, only the alias
+> *definition* was inside.
 
-> Aliases are expanded during parsing, not during execution (like 
-> functions are). The for loop is parsed completely before it is
-> executed.
+> > Using a function instead of an alias, or using eval will do what
+> > you want.
 
-Ah, what confused me was that I wrongly remembered it working inside
-an if (instead of for) block. But looking again now, only the alias
-*definition* was inside.
+> Do you mean replacing the line with: eval "alias foobarbaz='echo ok'"
+> That doesn't seem to work either (in dash or bash).
 
-> Using a function instead of an alias, or using eval will do what
-> you want.
+eval foobarbaz
 
-Do you mean replacing the line with: eval "alias foobarbaz='echo ok'"
-That doesn't seem to work either (in dash or bash).
+This may not be practical since it needs to be done for every alias use.
 
-> Note that some parts of the parse/execute split are not specified
-> by POSIX. In particular, ksh93 and the real Bourne shell parse dot
-> scripts completely before executing anything, while most other
-> shells parse as needed. Example: given the file alias1.sh below:
-> 
-> alias foobarbaz='echo ok' foobarbaz
-> 
-> The result is ok when running  dash -c '. ./alias1.sh'  but a
-> command not found error message when running  ksh93 -c '.
-> ./alias1.sh'.
-> 
-> Similarly, a string as passed to the -c option or eval or trap
-> builtins may or may not be parsed fully before execution.
-
-Interesting, thanks!
-
-Rusty
------BEGIN PGP SIGNATURE-----
-
-iQJ8BAEBCgBmBQJVtQYoXxSAAAAAAC4AKGlzc3Vlci1mcHJAbm90YXRpb25zLm9w
-ZW5wZ3AuZmlmdGhob3JzZW1hbi5uZXQ4NEI1OUJDRkM2MkIxMjlGRTFCMDZEMDQ0
-NjlENzhGNDdBQUYyQURGAAoJEEadePR6ryrfCwUP/AtBWQpOEajCsghiYrkDmVpS
-FuDMMo9s+uUTwJ6zrVviuj4cCfaigDBr1hlmc5ETjIMxbqgXYmG0o1GDkUvohKDR
-4apjVRXATe8Xuia+E94rZTqv1iAv+udCD1BVhH9SB0Hbc9Jf9bxAqY6JI+GxoPRc
-ea4tGDAPdPl9NJ69pPXP5AuDplqQOuap8BKzG00bu422z4CkIorvsg0W4+Ya+k+j
-KZetjxj6N8vF17gOLpWNuxtJKbDEokNhHCGuf3hS1+7SEibJKYhb3GkyDGJ5EPYv
-m3AocOlfSEuhZR8Dt5bK4gPNByrxl03PabBGmXVQaBzqjn+vIfykcuESXSHcl5SA
-02FVY3pWAZKPCGWnG2JcGZpn6jQJQt5fNtM5ooixmzvFM/f0ItOL3EFKwHzIZxh1
-ic+qIZcO8RrwfKktM3vytZ3fkSAVWJMcflj34+ce5A/LyfdrrqAkJGI3AbEul+Q6
-mQoYZGBL7Uq2tgBWNveWzAByaewiW/+nlLhUXQh69L3X1cjkkrULGDTSaV+EYZ+z
-mJP3qQcAB2DVnr757XgIh4kkDX8MDY4ZYVB+8ApgImUnBoklSSJeWXnBt+KwZgk7
-Rok5FxIde3OgyYB9tjzDF/EAZXKTKNLrXFkhhat9j2c8+8VptVNcw77HP2bbcgOE
-78H1zJW4UF8ntB5SGLTd
-=qogf
------END PGP SIGNATURE-----
+-- 
+Jilles Tjoelker
