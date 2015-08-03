@@ -1,47 +1,83 @@
-From: John Marshall <john.marshall@sanger.ac.uk>
-Subject: builtin read -r and backslash-char escape sequences
-Date: Mon, 3 Aug 2015 17:37:20 +0100
-Message-ID: <EDC4419D-6669-4211-9005-8970B5499D9A@sanger.ac.uk>
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
+From: Eric Blake <eblake@redhat.com>
+Subject: Re: builtin read -r and backslash-char escape sequences
+Date: Mon, 3 Aug 2015 11:03:16 -0600
+Message-ID: <55BF9ED4.2020301@redhat.com>
+References: <EDC4419D-6669-4211-9005-8970B5499D9A@sanger.ac.uk>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="NQOVCDKnj1uVEPIimJLOxf7D7RSGkIBAB"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp.sanger.ac.uk ([193.62.202.243]:14764 "EHLO
-	smtp.sanger.ac.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753331AbbHCQ4w convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Mon, 3 Aug 2015 12:56:52 -0400
-Received: from mib103854i.internal.sanger.ac.uk ([172.20.10.98])
-	by intmail3a.internal.sanger.ac.uk with esmtpsa (TLSv1:AES128-SHA:128)
-	(Exim 4.80.1)
-	(envelope-from <john.marshall@sanger.ac.uk>)
-	id 1ZMIjq-0008Jf-9V
-	for dash@vger.kernel.org; Mon, 03 Aug 2015 17:37:22 +0100
+Received: from mx1.redhat.com ([209.132.183.28]:57937 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754254AbbHCRFq (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 3 Aug 2015 13:05:46 -0400
+In-Reply-To: <EDC4419D-6669-4211-9005-8970B5499D9A@sanger.ac.uk>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: John Marshall <john.marshall@sanger.ac.uk>, dash@vger.kernel.org
 
-Problems with one of my scripts appear to have been caused by dash's read -r translating escape sequences (like \t) whereas several other shells read them literally.  For example:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NQOVCDKnj1uVEPIimJLOxf7D7RSGkIBAB
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-$ printf '%s' '\a\t\x' > backslashes 
-$ dash -c 'read -r foo < backslashes; echo "$foo"' | cat -t
+On 08/03/2015 10:37 AM, John Marshall wrote:
+> Problems with one of my scripts appear to have been caused by dash's re=
+ad -r translating escape sequences (like \t) whereas several other shells=
+ read them literally.  For example:
+>=20
+> $ printf '%s' '\a\t\x' > backslashes=20
+> $ dash -c 'read -r foo < backslashes; echo "$foo"' | cat -t
+> ^G^I\x
+> $ bash -c 'read -r foo < backslashes; echo "$foo"' | cat -t
+> \a\t\x
+> $ ksh -c 'read -r foo < backslashes; echo "$foo"' | cat -t
+> \a\t\x
+>=20
+> POSIX says of -r, "Do not treat a <backslash> character in any special =
+way. Consider each <backslash> to be part of the input line" [1].  Transl=
+ating them as escape sequences doesn't appear to be particularly compatib=
+le with this, but conceivably the translation is occurring at some other =
+stage.
+
+Bingo. The "some other stage" is your mistaken use of 'echo "$foo"'.
+echo is not portable with backslashes.
+
+$ bash -c 'shopt -s xpg_echo; read -r foo < backslashes; echo "$foo"' |
+cat -t
 ^G^I\x
-$ bash -c 'read -r foo < backslashes; echo "$foo"' | cat -t
-\a\t\x
-$ ksh -c 'read -r foo < backslashes; echo "$foo"' | cat -t
+$ dash -c 'read -r foo < backslashes; printf %s\\n "$foo"' | cat -t
 \a\t\x
 
-POSIX says of -r, "Do not treat a <backslash> character in any special way. Consider each <backslash> to be part of the input line" [1].  Translating them as escape sequences doesn't appear to be particularly compatible with this, but conceivably the translation is occurring at some other stage.
+>=20
+> Is this the intended behaviour?
 
-Is this the intended behaviour?
+No bug here except in your usage of echo when you should have been using
+printf.
 
-Thanks,
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-    John
 
-[1] http://pubs.opengroup.org/onlinepubs/9699919799/utilities/read.html#tag_20_109_04
+--NQOVCDKnj1uVEPIimJLOxf7D7RSGkIBAB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
- The Wellcome Trust Sanger Institute is operated by Genome Research 
- Limited, a charity registered in England with number 1021457 and a 
- company registered in England with number 2742969, whose registered 
- office is 215 Euston Road, London, NW1 2BE. 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJVv57ZAAoJEKeha0olJ0Nq6nkIAJy58poQa9ItRWRbCgNSRmwp
+jzLgZu8T0gCk4vb2dbsewhI6KeP8MsvAunEKQW+wmsQMlPU1vzngC+Bs6LQesJ2Q
+nVLpvlehsyxXV6JOzp1rzBVd1DEfILD4C7Jq/JWVqCI0yPGugeeNshCm08px6m1v
+M8s/vSsb1G4Wa66Ut2ZOIVAkFrV9lLfUFtNhE4yKJMeK/P+Rk0/zzGg8oGPDDYZR
+ULOlPO36kvq3SvdVLbDoZxzbYwt9dL/fONic5tL05mUAEN25GSM2NkijQPH/4evr
+mC+/lDUC+9H9b6uAkKT4favfkky97EqIqMqO29ErlyK17mmyGZauhlirjBxxHWM=
+=ecnK
+-----END PGP SIGNATURE-----
+
+--NQOVCDKnj1uVEPIimJLOxf7D7RSGkIBAB--
