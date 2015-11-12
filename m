@@ -1,51 +1,85 @@
-From: Seb <sbb@tuxfamily.org>
+From: Petr =?utf-8?Q?=C5=A0abata?= <contyk@redhat.com>
 Subject: Re: [bug?] echo -n does not work as described
-Date: Thu, 12 Nov 2015 09:35:36 +0100
-Message-ID: <20151112083536.GA796@ein.free.fr>
+Date: Thu, 12 Nov 2015 11:03:29 +0100
+Message-ID: <20151112100329.GA1841@kralicek.brq.redhat.com>
 References: <5643F1B2.5050207@sanitarium.net>
- <56440406.7000201@redhat.com>
- <56440A1E.8070701@sanitarium.net>
- <56440B7A.4040508@sanitarium.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="zhXaljGHf11kAtnf"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtpfb2-g21.free.fr ([212.27.42.10]:60215 "EHLO
-	smtpfb2-g21.free.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750765AbbKLIfl (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 12 Nov 2015 03:35:41 -0500
-Received: from smtp5-g21.free.fr (smtp5-g21.free.fr [212.27.42.5])
-	by smtpfb2-g21.free.fr (Postfix) with ESMTP id 59B77D8E1E1
-	for <dash@vger.kernel.org>; Thu, 12 Nov 2015 09:35:35 +0100 (CET)
+Received: from mx1.redhat.com ([209.132.183.28]:59573 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753642AbbKLKMJ (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 12 Nov 2015 05:12:09 -0500
 Content-Disposition: inline
-In-Reply-To: <56440B7A.4040508@sanitarium.net>
+In-Reply-To: <5643F1B2.5050207@sanitarium.net>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
-Cc: Kevin Korb <kmk@sanitarium.net>
+To: Kevin Korb <kmk@sanitarium.net>
+Cc: dash@vger.kernel.org
 
-On Wed, Nov 11, 2015 at 10:46:02PM -0500, Kevin Korb wrote:
 
-> >> By the way, 'echo -n' is non-portable, and POSIX says you
-> >> should use 'printf' instead.
-> 
-> If dash refuses to supply a compatible version of echo then
-> dash must not include a builtin version of echo.  If dash
-> didn't have a broken embedded version of echo I wouldn't have a
-> problem.
+--zhXaljGHf11kAtnf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-dash just claims to be compatible with POSIX, not with *sh. If
-you look for something like this (lighter than bash but with many
-of its features), glance rather at mksh:
+On Wed, Nov 11, 2015 at 08:56:02PM -0500, Kevin Korb wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>=20
+> I am on dash version 0.5.8.2 on Gentoo Linux (USE=3Dlibedit -static).
+>=20
+> The echo builtin does not work as described.  In the man page:
+>  echo [-n] args...
+>    Print the arguments on the standard output, separated by spaces.
+>    Unless the -n option is present, a newline is output following the
+>    arguments.
+>=20
+> However, in actual usage:
+> % dash
+> $ echo testing
+> testing
+> $ echo -n testing
+> - -n testing
+> $ /bin/echo -n testing
+> testing$
+>=20
+> This is causing me problems when I attempt to switch /bin/sh from bash
+> to dash.
 
-  https://www.mirbsd.org/mksh.htm
+Hmm, where does the 0.5.8.2 version come from, I wonder?
+The latest release is 0.5.8 [0] and I cannot reproduce your
+issue with it on Fedora [1] (and note that, afaik, Fedora doesn't
+apply any special patches that could affect this behavior).
 
-Now, I don't understand the present issue, all seems just work as
-expected here (0.5.8):
+Try rebuilding dash with USE=3D-libedit and see if it changes
+anything.  If not -- I would bug the Gentoo maintainers.
 
- $ dash -c 'type echo; echo -n foo; echo foo'
- echo is a shell builtin
- foofoo
+P
 
-++
-Seb.
+[0] http://gondor.apana.org.au/~herbert/dash/
+[1] dash-0.5.8-3.fc23.x86_64
 
+--zhXaljGHf11kAtnf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJWRGPxAAoJEPaFUazsAhFFZvcQAJ++EZeLLeCcSlmycuEMGSJw
+sjA2JR1x8bWmxgFab1gnujlEm+uyk0RTYKIIdxrwY41ZrCe31LPucXwp8ZPouwFc
+e28D0GZ2JNHCIlXAwoLM+HbNqtLNY7orkP6opo9iVnPkmMZNIlEU6+P19X7oIaoN
+DFOQk4eqrnaKEOoNAK6apGj08HB+BlRMlrkYCOdMUVwuFmvHRwtxS7iT3Tyc2vJG
+2v7BDWyNoPldQawNAkI/qv2hv0zLNCwSDNJOjTVeu4dFdVJXobudTqhxNfmgQz88
+0Z6k4LjjYdjN4xYg+l2h3XdcOYRd36kFpFxoPhU0NXrTjEV59VU/Td74TOvC1keu
+A3CdhHxNquyCm55/AeT4CPANFS4ere0b9agJlPXe3BTC3SROLQUAx80t2JIzEqba
+aMqivLuDt8pT2qLwTPBh+a2pLtqPZw982uMxYgajOp8wj/WLJiqRHz33b64f7sxy
+cPgKYmnXT89BMdrziqv/Ha/hYbCbk3AsJQXEXU9b5VNBrk5mtOI0pK02swyIubxf
+ayaEqlEkzpzgQiXKtKKpHDpd9g1gwl+CjpfkD05yFXBXBJhBQ21MBOnBrirCqp/k
+CY2gZ6ez4g1vQ+vBvliigoPWotmnOh9GvihRYpgY2TbgIeY9N54L1mhCsXj3Z68/
+/yVB57C+a946f/4i83UY
+=SH3M
+-----END PGP SIGNATURE-----
+
+--zhXaljGHf11kAtnf--
