@@ -1,40 +1,57 @@
-From: John Marshall <john.marshall@sanger.ac.uk>
-Subject: Re: builtin read -r and backslash-char escape sequences
-Date: Tue, 4 Aug 2015 10:56:39 +0100
-Message-ID: <A73736EB-F742-4F31-A48B-4C4816C5212B@sanger.ac.uk>
-References: <EDC4419D-6669-4211-9005-8970B5499D9A@sanger.ac.uk> <55BF9EE6.8050407@gigawatt.nl>
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8BIT
+From: Kevin Korb <kmk@sanitarium.net>
+Subject: [bug?] echo -n does not work as described
+Date: Wed, 11 Nov 2015 20:56:02 -0500
+Message-ID: <5643F1B2.5050207@sanitarium.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp.sanger.ac.uk ([193.62.202.243]:19862 "EHLO
-	smtp.sanger.ac.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932474AbbHDJ4o convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Tue, 4 Aug 2015 05:56:44 -0400
-In-Reply-To: <55BF9EE6.8050407@gigawatt.nl>
+Received: from asylum.sanitarium.net ([24.173.162.174]:57622 "HELO
+	asylum.sanitarium.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1752340AbbKLCCo (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 11 Nov 2015 21:02:44 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On 3 Aug 2015, at 18:03, Harald van Dijk wrote:
-> On 03/08/2015 18:37, John Marshall wrote:
->> Problems with one of my scripts appear to have been caused by dash's read -r translating escape sequences (like \t) whereas several other shells read them literally.  For example:
->> 
->> $ printf '%s' '\a\t\x' > backslashes
->> $ dash -c 'read -r foo < backslashes; echo "$foo"' | cat -t
->> ^G^I\x
-> 
-> You're using echo to print what gets assigned to foo, but backslashes are not portable with echo. You probably noticed that already since you're using printf to determine what gets saved in the backslashes file.
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-D'oh!  Indeed I noticed that when the backslashes were right there, but to really internalise it I guess one has to find out the hard way -- which I have now done.  The real script eventually evals the line rather than echoing it, but there's a cmd=`echo $cmd | sed ...` along the way that does the damage.
+I am on dash version 0.5.8.2 on Gentoo Linux (USE=libedit -static).
 
-Thanks to both of you,
+The echo builtin does not work as described.  In the man page:
+ echo [-n] args...
+   Print the arguments on the standard output, separated by spaces.
+   Unless the -n option is present, a newline is output following the
+   arguments.
 
-    John
+However, in actual usage:
+% dash
+$ echo testing
+testing
+$ echo -n testing
+- -n testing
+$ /bin/echo -n testing
+testing$
 
--- 
- The Wellcome Trust Sanger Institute is operated by Genome Research 
- Limited, a charity registered in England with number 1021457 and a 
- company registered in England with number 2742969, whose registered 
- office is 215 Euston Road, London, NW1 2BE. 
+This is causing me problems when I attempt to switch /bin/sh from bash
+to dash.
+
+- -- 
+~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,
+- -*~
+	Kevin Korb			Phone:    (407) 252-6853
+	Systems Administrator		Internet:
+	FutureQuest, Inc.		Kevin@FutureQuest.net  (work)
+	Orlando, Florida		kmk@sanitarium.net (personal)
+	Web page:			http://www.sanitarium.net/
+	PGP public key available on web site.
+~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,
+- -*~
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlZD8bIACgkQVKC1jlbQAQc0DQCaAt6x4XveLhPjaPiPaSG8ll5a
+3ZEAn0J5mkr1wd7Nd2l3Q6xKpB2LZ39+
+=lljb
+-----END PGP SIGNATURE-----
