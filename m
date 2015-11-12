@@ -1,48 +1,60 @@
 From: Kevin Korb <kmk@sanitarium.net>
 Subject: Re: [bug?] echo -n does not work as described
-Date: Thu, 12 Nov 2015 11:11:35 -0500
-Message-ID: <5644BA37.2090606@sanitarium.net>
-References: <5643F1B2.5050207@sanitarium.net>
- <20151112081006.GV19618@medion.lan>
+Date: Thu, 12 Nov 2015 11:12:28 -0500
+Message-ID: <5644BA6C.4030400@sanitarium.net>
+References: <5643F1B2.5050207@sanitarium.net> <56440406.7000201@redhat.com>
+ <56440A1E.8070701@sanitarium.net> <56440B7A.4040508@sanitarium.net>
+ <20151112083536.GA796@ein.free.fr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from asylum.sanitarium.net ([24.173.162.174]:54782 "HELO
+Received: from asylum.sanitarium.net ([24.173.162.174]:64030 "HELO
 	asylum.sanitarium.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751035AbbKLQLh (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 12 Nov 2015 11:11:37 -0500
-In-Reply-To: <20151112081006.GV19618@medion.lan>
+	with SMTP id S1751035AbbKLQMa (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 12 Nov 2015 11:12:30 -0500
+In-Reply-To: <20151112083536.GA796@ein.free.fr>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Bastian Bittorf <bittorf@bluebottle.com>
-Cc: dash@vger.kernel.org
+To: Seb <sbb@tuxfamily.org>, dash@vger.kernel.org
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-Then why is the -n behaviour documented in the man page?
+This is what I get:
+% dash -c 'type echo; echo -n foo; echo foo'
+echo is a shell builtin
+- -n foo
+foo
 
-On 11/12/2015 03:10 AM, Bastian Bittorf wrote:
-> * Kevin Korb <kmk@sanitarium.net> [12.11.2015 08:52]:
->> $ echo -n testing - -n testing
+
+On 11/12/2015 03:35 AM, Seb wrote:
+> On Wed, Nov 11, 2015 at 10:46:02PM -0500, Kevin Korb wrote:
 > 
-> in POSIX the '-n' switch (and -e) is undefined. you can work around
-> this via hijacking the call:
+>>>> By the way, 'echo -n' is non-portable, and POSIX says you 
+>>>> should use 'printf' instead.
+>> 
+>> If dash refuses to supply a compatible version of echo then dash
+>> must not include a builtin version of echo.  If dash didn't have
+>> a broken embedded version of echo I wouldn't have a problem.
 > 
-> #!/bin/sh echo() { case "$1" in '-n') shift printf '%s' "$@" ;; *) 
-> printf '%s\n' "$@" ;; esac }
+> dash just claims to be compatible with POSIX, not with *sh. If you
+> look for something like this (lighter than bash but with many of
+> its features), glance rather at mksh:
 > 
-> echo foo echo -n bar
+> https://www.mirbsd.org/mksh.htm
 > 
-> if you really want to remove all the bashisms, it can be a lot of
-> work. dont blame dash for this, but the script author. also
-> consider using shellsheck.net for this with the correct shebang.
+> Now, I don't understand the present issue, all seems just work as 
+> expected here (0.5.8):
 > 
-> bye, bastian -- To unsubscribe from this list: send the line
-> "unsubscribe dash" in the body of a message to
-> majordomo@vger.kernel.org More majordomo info at
-> http://vger.kernel.org/majordomo-info.html
+> $ dash -c 'type echo; echo -n foo; echo foo' echo is a shell
+> builtin foofoo
+> 
+> ++ Seb.
+> 
+> -- To unsubscribe from this list: send the line "unsubscribe dash"
+> in the body of a message to majordomo@vger.kernel.org More
+> majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
 
 - -- 
@@ -57,7 +69,7 @@ On 11/12/2015 03:10 AM, Bastian Bittorf wrote:
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iEYEARECAAYFAlZEujcACgkQVKC1jlbQAQfIuQCeJrtFu94ThY+48k5zphx+s1i/
-mJAAn2zHqfppmvh7mCrWuXHJGnkq9XJ6
-=pqKh
+iEYEARECAAYFAlZEumwACgkQVKC1jlbQAQciqwCeNRjcqFps3ZNtisqM3UI2rlQn
+3NMAn2DAvJuycgyFnDTf10jP3y4Gu8x9
+=lCLu
 -----END PGP SIGNATURE-----
