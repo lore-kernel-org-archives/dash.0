@@ -1,102 +1,91 @@
-From: Kevin Korb <kmk@sanitarium.net>
+From: Stephane Chazelas <stephane.chazelas@gmail.com>
 Subject: Re: [bug?] echo -n does not work as described
-Date: Thu, 12 Nov 2015 11:55:27 -0500
-Message-ID: <5644C47F.2060008@sanitarium.net>
+Date: Thu, 12 Nov 2015 21:24:45 +0000
+Message-ID: <20151112212445.GA12431@chaz.gmail.com>
 References: <5643F1B2.5050207@sanitarium.net>
- <20151112100329.GA1841@kralicek.brq.redhat.com>
- <5644BBDC.4000108@sanitarium.net>
+ <56440406.7000201@redhat.com>
+ <56440A1E.8070701@sanitarium.net>
+ <56440B7A.4040508@sanitarium.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from asylum.sanitarium.net ([24.173.162.174]:61895 "HELO
-	asylum.sanitarium.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752878AbbKLQz2 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 12 Nov 2015 11:55:28 -0500
-In-Reply-To: <5644BBDC.4000108@sanitarium.net>
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:35497 "EHLO
+	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752291AbbKLVYs (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 12 Nov 2015 16:24:48 -0500
+Received: by wmdw130 with SMTP id w130so4856996wmd.0
+        for <dash@vger.kernel.org>; Thu, 12 Nov 2015 13:24:47 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <56440B7A.4040508@sanitarium.net>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Kevin Korb <kmk@sanitarium.net>
+Cc: Eric Blake <eblake@redhat.com>, dash@vger.kernel.org
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+2015-11-11 22:46:02 -0500, Kevin Korb:
+[...]
+> >>> NOTE: your shell may have its own version of echo, which
+> >>> usually super=E2=80=90 sedes the version described here. Please r=
+efer
+> >>> to your shell's docu=E2=80=90 mentation for details about the opt=
+ions
+> >>> it supports.
+> >=20
+> >> By the way, 'echo -n' is non-portable, and POSIX says you should=20
+> >> use 'printf' instead.
+>=20
+> If dash refuses to supply a compatible version of echo then dash must
+> not include a builtin version of echo.  If dash didn't have a broken
+> embedded version of echo I wouldn't have a problem.
+[...]
 
-=46or future reference, I did some reading in Gentoo's bugzilla...
+To clarify, a few things, sh and the POSIX/Unix utilities like C
+nowadays is a language that has a (well several) standard that
+defines it, and several existing implementations of interpreters
+that interpret that language.
 
-Apparently the Gentoo devs broke dash's echo -n on purpose.  Their
-intention is to cause any shell script that is called with /bin/sh to
-fail if the script uses echo -n.  However, they didn't limit this
-behaviour to dash as /bin/sh as it happens as /bin/dash too and they
-didn't modify the man page and they didn't break bash this way.
+Among the most recognised specifications, we have POSIX and
+Unix. Both specifications have now been merged. To simplify, the
+Unix spec is like the POSIX spec but where a few optional parts
+are required.
 
-So, I am calling this a stupid Gentooism and I am forking their ebuild
-for my own systems with that patch commented out.
+So basically we have the POSIX syntax for sh and utilities and
+the Unix syntax.
 
-On 11/12/2015 11:18 AM, Kevin Korb wrote:
-> AHA!  Now we are getting somewhere.  I compiled dash myself and it=20
-> behaved properly.  I then tracked my problem to this Gentoo patch:=20
-> https://gitweb.gentoo.org/repo/gentoo.git/tree/app-shells/dash/files/=
-d
-as
->
->=20
-h-0.5.8.1-dumb-echo.patch
->=20
-> So, apparently my problem is with Gentoo not dash.  Thanks for
-> helping me figure that out.
->=20
-> On 11/12/2015 05:03 AM, Petr =8Aabata wrote:
->> On Wed, Nov 11, 2015 at 08:56:02PM -0500, Kevin Korb wrote:
->>> -----BEGIN PGP SIGNED MESSAGE----- Hash: SHA1
->>>=20
->>> I am on dash version 0.5.8.2 on Gentoo Linux (USE=3Dlibedit=20
->>> -static).
->>>=20
->>> The echo builtin does not work as described.  In the man page:
->>>  echo [-n] args... Print the arguments on the standard output,=20
->>> separated by spaces. Unless the -n option is present, a
->>> newline is output following the arguments.
->>>=20
->>> However, in actual usage: % dash $ echo testing testing $ echo
->>> -n testing - -n testing $ /bin/echo -n testing testing$
->>>=20
->>> This is causing me problems when I attempt to switch /bin/sh
->>> from bash to dash.
->=20
->> Hmm, where does the 0.5.8.2 version come from, I wonder? The
->> latest release is 0.5.8 [0] and I cannot reproduce your issue
->> with it on Fedora [1] (and note that, afaik, Fedora doesn't apply
->> any special patches that could affect this behavior).
->=20
->> Try rebuilding dash with USE=3D-libedit and see if it changes=20
->> anything.  If not -- I would bug the Gentoo maintainers.
->=20
->> P
->=20
->> [0] http://gondor.apana.org.au/~herbert/dash/ [1]=20
->> dash-0.5.8-3.fc23.x86_64
->=20
->=20
-> -- To unsubscribe from this list: send the line "unsubscribe dash"
-> in the body of a message to majordomo@vger.kernel.org More
-> majordomo info at  http://vger.kernel.org/majordomo-info.html
->=20
+In the POSIX syntax, the behaviour for:
 
-- --=20
-~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.=
-,
-	Kevin Korb			Phone:    (407) 252-6853
-	Systems Administrator		Internet:
-	FutureQuest, Inc.		Kevin@FutureQuest.net  (work)
-	Orlando, Florida		kmk@sanitarium.net (personal)
-	Web page:			http://www.sanitarium.net/
-	PGP public key available on web site.
-~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.,-*~'`^`'~*-,._.=
-,
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+echo -n whatever
 
-iEYEARECAAYFAlZExH8ACgkQVKC1jlbQAQcWQACg92JXp/RNRl5Bw3qGeFzQF8hq
-aXIAoK13wl6ELE9BEfFjRd1qJoWk26lC
-=3DxFAp
------END PGP SIGNATURE-----
+is unspecified. That means that a POSIX conformant script, or a
+script written to be portable to POSIX conformant systems must
+not call echo with a first argument that may be -n. We're told
+to use printf instead there:
+
+printf %s "$var"
+instead of
+echo -n "$var"
+
+Same goes for any argument that contains backslash character.
+
+In the Unix syntax however, the behaviour of echo is clearly
+specified.
+
+echo -n whatever
+
+is required to output "-n whatever<newline>", so your dash is
+both POSIX and Unix conformant in that regard.
+
+The builtin echo of bash, by default is neither POSIX nor Unix
+conformant unless both the xpg_echo and posix (that one enabled
+when called as sh) options have been enabled.
+
+More details at:
+
+http://unix.stackexchange.com/questions/65803/why-is-printf-better-than=
+-echo
+
+In short, don't use echo.
+
+--=20
+Stephane
