@@ -1,91 +1,60 @@
-From: Stephane Chazelas <stephane.chazelas@gmail.com>
-Subject: Re: [bug?] echo -n does not work as described
-Date: Thu, 12 Nov 2015 21:24:45 +0000
-Message-ID: <20151112212445.GA12431@chaz.gmail.com>
-References: <5643F1B2.5050207@sanitarium.net>
- <56440406.7000201@redhat.com>
- <56440A1E.8070701@sanitarium.net>
- <56440B7A.4040508@sanitarium.net>
+From: Gioele Barabucci <gioele@svario.it>
+Subject: Dash only reads the first character from pipe (bash reads whole line)
+Date: Sat, 14 Nov 2015 00:24:06 +0100
+Message-ID: <n25ren$pf5$1@ger.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:35497 "EHLO
-	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752291AbbKLVYs (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 12 Nov 2015 16:24:48 -0500
-Received: by wmdw130 with SMTP id w130so4856996wmd.0
-        for <dash@vger.kernel.org>; Thu, 12 Nov 2015 13:24:47 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <56440B7A.4040508@sanitarium.net>
+Received: from plane.gmane.org ([80.91.229.3]:54388 "EHLO plane.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751085AbbKMXZH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 13 Nov 2015 18:25:07 -0500
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <gcsd-dash@m.gmane.org>)
+	id 1ZxNiK-0005xw-N7
+	for dash@vger.kernel.org; Sat, 14 Nov 2015 00:25:04 +0100
+Received: from x5ce483de.dyn.telefonica.de ([92.228.131.222])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Sat, 14 Nov 2015 00:25:04 +0100
+Received: from gioele by x5ce483de.dyn.telefonica.de with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <dash@vger.kernel.org>; Sat, 14 Nov 2015 00:25:04 +0100
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Kevin Korb <kmk@sanitarium.net>
-Cc: Eric Blake <eblake@redhat.com>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-2015-11-11 22:46:02 -0500, Kevin Korb:
-[...]
-> >>> NOTE: your shell may have its own version of echo, which
-> >>> usually super=E2=80=90 sedes the version described here. Please r=
-efer
-> >>> to your shell's docu=E2=80=90 mentation for details about the opt=
-ions
-> >>> it supports.
-> >=20
-> >> By the way, 'echo -n' is non-portable, and POSIX says you should=20
-> >> use 'printf' instead.
->=20
-> If dash refuses to supply a compatible version of echo then dash must
-> not include a builtin version of echo.  If dash didn't have a broken
-> embedded version of echo I wouldn't have a problem.
-[...]
+Hello,
 
-To clarify, a few things, sh and the POSIX/Unix utilities like C
-nowadays is a language that has a (well several) standard that
-defines it, and several existing implementations of interpreters
-that interpret that language.
+a 6 year old Debian bug [1] describes a problem with reading from pipes 
+that is still present in the current dash version (I tested up to git 
+commit 7062c78).
 
-Among the most recognised specifications, we have POSIX and
-Unix. Both specifications have now been merged. To simplify, the
-Unix spec is like the POSIX spec but where a few optional parts
-are required.
+The following test, by the original reporter, shows the problem
 
-So basically we have the POSIX syntax for sh and utilities and
-the Unix syntax.
+ > The 'read' command seems to only read the first character and not the 
+ > whole line.
+ >
+ > Example / comparison with bash:
+ >
+ > # /bin/dash
+ > # sudo modprobe nf_conntrack
+ > # read MAX </proc/sys/net/netfilter/nf_conntrack_max
+ > # echo $MAX
+ > 2
+ >
+ > # /bin/bash
+ > # read MAX </proc/sys/net/netfilter/nf_conntrack_max
+ > # echo $MAX
+ > 262144
 
-In the POSIX syntax, the behaviour for:
+It this a known problem? Are there workarounds?
 
-echo -n whatever
+Regards,
 
-is unspecified. That means that a POSIX conformant script, or a
-script written to be portable to POSIX conformant systems must
-not call echo with a first argument that may be -n. We're told
-to use printf instead there:
+[1] https://bugs.debian.org/547902
 
-printf %s "$var"
-instead of
-echo -n "$var"
+--
+Gioele Barabucci <gioele@svario.it>
 
-Same goes for any argument that contains backslash character.
-
-In the Unix syntax however, the behaviour of echo is clearly
-specified.
-
-echo -n whatever
-
-is required to output "-n whatever<newline>", so your dash is
-both POSIX and Unix conformant in that regard.
-
-The builtin echo of bash, by default is neither POSIX nor Unix
-conformant unless both the xpg_echo and posix (that one enabled
-when called as sh) options have been enabled.
-
-More details at:
-
-http://unix.stackexchange.com/questions/65803/why-is-printf-better-than=
--echo
-
-In short, don't use echo.
-
---=20
-Stephane
