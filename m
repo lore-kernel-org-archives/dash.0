@@ -1,219 +1,101 @@
 From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: dash: read does not ignore trailing spaces
-Date: Fri, 4 Dec 2015 20:51:19 +0100
-Message-ID: <5661EEB7.8080908@gigawatt.nl>
-References: <n3nrqu$mj2$1@ger.gmane.org> <5660ADD6.4020308@gigawatt.nl>
- <20151203211748.GC9581@chaz.gmail.com> <5660C1A6.1010902@gigawatt.nl>
+Subject: Re: Sourcing an empty files does not reset exit status
+Date: Sat, 5 Dec 2015 16:40:59 +0100
+Message-ID: <5663058B.1030809@gigawatt.nl>
+References: <n2e2qe$voq$1@ger.gmane.org>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
- boundary="------------060209000805040806040003"
+ boundary="------------040404060600080405010304"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailfilter1-k0683s008-2.csv-networks.nl ([92.48.231.158]:49281
+Received: from mailfilter1-k0683s008-2.csv-networks.nl ([92.48.231.158]:53640
 	"EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753456AbbLDTv0 (ORCPT
-	<rfc822;dash@vger.kernel.org>); Fri, 4 Dec 2015 14:51:26 -0500
-In-Reply-To: <5660C1A6.1010902@gigawatt.nl>
+	by vger.kernel.org with ESMTP id S1753352AbbLEPlI (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sat, 5 Dec 2015 10:41:08 -0500
+In-Reply-To: <n2e2qe$voq$1@ger.gmane.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Stephane Chazelas <stephane.chazelas@gmail.com>
-Cc: Gioele Barabucci <gioele@svario.it>, dash@vger.kernel.org
+To: Gioele Barabucci <gioele@svario.it>
+Cc: dash@vger.kernel.org
 
 This is a multi-part message in MIME format.
---------------060209000805040806040003
-Content-Type: text/plain; charset=windows-1252; format=flowed
+--------------040404060600080405010304
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 03/12/2015 23:26, Harald van Dijk wrote:
-> On 03/12/2015 22:17, Stephane Chazelas wrote:
->> 2015-12-03 22:02:14 +0100, Harald van Dijk:
->> [....]
->>>    $ for shell in bash mksh posh zsh; do printf %s: "$shell"; $shell
->>> -c 'IFS=,; echo a, | { read v; echo "<$v>"; }'; done
->>>    bash:<a>
->>>    mksh:<a>
->>>    posh:<a,>
->>>    zsh:<a,>
->>>
->>> As far as I can tell, the posh/zsh behaviour is the correct
->>> behaviour, but I'm not convinced yet my interpretation is correct.
->> [...]
->>
->> zsh and pdksh (and other descendants of the Forsyth shell) treat it as
->> separator (and are not compliant), mksh (derived from pdksh)
->> changed it recently. posh (also based on pdksh) still hasn't changed it.
+On 17/11/2015 03:18, Gioele Barabucci wrote:
+> Hello,
 >
-> [...]
-> I do see your point. Thanks for the clear example, I think I agree with
-> you, the description of field splitting mentions that delimiters are
-> used as terminators:
+> a bug has been filed in the Debian BTS about dash not resetting the exit
+> status after sourcing an empty file with the dot command. [1]
 >
->    "The shell shall treat each character of the IFS as a delimiter and
-> use the delimiters as field terminators to [...]"
+> The following test echoes "OK" with bash and "fail" with dash
 >
-> It should not be much of a problem to extend the patch I posted to cover
-> the rules as you describe them, I will make an attempt at this later.
+>      #!/bin/sh
+>
+>      echo > ./empty
+>      false
+>
+>      . ./empty && echo "OK" || echo "fail"
+ >
+> A similar bug in dash has been discussed and addressed in 2011 [2], but
+> it looks like the solution has been only partial.
+>
+> The version of dash I tested is the current git master branch, commit
+> 2e58422.
+>
+> [1] https://bugs.debian.org/777262
+> [2] http://article.gmane.org/gmane.comp.shells.dash/531
 
-Here it is. Attached is an updated patch that ignores the complete 
-terminator if only a single field remains, otherwise ignores only 
-trailing IFS whitespace.
+The bug described there was about empty files. While the fix has been 
+applied and does make dash handle empty files properly, your test 
+doesn't use an empty file, it uses a file containing a single blank 
+line. Unfortunately, the single blank line gets parsed by dash as a null 
+command, null commands don't (and shouldn't) reset the exit status, and 
+the fix you link to doesn't handle this because it sees a command has 
+been executed and saves the exit status after executing that command as 
+the exit status to be used by ".".
+
+I think the easiest way to fix this is to prevent null commands from 
+affecting status in cmdloop, as attached.
+
+An alternative could be to change the outer if condition to exclude
+n == NULL, but I didn't do that because the change of job_warning and 
+clearing of numeof make sense to me even for null commands. Besides, 
+when debug tracing is enabled, null commands have a visible effect that 
+should remain.
+
+Note that this fixes the problem with . but the same problem can be 
+present in other locations. For example,
+
+     false
+     eval "
+     " && echo OK || echo Fail
+
+used to print Fail, and needed the same modification in the evalstring 
+function to make that print OK (included in the attached patch). There 
+may be other similar bugs lurking.
 
 Cheers,
 Harald van Dijk
 
---------------060209000805040806040003
+--------------040404060600080405010304
 Content-Type: text/plain; charset=UTF-8;
- name="dash-read-ifs.patch"
-Content-Transfer-Encoding: 7bit
+ name="dash-dot-status.patch"
+Content-Transfer-Encoding: base64
 Content-Disposition: attachment;
- filename="dash-read-ifs.patch"
+ filename="dash-dot-status.patch"
 
-diff --git a/src/expand.c b/src/expand.c
-index b2d710d..c6e87d5 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -203,7 +203,7 @@ expandarg(union node *arg, struct arglist *arglist, int flag)
- 	 * TODO - EXP_REDIR
- 	 */
- 	if (flag & EXP_FULL) {
--		ifsbreakup(p, &exparg);
-+		ifsbreakup(p, 0, &exparg);
- 		*exparg.lastp = NULL;
- 		exparg.lastp = &exparg.list;
- 		expandmeta(exparg.list, flag);
-@@ -1016,9 +1016,11 @@ recordregion(int start, int end, int nulonly)
-  * Break the argument string into pieces based upon IFS and add the
-  * strings to the argument list.  The regions of the string to be
-  * searched for IFS characters have been stored by recordregion.
-+ * If maxargs is non-zero, at most maxargs arguments will be created, by
-+ * joining together the last arguments.
-  */
- void
--ifsbreakup(char *string, struct arglist *arglist)
-+ifsbreakup(char *string, int maxargs, struct arglist *arglist)
- {
- 	struct ifsregion *ifsp;
- 	struct strlist *sp;
-@@ -1054,12 +1056,58 @@ ifsbreakup(char *string, struct arglist *arglist)
- 						start = p;
- 						continue;
- 					}
-+					/* If only reading one more argument:
-+					 * If we have exactly one field, read that field without its terminator.
-+					 * If we have more than one field, read all fields including their terminators,
-+					 * except for trailing IFS whitespace.
-+					 *
-+					 * This means that if we have only IFS characters left, and at most one
-+					 * of them is non-whitespace, we stop reading here.
-+					 * Otherwise, we read all the remaining characters except for trailing
-+					 * IFS whitespace.
-+					 *
-+					 * To keep track of this, the variable s indicates what we've seen so far.
-+					 * 0: only IFS whitespace.
-+					 * 1: exactly one IFS non-whitespace character.
-+					 * 2: non-IFS characters, or multiple IFS non-whitespace characters.
-+					 *
-+					 * In any case, q indicates the start of the characters to remove, or NULL
-+					 * if no characters should be removed.
-+					 */
-+					if (maxargs == 1) {
-+						int s = !ifsspc;
-+						q = p;
-+						for (;;) {
-+							p++;
-+							if (p >= string + ifsp->endoff) {
-+								if (q)
-+									*q = '\0';
-+								goto add;
-+							}
-+							if (*p == (char)CTLESC)
-+								p++;
-+							if (strchr(ifs, *p)) {
-+								if (strchr(defifs, *p)) {
-+									if (!q)
-+										q = p;
-+									continue;
-+								}
-+								if (s == 0) {
-+									s = 1;
-+									continue;
-+								}
-+							}
-+							s = 2;
-+							q = 0;
-+						}
-+					}
- 					*q = '\0';
- 					sp = (struct strlist *)stalloc(sizeof *sp);
- 					sp->text = start;
- 					*arglist->lastp = sp;
- 					arglist->lastp = &sp->next;
- 					p++;
-+					if (maxargs) maxargs--;
- 					if (!nulonly) {
- 						for (;;) {
- 							if (p >= string + ifsp->endoff) {
-diff --git a/src/expand.h b/src/expand.h
-index 6a90f67..26dc5b4 100644
---- a/src/expand.h
-+++ b/src/expand.h
-@@ -69,7 +69,7 @@ char *_rmescapes(char *, int);
- int casematch(union node *, char *);
- void recordregion(int, int, int);
- void removerecordregions(int); 
--void ifsbreakup(char *, struct arglist *);
-+void ifsbreakup(char *, int, struct arglist *);
- void ifsfree(void);
- 
- /* From arith.y */
-diff --git a/src/miscbltin.c b/src/miscbltin.c
-index b596fd2..39b9c47 100644
---- a/src/miscbltin.c
-+++ b/src/miscbltin.c
-@@ -67,28 +67,21 @@
-  *  less fields than variables -> remaining variables unset.
-  *
-  *  @param line complete line of input
-+ *  @param ac argument count
-  *  @param ap argument (variable) list
-  *  @param len length of line including trailing '\0'
-  */
- static void
--readcmd_handle_line(char *s, char **ap)
-+readcmd_handle_line(char *s, int ac, char **ap)
- {
- 	struct arglist arglist;
- 	struct strlist *sl;
--	char *backup;
--	char *line;
- 
--	/* ifsbreakup will fiddle with stack region... */
--	line = stackblock();
- 	s = grabstackstr(s);
- 
--	/* need a copy, so that delimiters aren't lost
--	 * in case there are more fields than variables */
--	backup = sstrdup(line);
--
- 	arglist.lastp = &arglist.list;
- 	
--	ifsbreakup(s, &arglist);
-+	ifsbreakup(s, ac, &arglist);
- 	*arglist.lastp = NULL;
- 	ifsfree();
- 
-@@ -104,21 +97,6 @@ readcmd_handle_line(char *s, char **ap)
- 			return;
- 		}
- 
--		/* remaining fields present, but no variables left. */
--		if (!ap[1] && sl->next) {
--			size_t offset;
--			char *remainder;
--
--			/* FIXME little bit hacky, assuming that ifsbreakup 
--			 * will not modify the length of the string */
--			offset = sl->text - s;
--			remainder = backup + offset;
--			rmescapes(remainder);
--			setvar(*ap, remainder, 0);
---------------060209000805040806040003--
+ZGlmZiAtLWdpdCBhL3NyYy9ldmFsLmMgYi9zcmMvZXZhbC5jCmluZGV4IDA3MWZiMWIuLjQ2
+Njg5ZWYgMTAwNjQ0Ci0tLSBhL3NyYy9ldmFsLmMKKysrIGIvc3JjL2V2YWwuYwpAQCAtMTcy
+LDcgKzE3Miw3IEBAIGV2YWxzdHJpbmcoY2hhciAqcywgaW50IGZsYWdzKQogCXN0YXR1cyA9
+IDA7CiAJd2hpbGUgKChuID0gcGFyc2VjbWQoMCkpICE9IE5FT0YpIHsKIAkJZXZhbHRyZWUo
+biwgZmxhZ3MgJiB+KHBhcnNlcl9lb2YoKSA/IDAgOiBFVl9FWElUKSk7Ci0JCXN0YXR1cyA9
+IGV4aXRzdGF0dXM7CisJCWlmIChuKSBzdGF0dXMgPSBleGl0c3RhdHVzOwogCQlwb3BzdGFj
+a21hcmsoJnNtYXJrKTsKIAkJaWYgKGV2YWxza2lwKQogCQkJYnJlYWs7CmRpZmYgLS1naXQg
+YS9zcmMvbWFpbi5jIGIvc3JjL21haW4uYwppbmRleCBiZWRiNjYzLi4xYjMwMWZhIDEwMDY0
+NAotLS0gYS9zcmMvbWFpbi5jCisrKyBiL3NyYy9tYWluLmMKQEAgLTIyOCw3ICsyMjgsNyBA
+QCBjbWRsb29wKGludCB0b3ApCiAJCQlqb2Jfd2FybmluZyA9IChqb2Jfd2FybmluZyA9PSAy
+KSA/IDEgOiAwOwogCQkJbnVtZW9mID0gMDsKIAkJCWV2YWx0cmVlKG4sIDApOwotCQkJc3Rh
+dHVzID0gZXhpdHN0YXR1czsKKwkJCWlmIChuKSBzdGF0dXMgPSBleGl0c3RhdHVzOwogCQl9
+CiAJCXBvcHN0YWNrbWFyaygmc21hcmspOwogCg==
+--------------040404060600080405010304--
