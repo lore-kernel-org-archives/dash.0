@@ -1,112 +1,55 @@
-From: Gioele Barabucci <gioele@svario.it>
-Subject: [PATCH] [BUILTIN] Reject malformed printf specifications with digits
- after '*'
-Date: Sun, 6 Dec 2015 15:09:42 +0100
-Message-ID: <n41fj7$tj9$1@ger.gmane.org>
+From: Jonathan Perkin <jperkin@joyent.com>
+Subject: [PATCH] trap: Implement POSIX.1-2008 trap reset behaviour
+Date: Mon, 7 Dec 2015 13:18:33 +0000
+Message-ID: <20151207131833.GC735@joyent.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------000505020300070602060700"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from plane.gmane.org ([80.91.229.3]:49557 "EHLO plane.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753132AbbLFOJ4 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 6 Dec 2015 09:09:56 -0500
-Received: from list by plane.gmane.org with local (Exim 4.69)
-	(envelope-from <gcsd-dash@m.gmane.org>)
-	id 1a5a0f-0001Hq-DY
-	for dash@vger.kernel.org; Sun, 06 Dec 2015 15:09:53 +0100
-Received: from x4db6bd17.dyn.telefonica.de ([77.182.189.23])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Sun, 06 Dec 2015 15:09:53 +0100
-Received: from gioele by x4db6bd17.dyn.telefonica.de with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Sun, 06 Dec 2015 15:09:53 +0100
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:35027 "EHLO
+	mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755046AbbLGNSi (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 7 Dec 2015 08:18:38 -0500
+Received: by wmuu63 with SMTP id u63so140038026wmu.0
+        for <dash@vger.kernel.org>; Mon, 07 Dec 2015 05:18:37 -0800 (PST)
+Received: from joyent.com (host86-144-234-20.range86-144.btcentralplus.com. [86.144.234.20])
+        by smtp.gmail.com with ESMTPSA id s11sm16760914wmb.14.2015.12.07.05.18.36
+        for <dash@vger.kernel.org>
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Mon, 07 Dec 2015 05:18:36 -0800 (PST)
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------000505020300070602060700
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+POSIX.1-2008 for trap adds the following behaviour:
 
-Hello,
+    If the first operand is an unsigned decimal integer, the shell shall
+    treat all operands as conditions, and shall reset each condition to
+    the default value.
 
-I am forwarding a patch related to the bug described at
-<https://bugs.debian.org/779618>.
-
-You can find the same patch at
-<https://github.com/gioele/dash/commit/ebdd2d7992c4b2bf49d9af2eed33e3c18c86dfc6>.
-
-I refreshed the patch to be compatible with the current code, but left
-the original author as the git author. I hope this is fine.
-
-Regards,
-
---
-Gioele Barabucci <gioele@svario.it>
-
-
-
-
---------------000505020300070602060700
-Content-Type: text/x-patch;
- name="0001-BUILTIN-Reject-malformed-printf-specifications-with-.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename*0="0001-BUILTIN-Reject-malformed-printf-specifications-with-.pa";
- filename*1="tch"
-
-From ebdd2d7992c4b2bf49d9af2eed33e3c18c86dfc6 Mon Sep 17 00:00:00 2001
-From: Patrick Brown <opensource@whoopdedo.org>
-Date: Mon, 2 Mar 2015 23:10:09 -0500
-Subject: [PATCH] [BUILTIN] Reject malformed printf specifications with digits
- after '*'
-
-Dash doesn't notice when a format string has digits following a * width
-specifier.
-
-    $ dash -c 'printf "%*0s  " 1 2 && echo FAIL || echo OK'
-    %10s  FAIL
-
-    $ bash -c 'printf "%*0s  " 1 2 && echo FAIL || echo OK'
-    bash: line 0: printf: `0': invalid format character
-    OK
-    $ mksh -c 'printf "%*0s  " 1 2 && echo FAIL || echo OK'
-    printf: %*0: invalid conversion specification
-    OK
-
-With this patch dash complains about the malformed specifications.
-
-    $ ./src/dash -c 'printf "%*0s  " 1 2 && echo FAIL || echo OK'
-    ./src/dash: 1: printf: %*0: invalid directive
-    OK
-
-Fixes: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=779618
-
-Originally-by: Patrick Brown <opensource@whoopdedo.org>
-Forwarded-by: Gioele Barabucci <gioele@svario.it>
+Whilst the standard specifies an "unsigned decimal integer", we take the
+pragmatic approach of enabling this behaviour iff the first operand is a
+valid signal, otherwise it is interpreted as an action.  This matches
+the behaviour of most other shells in this regard.
 ---
- src/bltin/printf.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ src/trap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/bltin/printf.c b/src/bltin/printf.c
-index 9673e10..83077a7 100644
---- a/src/bltin/printf.c
-+++ b/src/bltin/printf.c
-@@ -175,17 +175,20 @@ pc:
- 
- 			/* skip to field width */
- 			fmt += strspn(fmt, SKIP1);
--			if (*fmt == '*')
-+			if (*fmt == '*') {
- 				*param++ = getuintmax(1);
--
--			/* skip to possible '.', get following precision */
--			fmt += strspn(fmt, SKIP2);
--			if (*fmt == '.')
- 				++fmt;
--			if (*fmt == '*')
--				*param++ = getuintmax(1);
---------------000505020300070602060700--
+diff --git a/src/trap.c b/src/trap.c
+index 82d4263..2d20c3f 100644
+--- a/src/trap.c
++++ b/src/trap.c
+@@ -112,7 +112,7 @@ trapcmd(int argc, char **argv)
+ 		}
+ 		return 0;
+ 	}
+-	if (!ap[1])
++	if ((!ap[1]) || (decode_signal(*ap, 0) >= 0))
+ 		action = NULL;
+ 	else
+ 		action = *ap++;
+-- 
+2.4.9 (Apple Git-60)
+
+-- 
+Jonathan Perkin  -  Joyent, Inc.  -  www.joyent.com
