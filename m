@@ -1,89 +1,65 @@
 From: Jonathan Perkin <jperkin@joyent.com>
-Subject: [PATCH] [SHELL] Fix build on Solaris 9
-Date: Fri, 11 Dec 2015 11:56:43 +0000
-Message-ID: <20151211115623.GA54973@joyent.com>
+Subject: [PATCH] [SHELL] Fix 64-bit Solaris build
+Date: Fri, 11 Dec 2015 13:07:14 +0000
+Message-ID: <20151211130714.GD54973@joyent.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:35371 "EHLO
-	mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752902AbbLKL4s (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 11 Dec 2015 06:56:48 -0500
-Received: by mail-wm0-f41.google.com with SMTP id l68so9955991wml.0
-        for <dash@vger.kernel.org>; Fri, 11 Dec 2015 03:56:47 -0800 (PST)
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:34069 "EHLO
+	mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750960AbbLKNHW (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 11 Dec 2015 08:07:22 -0500
+Received: by mail-wm0-f50.google.com with SMTP id c17so10955389wmd.1
+        for <dash@vger.kernel.org>; Fri, 11 Dec 2015 05:07:22 -0800 (PST)
 Received: from joyent.com (host86-144-234-20.range86-144.btcentralplus.com. [86.144.234.20])
-        by smtp.gmail.com with ESMTPSA id s11sm3096126wmb.14.2015.12.11.03.56.45
+        by smtp.gmail.com with ESMTPSA id t64sm3306298wmf.23.2015.12.11.05.07.18
         for <dash@vger.kernel.org>
         (version=TLSv1/SSLv3 cipher=OTHER);
-        Fri, 11 Dec 2015 03:56:46 -0800 (PST)
+        Fri, 11 Dec 2015 05:07:20 -0800 (PST)
 Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Ensure dash can build in a default Solaris 9 or older environment:
+In a 64-bit Solaris environment there is no stat64() function, only
+stat().  This conflicts with the stat64 #define used to support
+dietlibc/klibc when stat64() is not found and results in:
 
- - Execute scripts with $SHELL rather than /bin/sh, the latter does not
-   support e.g. "if ! .." used by mkbuiltins.
+  ./../config.h:194:16: error: redefinition of 'struct stat'
+   #define stat64 stat
+                ^
+  In file included from cd.c:36:0:
+  /usr/include/sys/stat.h:217:8: note: originally defined here
+   struct stat {
+          ^
 
- - /bin/awk does not support ?: syntax, use explicit statements instead.
-
- - /bin/nl requires no spaces between options and arguments.
+Instead, add a AC_CHECK_DECL test for stat64, and only perform the
+AC_CHECK_FUNC test if it isn't already defined.
 ---
- src/Makefile.am |  4 ++--
- src/mkbuiltins  | 12 ++++++++----
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ configure.ac | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index 120ffa2..139355e 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -46,13 +46,13 @@ EXTRA_DIST = \
- 	mknodes.c nodetypes nodes.c.pat mksyntax.c mksignames.c
+diff --git a/configure.ac b/configure.ac
+index 8ae0dc6..f4c9b87 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -139,10 +139,12 @@ if test "$ac_cv_func_signal" != yes; then
+ fi
  
- token.h token_vars.h: mktokens
--	sh $^
-+	$(SHELL) $^
+ dnl Check for stat64 (dietlibc/klibc).
+-AC_CHECK_FUNC(stat64,, [
+-	AC_DEFINE(fstat64, fstat, [64-bit operations are the same as 32-bit])
+-	AC_DEFINE(lstat64, lstat, [64-bit operations are the same as 32-bit])
+-	AC_DEFINE(stat64, stat, [64-bit operations are the same as 32-bit])
++AC_CHECK_DECL(stat64,,[
++	AC_CHECK_FUNC(stat64,, [
++		AC_DEFINE(fstat64, fstat, [64-bit operations are the same as 32-bit])
++		AC_DEFINE(lstat64, lstat, [64-bit operations are the same as 32-bit])
++		AC_DEFINE(stat64, stat, [64-bit operations are the same as 32-bit])
++	])
+ ])
  
- builtins.def: builtins.def.in $(top_builddir)/config.h
- 	$(COMPILE) -E -x c -o $@ $<
- 
- builtins.c builtins.h: mkbuiltins builtins.def
--	sh $^
-+	$(SHELL) $^
- 
- init.c: mkinit $(dash_CFILES)
- 	./$^
-diff --git a/src/mkbuiltins b/src/mkbuiltins
-index 8c74d6b..b4d6f4e 100644
---- a/src/mkbuiltins
-+++ b/src/mkbuiltins
-@@ -84,9 +84,13 @@ awk '{	for (i = 2 ; i <= NF ; i++) {
- 			opt = substr($2, 2)
- 			$2 = $3
- 		}
--		printf "\t{ \"%s\", %s, %d },\n", $1,
--			(opt ~ /n/) ? "NULL" : $2,
--			(opt ~ /s/) + (opt ~ /[su]/) * 2 + (opt ~ /a/) * 4
-+		mask = 0
-+		cmd = $2
-+		if (opt ~ /n/) { cmd = "NULL" }
-+		if (opt ~ /s/) { mask += 1 }
-+		if (opt ~ /[su]/) { mask += 2 }
-+		if (opt ~ /a/) { mask += 4 }
-+		printf "\t{ \"%s\", %s, %d },\n", $1, cmd, mask
- 	}'
- echo '};'
- 
-@@ -97,7 +101,7 @@ cat <<\!
-  */
- 
- !
--sed 's/	-[a-z]*//' $temp2 | nl -b a -v 0 |
-+sed 's/	-[a-z]*//' $temp2 | nl -ba -v0 |
- 	LC_ALL= LC_COLLATE=C sort -u -k 3,3 |
- 	tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ |
- 	awk '{	printf "#define %s (builtincmd + %d)\n", $3, $1}'
+ AC_CHECK_FUNC(open64,, [
 -- 
 2.4.9 (Apple Git-60)
 
