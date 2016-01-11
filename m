@@ -1,53 +1,63 @@
 From: Gioele Barabucci <gioele@svario.it>
-Subject: Re: Inheriting IFS from environment
-Date: Sun, 3 Jan 2016 19:46:45 +0100
-Message-ID: <n6bqam$fk2$1@ger.gmane.org>
-References: <56840F22.6040302@inlv.org>
+Subject: [PATCH] man: Document ulimit -v
+Date: Mon, 11 Jan 2016 20:12:35 +0100
+Message-ID: <56938FD6.3010600@svario.it>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from plane.gmane.org ([80.91.229.3]:35516 "EHLO plane.gmane.org"
+Received: from plane.gmane.org ([80.91.229.3]:53214 "EHLO plane.gmane.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751385AbcACSrD (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 3 Jan 2016 13:47:03 -0500
+	id S934358AbcAKTMo (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 11 Jan 2016 14:12:44 -0500
 Received: from list by plane.gmane.org with local (Exim 4.69)
 	(envelope-from <gcsd-dash@m.gmane.org>)
-	id 1aFngC-0003qM-2H
-	for dash@vger.kernel.org; Sun, 03 Jan 2016 19:47:00 +0100
-Received: from 84.222.249.202 ([84.222.249.202])
+	id 1aIhtR-00022E-9s
+	for dash@vger.kernel.org; Mon, 11 Jan 2016 20:12:41 +0100
+Received: from x4db6b989.dyn.telefonica.de ([77.182.185.137])
         by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
         id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Sun, 03 Jan 2016 19:47:00 +0100
-Received: from gioele by 84.222.249.202 with local (Gmexim 0.1 (Debian))
+        for <dash@vger.kernel.org>; Mon, 11 Jan 2016 20:12:41 +0100
+Received: from gioele by x4db6b989.dyn.telefonica.de with local (Gmexim 0.1 (Debian))
         id 1AlnuQ-0007hv-00
-        for <dash@vger.kernel.org>; Sun, 03 Jan 2016 19:47:00 +0100
-In-Reply-To: <56840F22.6040302@inlv.org>
+        for <dash@vger.kernel.org>; Mon, 11 Jan 2016 20:12:41 +0100
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-On 30/12/2015 18:06, Martijn Dekker wrote:
-> Unlike bash, *ksh and zsh, dash allows inheriting IFS from the environment:
-> 
-> $ IFS=bla dash -c "x='hela hola'; echo \$x"
-> he  ho
-> 
-> This seems a bit dodgy from a security point of view.
+Document that `ulimit` can set the `RLIMIT_AS` limit (virtual memory) with
+the `-v` flag.
 
-Hi,
+Fixes: https://bugs.debian.org/78556
+Reported-by: Vincent Lefevre <vincent@vinc17.net>
+Signed-off-by: Gioele Barabucci <gioele@svario.it>
+---
+ src/dash.1 | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-The Debian BTS contains a similar report:
-<https://bugs.debian.org/541642>. One suggestion from that thread:
-
-> POSIX says (IEEE Std 1003.1, 2004 Edition; 2.5.3 Shell Variables):
->
->> Implementations may ignore the value of IFS in the environment at the
->> time the shell is invoked, treating IFS as if it were not set.
-
-Regards,
-
---
-Gioele Barabucci <gioele@svario.it>
-
+diff --git a/src/dash.1 b/src/dash.1
+index 832eae7..8b8026d 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -2114,7 +2114,7 @@ printed; for commands and tracked aliases the complete pathname of the
+ command is printed.
+ .It ulimit Xo
+ .Op Fl H \*(Ba Fl S
+-.Op Fl a \*(Ba Fl tfdscmlpn Op Ar value
++.Op Fl a \*(Ba Fl tfdscmlpnv Op Ar value
+ .Xc
+ Inquire about or set the hard or soft limits on processes or set new
+ limits.
+@@ -2164,6 +2164,9 @@ show or set the limit on the number of processes this user can
+ have at one time
+ .It Fl n
+ show or set the limit on the number files a process can have open at once
++.It Fl v
++show or set the limit on the total virtual memory that can be
++in use by a process (in kilobytes)
+ .It Fl r
+ show or set the limit on the real-time scheduling priority of a process
+ .El
+-- 
+2.6.4
 
