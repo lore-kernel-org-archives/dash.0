@@ -1,56 +1,76 @@
-From: Trek <trek00@inbox.ru>
-Subject: echo do not print NUL byte
-Date: Wed, 20 Jan 2016 22:38:50 +0100
-Message-ID: <20160120223850.25cdf852@enterprise>
+From: Eric Blake <eblake@redhat.com>
+Subject: Re: echo do not print NUL byte
+Date: Wed, 20 Jan 2016 15:19:00 -0700
+Message-ID: <56A007D4.4000207@redhat.com>
+References: <20160120223850.25cdf852@enterprise>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="jMscNfR1x3uE0dmI9WH4gVJCIgUTAirRU"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from fallback5.mail.ru ([94.100.181.253]:48982 "EHLO
-	fallback5.mail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751034AbcATVjF (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 20 Jan 2016 16:39:05 -0500
-Received: from smtp17.mail.ru (smtp17.mail.ru [94.100.176.154])
-	by fallback5.mail.ru (mPOP.Fallback_MX) with ESMTP id 92E62A23D57E
-	for <dash@vger.kernel.org>; Thu, 21 Jan 2016 00:38:55 +0300 (MSK)
-Received: from dynamic-adsl-84-220-78-39.clienti.tiscali.it ([84.220.78.39]:20448 helo=enterprise)
-	by smtp17.mail.ru with esmtpa (envelope-from <trek00@inbox.ru>)
-	id 1aM0Sq-0001ff-Oc
-	for dash@vger.kernel.org; Thu, 21 Jan 2016 00:38:53 +0300
+Received: from mx1.redhat.com ([209.132.183.28]:60660 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752936AbcATWTD (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 20 Jan 2016 17:19:03 -0500
+In-Reply-To: <20160120223850.25cdf852@enterprise>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Trek <trek00@inbox.ru>, dash@vger.kernel.org
 
-there is no way to print the NUL byte with the echo utility
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jMscNfR1x3uE0dmI9WH4gVJCIgUTAirRU
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-with an XSI shell (mksh, posh, yash):
+On 01/20/2016 02:38 PM, Trek wrote:
+> there is no way to print the NUL byte with the echo utility
 
-  $ sh -c 'echo \\0 | od -An -c'
-    \0  \n
+POSIX says you should use 'printf', not 'echo', if you expect to use any
+\ in the arguments.  That said, the man page says:
 
-with a shell that requires echo -e (ksh, bash, busybox, mksh):
-
-  $ sh -c 'echo -e \\0 | od -An -c'
-    \0  \n
-
-with dash (XSI, no -e argument):
-
-  $ dash -c 'echo \\0 | od -An -c'
-    \n
-
-where others characters are correctly printed:
-
-  $ dash -c 'echo \\0100 | od -An -c'
-     @  \n
-
-with dash it only works with printf:
-
-  $ dash -c 'printf \\0\\n | od -An -c'
-    \0  \n
+     echo [-n] args...
+=2E..
+            \0digits
+                    Output the character whose value is given by zero to
+three
+                    octal digits.  If there are zero digits, a nul charac=
+ter
+                    is output.
 
 
-I discovered this bug developing a small shell library, where you can
-find an use case in the n_bytes_encode function of the lib/bytes.sh file
-included in http://www.trek.eu.org/devel/naive/naive-0.0.2.tar.gz
+> with dash (XSI, no -e argument):
+>=20
+>   $ dash -c 'echo \\0 | od -An -c'
+>     \n
 
-c-ya!
+So this is behavior in disagreement with the documentation, so you
+definitely have discovered a bug.  Of course, since POSIX already says
+the use of \ is implementation-defined if XSI is not in force, and dash
+doesn't necessarily strive for full XSI compliance, it might be easier
+to patch the docs than to output a NUL byte.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--jMscNfR1x3uE0dmI9WH4gVJCIgUTAirRU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJWoAfUAAoJEKeha0olJ0Nq2HQH/iigC+hSJ5eMPW6bnNJXCqR2
+aMHp6lsjS2oVgACvTIv7Q2rnFxRFBBBVbfNBcQUYN3edRHuxFZ6nzi3HC/FsIF7P
++kf70YAv7wYpiN+H4S2JrMGmidgZcNvNLmwm01sNMude+2L24kdsAcGZvW5pZJtp
+KohezkeXEWy+yh+OFnsyMDECMzhfCkiXcUvBO5xc+oAUGgqrjZMOs+vhi7mRC7HM
+pQjDdSzNt0rIIEdjEnBMjGokrgjs/vVfyYQFbI0hPm0vKQGVV3nGmtSuMbdwamUK
+trtj/KvKJCmAPTEUO1FwFupXGSiPpKYd8mU9GZIwpqqn9AriSrEO59wReG56rks=
+=+qjG
+-----END PGP SIGNATURE-----
+
+--jMscNfR1x3uE0dmI9WH4gVJCIgUTAirRU--
