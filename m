@@ -1,65 +1,56 @@
-From: jca@wxcvbn.org (=?utf-8?Q?J=C3=A9r=C3=A9mie_Courr=C3=A8ges-Anglas?=)
-Subject: Re: [PATCH] man: Document ulimit -v
-Date: Wed, 20 Jan 2016 19:02:47 +0100
-Message-ID: <87fuxs5dtk.fsf@ritchie.wxcvbn.org>
-References: <56938FD6.3010600@svario.it>
+From: Trek <trek00@inbox.ru>
+Subject: echo do not print NUL byte
+Date: Wed, 20 Jan 2016 22:38:50 +0100
+Message-ID: <20160120223850.25cdf852@enterprise>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from chomsky.autogeree.net ([91.216.110.36]:52657 "EHLO
-	chomsky.autogeree.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934613AbcATSOK (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 20 Jan 2016 13:14:10 -0500
-In-Reply-To: <56938FD6.3010600@svario.it> (Gioele Barabucci's message of "Mon,
-	11 Jan 2016 20:12:35 +0100")
+Received: from fallback5.mail.ru ([94.100.181.253]:48982 "EHLO
+	fallback5.mail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751034AbcATVjF (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 20 Jan 2016 16:39:05 -0500
+Received: from smtp17.mail.ru (smtp17.mail.ru [94.100.176.154])
+	by fallback5.mail.ru (mPOP.Fallback_MX) with ESMTP id 92E62A23D57E
+	for <dash@vger.kernel.org>; Thu, 21 Jan 2016 00:38:55 +0300 (MSK)
+Received: from dynamic-adsl-84-220-78-39.clienti.tiscali.it ([84.220.78.39]:20448 helo=enterprise)
+	by smtp17.mail.ru with esmtpa (envelope-from <trek00@inbox.ru>)
+	id 1aM0Sq-0001ff-Oc
+	for dash@vger.kernel.org; Thu, 21 Jan 2016 00:38:53 +0300
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Gioele Barabucci <gioele@svario.it>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-Gioele Barabucci <gioele@svario.it> writes:
+there is no way to print the NUL byte with the echo utility
 
-> Document that `ulimit` can set the `RLIMIT_AS` limit (virtual memory) with
-> the `-v` flag.
+with an XSI shell (mksh, posh, yash):
 
-I don't know much about RLIMIT_AS, but I know that it isn't supported on
-all systems where dash runs, eg OpenBSD.  Maybe is it Linux-specific?
+  $ sh -c 'echo \\0 | od -An -c'
+    \0  \n
 
-Anyway, it would be better if the manpage said that the -v flag may not
-be implemented on all platforms.
+with a shell that requires echo -e (ksh, bash, busybox, mksh):
 
-The same could be said about ulimit -w. (I did not check the other flags).
+  $ sh -c 'echo -e \\0 | od -An -c'
+    \0  \n
 
-> Fixes: https://bugs.debian.org/78556
-> Reported-by: Vincent Lefevre <vincent@vinc17.net>
-> Signed-off-by: Gioele Barabucci <gioele@svario.it>
-> ---
->  src/dash.1 | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/src/dash.1 b/src/dash.1
-> index 832eae7..8b8026d 100644
-> --- a/src/dash.1
-> +++ b/src/dash.1
-> @@ -2114,7 +2114,7 @@ printed; for commands and tracked aliases the complete pathname of the
->  command is printed.
->  .It ulimit Xo
->  .Op Fl H \*(Ba Fl S
-> -.Op Fl a \*(Ba Fl tfdscmlpn Op Ar value
-> +.Op Fl a \*(Ba Fl tfdscmlpnv Op Ar value
->  .Xc
->  Inquire about or set the hard or soft limits on processes or set new
->  limits.
-> @@ -2164,6 +2164,9 @@ show or set the limit on the number of processes this user can
->  have at one time
->  .It Fl n
->  show or set the limit on the number files a process can have open at once
-> +.It Fl v
-> +show or set the limit on the total virtual memory that can be
-> +in use by a process (in kilobytes)
->  .It Fl r
->  show or set the limit on the real-time scheduling priority of a process
->  .El
+with dash (XSI, no -e argument):
 
--- 
-jca | PGP : 0x1524E7EE / 5135 92C1 AD36 5293 2BDF  DDCC 0DFA 74AE 1524 E7EE
+  $ dash -c 'echo \\0 | od -An -c'
+    \n
+
+where others characters are correctly printed:
+
+  $ dash -c 'echo \\0100 | od -An -c'
+     @  \n
+
+with dash it only works with printf:
+
+  $ dash -c 'printf \\0\\n | od -An -c'
+    \0  \n
+
+
+I discovered this bug developing a small shell library, where you can
+find an use case in the n_bytes_encode function of the lib/bytes.sh file
+included in http://www.trek.eu.org/devel/naive/naive-0.0.2.tar.gz
+
+c-ya!
