@@ -1,35 +1,30 @@
-From: Harald van Dijk <harald@gigawatt.nl>
+From: Trek <trek00@inbox.ru>
 Subject: Re: echo do not print NUL byte
-Date: Wed, 20 Jan 2016 23:32:11 +0100
-Message-ID: <56A00AEB.5090606@gigawatt.nl>
+Date: Thu, 21 Jan 2016 02:40:56 +0100
+Message-ID: <20160121024056.5eb1ff04@enterprise>
 References: <20160120223850.25cdf852@enterprise>
+	<56A00AEB.5090606@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailfilter1-k0683s008-2.csv-networks.nl ([92.48.231.158]:32982
-	"EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1750894AbcAUAUl (ORCPT
-	<rfc822;dash@vger.kernel.org>); Wed, 20 Jan 2016 19:20:41 -0500
-In-Reply-To: <20160120223850.25cdf852@enterprise>
+Received: from fallback2.mail.ru ([94.100.179.22]:52972 "EHLO
+	fallback2.mail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751343AbcAUBuH (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 20 Jan 2016 20:50:07 -0500
+Received: from smtp38.i.mail.ru (smtp38.i.mail.ru [94.100.177.98])
+	by fallback2.mail.ru (mPOP.Fallback_MX) with ESMTP id 6C03269F354A
+	for <dash@vger.kernel.org>; Thu, 21 Jan 2016 04:41:34 +0300 (MSK)
+In-Reply-To: <56A00AEB.5090606@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Trek <trek00@inbox.ru>, dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: dash@vger.kernel.org
 
-Hi,
+On Wed, 20 Jan 2016 23:32:11 +0100
+Harald van Dijk <harald@gigawatt.nl> wrote:
 
-On 20/01/2016 22:38, Trek wrote:
-> there is no way to print the NUL byte with the echo utility
->
-> with dash (XSI, no -e argument):
->
->    $ dash -c 'echo \\0 | od -An -c'
->      \n
+> This is https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=379227,
+> which did get fixed already, but it was after 0.5.8.
 
-This is https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=379227, which 
-did get fixed already, but it was after 0.5.8. That should mean it will 
-be in the next release of dash, but you can check out the sources from 
-Git if you want to see it now.
-
-Cheers,
-Harald van Dijk
+happy to see that it is already fixed and sorry for double reporting
