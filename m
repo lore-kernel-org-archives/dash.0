@@ -1,30 +1,46 @@
-From: Trek <trek00@inbox.ru>
-Subject: Re: echo do not print NUL byte
-Date: Thu, 21 Jan 2016 02:40:56 +0100
-Message-ID: <20160121024056.5eb1ff04@enterprise>
-References: <20160120223850.25cdf852@enterprise>
-	<56A00AEB.5090606@gigawatt.nl>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] man: Document ulimit -v
+Date: Thu, 21 Jan 2016 13:03:23 +0800
+Message-ID: <20160121050323.GA4908@gondor.apana.org.au>
+References: <87fuxs5dtk.fsf@ritchie.wxcvbn.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from fallback2.mail.ru ([94.100.179.22]:52972 "EHLO
-	fallback2.mail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751343AbcAUBuH (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 20 Jan 2016 20:50:07 -0500
-Received: from smtp38.i.mail.ru (smtp38.i.mail.ru [94.100.177.98])
-	by fallback2.mail.ru (mPOP.Fallback_MX) with ESMTP id 6C03269F354A
-	for <dash@vger.kernel.org>; Thu, 21 Jan 2016 04:41:34 +0300 (MSK)
-In-Reply-To: <56A00AEB.5090606@gigawatt.nl>
+Received: from helcar.hengli.com.au ([209.40.204.226]:54627 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750758AbcAUFDd (ORCPT <rfc822;dash@vger.kernel.org>);
+	Thu, 21 Jan 2016 00:03:33 -0500
+Content-Disposition: inline
+In-Reply-To: <87fuxs5dtk.fsf@ritchie.wxcvbn.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org
+To: =?iso-8859-1?Q?J=E9r=E9mie_Courr=E8ges-Anglas?= <jca@wxcvbn.org>
+Cc: gioele@svario.it, dash@vger.kernel.org
 
-On Wed, 20 Jan 2016 23:32:11 +0100
-Harald van Dijk <harald@gigawatt.nl> wrote:
+J=E9r=E9mie Courr=E8ges-Anglas <jca@wxcvbn.org> wrote:
+> Gioele Barabucci <gioele@svario.it> writes:
+>=20
+>> Document that `ulimit` can set the `RLIMIT_AS` limit (virtual memory=
+) with
+>> the `-v` flag.
+>=20
+> I don't know much about RLIMIT_AS, but I know that it isn't supported=
+ on
+> all systems where dash runs, eg OpenBSD.  Maybe is it Linux-specific?
+>=20
+> Anyway, it would be better if the manpage said that the -v flag may n=
+ot
+> be implemented on all platforms.
+>=20
+> The same could be said about ulimit -w. (I did not check the other fl=
+ags).
 
-> This is https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=379227,
-> which did get fixed already, but it was after 0.5.8.
+Rather than doing that we could just pass the manpage through
+cpp or some similar mechanism so that this becomes conditional.
 
-happy to see that it is already fixed and sorry for double reporting
+Cheers,
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
