@@ -1,74 +1,41 @@
-From: Laison Computech Inc <drogaosuper18@drogacenter.com.br>
-Subject: NEW ARRIVALS, CISCO,CPU's,Memory, LAPTOP AND AVAYA
-Date: Thu, 28 Jan 2016 22:05:03 -0200 (BRST)
-Message-ID: <71569828.15436825.1454025903158.JavaMail.root@drogacenter.com.br>
-Reply-To: Laison Computech Inc <sales@laisoncomputertech.us>
+From: Martijn Dekker <martijn@inlv.org>
+Subject: Re: dash: read does not ignore trailing spaces
+Date: Fri, 29 Jan 2016 12:57:02 +0000
+Message-ID: <56AB619E.4050605@inlv.org>
+References: <n3nrqu$mj2$1@ger.gmane.org> <5660ADD6.4020308@gigawatt.nl> <20151203211748.GC9581@chaz.gmail.com> <5660C1A6.1010902@gigawatt.nl> <5661EEB7.8080908@gigawatt.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.drogacenter.com.br ([189.112.135.51]:28062 "EHLO
-	srvimsva.drogacenter.com.br" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751273AbcA2ASh (ORCPT
-	<rfc822;dash@vger.kernel.org>); Thu, 28 Jan 2016 19:18:37 -0500
+Received: from kahlil.inlv.org ([37.59.109.123]:55632 "EHLO kahlil.inlv.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932112AbcA2M5F (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 29 Jan 2016 07:57:05 -0500
+Received: from breedzicht.local (host-78-150-214-254.as13285.net [78.150.214.254])
+	(authenticated bits=0)
+	by kahlil.inlv.org (8.14.9/8.14.4) with ESMTP id u0TCv2Vr019341
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO)
+	for <dash@vger.kernel.org>; Fri, 29 Jan 2016 13:57:02 +0100
+In-Reply-To: <5661EEB7.8080908@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
- Dear Sir/Madam,
+Harald van Dijk schreef op 04-12-15 om 19:51:
+> Here it is. Attached is an updated patch that ignores the complete
+> terminator if only a single field remains, otherwise ignores only
+> trailing IFS whitespace.
 
- Clean tested working pulls CPUs and QTYs in stock.
+I've tested the patch and it looks like it fixes the bug nicely.
 
- 115 X X5650
- 65 X E5410
- 75 X X5660
- 145 X E5530
- 100 X E5645
- 40 X X5680
- 75 X X5690
+With the patch, dash (like bash, ksh93, mksh and FreeBSD /bin/sh)
+completely passes the IFS test suite written by the AT&T ksh93 people:
+http://web.archive.org/web/20050414022354/http://www.research.att.com/~gsf/public/ifs.sh
+(archive.org link because the AT&T research site is down)
 
- Brand new sealed IP phones and QTYs in stock.
+Any chance of getting this patch pushed into the git repo?
 
- 55 x CP-7937G
- 77 x CP-7942G
- 54 x CP-7945G
- 75 x CP-7962G
- ......
- 45 x Avaya 9630
- 65 x Avaya 9641
- 55 x Avaya 9640
+Thanks,
 
- All NIB.
+- M.
 
- Here is our current stock list.
-
- SSD drives and 750 gig 2.5" sata drives
-
- We also have
- 250 x i5 dell
- 133 x HP
- 360 x Lenevo
- all grade A
-
- Here is the qty in stock for laptops
-
- 150 x E6500 Dell Latitude E6500 Core 2 Duo 2.80GHz T9600 4GB 160GB DVD+/-RW Win 7
- 60 x E6510 Dell Ltitude E6510. 15.6" Intel Core i5- M520 @ 2.40GHz. 4GB.  320GB DVD+/-RW Win 7
- 30 X 8530P HP EliteBook 8530p 15.4" Laptop 2.53GHz Core 2 Duo T9400, 4GB RAM, 160GB HDD, Win
- 100 x 8740W HP EliteBook 8740w 17" 2.4Ghz Core i5 6GB 250GB Win 7 Pr
- 45 x 8760W HP EliteBook 8760W 17.3" 2nd Gen Intel Core i7 2.70GHz 8GB 320GB Windows 7 Pro
- 50 x DELL 6520Dell latitude e6520 15.6" i5-2520M 2.5Ghz, 8GB Ram, 500GB HD  Win 7 @ $115
- 120 x DELL 6420 Laptop Dell Latitude E6420 14" Intel Core i5 2.4Ghz 4GB RAM 250GB HDD DVD Win 7
- 150 x T410 Lenovo ThinkPad Laptop T410s 14.1" 2.40GHz Core i5 4GB RAM 160GB Win 7
- 180 x 8440P HP EliteBook 8440p 14" M520 Core i5 2.4GHz 4GB 250GB Win 7
-
-
- Let me know if you're interested. We are very open to offers and willing to work with you to make sure that we have a deal.
-
- Thank You
- Barbara Johnson
- Laison Computech Inc
- 210 N Scoring Ave,
- Rialto California, 92376
- Tel: +1-657-232-7047
- Fax: +1-347-214-047
-sales@laisoncomputertech.us
