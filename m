@@ -1,115 +1,78 @@
-From: Joachim Breitner <mail@joachim-breitner.de>
-Subject: dash drops exported bash functions
-Date: Wed, 10 Feb 2016 16:18:53 +0100
-Message-ID: <1455117533.18345.59.camel@joachim-breitner.de>
+From: Eric Blake <eblake@redhat.com>
+Subject: Re: dash drops exported bash functions
+Date: Wed, 10 Feb 2016 08:54:40 -0700
+Message-ID: <56BB5D40.4070401@redhat.com>
+References: <1455117533.18345.59.camel@joachim-breitner.de>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-WMEfBOvpbsHeYQ9aED6u"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="eCcwuINRxdROXdMWGoRRlW06XD67g5dPq"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from hermes.serverama.de ([176.9.213.133]:56408 "EHLO
-	hermes.serverama.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751640AbcBJPqG (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 10 Feb 2016 10:46:06 -0500
-Received: from [10.254.1.12] (helo=kirk)
-	by hermes.serverama.de with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	(Exim 4.84)
-	(envelope-from <mail@joachim-breitner.de>)
-	id 1aTWXg-0004TG-Fm
-	for dash@vger.kernel.org; Wed, 10 Feb 2016 16:18:57 +0100
-Received: from jojo by kirk with local (Exim 4.86)
-	(envelope-from <mail@joachim-breitner.de>)
-	id 1aTWXg-0003t0-A6
-	for dash@vger.kernel.org; Wed, 10 Feb 2016 16:18:56 +0100
+Received: from mx1.redhat.com ([209.132.183.28]:55555 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751333AbcBJPyl (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 10 Feb 2016 10:54:41 -0500
+In-Reply-To: <1455117533.18345.59.camel@joachim-breitner.de>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Joachim Breitner <mail@joachim-breitner.de>, dash@vger.kernel.org
 
-
---=-WMEfBOvpbsHeYQ9aED6u
-Content-Type: multipart/mixed; boundary="=-tw5r7gO0aUlLcRsWfY+l"
-
-
---=-tw5r7gO0aUlLcRsWfY+l
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eCcwuINRxdROXdMWGoRRlW06XD67g5dPq
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Dear dash developers,
+On 02/10/2016 08:18 AM, Joachim Breitner wrote:
+> Dear dash developers,
+>=20
+> a change in 0.5.8, very likely this one
+> http://git.kernel.org/cgit/utils/dash/dash.git/commit/?id=3D46d3c1a614f=
+11f0d40a7e73376359618ff07abcd
+> broke the exporting of bash shell functions via the environment.
 
-a change in 0.5.8, very likely this one
-http://git.kernel.org/cgit/utils/dash/dash.git/commit/?id=3D46d3c1a614f11f0=
-d40a7e73376359618ff07abcd
-broke the exporting of bash shell functions via the environment.
+Not a bug. POSIX says that on shell startup, the behavior of any
+inherited environment variables that do not start with a proper shell
+name is undefined; and allows shells to scrub such items out of the
+environment on startup.  Just because bash does not scrub them (but
+instead treats them as shell function imports) does not mean dash has to
+behave the same.
 
-The attached script shows the breakage, as it outputs
+That said, preserving any unusable environment variables unchanged,
+rather than scrubbing them, may be slightly nicer behavior, but I'm not
+sure it's worth the bloat to dash to do so.
 
-$ ./exporttest.sh=C2=A0
-exportest called ()
-Setting up environment
-Calling myself
-exportest called (1)
-function foo successfully called
-Calling myself directly
-exportest called (2)
-function foo successfully called
-Calling myself via dash
-exportest called (3)
-/tmp/exporttest.sh: Zeile 33: foo: Kommando nicht gefunden.
-Done
+>=20
+> Exporting bash functions via the environment might be a rarely used
+> feature, but it is used in practice, unfortunately (otherwise I
+> wouldn=E2=80=99t have noticed this).
 
-Exporting bash functions via the environment might be a rarely used
-feature, but it is used in practice, unfortunately (otherwise I
-wouldn=E2=80=99t have noticed this).
-
-Thanks,
-Joachim
+Exporting bash functions is only usable if you plan on directly invoking
+bash.  Don't drag dash into the mess.  Inserting a dash child in between
+a bash parent and grandchild means all bets are off for whether the
+grandparent can export anything to the grandchild.
 
 --=20
-Joachim =E2=80=9Cnomeata=E2=80=9D Breitner
-=C2=A0 mail@joachim-breitner.de =E2=80=A2 https://www.joachim-breitner.de/
-=C2=A0 XMPP: nomeata@joachim-breitner.de=C2=A0=E2=80=A2 OpenPGP-Key: 0xF0FB=
-F51F
-=C2=A0 Debian Developer: nomeata@debian.org
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
---=-tw5r7gO0aUlLcRsWfY+l
-Content-Type: application/x-shellscript; name="exporttest.sh"
-Content-Disposition: attachment; filename="exporttest.sh"
-Content-Transfer-Encoding: base64
-
-IyEvdXNyL2Jpbi9lbnYgYmFzaAoKCmVjaG8gImV4cG9ydGVzdCBjYWxsZWQgKCRJVEVSQVRJT04p
-IgoKaWYgWyAteiAiJElURVJBVElPTiIgXQp0aGVuCgogIGVjaG8gIlNldHRpbmcgdXAgZW52aXJv
-bm1lbnQiCiAgc2V0IC1vIGFsbGV4cG9ydAogIGZ1bmN0aW9uIGZvbyB7CiAgICBlY2hvICJmdW5j
-dGlvbiBmb28gc3VjY2Vzc2Z1bGx5IGNhbGxlZCIKICB9CiAgSVRFUkFUSU9OPTEKICBzZXQgK28g
-YWxsZXhwb3J0CgogIGVjaG8gQ2FsbGluZyBteXNlbGYKICBleGVjICIkMCIKZWxpZiBbICIkSVRF
-UkFUSU9OIiA9IDEgXQp0aGVuCiAgZm9vCiAgSVRFUkFUSU9OPTIKICBlY2hvICJDYWxsaW5nIG15
-c2VsZiBkaXJlY3RseSIKICBleGVjICIkMCIKZWxpZiBbICIkSVRFUkFUSU9OIiA9IDIgXQp0aGVu
-CiAgZm9vCiAgSVRFUkFUSU9OPTMKICBlY2hvIENhbGxpbmcgbXlzZWxmIHZpYSBkYXNoCiAgZXhl
-YyBkYXNoIC1jICIkMCIKZWxpZiBbICIkSVRFUkFUSU9OIiA9IDMgXQp0aGVuCiAgZm9vCiAgZWNo
-byBEb25lCmZpCg==
-
-
---=-tw5r7gO0aUlLcRsWfY+l--
-
---=-WMEfBOvpbsHeYQ9aED6u
+--eCcwuINRxdROXdMWGoRRlW06XD67g5dPq
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQIcBAABCAAGBQJWu1TdAAoJED2QirPw+/Ufp20QAJbxxLFkgkqpllzdsUGfjQxS
-6I9q96iq8sFy65PPWqMHd8DAdxIpA5CWCeEtqiFmege64bxgNO06MzrNtO9Kz9E7
-/6A/ppqJKVuVr8ZHIPJzLEG9Dixi3Vh1EytPZnsXCqCaevCFIYjg+CMO8Ma6j3Ir
-Uy2wKDlZFB/WwbDt08KrosJO4Ss6L/eo1fda8jGVR5DyULlozvLjHonjA+Jm7H5B
-1QaF8nx+B78wCTI6yvCZ12uDGst/QHoGMZZAUVz6vRZ3iJhGagfhpa3GoOlyEKdk
-SrWNPoiTNnXR8bx7RmL/9U+uEJ7V2Vq2c8j4MD6NgdwJJDvUuN4ELTnsx1bJdwVc
-mEWHpe5mzMZ4TfqLlDI86Sd14vWKEXNLviCuHUffUO9w0kUo192fACEwYXYDZm2S
-bVDKeU1wppU+Ac/SgnqdGKJDKzPZcD1zvFkyN0AzvDm5ZmmTXRTJ04rjsG7OxPsQ
-573ZWBU08ZO84paJxMBatd7lvSNGzVIHUi7rWgrEm+AgOc/Ux0fMKKAdQQ5Pd6fo
-AsUNf6z54JTZzHYN6sKPq9xxzpocwZZDpYI6Bif6aU+/fKO+yYtXqY/3zAg5YVLu
-J/l3bJ3OKupEvnDtz0auhbVg7hPYgdM2Ph/k0FzXw1U3nVDs/n8jJEyhFJB1coUD
-j3F++/166ZNSZ149GXFP
-=0uNk
+iQEcBAEBCAAGBQJWu11AAAoJEKeha0olJ0NqLvQH/01iSML6NnYoSz78er05vuH0
+8lish/mHPiRjlWyPU80Ag7C68iK94wW2f3obc+wNlj8neHMo3NYjaAe/bwJfJ3bK
+4uxmkIKRNO/kW7d1lzIAIrybF6O2wb0r9PezCAoLwCMnf+iM5tb/wKifopwY7i3Q
+HcbGdSskVZRuPWXEZ7ByYszSwk6SifSNFCGf9rygNbv+SEpxwRl/T3W1dSfR5dYH
+NU2TDegYNtHRi0XtZy13cjxD4TnOR87TdKnE+o2RiRxyILy0OER+1n3fWm9Ujh2M
+QInMp8OOfM0USqnQiSUP2G7nKziW22k3k2NkUm03zyZWTU3XxjspWy0c8ia/KeM=
+=V0Bm
 -----END PGP SIGNATURE-----
 
---=-WMEfBOvpbsHeYQ9aED6u--
+--eCcwuINRxdROXdMWGoRRlW06XD67g5dPq--
