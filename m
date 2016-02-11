@@ -1,93 +1,79 @@
-From: Joachim Breitner <mail@joachim-breitner.de>
+From: Makarius <makarius@sketis.net>
 Subject: Re: dash drops exported bash functions
-Date: Wed, 10 Feb 2016 17:31:03 +0100
-Message-ID: <1455121863.18345.68.camel@joachim-breitner.de>
-References: <1455117533.18345.59.camel@joachim-breitner.de>
-	 <56BB5D40.4070401@redhat.com>
+Date: Thu, 11 Feb 2016 04:53:48 +0100 (CET)
+Message-ID: <alpine.LNX.2.00.1602110431550.61314@lxbroy10.informatik.tu-muenchen.de>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-ZNMelk/ER+NQ9ZanKRV0"
+Content-Type: MULTIPART/MIXED; BOUNDARY="-1618778321-1437632775-1455162828=:61314"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from hermes.serverama.de ([176.9.213.133]:56615 "EHLO
-	hermes.serverama.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751057AbcBJQbJ (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 10 Feb 2016 11:31:09 -0500
-In-Reply-To: <56BB5D40.4070401@redhat.com>
+Received: from mail-out1.informatik.tu-muenchen.de ([131.159.0.8]:59272 "EHLO
+	mail-out1.informatik.tu-muenchen.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750801AbcBKEBR (ORCPT
+	<rfc822;dash@vger.kernel.org>); Wed, 10 Feb 2016 23:01:17 -0500
+Received: from localhost (scan46 [10.46.146.16])
+	by mail46.informatik.tu-muenchen.de (Postfix) with ESMTP id C1A8F885ED168
+	for <dash@vger.kernel.org>; Thu, 11 Feb 2016 04:53:48 +0100 (CET)
+Received: from mail46.informatik.tu-muenchen.de ([10.46.146.15])
+	by localhost (mail46.informatik.tu-muenchen.de [10.46.146.16]) (amavisd-new, port 10026)
+	with ESMTP id 2ANw4RRka5Y1 for <dash@vger.kernel.org>;
+	Thu, 11 Feb 2016 04:53:48 +0100 (CET)
+Received: from lxbroy10.informatik.tu-muenchen.de (lxbroy10.informatik.tu-muenchen.de [131.159.47.103])
+	by mail46.informatik.tu-muenchen.de (Postfix) with ESMTPSA id 914F9885ED15D
+	for <dash@vger.kernel.org>; Thu, 11 Feb 2016 04:53:48 +0100 (CET)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <eblake@redhat.com>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
---=-ZNMelk/ER+NQ9ZanKRV0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+---1618778321-1437632775-1455162828=:61314
+Content-Type: TEXT/PLAIN; format=flowed; charset=ISO-8859-7
+Content-Transfer-Encoding: 8BIT
 
-Dear Eric,
+On 02/10/2016 08:54:40 Eric Blake wrote:
 
-Am Mittwoch, den 10.02.2016, 08:54 -0700 schrieb Eric Blake:
-> On 02/10/2016 08:18 AM, Joachim Breitner wrote:
-> > Dear dash developers,
-> >=20
-> > a change in 0.5.8, very likely this one
-> > http://git.kernel.org/cgit/utils/dash/dash.git/commit/?id=3D46d3c1a614f=
-11f0d40a7e73376359618ff07abcd
-> > broke the exporting of bash shell functions via the environment.
->=20
-> Not a bug. POSIX says that on shell startup, the behavior of any
-> inherited environment variables that do not start with a proper shell
-> name is undefined; and allows shells to scrub such items out of the
-> environment on startup.=C2=A0=C2=A0Just because bash does not scrub them =
-(but
-> instead treats them as shell function imports) does not mean dash has to
-> behave the same.
->=20
 > That said, preserving any unusable environment variables unchanged,
 > rather than scrubbing them, may be slightly nicer behavior, but I'm not
 > sure it's worth the bloat to dash to do so.
 
-I=E2=80=99m not versed in reading POSIX,, so I won=E2=80=99t argue with tha=
-t (although
-I could not find a reference), but let me point out 8.1
-"8.1 Environment Variable Definition" of "The Open Group Base
-Specifications Issue 7" says
-    =E2=80=9COther characters may be permitted by an implementation;
-    applications shall tolerate the presence of such names.=E2=80=9D
+> > Exporting bash functions via the environment might be a rarely used 
+> > feature, but it is used in practice, unfortunately (otherwise I 
+> > wouldn¢t have noticed this).
+>
+> Exporting bash functions is only usable if you plan on directly invoking 
+> bash.  Don't drag dash into the mess.  Inserting a dash child in between 
+> a bash parent and grandchild means all bets are off for whether the 
+> grandparent can export anything to the grandchild.
 
-But it is not a big deal now, as the application suffering from this
-issue will likely have to work-around this (or fix this, depending on
-the POV) anyways.
+Eric,
+
+I am a long-term user of GNU bash who is depending on the "export -f" 
+feature of that shell (in an application that is on the free market for 
+decades). The bash guys turn a shell function "foo" into the environment 
+variable "BASH_FUNC_foo%%" and hope to be able to pick it up later on.
+
+Dash gets into this game, because Ubuntu and Debian have chosen to make it 
+the default for /bin/sh some years ago. This means that typical "system" 
+invocations of Unix tools and libraries are now going through dash: 
+/bin/sh -c is often seen in practice instead of more delicate execve 
+invocations.
+
+This means with /bin/sh -> dash users have no proper chance to avoid it. 
+Sitting right there in the center /bin/sh, dash acquires special 
+responsibilities to play nice with other shells.
 
 
-Greetings,
-Joachim
---=20
-Joachim =E2=80=9Cnomeata=E2=80=9D Breitner
-=C2=A0 mail@joachim-breitner.de =E2=80=A2 https://www.joachim-breitner.de/
-=C2=A0 XMPP: nomeata@joachim-breitner.de=C2=A0=E2=80=A2 OpenPGP-Key: 0xF0FB=
-F51F
-=C2=A0 Debian Developer: nomeata@debian.org
+Note that the issue has come up now due to this recent change in 
+Debian-testing: https://tracker.debian.org/news/744916
+
+Thus a the following change from 2012 became exposed to testers/users of 
+Debian: 
+http://git.kernel.org/cgit/utils/dash/dash.git/commit/?id=46d3c1a614f11f0d40a7e73376359618ff07abcd
+
+In that change 46d3c1a614f, the original motivation was to make "export 
+-p" work more robustly in dash, and not to cripple export -f in bash 
+because of POSIX violations.
 
 
---=-ZNMelk/ER+NQ9ZanKRV0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAABCAAGBQJWu2XHAAoJED2QirPw+/UfGRUP/3y62M25pSaijvuOjWFlZJJ6
-b+bb4qfK6M+QkRRulVIYWWyl0gdAy73jsAn87+TUytQ3cMYmC1HpOfo0JP3Dg9Fq
-8B3+7dgsojEPVljwp6iQU2jrlUOZ7oMn8dhDbELro7tIQG//PE/jtZGqVxXsIBzD
-PoOLGZoR4OgrX3sTkglG57UkE+2jzEBHDFKro4DCXvvA82r/p/fjJLTixfNlKPW6
-JKJ48LmCVQDm6dTBUaCPdysSeVpZMBIJL/8yPVb9e/ZqCGLNzOXYBdMwel/qeFOW
-EkQd0QPPlLY3+OIsY35tbvpn6cSzE8KsHC0B59lNudqXtSsQVMfM4F2sPVru/hsu
-ScAU9BttQ17UslhsKX/Mba6lN0nkCmulIGZ+AWVvaRIhjqyymbI6o5zvITB0KDmd
-opY8XTsPNZYa8oFkxO/y+1QahArYq+UnUnHnp2PqPDTycePL49U4XzLNIszcT8s7
-At/jjj+z8LuQdQxPzC8MNsfLd1fDsKaYtqPHiBgGaJLL/4/ogPJCm4E7X/C6XKx0
-Cf+49cJsBF6EEkyXZ5ZC+G3RbaktB/CxNna+9SvQ7LYHN+TQKKg4o7YfTnVYHHQr
-irP7d9P2H9L/VZDGXb3aiaVI3d9HdqqLZFlrie5soTsaB1UtJwwX2Lw2/sLaQAAp
-CSjzuAYc1mSryTNi2lk5
-=1X2J
------END PGP SIGNATURE-----
-
---=-ZNMelk/ER+NQ9ZanKRV0--
+ 	Makarius
+---1618778321-1437632775-1455162828=:61314--
