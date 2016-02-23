@@ -1,34 +1,31 @@
-From: Chet Ramey <chet.ramey@case.edu>
-Subject: Re: [BUG] 'trap' is not quite POSIX compliant
-Date: Mon, 15 Feb 2016 13:46:43 -0500
-Message-ID: <56C21D13.1000506@case.edu>
-References: <56BF4F91.7080105@inlv.org>
-Reply-To: chet.ramey@case.edu
+From: Jan Verbeek <ring@openmailbox.org>
+Subject: [BUG] Illegal function names are accepted after being used as aliases
+Date: Tue, 23 Feb 2016 19:18:06 +0100
+Message-ID: <56CCA25E.5020809@openmailbox.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mpv3-2015.CWRU.Edu ([129.22.103.194]:19434 "EHLO
-	mpv3-2015.case.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751217AbcBOSwt (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 15 Feb 2016 13:52:49 -0500
-In-Reply-To: <56BF4F91.7080105@inlv.org>
+Received: from smtp16.openmailbox.org ([62.4.1.50]:37067 "EHLO
+	smtp16.openmailbox.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754800AbcBWSYN (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 23 Feb 2016 13:24:13 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Martijn Dekker <martijn@inlv.org>, dash@vger.kernel.org
-Cc: chet.ramey@case.edu
+To: dash@vger.kernel.org
 
-On 2/13/16 10:45 AM, Martijn Dekker wrote:
+Function definitions that use a bad function name (such as "-" and "=") 
+are accepted if the function name already exists as an alias. For example:
 
-> By the way, dash and zsh, as well as bash in non-POSIX mode, also accept
-> the counterintuitive and non-POSIX-compliant form "trap EXIT" to unset
-> the trap, but other shells don't: bash (POSIX), yash and ksh93 produce
-> an error, while mksh/lksh silently ignore that form. What a mess...
-
-The `trap EXIT' is historical Bourne shell behavior, though Posix makes it
-an error.
-
--- 
-``The lyf so short, the craft so long to lerne.'' - Chaucer
-		 ``Ars longa, vita brevis'' - Hippocrates
-Chet Ramey, ITS, CWRU    chet@case.edu    http://cnswww.cns.cwru.edu/~chet/
+$ -
+dash: 1: -: not found
+$ - () { echo hello; }
+dash: 2: Syntax error: Bad function name
+$ -
+dash: 2: -: not found
+$ alias -=true
+$ -
+$ - () { echo hello; }
+$ -
+hello
+$
