@@ -1,67 +1,84 @@
-From: Harald van Dijk <harald@gigawatt.nl>
+From: Eric Blake <eblake@redhat.com>
 Subject: Re: [BUG] Illegal function names are accepted after being used as
  aliases
-Date: Tue, 23 Feb 2016 19:44:09 +0100
-Message-ID: <56CCA879.1070208@gigawatt.nl>
-References: <56CCA25E.5020809@openmailbox.org>
+Date: Tue, 23 Feb 2016 11:58:30 -0700
+Message-ID: <56CCABD6.40001@redhat.com>
+References: <56CCA25E.5020809@openmailbox.org> <56CCA879.1070208@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ocb849DNeTC4ORxJQJUlXU8k3S1CbAlpH"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailfilter1-k0683s008-2.csv-networks.nl ([92.48.231.158]:49685
-	"EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753605AbcBWSoO (ORCPT
-	<rfc822;dash@vger.kernel.org>); Tue, 23 Feb 2016 13:44:14 -0500
-In-Reply-To: <56CCA25E.5020809@openmailbox.org>
+Received: from mx1.redhat.com ([209.132.183.28]:39366 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932074AbcBWS6b (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 23 Feb 2016 13:58:31 -0500
+In-Reply-To: <56CCA879.1070208@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jan Verbeek <ring@openmailbox.org>, dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>, Jan Verbeek <ring@openmailbox.org>, dash@vger.kernel.org
 
-On 23/02/2016 19:18, Jan Verbeek wrote:
-> Function definitions that use a bad function name (such as "-" and "=")
-> are accepted if the function name already exists as an alias. For example:
->
-> $ -
-> dash: 1: -: not found
-> $ - () { echo hello; }
-> dash: 2: Syntax error: Bad function name
-> $ -
-> dash: 2: -: not found
-> $ alias -=true
-> $ -
-> $ - () { echo hello; }
-> $ -
-> hello
-> $
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ocb849DNeTC4ORxJQJUlXU8k3S1CbAlpH
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-After alias -=true, - () { echo hello; } is treated as a use of that 
-alias. It doesn't define a function with a name of -, it defines a 
-function with a name of true, which consists only of valid characters.
+On 02/23/2016 11:44 AM, Harald van Dijk wrote:
 
-$ alias -=true
-$ -() { echo hello; }
-$ type -
-- is an alias for true
-$ type true
-true is a shell function
-$ true
-hello
+> This matches bash's behaviour, aside from bash requiring -- to prevent
+> detection of invalid flags to the alias command:
+>=20
+> bash-4.3$ alias -- -=3Dtrue
 
-This matches bash's behaviour, aside from bash requiring -- to prevent 
-detection of invalid flags to the alias command:
+Then dash DOES have a bug:
 
-bash-4.3$ alias -- -=true
-bash-4.3$ -() { echo hello; }
-bash-4.3$ type -
-- is aliased to `true'
-bash-4.3$ type true
-true is a function
-true ()
-{
-     echo hello
-}
-bash-4.3$ true
-hello
+# dash
+$ alias -- -=3D'echo hi'
+alias: -- not found
+$ echo $?
+1
+$ -
+hi
+$
 
-Cheers,
-Harald van Dijk
+POSIX XCU 1.4 is clear:
+http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap01.html
+
+"Default Behavior: When this section is listed as "None.", it means that
+the implementation need not support any options. Standard utilities that
+do not accept options, but that do accept operands, shall recognize "--"
+as a first argument to be discarded."
+
+and alias takes operands, stating "OPTIONS: None.", which means POSIX
+_requires_ 'alias -- -=3Dname' to (attempt to) define only the single
+alias '-', and NOT to also attempt to define '--' as an alias.
+
+It's okay if dash allows 'alias -=3Dblah' to define '-' as an alias as an=
+
+extension, but it MUST ignore '--' the way bash does.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--ocb849DNeTC4ORxJQJUlXU8k3S1CbAlpH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJWzKvWAAoJEKeha0olJ0Nqh3IH/jPH6cCTSShqloktxkmfZPOt
+70q1+olZZpi8VTTKWFfrW1slB9xZEoFYKl2x80gj+5tWqvCpU6TleJ5RolhsIT2C
+8Z4DMru9MggzJ2P9ubOnmylENax6cuXMNtrPjPUB89sqaHNtfhpQ49Vn1rIMRc0C
+JGQGWpQvXinN0Rm2Fgz845kPp+UpR6HxhxI+ay129yQlg1kXvMiB5uPC2Uajw/Va
+sPNM77Sg0tHETCAFnwTuy6SgSKbcSE9iH2F2NnAbryYbAQOz5tSQ/SPb70nY8pnR
+x26eFn6DwAcDtUDARvHSkgi7/UP5vymOr3/cGWAtwqyzEkhrJHrLrMOOW12tkOM=
+=HJ2s
+-----END PGP SIGNATURE-----
+
+--ocb849DNeTC4ORxJQJUlXU8k3S1CbAlpH--
