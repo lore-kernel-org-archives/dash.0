@@ -1,52 +1,66 @@
-From: Thorsten Glaser <t.glaser@tarent.de>
+From: Joerg Schilling <Joerg.Schilling-8LS2qeF34IpklNlQbfROjRvVK+yQ3ZXh@public.gmane.org>
 Subject: Re: heredoc and subshell
-Date: Wed, 24 Feb 2016 09:46:24 +0100 (CET)
-Message-ID: <alpine.DEB.2.20.1602240942580.2671@tglase-nb.lan.tarent.de>
-References: <2978711456265264@web9h.yandex.ru> <20160223231843.GA55161@stack.nl>
+Date: Wed, 24 Feb 2016 11:58:25 +0100
+Message-ID: <56cd8cd1.LdVYbpfe+0tQMm8I%Joerg.Schilling@fokus.fraunhofer.de>
+References: <2978711456265264@web9h.yandex.ru>
+ <56CCE1E3.1060805@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <dash-owner@vger.kernel.org>
-Received: from fb-n15-11.unbelievable-machine.net ([94.198.62.204]:1507 "EHLO
-	tglase-nb.lan.tarent.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754486AbcBXIzY convert rfc822-to-8bit (ORCPT
-	<rfc822;dash@vger.kernel.org>); Wed, 24 Feb 2016 03:55:24 -0500
-In-Reply-To: <20160223231843.GA55161@stack.nl>
-Content-Language: de-DE-1901
-Sender: dash-owner@vger.kernel.org
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 8bit
+Return-path: <austin-group-l-request-7882/jkIBncuagvECLh61g@public.gmane.org>
+In-Reply-To: <56CCE1E3.1060805-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Resent-Message-ID: <"kzQylC.A.61C.fzYzWB"@Phoebe.vpn.opengroup.org>
+Resent-To: austin-group-l-7882/jkIBncuagvECLh61g@public.gmane.org
+To: oleg-BA2faJl1U0pBDLzU/O5InQ@public.gmane.org, eblake-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, dash-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, austin-group-l-7882/jkIBncuagvECLh61g@public.gmane.org
 List-Id: dash@vger.kernel.org
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: Oleg Bulatov <oleg@bulatov.me>, dash@vger.kernel.org, miros-mksh@mirbsd.org
 
-(Thanks to izabera for bringing this to my attention!)
+Eric Blake <eblake-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-On Wed, 24 Feb 2016, Jilles Tjoelker wrote:
-> On Wed, Feb 24, 2016 at 01:07:44AM +0300, Oleg Bulatov wrote:
-
+> > --- code
+> > prefix() { sed -e "s/^/$1:/"; }
+> > DASH_CODE() { :; }
+> > 
+> > prefix A <<XXX && echo "$(prefix B <<XXX
+> > echo line 1
+> > XXX
+> > echo line 2)" && prefix DASH_CODE <<DASH_CODE
+> > echo line 3
+> > XXX
+> > echo line 4)"
+> > echo line 5
+> > DASH_CODE
+> > 
 > > --- bash 4.3.42 output:
+> > A:echo line 3
+> > B:echo line 1
+> > line 2
+> > DASH_CODE:echo line 4)"
+> > DASH_CODE:echo line 5
+>
+> So, it looks like bash is interpreting this as "first newline that is
+> not in the middle of another shell word), and parses the entire $(...)
 
-That=E2=80=99s the output I=E2=80=99d expect, from manually reading thi=
-s.
+I would like to get an explanation on what I should understand by:
 
-> Interestingly, mksh parses this in yet another way. In unmodified for=
-m,
-> it fails with  here document 'XXX' unclosed.
+	"first newline that is not in the middle of another shell word)
 
-Yeah, I noticed=E2=80=A6 yay another bug to fix (just had two last nigh=
-t)=E2=80=A6
 
-> After appending an XXX line, it outputs:
+BTW: If I replace $(..) by `..` and feed the code to the original SVr4 Bourne 
+Shell, I get the same output as you got from bash. I would guess that the bash 
+output you added above is correct.
 
-Ah okay, thanks for this hint, that should make debugging easier.
+Note that the command substitution is part of a " quoted string and even 
+without that, it would need to be parsed first.
 
-bye,
-//mirabilos
---=20
-Sometimes they [people] care too much: pretty printers [and syntax high=
-ligh-
-ting, d.A.] mechanically produce pretty output that accentuates irrelev=
-ant
-detail in the program, which is as sensible as putting all the preposit=
-ions
-in English text in bold font.	-- Rob Pike in "Notes on Programming in C=
-"
+The POSIX version from ksh88 (seen on Solaris) behaves the same with $(..) and 
+the `..` variant and the same as bash.
+
+The fact that ksh93 behaves different with $(..) and the `..` variant makes it 
+obvious that ksh93 has a bug.
+
+Jörg
+
+-- 
+ EMail:joerg-lSlhzV3CM+2sTnJN9+BGXg@public.gmane.org                    (home) Jörg Schilling D-13353 Berlin
+       joerg.schilling-8LS2qeF34IpklNlQbfROjRvVK+yQ3ZXh@public.gmane.org (work) Blog: http://schily.blogspot.com/
+ URL:  http://cdrecord.org/private/ http://sourceforge.net/projects/schilytools/files/'
