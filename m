@@ -1,44 +1,55 @@
-From: Oleg Bulatov <oleg@bulatov.me>
-Subject: Re: heredoc and subshell
-Date: Wed, 24 Feb 2016 23:27:39 +0300
-Message-ID: <1528771456345659@web29m.yandex.ru>
-References: <2978711456265264@web9h.yandex.ru>
-	 <56CCE1E3.1060805@redhat.com> <56cd8cd1.LdVYbpfe+0tQMm8I%Joerg.Schilling@fokus.fraunhofer.de>
+From: Adam Endrodi <adam.endrodi@nokia.com>
+Subject: "case" bug in dash
+Date: Wed, 2 Mar 2016 22:09:14 +0100
+Message-ID: <20160302210914.GC1056@timmy>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
 Return-path: <dash-owner@vger.kernel.org>
-Received: from forward16m.cmail.yandex.net ([5.255.216.147]:54819 "EHLO
-	forward16m.cmail.yandex.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757313AbcBXUcv (ORCPT
-	<rfc822;dash@vger.kernel.org>); Wed, 24 Feb 2016 15:32:51 -0500
-In-Reply-To: <56cd8cd1.LdVYbpfe+0tQMm8I%Joerg.Schilling@fokus.fraunhofer.de>
+Received: from demumfd001.nsn-inter.net ([93.183.12.32]:57445 "EHLO
+	demumfd001.nsn-inter.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752522AbcCBVMw convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Wed, 2 Mar 2016 16:12:52 -0500
+Received: from muvmp319.nsn-intra.net ([10.159.32.166])
+	by demumfd001.nsn-inter.net (8.15.2/8.15.2) with ESMTPS id u22LCncp027815
+	(version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
+	for <dash@vger.kernel.org>; Wed, 2 Mar 2016 21:12:49 GMT
+Received: from madam.europe.nsn-net.net ([10.156.137.69])
+	by muvmp319.nsn-intra.net (8.14.3/8.14.3) with ESMTP id u22LCnR1026775
+	for <dash@vger.kernel.org>; Wed, 2 Mar 2016 21:12:49 GMT
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Joerg Schilling <joerg.schilling@fokus.fraunhofer.de>, "eblake@redhat.com" <eblake@redhat.com>, "dash@vger.kernel.org" <dash@vger.kernel.org>, "austin-group-l@opengroup.org" <austin-group-l@opengroup.org>
+To: dash@vger.kernel.org
 
-24.02.2016, 13:58, "Joerg Schilling" <Joerg.Schilling@fokus.fraunhofer.de>:
-> BTW: If I replace $(..) by `..` and feed the code to the original SVr4 Bourne
-> Shell, I get the same output as you got from bash. I would guess that the bash
-> output you added above is correct.
 
-The behavior of `..` with heredoc has also interesting corner cases:
 
-$ cat x.sh 
-cat <<END ; echo `echo a
-echo b`
-hello
-END
-$ dash x.sh 
-echo ba
-x.sh: 3: x.sh: hello: not found
-x.sh: 4: x.sh: END: not found
-$ bash x.sh
-hello
-a b
-$
+Hi,
 
-On the one hand it reads heredoc, on the other hand it processes closing of the subshell.
+
+The following program prints "boo" incorrectly (I'm trying to match
+non-numbers):
+
+"""
+#!/bin/dash
+
+case "111" in
+*[^0-9]*)
+	echo boo;;
+esac
+"""
+
+File expansion seems to be affected too:
+
+/tmp/dash/src $ touch 111
+/tmp/dash/src $ ./dash -c 'echo *[^0-9]*'
+111 dash.1
+/tmp/dash/src $ bash -c 'echo *[^0-9]*' 
+alias.c alias.h alias.o arith_yacc.c arith_yacc.h arith_yacc.o arith_yylex.c arith_yylex.o bltin builtins.c builtins.def builtins.def.in builtins.h builtins.o cd.c cd.h cd.o dash dash.1 error.c error.h error.o eval.c eval.h eval.o exec.c exec.h exec.o expand.c expand.h expand.o funcs histedit.c histedit.o init.c init.h init.o input.c input.h input.o jobs.c jobs.h jobs.o machdep.h mail.c mail.h mail.o main.c main.h main.o Makefile Makefile.am Makefile.in memalloc.c memalloc.h memalloc.o miscbltin.c miscbltin.h miscbltin.o mkbuiltins mkinit mkinit.c mknodes mknodes.c mksignames mksignames.c mksyntax mksyntax.c mktokens myhistedit.h mystring.c mystring.h mystring.o nodes.c nodes.c.pat nodes.h nodes.o nodetypes options.c options.h options.o output.c output.h output.o parser.c parser.h parser.o
+  printf.o redir.c redir.h redir.o shell.h show.c show.h show.o signames.c signames.o syntax.c syntax.h syntax.o system.c system.h system.o test.o times.o token.h token_vars.h TOUR trap.c trap.h trap.o var.c var.h var.o
+
+Tried with 2e5842258bd5b252ffdaa630db09c9a19a9717ca (current git master)
+both with --enable-glob and --disable-glob.
 
 -- 
-Oleg
+adam
