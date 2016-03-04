@@ -1,44 +1,38 @@
-From: Martin Lucina <martin@lucina.net>
-Subject: Dash commit 46d3c1a (in 0.5.8+) breaks BSD make
-Date: Fri, 4 Mar 2016 15:06:35 +0100
-Message-ID: <20160304140635.GB2457@nodbug.lucina.net>
+From: Antti Kantee <pooka@rumpkernel.org>
+Subject: Re: Dash commit 46d3c1a (in 0.5.8+) breaks BSD make
+Date: Fri, 4 Mar 2016 14:24:17 +0000
+Message-ID: <56D99A91.2010901@rumpkernel.org>
+References: <20160304140635.GB2457@nodbug.lucina.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp.lucina.net ([62.176.169.44]:38214 "EHLO smtp.lucina.net"
+Received: from mail.cs.hut.fi ([130.233.192.7]:54204 "EHLO mail.cs.hut.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751420AbcCDONG (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 4 Mar 2016 09:13:06 -0500
-Content-Disposition: inline
+	id S1751420AbcCDOdV (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 4 Mar 2016 09:33:21 -0500
+In-Reply-To: <20160304140635.GB2457@nodbug.lucina.net>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
-Cc: rumpkernel-users@freelists.org
+To: dash@vger.kernel.org, rumpkernel-users@freelists.org
 
-Hi,
+On 04/03/16 14:06, Martin Lucina wrote:
+> Commit 46d3c1a ([VAR] Sanitise environment variable names on entry)
+> restricts exported environment variables actually set by dash on entry to
+> those reported as valid by endofname(). While this is technically correct
+> and matches IEEE Std 1003.1, it breaks BSD make which uses '.' as a
+> separator in variables exported via the environment to a sub-make.
 
-Commit 46d3c1a ([VAR] Sanitise environment variable names on entry)
-restricts exported environment variables actually set by dash on entry to
-those reported as valid by endofname(). While this is technically correct
-and matches IEEE Std 1003.1, it breaks BSD make which uses '.' as a
-separator in variables exported via the environment to a sub-make.
+I wouldn't go so far as to say it breaks BSD make.  Rather, it breaks a 
+rare pattern where variables containing "." (where "." follows a certain 
+convention) are passed to submakes via the shell (i.e. ".export" in the 
+Makefile).
 
-Upstream bug report: https://github.com/rumpkernel/rumprun/issues/38
+> Would the dash maintainers consider replacing 46d3c1a with a fix that
+> performs the name validity check at "export -p" time instead? If yes, I can
+> try my hand at a patch.
 
-I'm not sure what the correct fix is here. While we (rumprun) could
-possibly patch our version of NetBSD make to not use '.' in exported names,
-this problem would continue to hit other users of BSD-derived make.
-
-Would the dash maintainers consider replacing 46d3c1a with a fix that
-performs the name validity check at "export -p" time instead? If yes, I can
-try my hand at a patch.
-
-Based on my reading of reading of Std 1003.1 section 8.1...
-
-    "Other characters may be permitted by an implementation; applications
-    shall tolerate the presence of such names."
-
-... preserving "invalid" but exported environment variables would still be
-compliant behaviour.
-
-Martin
+There are probably enough deployments of dash with this behaviour so 
+that we need in any case need to remove the use of variables containing 
+"." coupled with ".export" from Makefiles.  Changing dash doesn't sound 
+useful to me.
