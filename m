@@ -1,39 +1,44 @@
-From: Martijn Dekker <martijn@inlv.org>
-Subject: Re: "case" bug in dash
-Date: Wed, 02 Mar 2016 22:18:44 +0100
-Message-ID: <56D758B4.6000005@inlv.org>
-References: <20160302210914.GC1056@timmy>
+From: Martin Lucina <martin@lucina.net>
+Subject: Dash commit 46d3c1a (in 0.5.8+) breaks BSD make
+Date: Fri, 4 Mar 2016 15:06:35 +0100
+Message-ID: <20160304140635.GB2457@nodbug.lucina.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from kahlil.inlv.org ([37.59.109.123]:52827 "EHLO kahlil.inlv.org"
+Received: from smtp.lucina.net ([62.176.169.44]:38214 "EHLO smtp.lucina.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750785AbcCBVSs (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 2 Mar 2016 16:18:48 -0500
-In-Reply-To: <20160302210914.GC1056@timmy>
+	id S1751420AbcCDONG (ORCPT <rfc822;dash@vger.kernel.org>);
+	Fri, 4 Mar 2016 09:13:06 -0500
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-Cc: Adam Endrodi <adam.endrodi@nokia.com>
+Cc: rumpkernel-users@freelists.org
 
-Adam Endrodi schreef op 02-03-16 om 22:09:
-> The following program prints "boo" incorrectly (I'm trying to match
-> non-numbers):
+Hi,
 
-That's correct. In shell glob pattern bracket expressions, the standard
-negator is '!' and not '^'. Many shells support '^' as a synonym, but
-that's an extension to the standard and not mandatory. Dash usually
-doesn't support such extensions. But all shells support '!', so just
-that instead and you're safe.
+Commit 46d3c1a ([VAR] Sanitise environment variable names on entry)
+restricts exported environment variables actually set by dash on entry to
+those reported as valid by endofname(). While this is technically correct
+and matches IEEE Std 1003.1, it breaks BSD make which uses '.' as a
+separator in variables exported via the environment to a sub-make.
 
-Reference:
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_13
-"If an open bracket introduces a bracket expression as in XBD RE Bracket
-Expression, except that the <exclamation-mark> character ( '!' ) shall
-replace the <circumflex> character ( '^' ) in its role in a non-matching
-list in the regular expression notation, it shall introduce a pattern
-bracket expression."
+Upstream bug report: https://github.com/rumpkernel/rumprun/issues/38
 
-- M.
+I'm not sure what the correct fix is here. While we (rumprun) could
+possibly patch our version of NetBSD make to not use '.' in exported names,
+this problem would continue to hit other users of BSD-derived make.
 
+Would the dash maintainers consider replacing 46d3c1a with a fix that
+performs the name validity check at "export -p" time instead? If yes, I can
+try my hand at a patch.
+
+Based on my reading of reading of Std 1003.1 section 8.1...
+
+    "Other characters may be permitted by an implementation; applications
+    shall tolerate the presence of such names."
+
+... preserving "invalid" but exported environment variables would still be
+compliant behaviour.
+
+Martin
