@@ -1,59 +1,88 @@
-From: Martin Lucina <martin@lucina.net>
-Subject: Re: Dash commit 46d3c1a (in 0.5.8+) breaks BSD make
-Date: Fri, 4 Mar 2016 16:48:41 +0100
-Message-ID: <20160304154841.GD2457@nodbug.lucina.net>
-References: <20160304140635.GB2457@nodbug.lucina.net>
- <56D99A91.2010901@rumpkernel.org>
+From: =?UTF-8?B?54mb5L+d6b6Z?= <kn0wns1c@gmail.com>
+Subject: dash security crash report
+Date: Tue, 8 Mar 2016 08:23:54 +0800
+Message-ID: <CAMQTrLCjauu_vnGuwauu5P+3jrZi-jkDrrwyp2QgJmH0b2YxXQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: multipart/mixed; boundary=001a113b1b68b0bc51052d7e9820
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp.lucina.net ([62.176.169.44]:38273 "EHLO smtp.lucina.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751476AbcCDPse (ORCPT <rfc822;dash@vger.kernel.org>);
-	Fri, 4 Mar 2016 10:48:34 -0500
-Content-Disposition: inline
-In-Reply-To: <56D99A91.2010901@rumpkernel.org>
+Received: from mail-oi0-f46.google.com ([209.85.218.46]:36744 "EHLO
+	mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S934258AbcCHAXz (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 7 Mar 2016 19:23:55 -0500
+Received: by mail-oi0-f46.google.com with SMTP id r187so91709810oih.3
+        for <dash@vger.kernel.org>; Mon, 07 Mar 2016 16:23:54 -0800 (PST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org, rumpkernel-users@freelists.org
+To: dash@vger.kernel.org
 
-On Friday, 04.03.2016 at=A014:24, Antti Kantee wrote:
-> On 04/03/16 14:06, Martin Lucina wrote:
-> >Commit 46d3c1a ([VAR] Sanitise environment variable names on entry)
-> >restricts exported environment variables actually set by dash on ent=
-ry to
-> >those reported as valid by endofname(). While this is technically co=
-rrect
-> >and matches IEEE Std 1003.1, it breaks BSD make which uses '.' as a
-> >separator in variables exported via the environment to a sub-make.
->=20
-> I wouldn't go so far as to say it breaks BSD make.  Rather, it breaks=
- a rare
-> pattern where variables containing "." (where "." follows a certain
-> convention) are passed to submakes via the shell (i.e. ".export" in t=
-he
-> Makefile).
->=20
-> >Would the dash maintainers consider replacing 46d3c1a with a fix tha=
-t
-> >performs the name validity check at "export -p" time instead? If yes=
-, I can
-> >try my hand at a patch.
->=20
-> There are probably enough deployments of dash with this behaviour so =
-that we
-> need in any case need to remove the use of variables containing "." c=
-oupled
-> with ".export" from Makefiles.  Changing dash doesn't sound useful to=
- me.
+--001a113b1b68b0bc51052d7e9820
+Content-Type: text/plain; charset=UTF-8
 
-You're right -- I spoke too soon and thought this behaviour was a gener=
-al
-property of nbmake rather than our specific usage of it. Still, the
-maintainers may want to note in dash documentation that sanitizing expo=
-rted
-variables can cause some applications depending on the non-POSIX behavi=
-our
-to fail.
+i use AFL fuzz dash shell and get 7 null deref vulnerablity and 1
+stack corruption vulnerablity. the crash testcase is in the
+attachment.
 
+system: Ubuntu 14.04.4 x86_64
+dash: 0.58
+
+jush use /bin/sh or /bin/dash execute the testcase then you can get a crash.
+
+--001a113b1b68b0bc51052d7e9820
+Content-Type: application/zip; name="cras_testcases.zip"
+Content-Disposition: attachment; filename="cras_testcases.zip"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_iliobnz30
+
+UEsDBAoAAAAAAEybZ0gAAAAAAAAAAAAAAAAPAAAAY3Jhc190ZXN0Y2FzZXMvUEsDBBQAAAAIAGoy
+PUga4HhK3QAAAIYBAAA6AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMDAxLHNpZ18xMSxzcmNfMDAw
+OTcwLG9wX2hhdm9jLHJlcF8zMhObwFJc+cnVx41RxWjr1nlbIcDGBkQmFOWkMDDobZ0NETRCBpIN
+////B9IMYPDqPwOjEJBmXMjR1wekWRkYpBjYgAwpFgYGLhkGsQaI2Q0MDDog9dwgqbMNCxkXLlzI
+sBAJfIZQCgpABa9VcYDNIPD/f/3/zTDQ19cHs1ecgQFmLwPU3s2bGf79V2QAqZkAlPv/4f8fkDqg
+HQ4MIAw1ZDYQG/7/z8HQhxXAvIVhPDAg/l8EB9ki9CD7/3vrpK0MDCwMCv+fAy3+38Dwn4EZEmRS
+DC/YGRjecTEIADkAUEsDBBQAAAAIAG8yPUjM0JYzGQAAABgAAAA5AAAAY3Jhc190ZXN0Y2FzZXMv
+aWRfMDAwMDEwLHNpZ18xMSxzcmNfMDAxMjM1LG9wX2hhdm9jLHJlcF84E2BguHTyHBBcnSVwlSue
+QYHBxqbpFIM1AFBLAwQUAAAACAB0Mj1I8Qr3ligAAABEAAAAOgAAAGNyYXNfdGVzdGNhc2VzL2lk
+XzAwMDAzNyxzaWdfMTEsc3JjXzAwMTM4NixvcF9oYXZvYyxyZXBfNjT7ZmMjaioqaqymKSoqGij8
+vP2/w436ZiCY1vyT4YElASD2P2f6VwcAUEsDBBQAAAAIAHoyPUgo5zC7oQAAAPsAAAA6AAAAY3Jh
+c190ZXN0Y2FzZXMvaWRfMDAwMDU3LHNpZ18xMSxzcmNfMDAxODkzLG9wX2hhdm9jLHJlcF8zMqt3
+9XFjZOSsZwCCqEUsQN4Oxh0gABMsWcRyhEGvOKMYQpYUlVRUV0+tBgIGBvb/DBcbgGpYQQoFGFgY
+QTTD4v//RWXASgUSgdyk57olqUUlDEkMKiUMekABHoa3DP8/MzCgWgvkMUBAiQCITPFU0CuOA9mX
+mGSjphJmAzL/MW7zgQr5PtxlUPjPbzIrMYlBDyj2EWLeEgYGJgZ0Z/7/8B8AUEsDBBQAAAAIAIIy
+PUh+pm8bmAAAANIAAAA6AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMDkxLHNpZ18xMSxzcmNfMDAy
+NDA3LG9wX2hhdm9jLHJlcF82NHtsEx3JwDDz/x9RQVHRTyyihQWMDAwM/wv4XhVnFJYUbQADOYYN
+e54Ahf1ERasZCgr6/gMVFBTwMzDgUiTKFdc9KaOA3To6OoZhhoQyp7WNjQBDhqgot2gTA0N4GsMM
+UXPuVyno4BUyYEEwRX+JnDt3jlGe99w5hnrrNR9S/v8HGicaHRNdWl1dzaDMbq0JMr66MqdG0QEA
+UEsDBBQAAAAIAIcyPUibWE/NnAAAANIAAAA6AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMTAyLHNp
+Z18xMSxzcmNfMDAyNjk0LG9wX2hhdm9jLHJlcF8zMqt39Zk0c+bcmctnzpyZalSSmMRQUcKg95kB
+CliLS4qAgjZqujZeNjaJSbI2Ng4MLyoYGNiAkiV6JalAWS0GKP/KKzhIgTFevnrFwOAgx8DEUM/6
+ghlsEiPDq9c8IDm4FAPDrxggaGCGgtdg8gsTiFTTZHjOMGfOhFIGhuVzgIBBYM6D//w2jCDXMDiC
+CBsbVpBTBRhUvjD8/8AAAFBLAwQUAAAACACLMj1I5AhJuHAAAABuAAAAOgAAAGNyYXNfdGVzdGNh
+c2VzL2lkXzAwMDEyMCxzaWdfMTEsc3JjXzAwMjc2MyxvcF9oYXZvYyxyZXBfNjSrzwtoYGD5X5K6
+/8///zcZGhleRXcoMARHv4pm+P/fod6RgeF/cD1Xw///zc0lWbLH6sMZGMSBAlm2x/LOLP3zH6hI
+95zwP5bojs0MpUC1/x/XMzAwpURzeTNkpObksDAwMjBEK9Tb2IjMTykssQYAUEsDBBQAAAAIAJAy
+PUh5J9/GRgAAAHcAAAA5AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMTQ0LHNpZ18xMSxzcmNfMDAz
+MjU2LG9wX2hhdm9jLHJlcF8yqz/DwcDA+Jb7/3+Gj/8tH/5n/MvMUPCTlcEVBKzBpGuAhiaUYa3J
+UP9fLMyDheEDCPw3AGpmEOlgYERiMoBACojAbSADAFBLAQIfAAoAAAAAAEybZ0gAAAAAAAAAAAAA
+AAAPACQAAAAAAAAAEAAAAAAAAABjcmFzX3Rlc3RjYXNlcy8KACAAAAAAAAEAGADM4BYvZHjRAczg
+Fi9keNEBrpjteGN40QFQSwECHwAUAAAACABqMj1IGuB4St0AAACGAQAAOgAkAAAAAAAAACAAAAAt
+AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMDAxLHNpZ18xMSxzcmNfMDAwOTcwLG9wX2hhdm9jLHJl
+cF8zMgoAIAAAAAAAAQAYAID6iu8ZWtEBLoPueGN40QEug+54Y3jRAVBLAQIfABQAAAAIAG8yPUjM
+0JYzGQAAABgAAAA5ACQAAAAAAAAAIAAAAGIBAABjcmFzX3Rlc3RjYXNlcy9pZF8wMDAwMTAsc2ln
+XzExLHNyY18wMDEyMzUsb3BfaGF2b2MscmVwXzgKACAAAAAAAAEAGAAARej0GVrRAeqU73hjeNEB
+6pTveGN40QFQSwECHwAUAAAACAB0Mj1I8Qr3ligAAABEAAAAOgAkAAAAAAAAACAAAADSAQAAY3Jh
+c190ZXN0Y2FzZXMvaWRfMDAwMDM3LHNpZ18xMSxzcmNfMDAxMzg2LG9wX2hhdm9jLHJlcF82NAoA
+IAAAAAAAAQAYAIC8dvsZWtEBuUbveGN40QG5Ru94Y3jRAVBLAQIfABQAAAAIAHoyPUgo5zC7oQAA
+APsAAAA6ACQAAAAAAAAAIAAAAFICAABjcmFzX3Rlc3RjYXNlcy9pZF8wMDAwNTcsc2lnXzExLHNy
+Y18wMDE4OTMsb3BfaGF2b2MscmVwXzMyCgAgAAAAAAABABgAgMqdAhpa0QG8v+14Y3jRAby/7Xhj
+eNEBUEsBAh8AFAAAAAgAgjI9SH6mbxuYAAAA0gAAADoAJAAAAAAAAAAgAAAASwMAAGNyYXNfdGVz
+dGNhc2VzL2lkXzAwMDA5MSxzaWdfMTEsc3JjXzAwMjQwNyxvcF9oYXZvYyxyZXBfNjQKACAAAAAA
+AAEAGAAAQiwJGlrRAWRY8HhjeNEBZFjweGN40QFQSwECHwAUAAAACACHMj1Im1hPzZwAAADSAAAA
+OgAkAAAAAAAAACAAAAA7BAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMTAyLHNpZ18xMSxzcmNfMDAy
+Njk0LG9wX2hhdm9jLHJlcF8zMgoAIAAAAAAAAQAYAAAjIg8aWtEBODHweGN40QE4MfB4Y3jRAVBL
+AQIfABQAAAAIAIsyPUjkCEm4cAAAAG4AAAA6ACQAAAAAAAAAIAAAAC8FAABjcmFzX3Rlc3RjYXNl
+cy9pZF8wMDAxMjAsc2lnXzExLHNyY18wMDI3NjMsb3BfaGF2b2MscmVwXzY0CgAgAAAAAAABABgA
+gG1/FBpa0QHqDe54Y3jRAeoN7nhjeNEBUEsBAh8AFAAAAAgAkDI9SHkn38ZGAAAAdwAAADkAJAAA
+AAAAAAAgAAAA9wUAAGNyYXNfdGVzdGNhc2VzL2lkXzAwMDE0NCxzaWdfMTEsc3JjXzAwMzI1Nixv
+cF9oYXZvYyxyZXBfMgoAIAAAAAAAAQAYAIBOdRoaWtEBE+PveGN40QET4+94Y3jRAVBLBQYAAAAA
+CQAJAL8EAACUBgAAAAA=
+--001a113b1b68b0bc51052d7e9820--
