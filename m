@@ -1,88 +1,67 @@
-From: =?UTF-8?B?54mb5L+d6b6Z?= <kn0wns1c@gmail.com>
-Subject: dash security crash report
-Date: Tue, 8 Mar 2016 08:23:54 +0800
-Message-ID: <CAMQTrLCjauu_vnGuwauu5P+3jrZi-jkDrrwyp2QgJmH0b2YxXQ@mail.gmail.com>
+From: "APPROVED" <creditoffers@newscityfind.us>
+Subject: Zero APR. No Credit Required. No Spend Limit!
+Date: Sat, 26 Mar 2016 17:17:36 -0500
+Message-ID: <KtnVVU_4n8LedDywsbv4Nhav73cnYS_ZK_QaVdWZ2gg.Ovqb23ScnBkFjFkzegg6kkj4-629hIWyeJfBI1TwDtM@newscityfind.us>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary=001a113b1b68b0bc51052d7e9820
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-oi0-f46.google.com ([209.85.218.46]:36744 "EHLO
-	mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934258AbcCHAXz (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 7 Mar 2016 19:23:55 -0500
-Received: by mail-oi0-f46.google.com with SMTP id r187so91709810oih.3
-        for <dash@vger.kernel.org>; Mon, 07 Mar 2016 16:23:54 -0800 (PST)
+Received: from unassigned-ptr.infinitumtech.net ([66.35.78.180]:42983 "EHLO
+	newscityfind.us" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1750963AbcCZWVG (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 26 Mar 2016 18:21:06 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
---001a113b1b68b0bc51052d7e9820
-Content-Type: text/plain; charset=UTF-8
+Date: 03/25/16
+Subject: Approval
 
-i use AFL fuzz dash shell and get 7 null deref vulnerablity and 1
-stack corruption vulnerablity. the crash testcase is in the
-attachment.
+____
 
-system: Ubuntu 14.04.4 x86_64
-dash: 0.58
+Credit Card Approval
 
-jush use /bin/sh or /bin/dash execute the testcase then you can get a crash.
+Attention: Your Credit Card Approval
 
---001a113b1b68b0bc51052d7e9820
-Content-Type: application/zip; name="cras_testcases.zip"
-Content-Disposition: attachment; filename="cras_testcases.zip"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_iliobnz30
+Low Rates for 2016
 
-UEsDBAoAAAAAAEybZ0gAAAAAAAAAAAAAAAAPAAAAY3Jhc190ZXN0Y2FzZXMvUEsDBBQAAAAIAGoy
-PUga4HhK3QAAAIYBAAA6AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMDAxLHNpZ18xMSxzcmNfMDAw
-OTcwLG9wX2hhdm9jLHJlcF8zMhObwFJc+cnVx41RxWjr1nlbIcDGBkQmFOWkMDDobZ0NETRCBpIN
-////B9IMYPDqPwOjEJBmXMjR1wekWRkYpBjYgAwpFgYGLhkGsQaI2Q0MDDog9dwgqbMNCxkXLlzI
-sBAJfIZQCgpABa9VcYDNIPD/f/3/zTDQ19cHs1ecgQFmLwPU3s2bGf79V2QAqZkAlPv/4f8fkDqg
-HQ4MIAw1ZDYQG/7/z8HQhxXAvIVhPDAg/l8EB9ki9CD7/3vrpK0MDCwMCv+fAy3+38Dwn4EZEmRS
-DC/YGRjecTEIADkAUEsDBBQAAAAIAG8yPUjM0JYzGQAAABgAAAA5AAAAY3Jhc190ZXN0Y2FzZXMv
-aWRfMDAwMDEwLHNpZ18xMSxzcmNfMDAxMjM1LG9wX2hhdm9jLHJlcF84E2BguHTyHBBcnSVwlSue
-QYHBxqbpFIM1AFBLAwQUAAAACAB0Mj1I8Qr3ligAAABEAAAAOgAAAGNyYXNfdGVzdGNhc2VzL2lk
-XzAwMDAzNyxzaWdfMTEsc3JjXzAwMTM4NixvcF9oYXZvYyxyZXBfNjT7ZmMjaioqaqymKSoqGij8
-vP2/w436ZiCY1vyT4YElASD2P2f6VwcAUEsDBBQAAAAIAHoyPUgo5zC7oQAAAPsAAAA6AAAAY3Jh
-c190ZXN0Y2FzZXMvaWRfMDAwMDU3LHNpZ18xMSxzcmNfMDAxODkzLG9wX2hhdm9jLHJlcF8zMqt3
-9XFjZOSsZwCCqEUsQN4Oxh0gABMsWcRyhEGvOKMYQpYUlVRUV0+tBgIGBvb/DBcbgGpYQQoFGFgY
-QTTD4v//RWXASgUSgdyk57olqUUlDEkMKiUMekABHoa3DP8/MzCgWgvkMUBAiQCITPFU0CuOA9mX
-mGSjphJmAzL/MW7zgQr5PtxlUPjPbzIrMYlBDyj2EWLeEgYGJgZ0Z/7/8B8AUEsDBBQAAAAIAIIy
-PUh+pm8bmAAAANIAAAA6AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMDkxLHNpZ18xMSxzcmNfMDAy
-NDA3LG9wX2hhdm9jLHJlcF82NHtsEx3JwDDz/x9RQVHRTyyihQWMDAwM/wv4XhVnFJYUbQADOYYN
-e54Ahf1ERasZCgr6/gMVFBTwMzDgUiTKFdc9KaOA3To6OoZhhoQyp7WNjQBDhqgot2gTA0N4GsMM
-UXPuVyno4BUyYEEwRX+JnDt3jlGe99w5hnrrNR9S/v8HGicaHRNdWl1dzaDMbq0JMr66MqdG0QEA
-UEsDBBQAAAAIAIcyPUibWE/NnAAAANIAAAA6AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMTAyLHNp
-Z18xMSxzcmNfMDAyNjk0LG9wX2hhdm9jLHJlcF8zMqt39Zk0c+bcmctnzpyZalSSmMRQUcKg95kB
-CliLS4qAgjZqujZeNjaJSbI2Ng4MLyoYGNiAkiV6JalAWS0GKP/KKzhIgTFevnrFwOAgx8DEUM/6
-ghlsEiPDq9c8IDm4FAPDrxggaGCGgtdg8gsTiFTTZHjOMGfOhFIGhuVzgIBBYM6D//w2jCDXMDiC
-CBsbVpBTBRhUvjD8/8AAAFBLAwQUAAAACACLMj1I5AhJuHAAAABuAAAAOgAAAGNyYXNfdGVzdGNh
-c2VzL2lkXzAwMDEyMCxzaWdfMTEsc3JjXzAwMjc2MyxvcF9oYXZvYyxyZXBfNjSrzwtoYGD5X5K6
-/8///zcZGhleRXcoMARHv4pm+P/fod6RgeF/cD1Xw///zc0lWbLH6sMZGMSBAlm2x/LOLP3zH6hI
-95zwP5bojs0MpUC1/x/XMzAwpURzeTNkpObksDAwMjBEK9Tb2IjMTykssQYAUEsDBBQAAAAIAJAy
-PUh5J9/GRgAAAHcAAAA5AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMTQ0LHNpZ18xMSxzcmNfMDAz
-MjU2LG9wX2hhdm9jLHJlcF8yqz/DwcDA+Jb7/3+Gj/8tH/5n/MvMUPCTlcEVBKzBpGuAhiaUYa3J
-UP9fLMyDheEDCPw3AGpmEOlgYERiMoBACojAbSADAFBLAQIfAAoAAAAAAEybZ0gAAAAAAAAAAAAA
-AAAPACQAAAAAAAAAEAAAAAAAAABjcmFzX3Rlc3RjYXNlcy8KACAAAAAAAAEAGADM4BYvZHjRAczg
-Fi9keNEBrpjteGN40QFQSwECHwAUAAAACABqMj1IGuB4St0AAACGAQAAOgAkAAAAAAAAACAAAAAt
-AAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMDAxLHNpZ18xMSxzcmNfMDAwOTcwLG9wX2hhdm9jLHJl
-cF8zMgoAIAAAAAAAAQAYAID6iu8ZWtEBLoPueGN40QEug+54Y3jRAVBLAQIfABQAAAAIAG8yPUjM
-0JYzGQAAABgAAAA5ACQAAAAAAAAAIAAAAGIBAABjcmFzX3Rlc3RjYXNlcy9pZF8wMDAwMTAsc2ln
-XzExLHNyY18wMDEyMzUsb3BfaGF2b2MscmVwXzgKACAAAAAAAAEAGAAARej0GVrRAeqU73hjeNEB
-6pTveGN40QFQSwECHwAUAAAACAB0Mj1I8Qr3ligAAABEAAAAOgAkAAAAAAAAACAAAADSAQAAY3Jh
-c190ZXN0Y2FzZXMvaWRfMDAwMDM3LHNpZ18xMSxzcmNfMDAxMzg2LG9wX2hhdm9jLHJlcF82NAoA
-IAAAAAAAAQAYAIC8dvsZWtEBuUbveGN40QG5Ru94Y3jRAVBLAQIfABQAAAAIAHoyPUgo5zC7oQAA
-APsAAAA6ACQAAAAAAAAAIAAAAFICAABjcmFzX3Rlc3RjYXNlcy9pZF8wMDAwNTcsc2lnXzExLHNy
-Y18wMDE4OTMsb3BfaGF2b2MscmVwXzMyCgAgAAAAAAABABgAgMqdAhpa0QG8v+14Y3jRAby/7Xhj
-eNEBUEsBAh8AFAAAAAgAgjI9SH6mbxuYAAAA0gAAADoAJAAAAAAAAAAgAAAASwMAAGNyYXNfdGVz
-dGNhc2VzL2lkXzAwMDA5MSxzaWdfMTEsc3JjXzAwMjQwNyxvcF9oYXZvYyxyZXBfNjQKACAAAAAA
-AAEAGAAAQiwJGlrRAWRY8HhjeNEBZFjweGN40QFQSwECHwAUAAAACACHMj1Im1hPzZwAAADSAAAA
-OgAkAAAAAAAAACAAAAA7BAAAY3Jhc190ZXN0Y2FzZXMvaWRfMDAwMTAyLHNpZ18xMSxzcmNfMDAy
-Njk0LG9wX2hhdm9jLHJlcF8zMgoAIAAAAAAAAQAYAAAjIg8aWtEBODHweGN40QE4MfB4Y3jRAVBL
-AQIfABQAAAAIAIsyPUjkCEm4cAAAAG4AAAA6ACQAAAAAAAAAIAAAAC8FAABjcmFzX3Rlc3RjYXNl
-cy9pZF8wMDAxMjAsc2lnXzExLHNyY18wMDI3NjMsb3BfaGF2b2MscmVwXzY0CgAgAAAAAAABABgA
-gG1/FBpa0QHqDe54Y3jRAeoN7nhjeNEBUEsBAh8AFAAAAAgAkDI9SHkn38ZGAAAAdwAAADkAJAAA
-AAAAAAAgAAAA9wUAAGNyYXNfdGVzdGNhc2VzL2lkXzAwMDE0NCxzaWdfMTEsc3JjXzAwMzI1Nixv
-cF9oYXZvYyxyZXBfMgoAIAAAAAAAAQAYAIBOdRoaWtEBE+PveGN40QET4+94Y3jRAVBLBQYAAAAA
-CQAJAL8EAACUBgAAAAA=
---001a113b1b68b0bc51052d7e9820--
+
+Please take a look at the new options:
+
+
+
+
+http://newscityfind.us/hfhwlhdjf/jmkhbli523ceynxi/IgScYZM7OenRsgxQCNiu0y63QXerC9IUKkuLhOErhxA/XoOqB3zHQqMmmhjzx1_OQnsZbitXTP3A8WKYAYtLvNC9X_dgoq0ZR2DXMJMiZS6163ogphWTMfelHZukCWt_QHq1PljRkeb3PNo52HyW7XE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Postal contact:
+MarketingDepartment|135HawthorneDr|LakePark|FL|33403
+http://newscityfind.us/hfhwlhdjf/jmkhbli529ceynxi/IgScYZM7OenRsgxQCNiu0y63QXerC9IUKkuLhOErhxA/XoOqB3zHQqMmmhjzx1_OQnsZbitXTP3A8WKYAYtLvNC9X_dgoq0ZR2DXMJMiZS6163ogphWTMfelHZukCWt_QHq1PljRkeb3PNo52HyW7XE
