@@ -1,38 +1,38 @@
-From: "Merchant Account Services" <merchantaccountservices@readaboutit.us>
-Subject: Merchant Account: No termination fees. No merchant account contract.
-Date: Sat, 09 Apr 2016 10:04:56 -0500
-Message-ID: <9S8vpFtN4dlCPeXIVopF18V9LXkPVLce90LozAECSiM.-CioWk9N_nSDQgqqwA6YpkOLWRZVSlqU2bpP-1IVqJc@readaboutit.us>
+From: "APPROVED" <creditoffers@readaboutit.us>
+Subject: Zero APR. No Credit Required. No Spend Limit!
+Date: Sat, 09 Apr 2016 16:12:32 -0500
+Message-ID: <6hCBQ-eSlUR4qth_4oHCspprFkAEsVacTlY_73KwihQ.Z71WRWgND96Vd4HkU2o-CO1E_yLABtxLeiZc_f2DtUo@readaboutit.us>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from unassigned-ptr.infinitumtech.net ([66.35.78.183]:47080 "EHLO
+Received: from unassigned-ptr.infinitumtech.net ([66.35.78.183]:49420 "EHLO
 	readaboutit.us" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1753337AbcDIPat (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 9 Apr 2016 11:30:49 -0400
+	with ESMTP id S1751114AbcDIVO4 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 9 Apr 2016 17:14:56 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-New: Credit Card Processing - Merchant Account
+Date: 03/25/16
+Subject: Approval
 
-http://findingbrowsing.com/rmcwoilx/bbfoqmubo245qgsqx/jCBwEsj5xNz5KY_x3DupBntDi-M2-F3QMpycrwK9CbY/ml73e2NFSZjJVKLJGyc4IqpmiZdP081oXMNRM73eF42_Si5sjALUblI3hxaUStbCSiS-p4HUGMUL7jEnEDU8aHoCNuahq8psB3yIAtdfqNiT-TsiAFLrscEGZGrxpudhikmOQDGS5wldChOgUerb8St0Lhl_r8m8ceQQG-2iml4
+____
 
+Credit Card Approval
 
-New: Credit Card Processing Guide
+Attention: Your Credit Card Approval
 
-*Accept all Major Credit Cards
+Low Rates for 2016
 
-*Find a great Affordable, Credit Card Processing 
 
-*Find a Merchant Account with Low Fees and easy Approval
+Please take a look at the new options:
 
 
 
-New: Credit Card Processing Guide
 
+http://readaboutit.us/kwnhvlc/conrdbn523gcts/VbSd0swOBbMPDi0qHAvWOGlhFr8St4OAyiXMb_QHrjE/i7PUdn0rEON5HR8VnUvDZoMnIcT-u9UTR9-dMU_7ZTFSqJuH5DgfAGe6mntEsilkkblzRdXcnucofhuNbbuv4xK6wrQxslJUkFsKP0yBOfI
 
-http://findingbrowsing.com/rmcwoilx/bbfoqmubo245qgsqx/jCBwEsj5xNz5KY_x3DupBntDi-M2-F3QMpycrwK9CbY/ml73e2NFSZjJVKLJGyc4IqpmiZdP081oXMNRM73eF42_Si5sjALUblI3hxaUStbCSiS-p4HUGMUL7jEnEDU8aHoCNuahq8psB3yIAtdfqNiT-TsiAFLrscEGZGrxpudhikmOQDGS5wldChOgUerb8St0Lhl_r8m8ceQQG-2iml4
 
 
 
@@ -62,44 +62,6 @@ http://findingbrowsing.com/rmcwoilx/bbfoqmubo245qgsqx/jCBwEsj5xNz5KY_x3DupBntDi-
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Postal contact:
+MarketingDepartment|135HawthorneDr|LakePark|FL|33403
+http://readaboutit.us/kwnhvlc/conrdbn529gcts/VbSd0swOBbMPDi0qHAvWOGlhFr8St4OAyiXMb_QHrjE/i7PUdn0rEON5HR8VnUvDZoMnIcT-u9UTR9-dMU_7ZTFSqJuH5DgfAGe6mntEsilkkblzRdXcnucofhuNbbuv4xK6wrQxslJUkFsKP0yBOfI
