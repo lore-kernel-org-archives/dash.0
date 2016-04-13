@@ -1,67 +1,57 @@
-From: "APPROVED" <creditoffers@readaboutit.us>
-Subject: Zero APR. No Credit Required. No Spend Limit!
-Date: Sat, 09 Apr 2016 16:12:32 -0500
-Message-ID: <6hCBQ-eSlUR4qth_4oHCspprFkAEsVacTlY_73KwihQ.Z71WRWgND96Vd4HkU2o-CO1E_yLABtxLeiZc_f2DtUo@readaboutit.us>
+From: Tema williams <temawilliams22@gmail.com>
+Subject: WE NEED YOUR HELP URGENTLY.
+Date: Wed, 13 Apr 2016 10:39:51 +0200
+Message-ID: <CA+hOsCuYVo3k2kucptQat=gY34MfN4ehu1UaL7Wbr5uReMq5+A@mail.gmail.com>
+Reply-To: temawilliams18@yahoo.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from unassigned-ptr.infinitumtech.net ([66.35.78.183]:49420 "EHLO
-	readaboutit.us" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1751114AbcDIVO4 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sat, 9 Apr 2016 17:14:56 -0400
+Received: from mail-ig0-f195.google.com ([209.85.213.195]:35441 "EHLO
+	mail-ig0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757741AbcDMIjw (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 13 Apr 2016 04:39:52 -0400
+Received: by mail-ig0-f195.google.com with SMTP id fn8so5612909igb.2
+        for <dash@vger.kernel.org>; Wed, 13 Apr 2016 01:39:52 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
 
-Date: 03/25/16
-Subject: Approval
+Dear Sir/madam,
 
-____
+With due respect and to the glory of Almighty God whom we worship I
+call upon you to assist my family. Please Permit me to inform you of
+my desire of going into business relationship with you.
 
-Credit Card Approval
+My name is Tema Williams,The only Son of late Chief PATRICK WILLIAMS.
+My father was a very wealthy cocoa merchant in Abidjan but we are from
+Sierra Leone
+After my Father death I and my Family move to South Africa as refugee.
 
-Attention: Your Credit Card Approval
+My father was poisoned to death by his business associates on one of
+their outings on a business trip. Before his death in a private
+hospital in Abidjan he secretly called me on his bed side and told me
+that he has the sum of ($12.000,000 MILLION US DOLLAR) kept with a
+security and finance company in South Africa.
 
-Low Rates for 2016
+He also explained to me that it was because of this wealth that he was
+poisoned by his business associates,that I should seek for a
+beneficiary in any country of my choice where I will transfer this
+money and use it for investment.I am honorably seeking for your
+assistance to transfer our fund out of South Africa.Upon the
+successful transfer of this fund,we shall make arrangement for me,my
+mother and younger sister to come over to your country to further our
+Education and invest in a profitable business that you may suggest.
 
+More over,I am willing to offer you 20% of the total sum as
+compensation for your effort/input after the successful transfer of
+this fund into your nominated bank account overseas.
 
-Please take a look at the new options:
+As we depend on God, and with God all things are possible.
+Anticipating to hear from you today.
 
+Thanks and God bless.
+PLEASE CALL ME +27787597591
 
+Best regards,
 
-
-http://readaboutit.us/kwnhvlc/conrdbn523gcts/VbSd0swOBbMPDi0qHAvWOGlhFr8St4OAyiXMb_QHrjE/i7PUdn0rEON5HR8VnUvDZoMnIcT-u9UTR9-dMU_7ZTFSqJuH5DgfAGe6mntEsilkkblzRdXcnucofhuNbbuv4xK6wrQxslJUkFsKP0yBOfI
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Postal contact:
-MarketingDepartment|135HawthorneDr|LakePark|FL|33403
-http://readaboutit.us/kwnhvlc/conrdbn529gcts/VbSd0swOBbMPDi0qHAvWOGlhFr8St4OAyiXMb_QHrjE/i7PUdn0rEON5HR8VnUvDZoMnIcT-u9UTR9-dMU_7ZTFSqJuH5DgfAGe6mntEsilkkblzRdXcnucofhuNbbuv4xK6wrQxslJUkFsKP0yBOfI
+Tema Williams
+(for the family)
