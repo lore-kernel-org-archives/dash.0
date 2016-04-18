@@ -1,57 +1,36 @@
-From: Tema williams <temawilliams22@gmail.com>
-Subject: WE NEED YOUR HELP URGENTLY.
-Date: Wed, 13 Apr 2016 10:39:51 +0200
-Message-ID: <CA+hOsCuYVo3k2kucptQat=gY34MfN4ehu1UaL7Wbr5uReMq5+A@mail.gmail.com>
-Reply-To: temawilliams18@yahoo.com
+From: <verifelaw@gmx.com>
+Subject: IMPORTANT MAIL TO YOU
+Date: Mon, 18 Apr 2016 11:55:58 +0200
+Message-ID: <255947d9-7536-45a5-9885-65bdfd730a93@GSCADMINS22.gsc.org.uk>
+Reply-To: <lawrencetyman@gmx.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-ig0-f195.google.com ([209.85.213.195]:35441 "EHLO
-	mail-ig0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757741AbcDMIjw (ORCPT <rfc822;dash@vger.kernel.org>);
-	Wed, 13 Apr 2016 04:39:52 -0400
-Received: by mail-ig0-f195.google.com with SMTP id fn8so5612909igb.2
-        for <dash@vger.kernel.org>; Wed, 13 Apr 2016 01:39:52 -0700 (PDT)
+Received: from mail-am1hn0252.outbound.protection.outlook.com ([157.56.112.252]:44075
+	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751490AbcDRJ4d (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 18 Apr 2016 05:56:33 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 
-Dear Sir/madam,
+I am Capt. Lawrence Tyman, an officer in US Army,and also a West Point
+Graduate, serving in the Military with the 82nd Air Borne Division
+Peace keeping force deployed from Afganistan to Syria.  
+We were moved to Syria from Iraq as the last batch just left,and i
+really need your help in assisting me with the safe keeping of 1 military
+trunk box contain funds amount of $10.2M which i secured on a raiding we carried out in 
+January in one of the chief Syrian IsIs base which i headed the squard as the 
+Captain.  With every possible arrangement to lift this box out, is intended to arrive 
+Belgium from there a diplomat will deliver it to your designated location
+I hope you can be trusted? You will be rewarded handsomely if you could help
+me secure the funds until I conclude my service here in 3 month to meet you while we can 
+plan head to head on a good and profitable business or company i can invest my funds in your country.
+If you can be trusted and willing to support me in securing this safely kindly indicate 
+by Letting me know this (1) Your name (2) Your address (3) Age (4) Occupation and 
+i will explain further when i get a response from you
+kindly contact me in this my private email address below: lawrencetyman@gmx.com
 
-With due respect and to the glory of Almighty God whom we worship I
-call upon you to assist my family. Please Permit me to inform you of
-my desire of going into business relationship with you.
-
-My name is Tema Williams,The only Son of late Chief PATRICK WILLIAMS.
-My father was a very wealthy cocoa merchant in Abidjan but we are from
-Sierra Leone
-After my Father death I and my Family move to South Africa as refugee.
-
-My father was poisoned to death by his business associates on one of
-their outings on a business trip. Before his death in a private
-hospital in Abidjan he secretly called me on his bed side and told me
-that he has the sum of ($12.000,000 MILLION US DOLLAR) kept with a
-security and finance company in South Africa.
-
-He also explained to me that it was because of this wealth that he was
-poisoned by his business associates,that I should seek for a
-beneficiary in any country of my choice where I will transfer this
-money and use it for investment.I am honorably seeking for your
-assistance to transfer our fund out of South Africa.Upon the
-successful transfer of this fund,we shall make arrangement for me,my
-mother and younger sister to come over to your country to further our
-Education and invest in a profitable business that you may suggest.
-
-More over,I am willing to offer you 20% of the total sum as
-compensation for your effort/input after the successful transfer of
-this fund into your nominated bank account overseas.
-
-As we depend on God, and with God all things are possible.
-Anticipating to hear from you today.
-
-Thanks and God bless.
-PLEASE CALL ME +27787597591
-
-Best regards,
-
-Tema Williams
-(for the family)
+Regards,
+Capt. Lawrence Tyman
