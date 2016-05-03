@@ -1,36 +1,33 @@
-From: <verifelaw@gmx.com>
-Subject: IMPORTANT MAIL TO YOU
-Date: Mon, 18 Apr 2016 11:55:58 +0200
-Message-ID: <255947d9-7536-45a5-9885-65bdfd730a93@GSCADMINS22.gsc.org.uk>
-Reply-To: <lawrencetyman@gmx.com>
+From: Mike Hillary <z9@johnxx123.pk.tn>
+Subject: RE:QUEST FOR INVESTMENT/PARTNERSHIP
+Date: Tue, 3 May 2016 02:56:06 -0700
+Message-ID: <DB3PR06MB1887B39236C020CED0F482B8B7A0@DB3PR06MB188.eurprd06.prod.outlook.com>
+Reply-To: <mike.hilary3@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-am1hn0252.outbound.protection.outlook.com ([157.56.112.252]:44075
-	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+Received: from mail-db3hn0252.outbound.protection.outlook.com ([157.55.234.252]:61472
+	"EHLO emea01-db3-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751490AbcDRJ4d (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 18 Apr 2016 05:56:33 -0400
+	id S1755438AbcECKlm convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Tue, 3 May 2016 06:41:42 -0400
+Content-Description: Mail message body
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
+To: Recipients <z9@johnxx123.pk.tn>
 
-I am Capt. Lawrence Tyman, an officer in US Army,and also a West Point
-Graduate, serving in the Military with the 82nd Air Borne Division
-Peace keeping force deployed from Afganistan to Syria.  
-We were moved to Syria from Iraq as the last batch just left,and i
-really need your help in assisting me with the safe keeping of 1 military
-trunk box contain funds amount of $10.2M which i secured on a raiding we carried out in 
-January in one of the chief Syrian IsIs base which i headed the squard as the 
-Captain.  With every possible arrangement to lift this box out, is intended to arrive 
-Belgium from there a diplomat will deliver it to your designated location
-I hope you can be trusted? You will be rewarded handsomely if you could help
-me secure the funds until I conclude my service here in 3 month to meet you while we can 
-plan head to head on a good and profitable business or company i can invest my funds in your country.
-If you can be trusted and willing to support me in securing this safely kindly indicate 
-by Letting me know this (1) Your name (2) Your address (3) Age (4) Occupation and 
-i will explain further when i get a response from you
-kindly contact me in this my private email address below: lawrencetyman@gmx.com
 
-Regards,
-Capt. Lawrence Tyman
+                      RE:QUEST FOR INVESTMENT/PARTNERSHIP
+Dear Friend,
+
+I am Mike Hilary, the former Assistant Director of Project,  Niger Delta
+Development Commission, (NDDC.) Nigeria
+
+I am interested in investing in your country but i am faced with the problem of finding a trustworthy partner who will advice me on the viable areas to invest in and at the same time, act as my representative. It is on this reason that i am contacting you.
+
+Please, indicate your interest by contacting me  for more details.
+Email,mike.hilary3@gmail.com
+
+Yours Sincerely,
+Mike Hillary
