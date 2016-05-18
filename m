@@ -1,197 +1,213 @@
-From: Geoff Nixon <geoff@geoff.codes>
-Subject: The behavior of `jobs -p` is definitely, without a doubt, a bug
-Date: Thu, 12 May 2016 19:06:43 -0700
-Message-ID: <154a7ddad4a.edbc789338466.8966956162476476079@geoff.codes>
+From: Svyatoslav Mishyn <juef@openmailbox.org>
+Subject: man fixes
+Date: Wed, 18 May 2016 12:07:28 +0300
+Message-ID: <20160518090722.GA370@k8>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="GID0FwUMdk1T2AWN"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:24063 "EHLO
-	sender163-mail.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752208AbcEMCGr (ORCPT <rfc822;dash@vger.kernel.org>);
-	Thu, 12 May 2016 22:06:47 -0400
+Received: from mail2.openmailbox.org ([62.4.1.33]:42196 "EHLO
+	mail2.openmailbox.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751958AbcERJHi (ORCPT <rfc822;dash@vger.kernel.org>);
+	Wed, 18 May 2016 05:07:38 -0400
+Received: from localhost (unknown [130.180.220.143])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: juef@openmailbox.org)
+	by mail2.openmailbox.org (Postfix) with ESMTPSA id 4DC4D105A98
+	for <dash@vger.kernel.org>; Wed, 18 May 2016 11:07:31 +0200 (CEST)
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "dash@vger.kernel.org" <dash@vger.kernel.org>, "482999@bugs.debian.org" <482999@bugs.debian.org>
+To: dash@vger.kernel.org
 
-Package: dash
-Version: build-from-git-HEAD--http://git.kernel.org/cgit/utils/dash/dash
-Severity: serious
-X-Debbugs-CC: herbert@gondor.apana.org.au
+
+--GID0FwUMdk1T2AWN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hello,
+
+just found some typos and mdocml warnings.
+
+
+-- 
+https://www.juef.tk/
+
+--GID0FwUMdk1T2AWN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="0001-man-fix-mandoc-warnings.patch"
+
+From 745af83b0953eb16ab31ed67f26808665576a46e Mon Sep 17 00:00:00 2001
+From: Svyatoslav Mishyn <juef@openmailbox.org>
+Date: Fri, 13 May 2016 09:47:54 +0300
+Subject: [PATCH 1/2] man: fix mandoc warnings
+
+They are:
+ * prologue macros out of order: Dt after Os
+ * skipping paragraph macro: Pp before Bd
+ * whitespace at end of input line
+ * skipping empty macro: Cm
+ * skipping paragraph macro: Pp before It
+ * sections out of conventional order: Sh ENVIRONMENT
+ * skipping -width argument: Bl -item
 ---
+ src/dash.1 | 41 ++++++++++++++++++-----------------------
+ 1 file changed, 18 insertions(+), 23 deletions(-)
 
-To Whom It May Concern:
+diff --git a/src/dash.1 b/src/dash.1
+index 832eae7..57e731a 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -32,9 +32,9 @@
+ .\"
+ .\"	@(#)sh.1	8.6 (Berkeley) 5/4/95
+ .\"
+-.Dd January 19, 2003
+-.Os
++.Dd May 13, 2016
+ .Dt DASH 1
++.Os
+ .Sh NAME
+ .Nm dash
+ .Nd command interpreter (shell)
+@@ -694,7 +694,6 @@ Builtin commands grouped into a (list) will not affect the current shell.
+ The second form does not fork another shell so is slightly more efficient.
+ Grouping commands together this way allows you to redirect
+ their output as though they were one program:
+-.Pp
+ .Bd -literal -offset indent
+ { printf \*q hello \*q ; printf \*q world\\n" ; } \*[Gt] greeting
+ .Ed
+@@ -1183,7 +1182,7 @@ option turns off the effect of any preceding
+ .Fl P
+ options.
+ .It Xo echo Op Fl n
+-.Ar args... 
++.Ar args...
+ .Xc
+ Print the arguments on the standard output, separated by spaces.
+ Unless the
+@@ -1417,7 +1416,6 @@ and
+ and the option
+ .Op c ,
+ which requires an argument.
+-.Pp
+ .Bd -literal -offset indent
+ while getopts abc: f
+ do
+@@ -1431,7 +1429,6 @@ shift `expr $OPTIND - 1`
+ .Ed
+ .Pp
+ This code will accept any of the following as equivalent:
+-.Pp
+ .Bd -literal -offset indent
+ cmd \-acarg file file
+ cmd \-a \-c arg file file
+@@ -1522,7 +1519,6 @@ variables.
+ With the
+ .Fl p
+ option specified the output will be formatted suitably for non-interactive use.
+-.Pp
+ .It Xo printf Ar format
+ .Op Ar arguments  ...
+ .Xc
+@@ -1814,7 +1810,7 @@ If n is greater than the number of positional parameters,
+ .Ic shift
+ will issue an error message, and exit with return status 2.
+ .It test Ar expression
+-.It \&[ Ar expression Cm ]
++.It \&[ Ar expression No \&]
+ The
+ .Ic test
+ utility evaluates the expression and, if it evaluates
+@@ -2176,7 +2172,6 @@ the current limit is displayed.
+ Limits of an arbitrary process can be displayed or set using the
+ .Xr sysctl 8
+ utility.
+-.Pp
+ .It umask Op Ar mask
+ Set the value of umask (see
+ .Xr umask 2 )
+@@ -2233,15 +2228,6 @@ will throw you into command VI command mode.
+ Hitting
+ .Aq return
+ while in command mode will pass the line to the shell.
+-.Sh EXIT STATUS
+-Errors that are detected by the shell, such as a syntax error, will cause the
+-shell to exit with a non-zero exit status.
+-If the shell is not an
+-interactive shell, the execution of the shell file will be aborted.
+-Otherwise
+-the shell will return the exit status of the last command executed, or
+-if the exit builtin is used with a numeric argument, it will return the
+-argument.
+ .Sh ENVIRONMENT
+ .Bl -tag -width MAILCHECK
+ .It Ev HOME
+@@ -2318,12 +2304,21 @@ command.
+ The process ID of the parent process of the shell.
+ .El
+ .Sh FILES
+-.Bl -item -width HOMEprofilexxxx
+-.It
+-.Pa $HOME/.profile
+-.It
+-.Pa /etc/profile
++.Bl -tag -width "$HOME/.profileXX" -compact
++.It Pa $HOME/.profile
++User's login profile.
++.It Pa /etc/profile
++System login profile.
+ .El
++.Sh EXIT STATUS
++Errors that are detected by the shell, such as a syntax error, will cause the
++shell to exit with a non-zero exit status.
++If the shell is not an
++interactive shell, the execution of the shell file will be aborted.
++Otherwise
++the shell will return the exit status of the last command executed, or
++if the exit builtin is used with a numeric argument, it will return the
++argument.
+ .Sh SEE ALSO
+ .Xr csh 1 ,
+ .Xr echo 1 ,
+-- 
+2.8.0
 
-I wrote most of this before I read through the Debian bug report process.
-I'm actually not sure whether this is supposed to go to Debian or to the
-kernel.org address; So I apologize if some of it is redundant or sounds a
-bit weird; I assumed I'd be "creating a new thread", so I refer to this
-thread as "that thread", etc.
 
-If I've made any other errors, again apologizes in advance; it's the first time
-I've worked with the Debian process, and I'm using dash on another platform, so
-I don't have access to "reportbug", etc.
+--GID0FwUMdk1T2AWN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="0002-man-fix-a-typo.patch"
 
-Also, if I come off a bit pissy, petulant, pedantic, or arrogant, it's only
-because I have so many, many times *been* "that guy" -- someone who takes the
-time and goes out of his way to write and file a bug report and send it through
-the proper channels -- only have it basically dismissed out of hand. So when
-I found myself in the position of not only reporting a bug, but having to
-refute the incorrect arguments made that led to the bug report being dismissed,
-and thinking about how this could have been fixed 8 years ago, it did irk me.
-So yes, I was a bit peeved as I wrote it, it is absolutely nothing personal
-(except in that it's some of my own emotional baggage).
+From 8a8a9d25a3a784c225d9fdb99c1b1eec5604c953 Mon Sep 17 00:00:00 2001
+From: Svyatoslav Mishyn <juef@openmailbox.org>
+Date: Fri, 13 May 2016 11:01:17 +0300
+Subject: [PATCH 2/2] man: fix a typo
 
-So, once again, apologies, I truly mean no disrespect.
-
--------------------------------------------------------------------------------
-
-So I thought I was going to be reporting a "new" bug today.
-
-But it turns out, this came up way back in 2008:
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=482999
-
-At at the time, the curt response and resolution seemed to be all of "no", and
-"you should just use $!".
-
-So I guess rather than a "bug report" per se, this is a vociferous argument
-questioning that conclusion, and a request that it be reconsidered.
-
-To me, this is definitely, absolutely, positively a bug.
-
+iff => if
 ---
+ src/dash.1 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Let me start with a couple of corrections to that previous thread.
-
-
-1. The line: jobs -p > /tmp/pids                   # this works
-
-Does *not*, in fact, work. Meaning there is *no* instance in which it works.
-
-Now (8 years later), to the assertions made in that thread.
-
-2. This response:
-
-> Hi, I don't think that's a bug, the jobs builtin 'shall display the
-> status of jobs that were started in the current shell environment;'[0]
-> 
-> When running jobs in a subshell, you change the shell environment for
-> the jobs builtin.
-> 
-> Regards, Gerrit.
-> 
-> [0] http://www.opengroup.org/onlinepubs/009695399/utilities/jobs.html
-
-Is just flat incorrect. In fact, it is almost the complete opposite of
-what the standard says. Perhaps we should refer back to (I'm intentionally
-using Issue 6 here, since that was the standard at the time of the original
-discussion, but nothing of relevance differs in Issue 7)
-http://pubs.opengroup.org/onlinepubs/009604499/utilities/xcu_chap02.html,
-"Shell Command Lanuage", in particular (all emphasis mine):
-
-  2.12. Shell Execution Environment
-  ---------------------------------
-  ...
-
-  *The environment of the shell process shall not be changed by the utility
-  unless explicitly specified by the utility description* (for example, cd and
-  umask).
-
-  A subshell environment *shall be created as a duplicate of the shell
-  environment*, except that signal traps that are not being ignored shall be
-  set to the default action. Changes made to the subshell environment shall not
-  affect the shell environment. *Command substitution*, commands that are
-  grouped with parentheses, and *asynchronous lists* shall be executed in a
-  subshell environment.
-
-and
-
-  2.9.3 Lists
-  -----------
-  ...
-
-  Asynchronous Lists
-
-  If a command is terminated by the control operator ampersand ( '&' ), the
-shell shall execute the command asynchronously in a subshell. 
-  ...
-  When an element of an asynchronous list (the portion of the list ended by an
-  ampersand ...), is started by the shell, the process ID of the last command
-  in the asynchronous list element shall become known in the current shell
-  execution environment; see Shell Execution Environment.
-
-In review, a subshell inherits a duplicate of the parent environment, which
-includes the asynchronous list of background tasks, and the shell environment is
-*explicitly* not to be changed, unless otherwise specified. Which it is not.
-
-Basically:  `(this)`, `$(this)`, `this &`, a few other cases, are subshells.
-They inherit the environment of the parent shell. The other interpretation given
-describes something like that which occurs with an invocation of `sh -c '...'`,
-which is not the case here.
-
-3. But let us return to the specification for "jobs". Since subshells are
-really not even the issue here at all. Indeed, the specification does says it
-
-  'shall display the status of jobs that were started in the current shell
-  environment'
-
-as quoted. In the description, but if you read a bit futher, it goes on to in
-face specify *how* it should do so. This includes, specifically,
-
-  STDOUT
-  ------
-  If the -p option is specified, the output shall consist of one line for each
-  process ID:
-
-  "%d\n", <process ID>
-
-That is: `jobs -p` *is supposed to go to standard output*, and something like
-the line below (note, here, we have no subshell):
-
-  `jobs -p | while read job; do echo $job; done`
-
-should work, as should all the examples in the original bug report:
-
-  `echo $(jobs -p)`
-  `for i in $(jobs -p); do echo $i; done`
-  `jobs -p | xargs`
-
-But they do not. The present behavior is to simply dump the process IDs directly
-to the TTY, it seems. Which is not, at all, what the specification dictates.
-
-5. Then lets read a bit further, shall we? Although from the "informative" part
-of the spec, there's this:
-
-  APPLICATION USAGE
-  -----------------
-  *The -p option is the only portable way* to find out the process group of a
-  job because different implementations have different strategies for defining
-  the process group of the job. *Usage such as ** $(jobs -p) ** provides a way
-  of referring to the process group of the job in an implementation-independent
-  way.
-
-  The jobs utility does not work as expected when it is operating in its own
-  utility execution environment because that environment has no applicable jobs
-  to manipulate... For this reason, jobs is generally implemented as a shell
-regular built-in. 
-
-So, I'm pretty sure the specification intends for echo $(jobs -p) to work.
-Since it *directly references that exact usage*. I'm not sure what's exactly
-meant by "generally implemented as a shell regular built-in" -- but I indeed
-just tried for an hour to see if I could write a shell function that could be
-used to emulate the same behavior. But I couldn't find (and I doubt there is) a
-way to do it without at lease something non-POSX, like a ksh DEBUG trap.
-
-And finally, do I really need to lay out the reasons why one might need the
-ability to list *all* jobs, as opposed to simply the last one used?
-
-To me, "just use $!" sounds to me a lot more like "just go use another shell".
+diff --git a/src/dash.1 b/src/dash.1
+index 57e731a..9ef14a8 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -606,10 +606,10 @@ and
+ .Dq ||
+ are AND-OR list operators.
+ .Dq &&
+-executes the first command, and then executes the second command iff the
++executes the first command, and then executes the second command if the
+ exit status of the first command is zero.
+ .Dq ||
+-is similar, but executes the second command iff the exit status of the first
++is similar, but executes the second command if the exit status of the first
+ command is nonzero.
+ .Dq &&
+ and
+-- 
+2.8.0
 
 
-I apologize for being brusk.
-Thank you for your attention to this matter.
-
-
-Geoff Nixon
-geoff at geoff.codes
-
+--GID0FwUMdk1T2AWN--
