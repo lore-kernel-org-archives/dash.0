@@ -1,56 +1,55 @@
-From: Jonathan Perkin <jperkin@joyent.com>
-Subject: Re: [SHELL] Fix 64-bit Solaris build
-Date: Mon, 6 Jun 2016 16:22:59 +0100
-Message-ID: <20160606152259.GE5022@joyent.com>
-References: <20151211130714.GD54973@joyent.com>
- <20160606142710.GA23472@gondor.apana.org.au>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: [PATCH v2] builtin: Fix handling of trailing IFS white spaces
+Date: Mon, 6 Jun 2016 22:43:39 +0200
+Message-ID: <5755E07B.6090300@gigawatt.nl>
+References: <5661EEB7.8080908@gigawatt.nl>
+ <20160606084805.GA20946@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:32986 "EHLO
-	mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751471AbcFFPXE (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 6 Jun 2016 11:23:04 -0400
-Received: by mail-wm0-f54.google.com with SMTP id r5so3414224wmr.0
-        for <dash@vger.kernel.org>; Mon, 06 Jun 2016 08:23:03 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20160606142710.GA23472@gondor.apana.org.au>
+Received: from mailfilter1-k0683s008.csv-networks.nl ([92.48.231.157]:41732
+	"EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752830AbcFFUoN (ORCPT
+	<rfc822;dash@vger.kernel.org>); Mon, 6 Jun 2016 16:44:13 -0400
+In-Reply-To: <20160606084805.GA20946@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
+Cc: Stephane Chazelas <stephane.chazelas@gmail.com>, Gioele Barabucci <gioele@svario.it>
 
-* On 2016-06-06 at 15:27 BST, Herbert Xu wrote:
+On 06/06/16 10:48, Herbert Xu wrote:
+> On Fri, Dec 04, 2015 at 08:51:19PM +0100, Harald van Dijk wrote:
+>>
+>> Here it is. Attached is an updated patch that ignores the complete
+>> terminator if only a single field remains, otherwise ignores only
+>> trailing IFS whitespace.
+>
+> There is a little bug in the patch if you happened to start with
+> an escaped IFS, otherwise I think it's good.
 
-> On Fri, Dec 11, 2015 at 01:07:14PM +0000, Jonathan Perkin wrote:
-> > In a 64-bit Solaris environment there is no stat64() function, only
-> > stat().  This conflicts with the stat64 #define used to support
-> > dietlibc/klibc when stat64() is not found and results in:
-> > 
-> >   ./../config.h:194:16: error: redefinition of 'struct stat'
-> >    #define stat64 stat
-> >                 ^
-> >   In file included from cd.c:36:0:
-> >   /usr/include/sys/stat.h:217:8: note: originally defined here
-> >    struct stat {
-> >           ^
-> > 
-> > Instead, add a AC_CHECK_DECL test for stat64, and only perform the
-> > AC_CHECK_FUNC test if it isn't already defined.
-> 
-> I don't understand, does stat64 exist or not? If it doesn't then
-> how can AC_CHECK_DECL help? Or do you mean that it only exists as
-> a macro?
+Thanks. If starting with an escaped IFS, the CTLESC should already have 
+been skipped before the if (maxargs == 1) check gets executed. That's 
+done at the start of the outer loop, but is not visible in the patch 
+because it's unmodified from the original code. Or did I misunderstand 
+you here?
 
-Right, it only exists as a macro, defined as
+> However, I think this loop is getting too deep so I've reworked
+> it to have just one loop over the string instead of three (two
+> nested loops).
 
-  #define stat64 stat
-  
-in sys/stat.h.  The AC_CHECK_FUNC test fails as it doesn't pull in any
-includes, and cannot find a stat64() function in libc.
+> Please test this.
 
-Adding the AC_CHECK_DECL test finds the definition and avoids running
-the AC_CHECK_FUNC tests if that is the case.
+With the link sent by Martijn Dekker earlier in this thread:
 
--- 
-Jonathan Perkin  -  Joyent, Inc.  -  www.joyent.com
+ 
+<http://web.archive.org/web/20050414022354/http://www.research.att.com/~gsf/public/ifs.sh>
+
+it gives a lot of failures:
+
+# tests 6856 passed 1844 failed 5012
+
+I'll look into it in more detail later, if no one beats me to it.
+
+Cheers,
+Harald van Dijk
