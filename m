@@ -1,96 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: trap: Implement POSIX.1-2008 trap reset behaviour (#2)
-Date: Mon, 6 Jun 2016 19:52:43 +0800
-Message-ID: <20160606115243.GA22071@gondor.apana.org.au>
-References: <20151207175047.GG735@joyent.com>
+Subject: Re: jobs: Don't attempt to access job table for job %0
+Date: Mon, 6 Jun 2016 19:57:06 +0800
+Message-ID: <20160606115706.GA22138@gondor.apana.org.au>
+References: <1449734374-23041-1-git-send-email-tklauser@distanz.ch>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50840 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:52443 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751039AbcFFLw7 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 6 Jun 2016 07:52:59 -0400
+	with ESMTP id S1751073AbcFFL5L (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 6 Jun 2016 07:57:11 -0400
 Content-Disposition: inline
-In-Reply-To: <20151207175047.GG735@joyent.com>
+In-Reply-To: <1449734374-23041-1-git-send-email-tklauser@distanz.ch>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Jonathan Perkin <jperkin@joyent.com>
+To: Tobias Klauser <tklauser@distanz.ch>
 Cc: dash@vger.kernel.org
 
-On Mon, Dec 07, 2015 at 05:50:47PM +0000, Jonathan Perkin wrote:
-> Clarifies a couple of issues with the previous patch, and expands on
-> the rationale in the commit message.  Sorry for the noise -- jperkin
+On Thu, Dec 10, 2015 at 08:59:34AM +0100, Tobias Klauser wrote:
+> If job %0 is (mistakenly) specified, an out-of-bounds access to the
+> jobtab occurs in function getjob() if num = 0:
+> 
+> 	jp = jobtab + 0 - 1
+> 
+> Fix this by checking that the job number is larger than 0 before
+> accessing the jobtab.
+> 
+> Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
 
-Thanks for the patch.
-
-I've decided to do something similar to your final patch:
-
----8<---
-Jonathan Perkin submitted a patch to fix the behaviour of trap
-when the first argument is an integer.  Currently it is treated
-as a command while POSIX requires it to be treated as a signal.
-
-This patch is based on his idea but instead of adding an extra
-argument to decode_signal I have added a new decode_signum helper.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/src/trap.c b/src/trap.c
-index 82d4263..edb9938 100644
---- a/src/trap.c
-+++ b/src/trap.c
-@@ -79,6 +79,8 @@ int gotsigchld;
- 
- extern char *signal_names[];
- 
-+static int decode_signum(const char *);
-+
- #ifdef mkinit
- INCLUDE "trap.h"
- INIT {
-@@ -112,7 +114,7 @@ trapcmd(int argc, char **argv)
- 		}
- 		return 0;
- 	}
--	if (!ap[1])
-+	if (!ap[1] || decode_signum(*ap) >= 0)
- 		action = NULL;
- 	else
- 		action = *ap++;
-@@ -400,18 +402,27 @@ out:
- 	/* NOTREACHED */
- }
- 
--int decode_signal(const char *string, int minsig)
-+static int decode_signum(const char *string)
- {
--	int signo;
-+	int signo = -1;
- 
- 	if (is_number(string)) {
- 		signo = atoi(string);
--		if (signo >= NSIG) {
--			return -1;
--		}
--		return signo;
-+		if (signo >= NSIG)
-+			signo = -1;
- 	}
- 
-+	return signo;
-+}
-+
-+int decode_signal(const char *string, int minsig)
-+{
-+	int signo;
-+
-+	signo = decode_signum(string);
-+	if (signo >= 0)
-+		return signo;
-+
- 	for (signo = minsig; signo < NSIG; signo++) {
- 		if (!strcasecmp(string, signal_names[signo])) {
- 			return signo;
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
