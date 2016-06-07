@@ -1,314 +1,80 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v3] builtin: Fix handling of trailing IFS white spaces
-Date: Tue, 7 Jun 2016 17:25:39 +0800
-Message-ID: <20160607092539.GA30397@gondor.apana.org.au>
-References: <5661EEB7.8080908@gigawatt.nl>
- <20160606084805.GA20946@gondor.apana.org.au>
- <5755E07B.6090300@gigawatt.nl>
+From: Stephen Kitt <steve@sk2.org>
+Subject: Re: [PATCH v2] jobs: Handle string-based job descriptors
+Date: Tue, 7 Jun 2016 16:43:07 +0200
+Message-ID: <20160607164307.650db975@heffalump.sk2.org>
+References: <1464940471-9819-1-git-send-email-steve@sk2.org>
+	<20160606144527.GA23630@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ boundary="Sig_/vpEknVY7tBUqYimZS/8Xc2O"; protocol="application/pgp-signature"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33392 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932210AbcFGJZr (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 7 Jun 2016 05:25:47 -0400
-Content-Disposition: inline
-In-Reply-To: <5755E07B.6090300@gigawatt.nl>
+Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:57397 "EHLO
+	4.mo3.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1161418AbcFGPWE (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 7 Jun 2016 11:22:04 -0400
+Received: from player730.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 479E8101411B
+	for <dash@vger.kernel.org>; Tue,  7 Jun 2016 16:43:17 +0200 (CEST)
+In-Reply-To: <20160606144527.GA23630@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org, Stephane Chazelas <stephane.chazelas@gmail.com>, Gioele Barabucci <gioele@svario.it>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org
 
-On Mon, Jun 06, 2016 at 10:43:39PM +0200, Harald van Dijk wrote:
->
-> Thanks. If starting with an escaped IFS, the CTLESC should already
-> have been skipped before the if (maxargs == 1) check gets executed.
-> That's done at the start of the outer loop, but is not visible in
-> the patch because it's unmodified from the original code. Or did I
-> misunderstand you here?
+--Sig_/vpEknVY7tBUqYimZS/8Xc2O
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-If the very first character later gets zeroed, you'd be zeroing
-the character after the CTLESC, leaving the CTLESC in the value
-to be assigned to the last variable of read.
+On Mon, 6 Jun 2016 22:45:27 +0800, Herbert Xu <herbert@gondor.apana.org.au>
+wrote:
+> On Fri, Jun 03, 2016 at 09:54:31AM +0200, Stephen Kitt wrote:
+> > When looking for a job using a string descriptor, e.g.
+> >=20
+> > 	fg %man
+> >=20
+> > the relevant loop in src/jobs.c only ever exits to the err label. With
+> > this patch, when the end condition is reached, we check whether a job
+> > was found, and if so, set things up to exit correctly via gotit.
+> > Multiple matches are already caught using the test in the match block.
+> >=20
+> > Signed-off-by: Stephen Kitt <steve@sk2.org> =20
+>=20
+> Thanks for the patch.  I'd prefer to move that logic out of the
+> loop, like this:
+[...]
 
-If you got rid of the very first q=p assignment it should just work.
+> -	while (1) {
+> -		if (!jp)
+> -			goto err;
+> +	while (jp) {
+[...]
 
-> With the link sent by Martijn Dekker earlier in this thread:
-> 
-> 
-> <http://web.archive.org/web/20050414022354/http://www.research.att.com/~gsf/public/ifs.sh>
-> 
-> it gives a lot of failures:
-> 
-> # tests 6856 passed 1844 failed 5012
-> 
-> I'll look into it in more detail later, if no one beats me to it.
+That is indeed much better, thanks!
 
-Thanks.  I've fixed up the buglet causing the failures:
+Regards,
 
----8<--
-The read built-in does not handle trailing IFS white spaces in
-the right way, when there are more fields than variables.  Part
-of the problem is that this case is handled outside of ifsbreakup.
+Stephen
 
-Harald van Dijk wrote a patch to fix this by moving the magic
-into ifsbreakup itself.
+--Sig_/vpEknVY7tBUqYimZS/8Xc2O
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-This patch further reorganises the ifsbreakup loop by having only
-one loop over the whole string.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+iQIcBAEBCgAGBQJXVt17AAoJEIDTAvWIbYOci5gP/0ic874rbx+k8DMvAywOWIBY
+Gerzkjx6PuqFT4Qjlv1IVgHimshotA0xXq0AYzhEd+j7LGG6q62qNEY0ye5eQk9h
+7k2AHeG2zUzym3G617R4YFKnuv+gbv2OffFsb6CiXbF7P4UyBeuNt0Y302fMwgwG
+b90kPs7v+0bNRIpcZ93RtQPpQRSoG0UdXMXI8+WtXkpD84dZhmBZ3f7Ywmu8b49d
+9a6HBe/4O7r/JjoUVPIoHeqMJXM+qHKPEXHMNuHlBHmolJ3YEfV0uINZoMTbVptt
+WgbbXSO7MbO4nid/RK8TpM2eQgYH/lkSjwoqT6DyQboYpgjSRn2dLnEdKll8yNQt
+23GJu3Kw2oinAV5DOUbg0lxI7Wrk7J0jSekKTyAPdjHpImlgN19oh0DqY8y1M6Tr
++eaYLWwIdvhsqBK2OZBx0IdMolqdIAfhO+53YExh9r+XYQ7AFcpEUt2GQDh/EY2g
+L+/330N0xTbvdV/5cM1f+rOFOiz4fNFHlbnRWjZdkUKDT/4c+PNcW1waWh9KOMW4
+kZQ2jKg0aWkdixfFS6gTDCc+6NrDB1B3knU93Ni4UIXwe1eiHfXyyENfW+c5JGUs
+A9EGlG202oEeuRHSWOds+19Uzy0zF03W47c/dTumKnGV/OUHk9rQ/j8bN+x6eikm
+U9XLR4a67rDkx3n10nNh
+=Mz68
+-----END PGP SIGNATURE-----
 
-diff --git a/src/expand.c b/src/expand.c
-index b2d710d..2207eba 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -50,6 +50,7 @@
- #include <glob.h>
- #endif
- #include <ctype.h>
-+#include <stdbool.h>
- 
- /*
-  * Routines to expand arguments to commands.  We have to deal with
-@@ -203,7 +204,7 @@ expandarg(union node *arg, struct arglist *arglist, int flag)
- 	 * TODO - EXP_REDIR
- 	 */
- 	if (flag & EXP_FULL) {
--		ifsbreakup(p, &exparg);
-+		ifsbreakup(p, -1, &exparg);
- 		*exparg.lastp = NULL;
- 		exparg.lastp = &exparg.list;
- 		expandmeta(exparg.list, flag);
-@@ -1016,15 +1017,18 @@ recordregion(int start, int end, int nulonly)
-  * Break the argument string into pieces based upon IFS and add the
-  * strings to the argument list.  The regions of the string to be
-  * searched for IFS characters have been stored by recordregion.
-+ * If maxargs is non-negative, at most maxargs arguments will be created, by
-+ * joining together the last arguments.
-  */
- void
--ifsbreakup(char *string, struct arglist *arglist)
-+ifsbreakup(char *string, int maxargs, struct arglist *arglist)
- {
- 	struct ifsregion *ifsp;
- 	struct strlist *sp;
- 	char *start;
- 	char *p;
- 	char *q;
-+	char *r = NULL;
- 	const char *ifs, *realifs;
- 	int ifsspc;
- 	int nulonly;
-@@ -1042,16 +1046,75 @@ ifsbreakup(char *string, struct arglist *arglist)
- 			ifs = nulonly ? nullstr : realifs;
- 			ifsspc = 0;
- 			while (p < string + ifsp->endoff) {
-+				int c;
-+				bool isifs;
-+				bool isdefifs;
-+
- 				q = p;
--				if (*p == (char)CTLESC)
--					p++;
--				if (strchr(ifs, *p)) {
-+				c = *p++;
-+				if (c == (char)CTLESC)
-+					c = *p++;
-+
-+				isifs = strchr(ifs, c);
-+				isdefifs = false;
-+				if (isifs)
-+					isdefifs = strchr(defifs, c);
-+
-+				/* If only reading one more argument:
-+				 * If we have exactly one field,
-+				 * read that field without its terminator.
-+				 * If we have more than one field,
-+				 * read all fields including their terminators,
-+				 * except for trailing IFS whitespace.
-+				 *
-+				 * This means that if we have only IFS
-+				 * characters left, and at most one
-+				 * of them is non-whitespace, we stop
-+				 * reading here.
-+				 * Otherwise, we read all the remaining
-+				 * characters except for trailing
-+				 * IFS whitespace.
-+				 *
-+				 * In any case, r indicates the start
-+				 * of the characters to remove, or NULL
-+				 * if no characters should be removed.
-+				 */
-+				if (!maxargs) {
-+					if (isdefifs) {
-+						if (!r)
-+							r = q;
-+						continue;
-+					}
-+
-+					if (!(isifs && ifsspc))
-+						r = NULL;
-+
-+					ifsspc = 0;
-+					continue;
-+				}
-+
-+				if (ifsspc) {
-+					if (isdefifs)
-+						continue;
-+
-+					if (isifs)
-+						q = p;
-+
-+					start = q;
-+					isifs = false;
-+				}
-+
-+				if (isifs) {
- 					if (!nulonly)
--						ifsspc = (strchr(defifs, *p) != NULL);
-+						ifsspc = isdefifs;
- 					/* Ignore IFS whitespace at start */
- 					if (q == start && ifsspc) {
--						p++;
- 						start = p;
-+						ifsspc = 0;
-+						continue;
-+					}
-+					if (maxargs > 0 && !--maxargs) {
-+						r = q;
- 						continue;
- 					}
- 					*q = '\0';
-@@ -1059,39 +1122,20 @@ ifsbreakup(char *string, struct arglist *arglist)
- 					sp->text = start;
- 					*arglist->lastp = sp;
- 					arglist->lastp = &sp->next;
--					p++;
--					if (!nulonly) {
--						for (;;) {
--							if (p >= string + ifsp->endoff) {
--								break;
--							}
--							q = p;
--							if (*p == (char)CTLESC)
--								p++;
--							if (strchr(ifs, *p) == NULL ) {
--								p = q;
--								break;
--							} else if (strchr(defifs, *p) == NULL) {
--								if (ifsspc) {
--									p++;
--									ifsspc = 0;
--								} else {
--									p = q;
--									break;
--								}
--							} else
--								p++;
--						}
--					}
- 					start = p;
--				} else
--					p++;
-+					continue;
-+				}
-+
-+				ifsspc = 0;
- 			}
- 		} while ((ifsp = ifsp->next) != NULL);
- 		if (nulonly)
- 			goto add;
- 	}
- 
-+	if (r)
-+		*r = '\0';
-+
- 	if (!*start)
- 		return;
- 
-diff --git a/src/expand.h b/src/expand.h
-index 6a90f67..26dc5b4 100644
---- a/src/expand.h
-+++ b/src/expand.h
-@@ -69,7 +69,7 @@ char *_rmescapes(char *, int);
- int casematch(union node *, char *);
- void recordregion(int, int, int);
- void removerecordregions(int); 
--void ifsbreakup(char *, struct arglist *);
-+void ifsbreakup(char *, int, struct arglist *);
- void ifsfree(void);
- 
- /* From arith.y */
-diff --git a/src/miscbltin.c b/src/miscbltin.c
-index b596fd2..39b9c47 100644
---- a/src/miscbltin.c
-+++ b/src/miscbltin.c
-@@ -67,28 +67,21 @@
-  *  less fields than variables -> remaining variables unset.
-  *
-  *  @param line complete line of input
-+ *  @param ac argument count
-  *  @param ap argument (variable) list
-  *  @param len length of line including trailing '\0'
-  */
- static void
--readcmd_handle_line(char *s, char **ap)
-+readcmd_handle_line(char *s, int ac, char **ap)
- {
- 	struct arglist arglist;
- 	struct strlist *sl;
--	char *backup;
--	char *line;
- 
--	/* ifsbreakup will fiddle with stack region... */
--	line = stackblock();
- 	s = grabstackstr(s);
- 
--	/* need a copy, so that delimiters aren't lost
--	 * in case there are more fields than variables */
--	backup = sstrdup(line);
--
- 	arglist.lastp = &arglist.list;
- 	
--	ifsbreakup(s, &arglist);
-+	ifsbreakup(s, ac, &arglist);
- 	*arglist.lastp = NULL;
- 	ifsfree();
- 
-@@ -104,21 +97,6 @@ readcmd_handle_line(char *s, char **ap)
- 			return;
- 		}
- 
--		/* remaining fields present, but no variables left. */
--		if (!ap[1] && sl->next) {
--			size_t offset;
--			char *remainder;
--
--			/* FIXME little bit hacky, assuming that ifsbreakup 
--			 * will not modify the length of the string */
--			offset = sl->text - s;
--			remainder = backup + offset;
--			rmescapes(remainder);
--			setvar(*ap, remainder, 0);
--
--			return;
--		}
--		
- 		/* set variable to field */
- 		rmescapes(sl->text);
- 		setvar(*ap, sl->text, 0);
-@@ -211,7 +189,7 @@ start:
- out:
- 	recordregion(startloc, p - (char *)stackblock(), 0);
- 	STACKSTRNUL(p);
--	readcmd_handle_line(p + 1, ap);
-+	readcmd_handle_line(p + 1, argc - (ap - argv), ap);
- 	return status;
- }
- 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--Sig_/vpEknVY7tBUqYimZS/8Xc2O--
