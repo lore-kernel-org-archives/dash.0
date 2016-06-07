@@ -1,492 +1,312 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v2] eval: Return status in eval functions
-Date: Tue, 7 Jun 2016 16:47:59 +0800
-Message-ID: <20160607084759.GA30183@gondor.apana.org.au>
-References: <5663058B.1030809@gigawatt.nl>
- <20160606101337.GA21441@gondor.apana.org.au>
- <5755E7C0.8010309@gigawatt.nl>
+Subject: [PATCH v3] builtin: Fix handling of trailing IFS white spaces
+Date: Tue, 7 Jun 2016 17:25:39 +0800
+Message-ID: <20160607092539.GA30397@gondor.apana.org.au>
+References: <5661EEB7.8080908@gigawatt.nl>
+ <20160606084805.GA20946@gondor.apana.org.au>
+ <5755E07B.6090300@gigawatt.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40324 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:33392 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752093AbcFGIs3 (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 7 Jun 2016 04:48:29 -0400
+	with ESMTP id S932210AbcFGJZr (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 7 Jun 2016 05:25:47 -0400
 Content-Disposition: inline
-In-Reply-To: <5755E7C0.8010309@gigawatt.nl>
+In-Reply-To: <5755E07B.6090300@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org, Gioele Barabucci <gioele@svario.it>
+Cc: dash@vger.kernel.org, Stephane Chazelas <stephane.chazelas@gmail.com>, Gioele Barabucci <gioele@svario.it>
 
-On Mon, Jun 06, 2016 at 11:14:40PM +0200, Harald van Dijk wrote:
+On Mon, Jun 06, 2016 at 10:43:39PM +0200, Harald van Dijk wrote:
 >
-> Nice! It does indeed fix additional problems. It also introduces a
-> few new bugs though (modified from the FreeBSD testsuite):
-> 
-> src/dash -c 'eval "false
-> 
-> "'; echo $?
-> 
-> This should print 1 and used to print 1, but with this patch
-> applied, it prints 0. The parsing here adds a null commands, which
-> shouldn't affect the exit status.
+> Thanks. If starting with an escaped IFS, the CTLESC should already
+> have been skipped before the if (maxargs == 1) check gets executed.
+> That's done at the start of the outer loop, but is not visible in
+> the patch because it's unmodified from the original code. Or did I
+> misunderstand you here?
 
-OK, I have applied your original patch with some formatting fixes.
+If the very first character later gets zeroed, you'd be zeroing
+the character after the CTLESC, leaving the CTLESC in the value
+to be assigned to the last variable of read.
 
-> Unfortunately, attempting to fix this by simply setting
-> status = exitstatus for null commands breaks other things: given
+If you got rid of the very first q=p assignment it should just work.
+
+> With the link sent by Martijn Dekker earlier in this thread:
 > 
-> src/dash -c 'false; case x in *) esac'; echo $?
-
-This is actually the result of the nofork path created for -c.
-I'll fix it using the same method as you used in the original patch.
-
-> Another one modified from the FreeBSD testsuite:
 > 
-> src/dash -xc 'f() {
->   trap "return 1" USR1
->   kill -USR1 $$
-> }
-> f'; echo $?
+> <http://web.archive.org/web/20050414022354/http://www.research.att.com/~gsf/public/ifs.sh>
 > 
-> This should print 1 and used to print 1, but with this patch
-> applied, it prints 0.
-
-I have fixed this by rereading exitstatus after dotrap.
-
-> >@@ -588,10 +588,12 @@ evalpipe(union node *n, int flags)
-> >  		close(pip[1]);
-> >  	}
-> >  	if (n->npipe.backgnd == 0) {
-> >-		exitstatus = waitforjob(jp);
-> >+		status = waitforjob(jp);
-> >  		TRACE(("evalpipe:  job done exit status %d\n", exitstatus));
+> it gives a lot of failures:
 > 
-> This line looks like it should be updated to print status rather
-> than exitstatus when tracing is enabled. :)
+> # tests 6856 passed 1844 failed 5012
+> 
+> I'll look into it in more detail later, if no one beats me to it.
 
-Fixed too.
+Thanks.  I've fixed up the buglet causing the failures:
 
 ---8<--
-The exit status is currently clobbered too early for case statements
-and loops.  This patch fixes it by making the eval functions return
-the current exit status and setting them in one place -- evaltree.
+The read built-in does not handle trailing IFS white spaces in
+the right way, when there are more fields than variables.  Part
+of the problem is that this case is handled outside of ifsbreakup.
 
-Harald van Dijk pointed out a number of bugs in the original patch.
+Harald van Dijk wrote a patch to fix this by moving the magic
+into ifsbreakup itself.
+
+This patch further reorganises the ifsbreakup loop by having only
+one loop over the whole string.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/src/eval.c b/src/eval.c
-index 30c05f9..7498f9d 100644
---- a/src/eval.c
-+++ b/src/eval.c
-@@ -81,16 +81,16 @@ int savestatus = -1;		/* exit status of last command outside traps */
- STATIC
+diff --git a/src/expand.c b/src/expand.c
+index b2d710d..2207eba 100644
+--- a/src/expand.c
++++ b/src/expand.c
+@@ -50,6 +50,7 @@
+ #include <glob.h>
  #endif
- void evaltreenr(union node *, int) __attribute__ ((__noreturn__));
--STATIC void evalloop(union node *, int);
--STATIC void evalfor(union node *, int);
--STATIC void evalcase(union node *, int);
--STATIC void evalsubshell(union node *, int);
-+STATIC int evalloop(union node *, int);
-+STATIC int evalfor(union node *, int);
-+STATIC int evalcase(union node *, int);
-+STATIC int evalsubshell(union node *, int);
- STATIC void expredir(union node *);
--STATIC void evalpipe(union node *, int);
-+STATIC int evalpipe(union node *, int);
- #ifdef notyet
--STATIC void evalcommand(union node *, int, struct backcmd *);
-+STATIC int evalcommand(union node *, int, struct backcmd *);
- #else
--STATIC void evalcommand(union node *, int);
-+STATIC int evalcommand(union node *, int);
- #endif
- STATIC int evalbltin(const struct builtincmd *, int, char **, int);
- STATIC int evalfun(struct funcnode *, int, char **, int);
-@@ -170,11 +170,13 @@ evalstring(char *s, int flags)
- 	setstackmark(&smark);
+ #include <ctype.h>
++#include <stdbool.h>
  
- 	status = 0;
--	while ((n = parsecmd(0)) != NEOF) {
--		evaltree(n, flags & ~(parser_eof() ? 0 : EV_EXIT));
-+	for (; (n = parsecmd(0)) != NEOF; popstackmark(&smark)) {
-+		int i;
-+
-+		i = evaltree(n, flags & ~(parser_eof() ? 0 : EV_EXIT));
- 		if (n)
--			status = exitstatus;
--		popstackmark(&smark);
-+			status = i;
-+
- 		if (evalskip)
- 			break;
- 	}
-@@ -192,13 +194,13 @@ evalstring(char *s, int flags)
-  * exitstatus.
+ /*
+  * Routines to expand arguments to commands.  We have to deal with
+@@ -203,7 +204,7 @@ expandarg(union node *arg, struct arglist *arglist, int flag)
+ 	 * TODO - EXP_REDIR
+ 	 */
+ 	if (flag & EXP_FULL) {
+-		ifsbreakup(p, &exparg);
++		ifsbreakup(p, -1, &exparg);
+ 		*exparg.lastp = NULL;
+ 		exparg.lastp = &exparg.list;
+ 		expandmeta(exparg.list, flag);
+@@ -1016,15 +1017,18 @@ recordregion(int start, int end, int nulonly)
+  * Break the argument string into pieces based upon IFS and add the
+  * strings to the argument list.  The regions of the string to be
+  * searched for IFS characters have been stored by recordregion.
++ * If maxargs is non-negative, at most maxargs arguments will be created, by
++ * joining together the last arguments.
   */
- 
--void
-+int
- evaltree(union node *n, int flags)
+ void
+-ifsbreakup(char *string, struct arglist *arglist)
++ifsbreakup(char *string, int maxargs, struct arglist *arglist)
  {
- 	int checkexit = 0;
--	void (*evalfn)(union node *, int);
-+	int (*evalfn)(union node *, int);
- 	unsigned isor;
--	int status;
-+	int status = 0;
- 	if (n == NULL) {
- 		TRACE(("evaltree(NULL) called\n"));
- 		goto out;
-@@ -221,8 +223,7 @@ evaltree(union node *n, int flags)
- 		break;
- #endif
- 	case NNOT:
--		evaltree(n->nnot.com, EV_TESTED);
--		status = !exitstatus;
-+		status = !evaltree(n->nnot.com, EV_TESTED);
- 		goto setstatus;
- 	case NREDIR:
- 		errlinno = lineno = n->nredir.linno;
-@@ -230,11 +231,8 @@ evaltree(union node *n, int flags)
- 			lineno -= funcline - 1;
- 		expredir(n->nredir.redirect);
- 		pushredir(n->nredir.redirect);
--		status = redirectsafe(n->nredir.redirect, REDIR_PUSH);
--		if (!status) {
--			evaltree(n->nredir.n, flags & EV_TESTED);
--			status = exitstatus;
--		}
-+		status = redirectsafe(n->nredir.redirect, REDIR_PUSH) ?:
-+			 evaltree(n->nredir.n, flags & EV_TESTED);
- 		if (n->nredir.redirect)
- 			popredir(0);
- 		goto setstatus;
-@@ -242,8 +240,8 @@ evaltree(union node *n, int flags)
- #ifdef notyet
- 		if (eflag && !(flags & EV_TESTED))
- 			checkexit = ~0;
--		evalcommand(n, flags, (struct backcmd *)NULL);
--		break;
-+		status = evalcommand(n, flags, (struct backcmd *)NULL);
-+		goto setstatus;
- #else
- 		evalfn = evalcommand;
- checkexit:
-@@ -278,43 +276,37 @@ checkexit:
- #error NOR + 1 != NSEMI
- #endif
- 		isor = n->type - NAND;
--		evaltree(
--			n->nbinary.ch1,
--			(flags | ((isor >> 1) - 1)) & EV_TESTED
--		);
--		if (!exitstatus == isor)
-+		status = evaltree(n->nbinary.ch1,
-+				  (flags | ((isor >> 1) - 1)) & EV_TESTED);
-+		if (!status == isor || evalskip)
- 			break;
--		if (!evalskip) {
--			n = n->nbinary.ch2;
-+		n = n->nbinary.ch2;
- evaln:
--			evalfn = evaltree;
-+		evalfn = evaltree;
- calleval:
--			evalfn(n, flags);
--			break;
--		}
--		break;
-+		status = evalfn(n, flags);
-+		goto setstatus;
- 	case NIF:
--		evaltree(n->nif.test, EV_TESTED);
-+		status = evaltree(n->nif.test, EV_TESTED);
- 		if (evalskip)
- 			break;
--		if (exitstatus == 0) {
-+		if (!status) {
- 			n = n->nif.ifpart;
- 			goto evaln;
- 		} else if (n->nif.elsepart) {
- 			n = n->nif.elsepart;
- 			goto evaln;
- 		}
--		goto success;
-+		status = 0;
-+		goto setstatus;
- 	case NDEFUN:
- 		defun(n);
--success:
--		status = 0;
- setstatus:
- 		exitstatus = status;
- 		break;
- 	}
- out:
--	if (checkexit & exitstatus)
-+	if (checkexit & status)
- 		goto exexit;
- 
- 	dotrap();
-@@ -323,6 +315,8 @@ out:
- exexit:
- 		exraise(EXEXIT);
- 	}
-+
-+	return exitstatus;
- }
- 
- 
-@@ -363,7 +357,7 @@ static int skiploop(void)
- }
- 
- 
--STATIC void
-+STATIC int
- evalloop(union node *n, int flags)
- {
- 	int skip;
-@@ -375,33 +369,34 @@ evalloop(union node *n, int flags)
- 	do {
- 		int i;
- 
--		evaltree(n->nbinary.ch1, EV_TESTED);
-+		i = evaltree(n->nbinary.ch1, EV_TESTED);
- 		skip = skiploop();
-+		if (skip == SKIPFUNC)
-+			status = i;
- 		if (skip)
- 			continue;
--		i = exitstatus;
- 		if (n->type != NWHILE)
- 			i = !i;
- 		if (i != 0)
- 			break;
--		evaltree(n->nbinary.ch2, flags);
--		status = exitstatus;
-+		status = evaltree(n->nbinary.ch2, flags);
- 		skip = skiploop();
- 	} while (!(skip & ~SKIPCONT));
--	if (skip != SKIPFUNC)
--		exitstatus = status;
- 	loopnest--;
-+
-+	return status;
- }
- 
- 
- 
--STATIC void
-+STATIC int
- evalfor(union node *n, int flags)
- {
- 	struct arglist arglist;
- 	union node *argp;
+ 	struct ifsregion *ifsp;
  	struct strlist *sp;
- 	struct stackmark smark;
-+	int status;
- 
- 	errlinno = lineno = n->nfor.linno;
- 	if (funcline)
-@@ -414,28 +409,31 @@ evalfor(union node *n, int flags)
- 	}
- 	*arglist.lastp = NULL;
- 
--	exitstatus = 0;
-+	status = 0;
- 	loopnest++;
- 	flags &= EV_TESTED;
- 	for (sp = arglist.list ; sp ; sp = sp->next) {
- 		setvar(n->nfor.var, sp->text, 0);
--		evaltree(n->nfor.body, flags);
-+		status = evaltree(n->nfor.body, flags);
- 		if (skiploop() & ~SKIPCONT)
- 			break;
- 	}
- 	loopnest--;
- 	popstackmark(&smark);
+ 	char *start;
+ 	char *p;
+ 	char *q;
++	char *r = NULL;
+ 	const char *ifs, *realifs;
+ 	int ifsspc;
+ 	int nulonly;
+@@ -1042,16 +1046,75 @@ ifsbreakup(char *string, struct arglist *arglist)
+ 			ifs = nulonly ? nullstr : realifs;
+ 			ifsspc = 0;
+ 			while (p < string + ifsp->endoff) {
++				int c;
++				bool isifs;
++				bool isdefifs;
 +
-+	return status;
- }
- 
- 
- 
--STATIC void
-+STATIC int
- evalcase(union node *n, int flags)
- {
- 	union node *cp;
- 	union node *patp;
- 	struct arglist arglist;
- 	struct stackmark smark;
-+	int status = 0;
- 
- 	errlinno = lineno = n->ncase.linno;
- 	if (funcline)
-@@ -444,12 +442,16 @@ evalcase(union node *n, int flags)
- 	setstackmark(&smark);
- 	arglist.lastp = &arglist.list;
- 	expandarg(n->ncase.expr, &arglist, EXP_TILDE);
--	exitstatus = 0;
- 	for (cp = n->ncase.cases ; cp && evalskip == 0 ; cp = cp->nclist.next) {
- 		for (patp = cp->nclist.pattern ; patp ; patp = patp->narg.next) {
- 			if (casematch(patp, arglist.list->text)) {
--				if (evalskip == 0) {
--					evaltree(cp->nclist.body, flags);
-+				/* Ensure body is non-empty as otherwise
-+				 * EV_EXIT may prevent us from setting the
-+				 * exit status.
+ 				q = p;
+-				if (*p == (char)CTLESC)
+-					p++;
+-				if (strchr(ifs, *p)) {
++				c = *p++;
++				if (c == (char)CTLESC)
++					c = *p++;
++
++				isifs = strchr(ifs, c);
++				isdefifs = false;
++				if (isifs)
++					isdefifs = strchr(defifs, c);
++
++				/* If only reading one more argument:
++				 * If we have exactly one field,
++				 * read that field without its terminator.
++				 * If we have more than one field,
++				 * read all fields including their terminators,
++				 * except for trailing IFS whitespace.
++				 *
++				 * This means that if we have only IFS
++				 * characters left, and at most one
++				 * of them is non-whitespace, we stop
++				 * reading here.
++				 * Otherwise, we read all the remaining
++				 * characters except for trailing
++				 * IFS whitespace.
++				 *
++				 * In any case, r indicates the start
++				 * of the characters to remove, or NULL
++				 * if no characters should be removed.
 +				 */
-+				if (evalskip == 0 && cp->nclist.body) {
-+					status = evaltree(cp->nclist.body,
-+							  flags);
- 				}
- 				goto out;
++				if (!maxargs) {
++					if (isdefifs) {
++						if (!r)
++							r = q;
++						continue;
++					}
++
++					if (!(isifs && ifsspc))
++						r = NULL;
++
++					ifsspc = 0;
++					continue;
++				}
++
++				if (ifsspc) {
++					if (isdefifs)
++						continue;
++
++					if (isifs)
++						q = p;
++
++					start = q;
++					isifs = false;
++				}
++
++				if (isifs) {
+ 					if (!nulonly)
+-						ifsspc = (strchr(defifs, *p) != NULL);
++						ifsspc = isdefifs;
+ 					/* Ignore IFS whitespace at start */
+ 					if (q == start && ifsspc) {
+-						p++;
+ 						start = p;
++						ifsspc = 0;
++						continue;
++					}
++					if (maxargs > 0 && !--maxargs) {
++						r = q;
+ 						continue;
+ 					}
+ 					*q = '\0';
+@@ -1059,39 +1122,20 @@ ifsbreakup(char *string, struct arglist *arglist)
+ 					sp->text = start;
+ 					*arglist->lastp = sp;
+ 					arglist->lastp = &sp->next;
+-					p++;
+-					if (!nulonly) {
+-						for (;;) {
+-							if (p >= string + ifsp->endoff) {
+-								break;
+-							}
+-							q = p;
+-							if (*p == (char)CTLESC)
+-								p++;
+-							if (strchr(ifs, *p) == NULL ) {
+-								p = q;
+-								break;
+-							} else if (strchr(defifs, *p) == NULL) {
+-								if (ifsspc) {
+-									p++;
+-									ifsspc = 0;
+-								} else {
+-									p = q;
+-									break;
+-								}
+-							} else
+-								p++;
+-						}
+-					}
+ 					start = p;
+-				} else
+-					p++;
++					continue;
++				}
++
++				ifsspc = 0;
  			}
-@@ -457,6 +459,8 @@ evalcase(union node *n, int flags)
+ 		} while ((ifsp = ifsp->next) != NULL);
+ 		if (nulonly)
+ 			goto add;
  	}
+ 
++	if (r)
++		*r = '\0';
++
+ 	if (!*start)
+ 		return;
+ 
+diff --git a/src/expand.h b/src/expand.h
+index 6a90f67..26dc5b4 100644
+--- a/src/expand.h
++++ b/src/expand.h
+@@ -69,7 +69,7 @@ char *_rmescapes(char *, int);
+ int casematch(union node *, char *);
+ void recordregion(int, int, int);
+ void removerecordregions(int); 
+-void ifsbreakup(char *, struct arglist *);
++void ifsbreakup(char *, int, struct arglist *);
+ void ifsfree(void);
+ 
+ /* From arith.y */
+diff --git a/src/miscbltin.c b/src/miscbltin.c
+index b596fd2..39b9c47 100644
+--- a/src/miscbltin.c
++++ b/src/miscbltin.c
+@@ -67,28 +67,21 @@
+  *  less fields than variables -> remaining variables unset.
+  *
+  *  @param line complete line of input
++ *  @param ac argument count
+  *  @param ap argument (variable) list
+  *  @param len length of line including trailing '\0'
+  */
+ static void
+-readcmd_handle_line(char *s, char **ap)
++readcmd_handle_line(char *s, int ac, char **ap)
+ {
+ 	struct arglist arglist;
+ 	struct strlist *sl;
+-	char *backup;
+-	char *line;
+ 
+-	/* ifsbreakup will fiddle with stack region... */
+-	line = stackblock();
+ 	s = grabstackstr(s);
+ 
+-	/* need a copy, so that delimiters aren't lost
+-	 * in case there are more fields than variables */
+-	backup = sstrdup(line);
+-
+ 	arglist.lastp = &arglist.list;
+ 	
+-	ifsbreakup(s, &arglist);
++	ifsbreakup(s, ac, &arglist);
+ 	*arglist.lastp = NULL;
+ 	ifsfree();
+ 
+@@ -104,21 +97,6 @@ readcmd_handle_line(char *s, char **ap)
+ 			return;
+ 		}
+ 
+-		/* remaining fields present, but no variables left. */
+-		if (!ap[1] && sl->next) {
+-			size_t offset;
+-			char *remainder;
+-
+-			/* FIXME little bit hacky, assuming that ifsbreakup 
+-			 * will not modify the length of the string */
+-			offset = sl->text - s;
+-			remainder = backup + offset;
+-			rmescapes(remainder);
+-			setvar(*ap, remainder, 0);
+-
+-			return;
+-		}
+-		
+ 		/* set variable to field */
+ 		rmescapes(sl->text);
+ 		setvar(*ap, sl->text, 0);
+@@ -211,7 +189,7 @@ start:
  out:
- 	popstackmark(&smark);
-+
-+	return status;
+ 	recordregion(startloc, p - (char *)stackblock(), 0);
+ 	STACKSTRNUL(p);
+-	readcmd_handle_line(p + 1, ap);
++	readcmd_handle_line(p + 1, argc - (ap - argv), ap);
+ 	return status;
  }
- 
- 
-@@ -465,7 +469,7 @@ out:
-  * Kick off a subshell to evaluate a tree.
-  */
- 
--STATIC void
-+STATIC int
- evalsubshell(union node *n, int flags)
- {
- 	struct job *jp;
-@@ -494,8 +498,8 @@ nofork:
- 	status = 0;
- 	if (! backgnd)
- 		status = waitforjob(jp);
--	exitstatus = status;
- 	INTON;
-+	return status;
- }
- 
- 
-@@ -541,7 +545,7 @@ expredir(union node *n)
-  * of all the rest.)
-  */
- 
--STATIC void
-+STATIC int
- evalpipe(union node *n, int flags)
- {
- 	struct job *jp;
-@@ -549,6 +553,7 @@ evalpipe(union node *n, int flags)
- 	int pipelen;
- 	int prevfd;
- 	int pip[2];
-+	int status = 0;
- 
- 	TRACE(("evalpipe(0x%lx) called\n", (long)n));
- 	pipelen = 0;
-@@ -589,10 +594,12 @@ evalpipe(union node *n, int flags)
- 		close(pip[1]);
- 	}
- 	if (n->npipe.backgnd == 0) {
--		exitstatus = waitforjob(jp);
--		TRACE(("evalpipe:  job done exit status %d\n", exitstatus));
-+		status = waitforjob(jp);
-+		TRACE(("evalpipe:  job done exit status %d\n", status));
- 	}
- 	INTON;
-+
-+	return status;
- }
- 
- 
-@@ -679,7 +686,7 @@ parse_command_args(char **argv, const char **path)
-  * Execute a simple command.
-  */
- 
--STATIC void
-+STATIC int
- #ifdef notyet
- evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
- #else
-@@ -849,7 +856,7 @@ bail:
- 			INTOFF;
- 			jp = makejob(cmd, 1);
- 			if (forkshell(jp, cmd, FORK_FG) != 0) {
--				exitstatus = waitforjob(jp);
-+				status = waitforjob(jp);
- 				INTON;
- 				break;
- 			}
-@@ -868,17 +875,19 @@ bail:
- 		if (evalbltin(cmdentry.u.cmd, argc, argv, flags)) {
- 			if (exception == EXERROR && spclbltin <= 0) {
- 				FORCEINTON;
--				break;
-+				goto readstatus;
- 			}
- raise:
- 			longjmp(handler->loc, 1);
- 		}
--		break;
-+		goto readstatus;
- 
- 	case CMDFUNCTION:
- 		poplocalvars(1);
- 		if (evalfun(cmdentry.u.func, argc, argv, flags))
- 			goto raise;
-+readstatus:
-+		status = exitstatus;
- 		break;
- 	}
- 
-@@ -894,6 +903,8 @@ out:
- 		 */
- 		setvar("_", lastarg, 0);
- 	popstackmark(&smark);
-+
-+	return status;
- }
- 
- STATIC int
-diff --git a/src/eval.h b/src/eval.h
-index 6e8acda..63e7d86 100644
---- a/src/eval.h
-+++ b/src/eval.h
-@@ -53,7 +53,7 @@ struct backcmd {		/* result of evalbackcmd */
- 
- int evalstring(char *, int);
- union node;	/* BLETCH for ansi C */
--void evaltree(union node *, int);
-+int evaltree(union node *, int);
- void evalbackcmd(union node *, struct backcmd *);
- 
- extern int evalskip;
-diff --git a/src/main.c b/src/main.c
-index 497ac16..fcd3e7d 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -225,11 +225,13 @@ cmdloop(int top)
- 			}
- 			numeof++;
- 		} else if (nflag == 0) {
-+			int i;
-+
- 			job_warning = (job_warning == 2) ? 1 : 0;
- 			numeof = 0;
--			evaltree(n, 0);
-+			i = evaltree(n, 0);
- 			if (n)
--				status = exitstatus;
-+				status = i;
- 		}
- 		popstackmark(&smark);
  
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
