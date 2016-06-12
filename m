@@ -1,80 +1,54 @@
-From: Stephen Kitt <steve@sk2.org>
-Subject: Re: [PATCH v2] jobs: Handle string-based job descriptors
-Date: Tue, 7 Jun 2016 16:43:07 +0200
-Message-ID: <20160607164307.650db975@heffalump.sk2.org>
-References: <1464940471-9819-1-git-send-email-steve@sk2.org>
-	<20160606144527.GA23630@gondor.apana.org.au>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: [PATCH v3] builtin: Fix handling of trailing IFS white spaces
+Date: Sun, 12 Jun 2016 12:35:15 +0200
+Message-ID: <575D3AE3.1080700@gigawatt.nl>
+References: <5661EEB7.8080908@gigawatt.nl>
+ <20160606084805.GA20946@gondor.apana.org.au> <5755E07B.6090300@gigawatt.nl>
+ <20160607092539.GA30397@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
- boundary="Sig_/vpEknVY7tBUqYimZS/8Xc2O"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:57397 "EHLO
-	4.mo3.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161418AbcFGPWE (ORCPT <rfc822;dash@vger.kernel.org>);
-	Tue, 7 Jun 2016 11:22:04 -0400
-Received: from player730.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 479E8101411B
-	for <dash@vger.kernel.org>; Tue,  7 Jun 2016 16:43:17 +0200 (CEST)
-In-Reply-To: <20160606144527.GA23630@gondor.apana.org.au>
+Received: from mailfilter1-k0683s008.csv-networks.nl ([92.48.231.157]:32915
+	"EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750856AbcFLKfg (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sun, 12 Jun 2016 06:35:36 -0400
+In-Reply-To: <20160607092539.GA30397@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
+Cc: Stephane Chazelas <stephane.chazelas@gmail.com>, Gioele Barabucci <gioele@svario.it>
 
---Sig_/vpEknVY7tBUqYimZS/8Xc2O
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 07/06/16 11:25, Herbert Xu wrote:
+> If the very first character later gets zeroed, you'd be zeroing
+> the character after the CTLESC, leaving the CTLESC in the value
+> to be assigned to the last variable of read.
 
-On Mon, 6 Jun 2016 22:45:27 +0800, Herbert Xu <herbert@gondor.apana.org.au>
-wrote:
-> On Fri, Jun 03, 2016 at 09:54:31AM +0200, Stephen Kitt wrote:
-> > When looking for a job using a string descriptor, e.g.
-> >=20
-> > 	fg %man
-> >=20
-> > the relevant loop in src/jobs.c only ever exits to the err label. With
-> > this patch, when the end condition is reached, we check whether a job
-> > was found, and if so, set things up to exit correctly via gotit.
-> > Multiple matches are already caught using the test in the match block.
-> >=20
-> > Signed-off-by: Stephen Kitt <steve@sk2.org> =20
->=20
-> Thanks for the patch.  I'd prefer to move that logic out of the
-> loop, like this:
-[...]
+Ah, I see. Thanks for the explanation. While trying to make it misbehave 
+I found that rmescapes removes trailing CTLESC, and readcmd_handle_line 
+calls rmescapes before the trailing CTLESC gets a chance to cause 
+problems. I was now still only able to see the problem when adding some 
+extra debugging statements.
 
-> -	while (1) {
-> -		if (!jp)
-> -			goto err;
-> +	while (jp) {
-[...]
+> If you got rid of the very first q=p assignment it should just work.
 
-That is indeed much better, thanks!
+There is a later q=p assignment too that gets performed after CTLESC has 
+been skipped. That one also isn't going to cause problems in practice, 
+since it only gets executed when a character is both IFS and IFS 
+whitespace, but when called from readcmd_handle_line, there's never 
+going to be escaped IFS whitespace.
 
-Regards,
+> Thanks.  I've fixed up the buglet causing the failures:
 
-Stephen
+The results are a lot better now, but I did spot a problem:
 
---Sig_/vpEknVY7tBUqYimZS/8Xc2O
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+src/dash -c 'X="x  "; echo $X'
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+This is supposed to print "x\n", but the IFS breakup of $X generates two 
+words, one "x", one " ", meaning "x  \n" gets printed instead. I think 
+this is intended to get fixed up in the if (ifsspc) block, but that 
+block doesn't get executed when there are no more characters after the 
+spaces.
 
-iQIcBAEBCgAGBQJXVt17AAoJEIDTAvWIbYOci5gP/0ic874rbx+k8DMvAywOWIBY
-Gerzkjx6PuqFT4Qjlv1IVgHimshotA0xXq0AYzhEd+j7LGG6q62qNEY0ye5eQk9h
-7k2AHeG2zUzym3G617R4YFKnuv+gbv2OffFsb6CiXbF7P4UyBeuNt0Y302fMwgwG
-b90kPs7v+0bNRIpcZ93RtQPpQRSoG0UdXMXI8+WtXkpD84dZhmBZ3f7Ywmu8b49d
-9a6HBe/4O7r/JjoUVPIoHeqMJXM+qHKPEXHMNuHlBHmolJ3YEfV0uINZoMTbVptt
-WgbbXSO7MbO4nid/RK8TpM2eQgYH/lkSjwoqT6DyQboYpgjSRn2dLnEdKll8yNQt
-23GJu3Kw2oinAV5DOUbg0lxI7Wrk7J0jSekKTyAPdjHpImlgN19oh0DqY8y1M6Tr
-+eaYLWwIdvhsqBK2OZBx0IdMolqdIAfhO+53YExh9r+XYQ7AFcpEUt2GQDh/EY2g
-L+/330N0xTbvdV/5cM1f+rOFOiz4fNFHlbnRWjZdkUKDT/4c+PNcW1waWh9KOMW4
-kZQ2jKg0aWkdixfFS6gTDCc+6NrDB1B3knU93Ni4UIXwe1eiHfXyyENfW+c5JGUs
-A9EGlG202oEeuRHSWOds+19Uzy0zF03W47c/dTumKnGV/OUHk9rQ/j8bN+x6eikm
-U9XLR4a67rDkx3n10nNh
-=Mz68
------END PGP SIGNATURE-----
-
---Sig_/vpEknVY7tBUqYimZS/8Xc2O--
+Cheers,
+Harald van Dijk
