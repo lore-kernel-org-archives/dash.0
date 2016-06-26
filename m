@@ -1,42 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4] builtin: Fix handling of trailing IFS white spaces
-Date: Mon, 20 Jun 2016 09:28:04 +0800
-Message-ID: <20160620012804.GA7606@gondor.apana.org.au>
-References: <5661EEB7.8080908@gigawatt.nl>
- <20160606084805.GA20946@gondor.apana.org.au>
- <5755E07B.6090300@gigawatt.nl>
- <20160607092539.GA30397@gondor.apana.org.au>
- <575D3AE3.1080700@gigawatt.nl>
- <20160612110643.GA927@gondor.apana.org.au>
- <575D4381.2080903@gigawatt.nl>
- <20160612121748.GA1270@gondor.apana.org.au>
- <5767162C.5020709@gigawatt.nl>
+From: Aspire Money Loan <starcargo.mln@kalstaronline.com>
+Subject: =?utf-8?Q?Sauda=C3=A7=C3=B5es?=
+Date: Mon, 27 Jun 2016 03:36:53 +0700 (WIT)
+Message-ID: <1457108648.43656.1466973413598.JavaMail.zimbra@kalstaronline.com>
+Reply-To: Aspire Money Loan <aspire.offer1983@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60404 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751725AbcFTB2X (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 19 Jun 2016 21:28:23 -0400
-Content-Disposition: inline
-In-Reply-To: <5767162C.5020709@gigawatt.nl>
+Received: from mail2.kalstaronline.com ([202.43.163.170]:38625 "EHLO
+	mail2.kalstaronline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751394AbcFZUlq convert rfc822-to-8bit (ORCPT
+	<rfc822;dash@vger.kernel.org>); Sun, 26 Jun 2016 16:41:46 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org, Stephane Chazelas <stephane.chazelas@gmail.com>, Gioele Barabucci <gioele@svario.it>
 
-On Mon, Jun 20, 2016 at 12:01:16AM +0200, Harald van Dijk wrote:
-> 
-> FWIW, I've been testing this along with your eval patch, haven't
-> spotted any more issues, either from code inspection or from actual
-> use, and don't expect to spot any more issues. Very nice.
-
-Thanks for testing! I'll add a
-
-Tested-by: Harald van Dijk <harald@gigawatt.nl>
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sauda=C3=A7=C3=B5es,
+          Eu sou a senhora Annie Ethan de uma empresa de cr=C3=A9dito p=
+rivado conhecido como Aspire dinheiro Loan=C2=AE. Oferecemos todos os t=
+ipos de empr=C3=A9stimo a taxa de juro de 3%. Se voc=C3=AA est=C3=A1 na=
+ necessidade de empr=C3=A9stimo favor contacte-nos com as informa=C3=A7=
+=C3=B5es abaixo.
+Nome completo:
+G=C3=AAnero:
+Pa=C3=ADs:
+Endere=C3=A7o:
+Montante do empr=C3=A9stimo:
+Dura=C3=A7=C3=A3o:
+Tel:
+Aguardamos sua resposta se voc=C3=AA estiver interessado
+Obrigado,
+Annie Ethan
