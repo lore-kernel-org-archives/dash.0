@@ -1,83 +1,34 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: export statements and command substitution
-Date: Sun, 24 Jul 2016 16:05:02 +0200
-Message-ID: <a3599e38-fa1c-92ea-8c67-97f1574c0339@gigawatt.nl>
-References: <5e6f29ec-418c-32f9-7754-5a4fe1f66577@gmx.de>
+From: Vladimir Didenko <vladimir.didenko@gmail.com>
+Subject: Declaring local variables inside while loop leads to memory leak
+Date: Tue, 26 Jul 2016 13:35:53 +0300
+Message-ID: <CAHRK1yP1GyUJEPNLSicUatRJPOJg=Oeac1daJkuJs6eDD+xi9Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailfilter1-k0683s008.csv-networks.nl ([92.48.231.157]:50811
-	"EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751490AbcGXOFW (ORCPT
-	<rfc822;dash@vger.kernel.org>); Sun, 24 Jul 2016 10:05:22 -0400
-In-Reply-To: <5e6f29ec-418c-32f9-7754-5a4fe1f66577@gmx.de>
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:35931 "EHLO
+	mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750806AbcGZKfz (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 26 Jul 2016 06:35:55 -0400
+Received: by mail-wm0-f48.google.com with SMTP id q128so167546615wma.1
+        for <dash@vger.kernel.org>; Tue, 26 Jul 2016 03:35:55 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Nico Huber <nico.h@gmx.de>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On 24/07/16 15:46, Nico Huber wrote:
-> Hi dash folks,
->
-> we stumbled over a little curiosity in dash's behavior when you combine
-> a variable assignment within an export statement with command sub-
-> stitution.
->
-> The following works fine in bash:
->   $ export foo=$(echo foo bar)
->   $ echo $foo
->   foo bar
-> dash, however, applies field splitting and thus takes `bar` as a second
-> variable name:
->   $ export foo=$(echo foo bar)
->   $ echo $foo
->   foo
-> which can easily be fixed by adding double quotes:
->   $ export foo="$(echo foo bar)"
->   $ echo $foo
->   foo bar
->
-> I know bash shouldn't be the reference so I had a look at [1]. It
-> states:
->  "If a command substitution occurs inside double-quotes, field
->   splitting and pathname expansion shall not be performed on the
->   results of the substitution."
-> Which one could read as field splitting should take place if you don't
-> supply double quotes. But in present shells variable assignments seem
-> to be an exception.
->
-> And even dash doesn't apply field splitting on a simple assignment:
->   $ foo=$(echo foo bar)
->   $ echo $foo
->   foo bar
+Hi.
 
-Yes, that's as specified in 
-<http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_09_01>. 
-First, commands are scanned to see what words are shell variable 
-assignments. Then, those words that are not shell variable assignments 
-are fully expanded. Finally, redirections are applied and shell variable 
-assignments get a limited expansion that omits field splitting.
+I found that declaring local variables inside while loop leads to
+memory leak. Code sample:
 
-Note that the a=b in export a=b is not a shell variable assignment, as 
-far as the parser is currently concerned, both in the dash 
-implementation and in the language specification, it is just a word 
-that's used as an argument for the export command. What the export 
-command then does with it is another story.
+test()
+{
+   while [ true ]; do
+      local a=
+   done
+}
 
-> That's at least inconsistent and, IMO, the export statement should have
-> the same semantics (i.e. not requiring double quotes) as things can get
-> quite nasty if you think of evaluations like:
->   $ export foo=$(echo bar bar=foo)
->   $ echo $foo
->   bar
->   $ echo $bar
->   foo
+test
 
-The next version of POSIX will require this behaviour, see 
-<http://austingroupbugs.net/view.php?id=351>, but the current version 
-doesn't even allow it.
-
-> Best regards,
-> Nico
-> [1]
-> http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_03
+-- 
+Regards,
+Vladimir.
