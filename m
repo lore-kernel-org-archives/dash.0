@@ -1,64 +1,131 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: [bug-diffutils] bug#24116: [platform-testers] new snapshot
- available: diffutils-3.3.50-0353
-Date: Fri, 5 Aug 2016 19:15:02 +0200
-Message-ID: <82552903-31e7-eeb1-948d-3bbac2288046@gigawatt.nl>
-References: <CA+8g5KEOBs=AtZoBZw7CJ5wW8=Yw88KrvjJK1PeEqK3uj_1wEg@mail.gmail.com>
- <9C56E56C-4D31-46AB-AC75-1AA8A759BF4D@gmail.com>
- <CA+8g5KGack9X8ByfoJEtbQHj-44iG6bvQ0yhguVqQ4vqZh4geA@mail.gmail.com>
- <2e1ea9a1-278e-8979-023b-72f77d677f5f@intel.com>
- <90e016d1-e0be-83c8-d0ee-ecb5665318ef@gigawatt.nl>
- <57A4BD00.1080900@redhat.com>
+From: Seb <sbb@tuxfamily.org>
+Subject: Re: [PATCH 1/2] mkbuiltins: Use a `while` loop rather than `nl`
+Date: Sat, 6 Aug 2016 11:02:42 +0200
+Message-ID: <20160806090242.GA4686@woland.sadovaia.lan>
+References: <20160804055411.23558-1-somasissounds@gmail.com>
+ <be6ddf83-041e-7dca-5f5c-16167faa9d95@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="fdj2RfSjLxBAspz7"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailfilter1-k0683s008.csv-networks.nl ([92.48.231.157]:58978
-	"EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1161262AbcHERPM (ORCPT
-	<rfc822;dash@vger.kernel.org>); Fri, 5 Aug 2016 13:15:12 -0400
-In-Reply-To: <57A4BD00.1080900@redhat.com>
+Received: from smtpfb2-g21.free.fr ([212.27.42.10]:32911 "EHLO
+	smtpfb2-g21.free.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751011AbcHFV7N (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sat, 6 Aug 2016 17:59:13 -0400
+Received: from smtp5-g21.free.fr (smtp5-g21.free.fr [212.27.42.5])
+	by smtpfb2-g21.free.fr (Postfix) with ESMTP id 53733CDC145
+	for <dash@vger.kernel.org>; Sat,  6 Aug 2016 11:02:41 +0200 (CEST)
+Content-Disposition: inline
+In-Reply-To: <be6ddf83-041e-7dca-5f5c-16167faa9d95@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <eblake@redhat.com>, Dave Gordon <david.s.gordon@intel.com>, Jim Meyering <jim@meyering.net>, Assaf Gordon <assafgordon@gmail.com>
-Cc: 24116@debbugs.gnu.org, dash@vger.kernel.org
+To: dash@vger.kernel.org
+Cc: Harald van Dijk <harald@gigawatt.nl>
 
-On 05/08/2016 18:21, Eric Blake wrote:
-> On 08/05/2016 07:13 AM, Harald van Dijk wrote:
->> Unfortunately, POSIX currently requires the export command to not have
->> any magic quoting, and any POSIX-conforming shell will make
->>
->>     a="b c=d"
->>     export a=$a
->>
->> set a to b, and c to d. Not so with bash, but that's because bash simply
->> isn't POSIX-conforming, even if invoked as sh.
->
-> Not quite so fast.
->
->>
->> POSIX will require special quoting rules for the export command in the
->> future, similar to what bash does today. When it does, dash is likely to
->> change to match that, and the local command will likely be changed to
->> work the same way.
->
-> POSIX has already issued an interpretation request, and therefore, any
-> CURRENT implementations (including bash) that already behave as
-> permitted by the interpretation ARE conforming. [...]
 
-> http://austingroupbugs.net/view.php?id=351
+--fdj2RfSjLxBAspz7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-An interpretation request doesn't automatically mean that all current 
-implementations are conforming, does it? It only means that when the 
-interpretation response says so. In this case, the response says that 
-the standard does not allow bash/ksh's behaviour.
+On Thu, Aug 04, 2016 at 07:17:47PM +0200, Harald van Dijk wrote:
 
-http://austingroupbugs.net/view.php?id=351#c865:
+> Given that dash was fairly recently changed to make it build on
+> Solaris 9, it seems like a mistake to break that again.
 
-> Interpretation response
-> ------------------------
-> The standard states that the current behavior of ksh93 does not conform, and conforming implementations must conform to this. However, concerns have been raised about this which are being referred to the sponsor.
+Hello,
 
-The fact that this is seen as a defect in the standard which will be 
-fixed, rather than a defect in bash/ksh, doesn't make bash/ksh conform, 
-it merely means that bash/ksh shouldn't be changed to conform.
+This is an attempt to simplify the current implementation. This
+one does not require any temporary file anymore and relies only
+on sort and (a rather basic usage of) awk.
+
+I've checked the the Opensolaris' awk manual, trying to not
+introduce some unsupported syntax. I still wonder about the
+escaped newlines and the (currently commented) close()
+statements, but both can be easily addressed. So, if someone
+thinks it's worth testing...
+
+++
+Seb.
+
+--fdj2RfSjLxBAspz7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename=mkbuiltins
+
+#!/bin/sh
+
+LC_ALL=C      # Force the collate order of the builtins.
+export LC_ALL # some shells may not support the "export FOO=bar" form.
+
+awk '
+(NF && ($1 !~ /^#/)) {
+    # command [options] alias1 [[options] alias2] ...
+    for (i = 2; i <= NF; i++) {
+        mask = 0
+        cmd = $1
+        if ($i ~ /^-/) {
+            if ($i ~ /n/)
+                cmd = "NULL"
+            if ($i ~ /s/)
+                mask += 1
+            if ($i ~ /[su]/)
+                mask += 2
+            if ($i ~ /a/)
+                mask += 4
+            i++
+        }
+        print $i, cmd, mask, $1
+    }
+}' $1 | sort -k1,1 | awk '
+BEGIN {
+    BUILTINS_H = "./builtins.h"
+    BUILTINS_C = "./builtins.c"
+    warn = "/*\n * This file was generated by the mkbuiltins program.\n */\n"
+    print  warn >BUILTINS_H
+    print  warn "\n#include \"shell.h\"" \
+                "\n#include \"builtins.h\"\n" >BUILTINS_C
+}
+(!($NF in DEFINE)) {
+    up = $NF # /bin/awk has no toupper() on Solaris.
+    gsub(/a/, "A", up); gsub(/j/, "J", up); gsub(/s/, "S", up)
+    gsub(/b/, "B", up); gsub(/k/, "K", up); gsub(/t/, "T", up)
+    gsub(/c/, "C", up); gsub(/l/, "L", up); gsub(/u/, "U", up)
+    gsub(/d/, "D", up); gsub(/m/, "M", up); gsub(/v/, "V", up)
+    gsub(/e/, "E", up); gsub(/n/, "N", up); gsub(/w/, "W", up)
+    gsub(/f/, "F", up); gsub(/o/, "O", up); gsub(/x/, "X", up)
+    gsub(/g/, "G", up); gsub(/p/, "P", up); gsub(/y/, "Y", up)
+    gsub(/h/, "H", up); gsub(/q/, "Q", up); gsub(/z/, "Z", up)
+    gsub(/i/, "I", up); gsub(/r/, "R", up)
+
+
+    print "#define "up" (builtincmd + "(NR-1)")" >BUILTINS_H
+    print "int "$NF"(int, char **);" >BUILTINS_C
+    DEFINE[$NF]
+}
+{
+    CMD[NR] = "\""$1"\", "$2", "$3
+}
+END {
+    print "\n#define NUMBUILTINS "NR"\n" \
+          "\n#define BUILTIN_SPECIAL 0x1" \
+          "\n#define BUILTIN_REGULAR 0x2" \
+          "\n#define BUILTIN_ASSIGN  0x4\n" \
+          "\nstruct builtincmd {" \
+          "\n    const char *name;" \
+          "\n    int (*builtin)(int, char **);" \
+          "\n    unsigned flags;" \
+          "\n};" \
+          "\n\nextern const struct builtincmd builtincmd[];" >BUILTINS_H
+    # close(BUILTINS_H) # not supported on Solaris ? 
+
+    print "\nconst struct builtincmd builtincmd[] = {" >BUILTINS_C
+    for (i = 1; i <= NR; i++)
+        print "\t{ "CMD[i]" }," >BUILTINS_C
+    print "};" >BUILTINS_C
+    # close(BUILTINS_C)
+}'
+
+# EoF
+
+--fdj2RfSjLxBAspz7--
+
+
+
