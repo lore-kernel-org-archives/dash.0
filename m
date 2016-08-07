@@ -1,56 +1,43 @@
-From: Harald van Dijk <harald@gigawatt.nl>
+From: Seb <sbb@tuxfamily.org>
 Subject: Re: [PATCH 1/2] mkbuiltins: Use a `while` loop rather than `nl`
-Date: Sat, 6 Aug 2016 18:51:28 +0200
-Message-ID: <60024a83-638d-5354-84d0-85ce96c1ec65@gigawatt.nl>
+Date: Sun, 7 Aug 2016 12:17:39 +0200
+Message-ID: <20160807101739.GA4738@woland.sadovaia.lan>
 References: <20160804055411.23558-1-somasissounds@gmail.com>
  <be6ddf83-041e-7dca-5f5c-16167faa9d95@gigawatt.nl>
+ <20160806090242.GA4686@woland.sadovaia.lan>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailfilter1-k0683s008.csv-networks.nl ([92.48.231.157]:54971
-	"EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751011AbcHFV7P (ORCPT
-	<rfc822;dash@vger.kernel.org>); Sat, 6 Aug 2016 17:59:15 -0400
-In-Reply-To: <be6ddf83-041e-7dca-5f5c-16167faa9d95@gigawatt.nl>
+Received: from smtp5-g21.free.fr ([212.27.42.5]:46970 "EHLO smtp5-g21.free.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751606AbcHGKRq (ORCPT <rfc822;dash@vger.kernel.org>);
+	Sun, 7 Aug 2016 06:17:46 -0400
+Received: from woland (unknown [88.181.135.123])
+	by smtp5-g21.free.fr (Postfix) with ESMTPS id 9C5B05FF8A
+	for <dash@vger.kernel.org>; Sun,  7 Aug 2016 12:26:47 +0200 (CEST)
+Content-Disposition: inline
+In-Reply-To: <20160806090242.GA4686@woland.sadovaia.lan>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Kylie McClain <somasissounds@gmail.com>, dash@vger.kernel.org
-Cc: Kylie McClain <somasis@exherbo.org>
+To: dash@vger.kernel.org
 
-On 04/08/2016 19:17, Harald van Dijk wrote:
-> On 04/08/2016 07:54, Kylie McClain wrote:
->> From: Kylie McClain <somasis@exherbo.org>
->>
->> nl, while specified in POSIX, is rather obscure and isn't provided by
->> small
->> coreutils implementations such as `busybox`. This while loop works
->> just as
->> well for our purposes.
-> ...
->> -sed 's/    -[a-z]*//' $temp2 | nl -ba -v0 |
->> +sed 's/    -[a-z]*//' $temp2 | while read line;do \
->> +    i=$(( ${i:--1} + 1 )); printf '%s %s\n' "${i}" "${line}";done |
->
-> $(( ... )) is mentioned in
-> <https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Shell-Substitutions.html>
-> as not universally supported, notably Solaris 10 /bin/sh does not have
-> it. Given that dash was fairly recently changed to make it build on
-> Solaris 9, it seems like a mistake to break that again.
+On Sat, Aug 06, 2016 at 11:02:42AM +0200, Seb wrote:
+> This is an attempt to simplify the current implementation [...]
 
-I just realised that that particular change to make it build on Solaris 
-9 involved avoiding running mkbuiltins using sh, choosing to use $SHELL 
-instead, as $SHELL should already have been picked by configure as 
-something more modern. So the use of $(( ... )) should probably not be a 
-problem after all...
+BTW, I wonder if there is not a (virtual) bug with the current
+mkbuiltins. Look at the TRUECMD macro in the generated builtins.h:
 
-> Aside from that, i is such a common variable name that it seems risky to
-> assume it is unset. I know I've set it myself in shell sessions that I
-> ended up using for building dash. I never exported it, so it wouldn't
-> break here, but it doesn't seem like a stretch that someone else does
-> export it.
+ #define TRUECMD (builtincmd + 1)
 
-...as long as i is simply initialised before the loop.
+It doesn't point on "true" (mask=2, "special builtin") but on ":"
+(mask=3, "standard builtin"), whatever the order of the aliases
+you set in builtins.def.in. Maybe it's a mere problem with the
+macro name ("TRUECMD" should rather be "COLONCMD"), but I don't
+know if it is really an intended behaviour as the result is
+finally a matter of sorting.
 
-Cheers,
-Harald van Dijk
+++
+Seb.
+
+
+
