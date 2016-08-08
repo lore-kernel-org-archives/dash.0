@@ -1,43 +1,50 @@
-From: Seb <sbb@tuxfamily.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 1/2] mkbuiltins: Use a `while` loop rather than `nl`
-Date: Sun, 7 Aug 2016 12:17:39 +0200
-Message-ID: <20160807101739.GA4738@woland.sadovaia.lan>
-References: <20160804055411.23558-1-somasissounds@gmail.com>
- <be6ddf83-041e-7dca-5f5c-16167faa9d95@gigawatt.nl>
- <20160806090242.GA4686@woland.sadovaia.lan>
+Date: Mon, 8 Aug 2016 23:33:37 +0800
+Message-ID: <20160808153337.GA31891@gondor.apana.org.au>
+References: <be6ddf83-041e-7dca-5f5c-16167faa9d95@gigawatt.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from smtp5-g21.free.fr ([212.27.42.5]:46970 "EHLO smtp5-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751606AbcHGKRq (ORCPT <rfc822;dash@vger.kernel.org>);
-	Sun, 7 Aug 2016 06:17:46 -0400
-Received: from woland (unknown [88.181.135.123])
-	by smtp5-g21.free.fr (Postfix) with ESMTPS id 9C5B05FF8A
-	for <dash@vger.kernel.org>; Sun,  7 Aug 2016 12:26:47 +0200 (CEST)
+Received: from helcar.hengli.com.au ([209.40.204.226]:60735 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752123AbcHHPdo (ORCPT <rfc822;dash@vger.kernel.org>);
+	Mon, 8 Aug 2016 11:33:44 -0400
 Content-Disposition: inline
-In-Reply-To: <20160806090242.GA4686@woland.sadovaia.lan>
+In-Reply-To: <be6ddf83-041e-7dca-5f5c-16167faa9d95@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: somasissounds@gmail.com, dash@vger.kernel.org, somasis@exherbo.org
 
-On Sat, Aug 06, 2016 at 11:02:42AM +0200, Seb wrote:
-> This is an attempt to simplify the current implementation [...]
+Harald van Dijk <harald@gigawatt.nl> wrote:
+> On 04/08/2016 07:54, Kylie McClain wrote:
+>> From: Kylie McClain <somasis@exherbo.org>
+>>
+>> nl, while specified in POSIX, is rather obscure and isn't provided by small
+>> coreutils implementations such as `busybox`. This while loop works just as
+>> well for our purposes.
+> ...
+>> -sed 's/      -[a-z]*//' $temp2 | nl -ba -v0 |
+>> +sed 's/      -[a-z]*//' $temp2 | while read line;do \
+>> +     i=$(( ${i:--1} + 1 )); printf '%s %s\n' "${i}" "${line}";done |
+> 
+> $(( ... )) is mentioned in 
+> <https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Shell-Substitutions.html> 
+> as not universally supported, notably Solaris 10 /bin/sh does not have 
+> it. Given that dash was fairly recently changed to make it build on 
+> Solaris 9, it seems like a mistake to break that again.
+> 
+> Aside from that, i is such a common variable name that it seems risky to 
+> assume it is unset. I know I've set it myself in shell sessions that I 
+> ended up using for building dash. I never exported it, so it wouldn't 
+> break here, but it doesn't seem like a stretch that someone else does 
+> export it.
 
-BTW, I wonder if there is not a (virtual) bug with the current
-mkbuiltins. Look at the TRUECMD macro in the generated builtins.h:
+nl has been around forever.  I'm not taking this patch.
 
- #define TRUECMD (builtincmd + 1)
-
-It doesn't point on "true" (mask=2, "special builtin") but on ":"
-(mask=3, "standard builtin"), whatever the order of the aliases
-you set in builtins.def.in. Maybe it's a mere problem with the
-macro name ("TRUECMD" should rather be "COLONCMD"), but I don't
-know if it is really an intended behaviour as the result is
-finally a matter of sorting.
-
-++
-Seb.
-
-
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
