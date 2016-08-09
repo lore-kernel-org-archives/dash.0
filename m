@@ -1,63 +1,49 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: [PATCH 2/2] histedit: Remove non-glibc fallback code
-Date: Mon, 8 Aug 2016 17:50:11 +0200
-Message-ID: <20160808155011.GA29197@stack.nl>
-References: <20160804055411.23558-1-somasissounds@gmail.com>
- <20160804055411.23558-2-somasissounds@gmail.com>
- <20160804155908.GA94936@stack.nl>
+From: Olof Johansson <olof@ethup.se>
+Subject: Parameter expansion, patterns and fnmatch
+Date: Tue, 9 Aug 2016 11:28:32 +0200
+Message-ID: <20160809092832.GB23983@brutus.ethup.se>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:56503 "EHLO mx1.stack.nl"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752143AbcHHPuO (ORCPT <rfc822;dash@vger.kernel.org>);
-	Mon, 8 Aug 2016 11:50:14 -0400
+Received: from brutus.ethup.se ([85.17.45.102]:55667 "EHLO brutus.ethup.se"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932274AbcHIJe7 (ORCPT <rfc822;dash@vger.kernel.org>);
+	Tue, 9 Aug 2016 05:34:59 -0400
 Content-Disposition: inline
-In-Reply-To: <20160804155908.GA94936@stack.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Kylie McClain <somasissounds@gmail.com>
-Cc: dash@vger.kernel.org, Kylie McClain <somasis@exherbo.org>
+To: dash@vger.kernel.org
 
-On Thu, Aug 04, 2016 at 05:59:08PM +0200, Jilles Tjoelker wrote:
-> >From 23da600dcff616662a93f307420d9142598e2cae Mon Sep 17 00:00:00 2001
-> From: Jilles Tjoelker <jilles@stack.nl>
-> Date: Thu, 4 Aug 2016 17:51:12 +0200
-> Subject: [PATCH 1/2] [HISTEDIT] Stop depending on getopt reset feature.
+Hello,
 
-> Instead, use our own nextopt() function.
-> ---
->  src/histedit.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
-> 
-> diff --git a/src/histedit.c b/src/histedit.c
-> index 94465d7..ec45065 100644
-> --- a/src/histedit.c
-> +++ b/src/histedit.c
-> @@ -214,13 +214,8 @@ histcmd(int argc, char **argv)
->  	if (argc == 1)
->  		sh_error("missing history argument");
->  
-> -#ifdef __GLIBC__
-> -	optind = 0;
-> -#else
-> -	optreset = 1; optind = 1; /* initialize getopt */
-> -#endif
->  	while (not_fcnumber(argv[optind]) &&
-> -	      (ch = getopt(argc, argv, ":e:lnrs")) != -1)
-> +	      (ch = nextopt(":e:lnrs")) != '\0')
->  		switch ((char)ch) {
->  		case 'e':
->  			editor = optionarg;
+I'm seeing some discrepancies between dash built with --enable-fnmatch
+and dash built without that got me curious. Maybe you could help shed
+some light?
 
-This is clearly wrong; not_fcnumber() should be passed *argptr instead
-of something bogus depending on optind.
+ foo='[abc]'
+ echo ${foo#[}
+ echo ${foo#\[}
 
-The fixed version is what FreeBSD sh has as of SVN r240541 but I have
-not tested it in dash.
+With dash built with --enable-fnmatch:
 
-In any case, a side effect of this change is a small code size
-reduction.
+ abc]
+ abc]
 
+With dash built without --enable-fnmatch:
+
+ [abc]
+ abc]
+
+I was able to reproduce this behavior on latest git master
+(17a5f24e0). The dash manual states:
+
+> The end of the character class is indicated by a ]; if the ] is
+> missing then the [ matches a [ rather than introducing a character
+> class.
+
+Which to me suggests that the non-fnmatch case is not the expected
+behavior. Is this interpretation correct?
+
+Thanks,
 -- 
-Jilles Tjoelker
+Olof Johansson                            https://github.com/olof
