@@ -1,85 +1,82 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: declaration utilities (was: [bug-diffutils] bug#24116:
- [platform-testers] new snapshot available: diffutils-3.3.50-0353)
-Date: Wed, 24 Aug 2016 00:04:47 +0200
-Message-ID: <20160823220447.GB57473@stack.nl>
-References: <CA+8g5KEOBs=AtZoBZw7CJ5wW8=Yw88KrvjJK1PeEqK3uj_1wEg@mail.gmail.com>
- <9C56E56C-4D31-46AB-AC75-1AA8A759BF4D@gmail.com>
- <CA+8g5KGack9X8ByfoJEtbQHj-44iG6bvQ0yhguVqQ4vqZh4geA@mail.gmail.com>
- <2e1ea9a1-278e-8979-023b-72f77d677f5f@intel.com>
- <90e016d1-e0be-83c8-d0ee-ecb5665318ef@gigawatt.nl>
- <57A4BD00.1080900@redhat.com>
- <82552903-31e7-eeb1-948d-3bbac2288046@gigawatt.nl>
+From: Zdenek Kaspar <zkaspar82@gmail.com>
+Subject: Re: dash 0.5.9: break and continue bug
+Date: Wed, 24 Aug 2016 00:24:19 +0200
+Message-ID: <8b03873e-32d7-d450-9dfb-d9d6e4ac4632@gmail.com>
+References: <c8a328b0-1ed7-cb35-5a9c-95b7f592cb9e@gmail.com>
+ <377a8f04-2ecb-0171-7fb4-5baeacefab26@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:16336 "EHLO mx1.stack.nl"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1758127AbcHWWEv (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 23 Aug 2016 18:04:51 -0400
-Content-Disposition: inline
-In-Reply-To: <82552903-31e7-eeb1-948d-3bbac2288046@gigawatt.nl>
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:34630 "EHLO
+        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755834AbcHWWYY (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 23 Aug 2016 18:24:24 -0400
+Received: by mail-wm0-f43.google.com with SMTP id q128so30027966wma.1
+        for <dash@vger.kernel.org>; Tue, 23 Aug 2016 15:24:21 -0700 (PDT)
+In-Reply-To: <377a8f04-2ecb-0171-7fb4-5baeacefab26@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Eric Blake <eblake@redhat.com>, dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
 
-[Cc trimmed]
-On Fri, Aug 05, 2016 at 07:15:02PM +0200, Harald van Dijk wrote:
-> On 05/08/2016 18:21, Eric Blake wrote:
-> > On 08/05/2016 07:13 AM, Harald van Dijk wrote:
-> >> Unfortunately, POSIX currently requires the export command to not have
-> >> any magic quoting, and any POSIX-conforming shell will make
+On 08/23/2016 10:41 PM, Harald van Dijk wrote:
+> On 23/08/16 22:23, Zdenek Kaspar wrote:
+>> Hi, I've noticed 0.5.9 does ignore break and continue statements, here
+>> is simple reproducer:
+>>
+>>
+>> one() {
+>>     echo "  one"
+>>     break
+>> }
+>>
+>> two() {
+>>     echo "  two"
+>> }
+>>
+>> for i in 1 2
+>> do
+>>     echo "loop $i:"
+>>     one
+>>     two
+>> done
+>>
+>>
+>> dash-0.5.9:
+>> $ dash dash-break-test
+>> loop 1:
+>>   one
+>>   two
+>> loop 2:
+>>   one
+>>   two
+>>
+>> dash-0.5.8-4.fc24.x86_64:
+>> $ dash dash-break-test
+>> loop 1:
+>>   one
+> 
+> break and continue now need to appear in the loop directly, they cannot
+> be wrapped in a function any more. Although this is a visible change in
+> behaviour, it is intentional:
+>   <https://www.mail-archive.com/dash%40vger.kernel.org/msg00929.html>
+> 
+> The standard is a bit unclear on how break and continue are meant to
+> behave in these situations, as it refers to the "enclosing loop" without
+> defining what counts and doesn't count as the enclosing loop, but the
+> next version of the standard will make it clear that your script is not
+> required to behave the way you expect:
+>   <http://austingroupbugs.net/view.php?id=842>
+> 
+> That said, shells are still allowed to treat your script the way you
+> expect.
+> 
+>> HTH, Z.
 
-> >>     a="b c=d"
-> >>     export a=$a
+Kinda sucks it does not abort execution completely and write some error
+message then, because this can do some damage...
 
-> >> set a to b, and c to d. Not so with bash, but that's because bash simply
-> >> isn't POSIX-conforming, even if invoked as sh.
+Anyway, thanks Harald for pointing me to changed SPEC where this (new)
+behaviour is explained.
 
-> > Not quite so fast.
-
-> >> POSIX will require special quoting rules for the export command in the
-> >> future, similar to what bash does today. When it does, dash is likely to
-> >> change to match that, and the local command will likely be changed to
-> >> work the same way.
-
-> > POSIX has already issued an interpretation request, and therefore, any
-> > CURRENT implementations (including bash) that already behave as
-> > permitted by the interpretation ARE conforming. [...]
-
-> > http://austingroupbugs.net/view.php?id=351
-
-> An interpretation request doesn't automatically mean that all current 
-> implementations are conforming, does it? It only means that when the 
-> interpretation response says so. In this case, the response says that 
-> the standard does not allow bash/ksh's behaviour.
-
-> http://austingroupbugs.net/view.php?id=351#c865:
-
-> > Interpretation response
-> > ------------------------
-> > The standard states that the current behavior of ksh93 does not
-> > conform, and conforming implementations must conform to this.
-> > However, concerns have been raised about this which are being
-> > referred to the sponsor.
-
-> The fact that this is seen as a defect in the standard which will be 
-> fixed, rather than a defect in bash/ksh, doesn't make bash/ksh conform, 
-> it merely means that bash/ksh shouldn't be changed to conform.
-
-Although it is certainly true that the current standard forbids special
-quoting rules for export and readonly, making this change sooner rather
-than later will be helpful to users.
-
-Looking at ChangeLog.O, I can see dash had special quoting rules for
-export, readonly and local between 1997 and 2001. They were removed,
-basically, because there was no specification guidance. The
-specification guidance is now available in the form of Austin group bug
-#351.
-
-Users of FreeBSD sh have likewise liked having these new rules
-available.
-
--- 
-Jilles Tjoelker
+THX, Z.
