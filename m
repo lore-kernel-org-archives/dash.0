@@ -1,82 +1,97 @@
-From: Zdenek Kaspar <zkaspar82@gmail.com>
-Subject: Re: dash 0.5.9: break and continue bug
-Date: Wed, 24 Aug 2016 00:24:19 +0200
-Message-ID: <8b03873e-32d7-d450-9dfb-d9d6e4ac4632@gmail.com>
-References: <c8a328b0-1ed7-cb35-5a9c-95b7f592cb9e@gmail.com>
- <377a8f04-2ecb-0171-7fb4-5baeacefab26@gigawatt.nl>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: [BUG] regression in builtin echo
+Date: Thu, 1 Sep 2016 22:18:30 +0200
+Message-ID: <3efcd42c-e20b-3506-3d62-69b85c027ef4@gigawatt.nl>
+References: <CAKkO-EgCkv48unwXBjN1JdjSNx3_D1yCZQhde7WJedOFRUDaGg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed;
+ boundary="------------21ED68BE76733C1204AB08E2"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:34630 "EHLO
-        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755834AbcHWWYY (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 23 Aug 2016 18:24:24 -0400
-Received: by mail-wm0-f43.google.com with SMTP id q128so30027966wma.1
-        for <dash@vger.kernel.org>; Tue, 23 Aug 2016 15:24:21 -0700 (PDT)
-In-Reply-To: <377a8f04-2ecb-0171-7fb4-5baeacefab26@gigawatt.nl>
+Received: from mailfilter1-k0683s008.csv-networks.nl ([92.48.231.157]:53739
+        "EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751020AbcIAWTG (ORCPT
+        <rfc822;dash@vger.kernel.org>); Thu, 1 Sep 2016 18:19:06 -0400
+In-Reply-To: <CAKkO-EgCkv48unwXBjN1JdjSNx3_D1yCZQhde7WJedOFRUDaGg@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
+To: Luigi Tarenga <luigi.tarenga@gmail.com>, dash@vger.kernel.org
 
-On 08/23/2016 10:41 PM, Harald van Dijk wrote:
-> On 23/08/16 22:23, Zdenek Kaspar wrote:
->> Hi, I've noticed 0.5.9 does ignore break and continue statements, here
->> is simple reproducer:
->>
->>
->> one() {
->>     echo "  one"
->>     break
->> }
->>
->> two() {
->>     echo "  two"
->> }
->>
->> for i in 1 2
->> do
->>     echo "loop $i:"
->>     one
->>     two
->> done
->>
->>
->> dash-0.5.9:
->> $ dash dash-break-test
->> loop 1:
->>   one
->>   two
->> loop 2:
->>   one
->>   two
->>
->> dash-0.5.8-4.fc24.x86_64:
->> $ dash dash-break-test
->> loop 1:
->>   one
-> 
-> break and continue now need to appear in the loop directly, they cannot
-> be wrapped in a function any more. Although this is a visible change in
-> behaviour, it is intentional:
->   <https://www.mail-archive.com/dash%40vger.kernel.org/msg00929.html>
-> 
-> The standard is a bit unclear on how break and continue are meant to
-> behave in these situations, as it refers to the "enclosing loop" without
-> defining what counts and doesn't count as the enclosing loop, but the
-> next version of the standard will make it clear that your script is not
-> required to behave the way you expect:
->   <http://austingroupbugs.net/view.php?id=842>
-> 
-> That said, shells are still allowed to treat your script the way you
-> expect.
-> 
->> HTH, Z.
+This is a multi-part message in MIME format.
+--------------21ED68BE76733C1204AB08E2
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Kinda sucks it does not abort execution completely and write some error
-message then, because this can do some damage...
+On 01/09/16 10:13, Luigi Tarenga wrote:
+> hi,
+> I just find a problem in the dash distributed with arch linux.
+> I didn't tested from dash source but the bug can be easily
+> checked:
+>
+> dash 0.5.9-1
+>
+> $ echo one two three
+> one two three
+> $
+> $ echo -n one two three
+> one$
 
-Anyway, thanks Harald for pointing me to changed SPEC where this (new)
-behaviour is explained.
+Yikes.
 
-THX, Z.
+> with -n option it stop after printing one more parameter...
+> do you have the same problem or it's caused by a patch in arch?
+
+That's caused by <http://www.spinics.net/lists/dash/msg00942.html>, not 
+by Arch. It's scary that this has gone totally unnoticed for more than a 
+year.
+
+While the original code implementing the echo command was overly 
+complicated, the simplified version does not do the right thing, as you 
+noticed.
+
+Here's another attempt at a simplified implementation.
+
+> Luigi
+
+--------------21ED68BE76733C1204AB08E2
+Content-Type: text/x-patch;
+ name="echo.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="echo.patch"
+
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index 9673e10..b7b6d68 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -447,16 +447,20 @@ echocmd(int argc, char **argv)
+ 	nonl = *++argv ? equal(*argv, "-n") : 0;
+ 	argv += nonl;
+ 
+-	do {
+-		int c;
++	if (*argv) {
++		for (;;) {
++			if (print_escape_str("%s", NULL, NULL, *argv))
++				return 0;
++
++			if (!*++argv)
++				break;
++
++			out1c(' ');
++		}
++	}
+ 
+-		if (likely(*argv))
+-			nonl += print_escape_str("%s", NULL, NULL, *argv++);
+-		if (nonl > 0)
+-			break;
++	if (!nonl)
++		out1c('\n');
+ 
+-		c = *argv ? ' ' : '\n';
+-		out1c(c);
+-	} while (*argv);
+ 	return 0;
+ }
+
+--------------21ED68BE76733C1204AB08E2--
