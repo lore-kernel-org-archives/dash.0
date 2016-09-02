@@ -1,61 +1,66 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [BUG] regression in builtin echo
-Date: Fri, 2 Sep 2016 21:14:39 +0800
-Message-ID: <20160902131439.GA12162@gondor.apana.org.au>
-References: <3efcd42c-e20b-3506-3d62-69b85c027ef4@gigawatt.nl>
+Subject: Re: Parameter expansion, patterns and fnmatch
+Date: Fri, 2 Sep 2016 22:04:37 +0800
+Message-ID: <20160902140437.GA12639@gondor.apana.org.au>
+References: <0ce0bca2-3bdd-a1f5-169e-0291a49cd6c7@gigawatt.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50825 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:47125 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751074AbcIBNOs (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 2 Sep 2016 09:14:48 -0400
+        with ESMTP id S1752046AbcIBOEp (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 2 Sep 2016 10:04:45 -0400
 Content-Disposition: inline
-In-Reply-To: <3efcd42c-e20b-3506-3d62-69b85c027ef4@gigawatt.nl>
+In-Reply-To: <0ce0bca2-3bdd-a1f5-169e-0291a49cd6c7@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Harald van Dijk <harald@gigawatt.nl>
-Cc: luigi.tarenga@gmail.com, dash@vger.kernel.org
+Cc: olof@ethup.se, dash@vger.kernel.org
 
 Harald van Dijk <harald@gigawatt.nl> wrote:
+>
+> Yes, this looks like a bug in dash. With the default --disable-fnmatch 
+> code, when dash encounters [ in a pattern, it immediately treats the 
+> following characters as part of the set. If it then encounters the end 
+> of the pattern without having seen a matching ], it attempts to reset 
+> the state and continue as if [ was treated as a literal character right 
+> from the start. The attempt to reset the state doesn't look right, and 
+> has been like this since at least the initial Git commit in 2005.
+
+pdksh exhibits the same behaviour:
+
+$ pdksh -c 'foo=[abc]; echo ${foo#[}'
+[abc]
+$
+
+POSIX says:
+
+9.3.3 BRE Special Characters
+
+A BRE special character has special properties in certain contexts.
+Outside those contexts, or when preceded by a backslash, such a
+character is a BRE that matches the special character itself. The
+BRE special characters and the contexts in which they have their
+special meaning are as follows:
+
+.[\
+The period, left-bracket, and backslash shall be special except
+when used in a bracket expression (see RE Bracket Expression). An
+expression containing a '[' that is not preceded by a backslash
+and is not part of a bracket expression produces undefined results.
+
+> This also affects
 > 
-> While the original code implementing the echo command was overly 
-> complicated, the simplified version does not do the right thing, as you 
-> noticed.
+>     case [a in [?) echo ok ;; *) echo bad ;; esac
+> 
+> which should print ok.
 
-Indeed.
+Even ksh prints bad here.
 
-However, we don't need to rewrite the function to fix this.
+I would however consider a patch that simplifies the code in the
+undefined case.
 
----8<---
-Subject: builtin: Fix echo -n early termination
-
-The commit 7a784244625d5489c0fc779201c349555dc5f8bc ("[BUILTIN]
-Simplify echo command") broke echo -n by making it always terminate
-after printing the first argument.
-
-This patch fixes this by only terminating when we have reached
-the end of the arguments.
-
-Fixes: 7a784244625d ("[BUILTIN] Simplify echo command")
-Reported-by: Luigi Tarenga <luigi.tarenga@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-
-diff --git a/src/bltin/printf.c b/src/bltin/printf.c
-index 1112253..a626cee 100644
---- a/src/bltin/printf.c
-+++ b/src/bltin/printf.c
-@@ -459,7 +459,7 @@ echocmd(int argc, char **argv)
- 
- 		if (likely(*argv))
- 			nonl += print_escape_str("%s", NULL, NULL, *argv++);
--		if (nonl > 0)
-+		if (likely((nonl + !*argv) > 1))
- 			break;
- 
- 		c = *argv ? ' ' : '\n';
-
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
