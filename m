@@ -1,60 +1,50 @@
-From: Chet Ramey <chet.ramey@case.edu>
-Subject: Re: Parameter expansion, patterns and fnmatch
-Date: Fri, 2 Sep 2016 11:06:29 -0400
-Message-ID: <4771ef64-20d7-6e99-5404-b75a03f5a5c4@case.edu>
-References: <20160902140437.GA12639@gondor.apana.org.au>
- <6f39229b-7196-afd9-8e8f-3db1c33bf80a@redhat.com>
- <20160902144646.GA13296@gondor.apana.org.au>
-Reply-To: chet.ramey@case.edu
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: [BUG] regression in builtin echo
+Date: Fri, 2 Sep 2016 17:24:59 +0200
+Message-ID: <20160902152459.GC87540@stack.nl>
+References: <3efcd42c-e20b-3506-3d62-69b85c027ef4@gigawatt.nl>
+ <20160902131439.GA12162@gondor.apana.org.au>
+ <20160902141631.GA87540@stack.nl>
+ <20160902141912.GA12739@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mpv1-2015.CWRU.Edu ([129.22.103.226]:13336 "EHLO
-        mpv1-2015.case.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754191AbcIBPOD (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 2 Sep 2016 11:14:03 -0400
-In-Reply-To: <20160902144646.GA13296@gondor.apana.org.au>
+Received: from relay04.stack.nl ([131.155.140.107]:23748 "EHLO mx1.stack.nl"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S932367AbcIBPZE (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 2 Sep 2016 11:25:04 -0400
+Content-Disposition: inline
+In-Reply-To: <20160902141912.GA12739@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>, Eric Blake <eblake@redhat.com>
-Cc: chet.ramey@case.edu, Harald van Dijk <harald@gigawatt.nl>, olof@ethup.se, dash@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Harald van Dijk <harald@gigawatt.nl>, luigi.tarenga@gmail.com, dash@vger.kernel.org
 
-On 9/2/16 10:46 AM, Herbert Xu wrote:
-> On Fri, Sep 02, 2016 at 09:25:15AM -0500, Eric Blake wrote:
->>
->> 2.13.1 Patterns Matching a Single Character
->>
->> [
->>     If an open bracket introduces a bracket expression as in XBD RE
->> Bracket Expression, except that the <exclamation-mark> character ( '!' )
->> shall replace the <circumflex> character ( '^' ) in its role in a
->> non-matching list in the regular expression notation, it shall introduce
->> a pattern bracket expression. A bracket expression starting with an
->> unquoted <circumflex> character produces unspecified results. Otherwise,
->> '[' shall match the character itself.
-> 
-> BTW, this last sentence is not present in
-> 
-> http://pubs.opengroup.org/onlinepubs/009604499/utilities/xcu_chap02.html#tag_02_13
+On Fri, Sep 02, 2016 at 10:19:12PM +0800, Herbert Xu wrote:
+> On Fri, Sep 02, 2016 at 04:16:31PM +0200, Jilles Tjoelker wrote:
 
-That's pretty old; it's from 2004.
+> > Unlike Harald van Dijk's patch, the above patch breaks \c. Per POSIX
+> > (XSI option), \c shall cause all characters following it in the
+> > arguments to be ignored (so not only in the argument where \c occurs).
+> > For example:
+> >   echo 'a\cb' c; echo d
+> > shall write "ad" followed by a newline.
 
-> So I presume it's a newer unreleased revision.
+> Works for me:
 
-It's in the current revision, which dates from 2008.
+> $ build/src/dash -c "echo 'a\cb' c; echo d"
+> ad
+> $ 
 
-> 
-> Seriously, you guys are turning POSIX into a joke by introducing
-> all these new requirements.  At this point I think we should
-> pretty much give up on POSIX compliance the way it's headed.
+> AFAICS my patch doesn't change \c handling at all.  When we hit
+> \c print_escape_str will return 0x100, which guarantees that we
+> hit the berak.
 
-Let's not go overboard here.  This was introduced to tighten up ambiguous
-behavior: what happens when the open bracket *doesn't* introduce a
-bracket expression.
+You are right. The code is very tricky and my analysis without running
+the code was wrong.
 
+I think developing a shell is hard enough already without making the
+code so tricky, though.
 
 -- 
-``The lyf so short, the craft so long to lerne.'' - Chaucer
-		 ``Ars longa, vita brevis'' - Hippocrates
-Chet Ramey, UTech, CWRU    chet@case.edu    http://cnswww.cns.cwru.edu/~chet/
+Jilles Tjoelker
