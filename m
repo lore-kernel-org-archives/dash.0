@@ -1,50 +1,57 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: [BUG] regression in builtin echo
-Date: Fri, 2 Sep 2016 17:24:59 +0200
-Message-ID: <20160902152459.GC87540@stack.nl>
-References: <3efcd42c-e20b-3506-3d62-69b85c027ef4@gigawatt.nl>
- <20160902131439.GA12162@gondor.apana.org.au>
- <20160902141631.GA87540@stack.nl>
- <20160902141912.GA12739@gondor.apana.org.au>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: Parameter expansion, patterns and fnmatch
+Date: Sat, 3 Sep 2016 14:03:28 +0200
+Message-ID: <b25fbf0a-1b36-24d4-9a6c-7d8a9d8dd894@gigawatt.nl>
+References: <20160902140437.GA12639@gondor.apana.org.au>
+ <6f39229b-7196-afd9-8e8f-3db1c33bf80a@redhat.com>
+ <20160902142928.GA13022@gondor.apana.org.au>
+ <dd9729a1-ce0d-8549-b52a-9d205740858c@redhat.com>
+ <20160902145153.GA13458@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay04.stack.nl ([131.155.140.107]:23748 "EHLO mx1.stack.nl"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932367AbcIBPZE (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 2 Sep 2016 11:25:04 -0400
-Content-Disposition: inline
-In-Reply-To: <20160902141912.GA12739@gondor.apana.org.au>
+Received: from mailfilter1-k0683s008.csv-networks.nl ([92.48.231.157]:46698
+        "EHLO mailfilter1-k0683s008.csv-networks.nl" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751953AbcICMDn (ORCPT
+        <rfc822;dash@vger.kernel.org>); Sat, 3 Sep 2016 08:03:43 -0400
+In-Reply-To: <20160902145153.GA13458@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Harald van Dijk <harald@gigawatt.nl>, luigi.tarenga@gmail.com, dash@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>, Eric Blake <eblake@redhat.com>
+Cc: olof@ethup.se, dash@vger.kernel.org
 
-On Fri, Sep 02, 2016 at 10:19:12PM +0800, Herbert Xu wrote:
-> On Fri, Sep 02, 2016 at 04:16:31PM +0200, Jilles Tjoelker wrote:
+On 02/09/16 16:51, Herbert Xu wrote:
+> On Fri, Sep 02, 2016 at 09:49:53AM -0500, Eric Blake wrote:
+>> On 09/02/2016 09:29 AM, Herbert Xu wrote:
+>>> On Fri, Sep 02, 2016 at 09:25:15AM -0500, Eric Blake wrote:
+>>>>
+>>>>>> This also affects
+>>>>>>
+>>>>>>     case [a in [?) echo ok ;; *) echo bad ;; esac
+>>>>>>
+>>>>>> which should print ok.
+>>>>>
+>>>>> Even ksh prints bad here.
+>>>>
+>>>> So ksh is also buggy.
+>>>
+>>> Good luck writing a script with an unquoted [ expecting it to be
+>>> portable :)
+>>
+>> [ '' ] || echo empty
+>>
+>> There, I just wrote a portable script with unquoted [ portably
+>> interpreted as itself and not as a bracket filename expansion pattern.
+>
+> dash handles that just fine.  We're not talking about a lone [
+> in file expansion context here.
 
-> > Unlike Harald van Dijk's patch, the above patch breaks \c. Per POSIX
-> > (XSI option), \c shall cause all characters following it in the
-> > arguments to be ignored (so not only in the argument where \c occurs).
-> > For example:
-> >   echo 'a\cb' c; echo d
-> > shall write "ad" followed by a newline.
+We were originally talking about the [ in ${foo#[}. That is a lone [ in 
+pattern matching context, which is what file expansion context is.
 
-> Works for me:
-
-> $ build/src/dash -c "echo 'a\cb' c; echo d"
-> ad
-> $ 
-
-> AFAICS my patch doesn't change \c handling at all.  When we hit
-> \c print_escape_str will return 0x100, which guarantees that we
-> hit the berak.
-
-You are right. The code is very tricky and my analysis without running
-the code was wrong.
-
-I think developing a shell is hard enough already without making the
-code so tricky, though.
-
--- 
-Jilles Tjoelker
+We're talking about something that dash has had code to handle for >10 
+years, that's been documented by dash as supported for >10 years, and 
+now that it turns out there's a flaw in the code where dash does not 
+behave as documented and as clearly intended by the code, it's POSIX's 
+fault?
