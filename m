@@ -1,38 +1,37 @@
-From: Andrey Voropaev <voropaev.andrey@gmail.com>
-Subject: Tests [ 0 -eq $UID ] don't work as in bash
-Date: Wed, 7 Sep 2016 16:44:03 +0200
-Message-ID: <CAFOXTdceLsR_xBcs=B2QajQHW_UJyBKTr6R8fQvUNCxikYn77w@mail.gmail.com>
+From: Paul Smith <paul@mad-scientist.net>
+Subject: Re: Tests [ 0 -eq $UID ] don't work as in bash
+Date: Wed, 07 Sep 2016 11:55:00 -0400
+Message-ID: <1473263700.7265.3.camel@mad-scientist.net>
+References: <CAFOXTdceLsR_xBcs=B2QajQHW_UJyBKTr6R8fQvUNCxikYn77w@mail.gmail.com>
+Reply-To: paul@mad-scientist.net
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-it0-f47.google.com ([209.85.214.47]:35255 "EHLO
-        mail-it0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752767AbcIGOoE (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 7 Sep 2016 10:44:04 -0400
-Received: by mail-it0-f47.google.com with SMTP id e124so200616360ith.0
-        for <dash@vger.kernel.org>; Wed, 07 Sep 2016 07:44:04 -0700 (PDT)
+Received: from gproxy5-pub.mail.unifiedlayer.com ([67.222.38.55]:51561 "HELO
+        gproxy5-pub.mail.unifiedlayer.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with SMTP id S1753998AbcIGQXt (ORCPT
+        <rfc822;dash@vger.kernel.org>); Wed, 7 Sep 2016 12:23:49 -0400
+In-Reply-To: <CAFOXTdceLsR_xBcs=B2QajQHW_UJyBKTr6R8fQvUNCxikYn77w@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Andrey Voropaev <voropaev.andrey@gmail.com>, dash@vger.kernel.org
 
-Hello!
+On Wed, 2016-09-07 at 16:44 +0200, Andrey Voropaev wrote:
+> if [ 0 -eq $UID ]
 
-I'm sorry if this is FAQ question, but googling didn't report it, so
-I'm asking here.
+The variable UID is not defined to be automatically set by the shell in
+POSIX; having it set is a bash extension.  dash doesn't set it
+automatically for you.
 
-In our scripts we often use constructs like
+You'll have to set it yourself:
 
-##############
-if [ 0 -eq $UID ]
-then
-        echo "This script must not be run by root user!"
-        exit 1
-fi
-#################
+  UID=$(id -u)
 
-This works fine in bash, but dash fails with warning " [: -ne:
-argument expected". Is this intended feature? How to work around it in
-dash then?
+Also you should quote variable references, in general:
 
-Best regards
-Andrei Voropaev
+  if [ 0 -eq "$UID" ]
+
+Be sure that if your scripts rely on bash-isms you start them with
+#!/bin/bash and if you don't want them to rely on bash-isms, you start
+them with #!/bin/sh.
