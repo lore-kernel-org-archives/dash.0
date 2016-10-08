@@ -1,158 +1,243 @@
-From: "Paul Tsang" <haochenghk1987@163.com>
-Subject: =?utf-8?B?UmU75LiA6Iis6LS45piT6YCA56iOJuadseiOni/mt7HlnLMv5buj5beeL+S4rQ==?=
-        =?utf-8?B?5bGxL+mmmea4r+eJqea1gQ==?=
-Date: Sun, 2 Oct 2016 09:54:55 +0800
-Message-ID: <20161002095508830738@yun151.com>
-Reply-To: <haochenghk1987@163.com>
+From: Martijn Dekker <martijn@inlv.org>
+Subject: Re: dash tested against ash testsuite: 17 failures
+Date: Sat, 8 Oct 2016 21:42:12 +0200
+Message-ID: <7d291bb2-a968-471d-d2a0-87adfd0bc38d@inlv.org>
+References: <CAK1hOcMma=uH2R=vWX1Z6r2xf9PcW7MPSEPYOk76Zn97LD-7Jw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from [61.176.221.2] ([61.176.221.2]:4636 "EHLO mail.yun151.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751681AbcJBB7r (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sat, 1 Oct 2016 21:59:47 -0400
-Received: from localhost by mail.yun151.com (MDaemon PRO v10.1.1)
-        with ESMTP id md50144160468.msg
-        for <dash@vger.kernel.org>; Sun, 02 Oct 2016 09:58:17 +0800
+Received: from kahlil.inlv.org ([37.59.109.123]:53808 "EHLO kahlil.inlv.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751729AbcJHU2S (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 8 Oct 2016 16:28:18 -0400
+Received: from breedzicht.local ([145.15.244.33])
+        (authenticated bits=0)
+        by kahlil.inlv.org (8.14.9/8.14.4) with ESMTP id u98JgC5A027347
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO)
+        for <dash@vger.kernel.org>; Sat, 8 Oct 2016 21:42:13 +0200
+In-Reply-To: <CAK1hOcMma=uH2R=vWX1Z6r2xf9PcW7MPSEPYOk76Zn97LD-7Jw@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-RGVhciBTaXIvTWlzcw0KDQrlj6ropoHotLXlj7jmi6XmnInkuIDoiKznurPnqI7kurrotYTotKjl
-kozog73lvIAxNyXnmoTlop7lgLznqI7kuJPnlKjlj5HnpajvvIzmiJHlj7jkvr/og73kuLrotLXl
-j7jlgZrpgIDnqI7vvJsNCjEu5Ye65Y+j6YCA56iO5p2h5Lu277ya4pGg55yf5q2j5pyJ55Sf5Lqn
-57uP6JCl6IO95Yqb55qE5LyB5Lia6ICM5LiN5piv56m65aOz5LyB5Lia4pGh6ZyA5Luj5Yqe5Ye6
-5Y+j6YCA56iO55qE5LyB5Lia4pGi5L+d6K+B6IO95byA5aKe5YC856iO5LiT55So5Y+R56Wo55qE
-5LyB5Lia4pGj5L+d6K+B5LyB5Lia5byA55qE5aKe5YC856iO5LiT55So5Y+R56Wo55qE5ZCI5rOV
-77yM5ZCI55CG6ICM5LiN5piv6Jma5byA5aKe5YC856iO5LiT55So5Y+R56WoDQoyLui0p+eJqeWH
-uuWPo++8m+W3peWOgumhu+aPkOS+m+S6p+WTgeWQjeensO+8jOWVhuWTgee8luegge+8jOinhOag
-vO+8jOWei+WPt++8jOWMheijheaWueW8j++8jOWNleS7t++8jOaAu+S7t+WPiuijheeuseWNlS4N
-CjMu57uT5rGH77ya4pGg6LSn54mp5Ye65Y+j5ZCO5Lik5Liq5pyI5YaF77yI5LiN6IO96LaF6L+H
-5Lik5Liq5pyI77yJ5b+F6aG76L+b6KGM57uT5rGH5qC46ZSA44CC5bel5Y6C6YCa55+l5a6i5oi3
-77yI5aSW5Zu977yJ5Y+K5pe257uT5rGH77yM5Lul5L6/5oiR5Y+45Y+K5pe25Yiw5aSW5rGH566h
-55CG5bGA6L+b6KGM5aSW5rGH5qC46ZSA5bel5L2c77yM5ZCm5YiZ5Lya5b2x5ZON5oiR5Y+455qE
-6L+Q5L2c5Y+K5Ye65Y+j6LSn54mp55qE6YCA56iO5bel5L2c44CC4pGh5oiR5Y+45pS25Yiw5rGH
-5qy+5ZCO5oyJ6ZO26KGM5b2T5pel6ZO26KGM54mM5Lu377yMMjTlsI/ml7blhoXmsYfoh7Plt6Xl
-joLotKbmiLcNCjQu5byA56Wo77ya4pGg5oiR5Y+45rGH5Ye66LSn5qy+5ZCO77yM5bCG44CI5rGH
-5qy+5Y2V44CJ44CB44CI5byA56Wo5piO57uG6KGo44CJ44CB44CI6LSt6LSn5ZCI5ZCM44CJRU1B
-SUzoh7Plt6XljoLotKLliqHpg6jikaHlt6XljoLmoLnmja7jgIjlvIDnpajmmI7nu4booajjgInl
-vIDlh7oxNyXnmoTjgIjlop7lgLznqI7kuJPnlKjlj5HnpajjgInvvIzmiqzlpLTkuLrmiJHlj7jv
-vIzlj5HnpajnmoTllYblk4HlkI3np7DjgIHop4TmoLzjgIHljZXkvY3jgIHljZXku7fjgIHmgLvk
-u7fjgIHnqI7ph5HlnYflv4Xpobvlh4bnoa7ml6Dor6/vvIzlj5HnpajnmoTku7fnqI7lkIjorqHp
-h5Hpop3kuI7msYfmrL7ljZXph5Hpop3kuIDoh7TjgILikaLlt6XljoLlv4Xpobvkv53or4HlvIDn
-moTlj5HnpajmmK/lkIjnkIbjgIHlkIjms5XnmoTjgILikaPlt6XljoLpobvlsIblvIDlpb3nmoTl
-op7lgLznqI7kuJPnlKjlj5HnpajvvIznm5blpb3nq6DnmoTotK3otKflkIjlkIzvvIjkuIDlvI/k
-uozku73vvInjgIHnm5blpb3nq6DnmoTpgIHotKfljZXkuInku73otYTmlpnnu5nmiJHlj7jjgIIN
-CjUu5LuY56iO5qy+77ya4pGg5b6F5oiR5Y+457uP6L+H5Zu956iO6K6k6K+B5oiQ5YqfMuS4quW3
-peS9nOaXpeS7peWQjuWwhueojuasvuaxh+e7meW3peWOguOAguKRoeW+heaIkeWPuOaUtuWIsOWb
-veeojueahOmAgOeojuasvjLkuKrlt6XkvZzml6XlsIbnqI7mrL7msYfnu5nlt6XljoLikaLku5jn
-moTpgIDnqI7mrL7mmK/lrp7pmYXpgIDnqI7mrL7miaPpmaTmiJHlj7jnmoTku6PnkIbmiYvnu63o
-tLkuDQoNCumAgOeojumineiuoeeul+aWueazleWmguS4iw0K6YCA56iO6aKdPe+8iOWinuWAvOeo
-juWPkeelqOmHkemine+8iS/vvIgxK+WinuWAvOeojueOh++8iSrlh7rlj6PpgIDnqI7njofjgIIN
-CuS+i+Wmgu+8mui0p+WAvDEwMOS4h+S6uuawkeW4ge+8jOWinuWAvOeojueOh+S4ujE3Je+8jOmA
-gOeojueOh+S4ujEzJe+8jOWIme+8mg0KMTAwMDAwMC8xLjE3KjAuMTM9MTExMTExLjEx5YWD5Lq6
-5rCR5biBDQoNCuS7peS4i+WgseWDueeCuuW4uOimi+eJqea1geS6pOiyqOWgseWDue+8jOWmguac
-iemcgOimge+8jOatoei/juS+humbu+ipouWDuQ0KMe+8ieaVo+iyqOWHuuWPo+mmmea4r+WgseWD
-ue+8mw0K5bm/5Lic5rGf6ZeoL+S9m+WxsS/kuK3lsbHmlaPotKfpgJ/pgJLpppnmuK/oh6rmj5Dl
-g7nvvJtSTUIwLjgvS0fmiJZSTUIyMDAvQ0JNDQrlub/kuJzmuIXov5wv5rKz5rqQL+aDoOW3nuaV
-o+i0p+mAn+mAkummmea4r+iHquaPkOWDue+8m1JNQjAuOC9LR+aIllJNQjIwMC9DQk0NCuW5v+S4
-nOaxleWktOaVo+i0p+mAn+mAkummmea4r+iHquaPkOWDue+8m1JNQjAuOS9LR+aIllJNQjIxMC9D
-Qk0NCua5luWNly/msZ/opb8v5rmW5YyX5pWj6LSn6YCf6YCS6aaZ5riv6Ieq5o+Q5YO577ybUk1C
-MS9LR+aIllJNQjIzMC9DQk0NCua1meaxny/msZ/oi48v5LiK5rW35pWj6LSn6YCf6YCS6aaZ5riv
-6Ieq5o+Q5YO577ybUk1CMS4yL0tH5oiWUk1CMjUwL0NCTQ0K5rKz5Y2XL+WxseS4nC/lronlvr3m
-laPotKfpgJ/pgJLpppnmuK/oh6rmj5Dlg7nvvJtSTUIyL0tH5oiWUk1CMjgwL0NCTQ0K5Lqs5rSl
-57+8L+WGheiSmeWPpOWQhOecgeaVo+i0p+mAn+mAkummmea4r+iHquaPkOWDue+8m1JNQjIuNS9L
-R+aIllJNQjMwMC9DQk0NCuazqO+8muS7peS4iuiyu+eUqOS4jeWMheWQq+mmmea4r+mAgeWuouOA
-geWFpeS7k+aUtuiyuy4NCuaVo+iyqOmmmea4r+a0vumAgeaUtuiyu+aomea6ljoNCkHvvJrkuZ3p
-vo3ljYDvvJogUk1CMTgwIO+8m0I65paw55WM5Y2A77yaIFJNQjIwMCAgQzog6aaZ5riv5Y2A77ya
-IFJNQjMwMA0K5pWj6LKo6aaZ5riv5YWl5LuT5pS26LK75qiZ5rqWOg0K6aaZ5riv5YWl5LuT6LS5
-77ybUk1CMzUw77yI55m76K6w6LS544CB5YGc6L2m6LS5562J5p2C6LS55a6e5oql5a6e6ZSA77yJ
-DQoNCg0KMu+8ieaVo++8iOadgu+8ieiyqOS6pOa3seWcs+ebkOeUsOa4r+OAgeS4reWklui/kOOA
-geWFq+i+vuS7k+OAgemHkei/kOi+vuetieWklumBi+WAieWgseWDue+8m+acgOS9jua2iOiyu++8
-m1JNQjgwMC/llq4g77yI5oql5YWz44CB55m76K6w6LS5562J5LuT5bqT5p2C6LS55a6e5oql5a6e
-6ZSA77yJDQrms6jvvJsxLuW/hemhu+aQuuW4puaJgOWxnuiIueWFrOWPuOaIlui0p+i/kOS7o+eQ
-huS5i+iQvei0p+e6uChTaGlwcGluZyBvcmRlcinkuIDlvI/kupTku73lj4rmiqXlhbPmlofku7bv
-vIjlpoLml6DokL3otKfnurjvvIzmnKzlhazlj7jlj6/mi5Lnu53mlLbotKfvvIkNCiAyLua3seWc
-s+S6pOi0p+S8muS6p+eUn+WTquS6m+i0ueeUqO+8nw0KMe+8ieaKpeWFs+i0ue+8mlJNQjM1MC/l
-jZXvvJsgDQoy77yJ6L2m6L6G5YWl5Zy655m76K6w6LS577yb5ZCo6L2m77yaUk1CNzAv6L2mICAg
-IOi0p+afnOi9pu+8mlJNQjEzMC/mn5zvvJsgIA0KM++8ieadgui0ue+8iGJpZGluZyBtZXRlcmlh
-bCBmZWXvvInvvJpSTUI1L+i9piAgICAgUk1CMTUv5p+c77ybIA0KNO+8ieS7o+aNouWVhuajgO+8
-mlJNQjE1MC/ljZUNCg0KDQoz77yJ6aaZ5riv5pmu6LKo77yM5Lit5qqU6LKo5Yiw5YWn5Zyw5ZCE
-55yB5biC5aCx5YO577ybDQrlv6vku7bljIXnqIXloLHpl5zlhaXlj6Pnibnpu546QS7miYvnuozn
-sKHllq4s5rW36Zec55uj566h5qKd5Lu257Ch5ZauLOS4jeeUqOWWruitieS4jeeUqOaJueaWhyzk
-uIDkupvpm7vlrZDoqK3lgpnlj6/ku6XkuI3pnIAzQ+itieaYjuS5n+WPr+WFpeWPoy4gQi7pgJ/l
-uqblv6ss5qyh5pel5Yiw6LKoLOmAguWQiOe3iuaApeiyqOeJqemAmumXnC4gQy7lpoLmnpzosqjp
-h4/ovIPlpKcs5Y+v5Lul6YeH55So5q+P5aSp5YiG5om55aCx6Zec5pa55byPLiBELuW/q+S7tuWM
-heeoheWgsemXnOS4jeaPkOS+m+eoheelqCzmspLms5XpgLLooYznqIXnpajmirXmiaMuDQpBIOex
-uw0K5qqU77yM55m957q477yM57q45ZOB77yM57q46KKL77yM57q4566x77yM57q455uS77yM5ZCN
-54mH77yM5pel5Y6G77yM6Imy5Y2h77yM5ZCK54mM77yM6K6w5LqL57C/77yM5bCP5YaM5a2Q77yM
-5a6j5Lyg5Y2V5byg77yM6K+05piO5Lmm77yM55uu5b2V77yM5qCH6LS077yM5rW35oql77yM6IO2
-57q477yM6LS057q477yM6IO25p2h77yM5aGR5paZ6KKL77yM6IO26Iac77yM6IO25omj5YW377yM
-5aGR5paZ566h77yM6IO25aOz77yM6IO255uW77yM6J665Lid77yM5rC0566h77yM6ZOB54mH77yM
-6ZOB5p2h77yM6ZOB55uW77yM6ZOB5aOz77yM6ZOB5omj77yM6ZOB5p6277yM6Z6L5bqV5Y+K6YWN
-5Lu277yM57uH5bim77yM57yO5bim77yM6IO25qC55bim77yM5biD5qCH77yM5p2+57Sn5bim77yM
-57yW57uH5bim77yM5pyI5Y6G77yM57uz5a2Q44CCDQrvv6U5L2tnDQpCIOexuw0K5aGR5paZ5o6l
-5aS077yM5aGR5paZ5Za35aS077yM6ZOB6Iqv77yM6ZOB6ZKI77yM56OB6ZOB77yM5by557Cn77yM
-6ZKi54mH77yM6ZKi5bC677yM6ZKi54+g77yM6ZOd54mH77yM6ZSh57q/77yM6ZKi57q/77yM5biD
-5paZ77yM57qx57q/77yM57q/55CD77yM6Iqx6L6577yM6aWw5omj77yM5ouJ6ZO+77yM6IO25biD
-77yM5rW357u177yM5Y6L5YWL5Yqb5Yi25ZOB77yM55S16K+d57q/5o+S5aS077yM5Lmm5YaM77yM
-6L2v5pyo77yM5rSL54Ob77yM5aKZ57q477yM5Y+R5rOh6IO277yM6ZKb57q/77yM5pyo5p2/77yM
-6ZOB5bqn77yM5Lid5bim77yM5Yi35a2Q77yM5rOl6IO277yM56CC57q477yM5Lye6YWN5Lu277yM
-5aGR5paZ546p5YW344CCDQrvv6UxMS9rZw0KQyDnsbsNCuWNpOi9ru+8jOa7mui9ru+8jOa7kei9
-ru+8jOeUtee6v++8jOW7uuadkO+8jOi/h+a7pOe9ke+8jOW5suiKse+8jOm8k+e6uO+8jOeggui9
-ru+8jOefs+adkO+8jOeBr+Wjs++8jOeBr+e9qe+8jOWPkemlsOWTge+8jOS9juS7t+a0kuawtOWk
-tO+8jCBQVkMg55qu77yM56Oo55+z77yM5rK555+z77yM6JW+5Lid77yM56Oo6L2u77yM5ryG5YyF
-57q/77yM54SK5p6d77yM5aGR5paZ5o+S5aS077yM5LqU6YeR5o+S5aS077yM6IO257KS77yM6ZOc
-5p2Q77yM6ZOd5p2Q77yM5Y2w5Yi36IO254mH44CCDQrvv6UxMy9rZw0KRCDnsbsNCueJm+earu+8
-jOe+iuearu+8jOa/gOWFiee6uO+8jOearuWFiee6uO+8jOeDq+mHkee6uO+8jOi9tOW/g++8jOWW
-h+WPree9ke+8jOihqOW4pu+8jOeBr+azoe+8jOeBr+euoe+8jOafk+aWme+8jOiJsueyie+8jOmi
-nOaWme+8jOiDtuawtO+8jOagkeiEgu+8jOW3peS4mueUqOearuW4pu+8jOmZtueTt+WItuWTge+8
-jOeOu+eSg+WItuWTge+8jOmbleWIu+WTge+8jOa0l+awtOS4ne+8jOaWh+WFt++8jOe7kuavm+eO
-qeWFt++8jOW3peS4mueUqOe6v+WciO+8jOiDjOWMhe+8jOWwvOm+meiii++8jOacuuaisOayueWw
-ge+8jOiinOWtkO+8jOaJi+Wll++8jOmdnumTtuWItumkkOWFt++8jOWIgOeJh++8jOWIgOWFt++8
-jOmdnuecn+earuaJi+iii++8jOW4veWtkO+8jOS6lOmHkeW3peWFt++8jOW8gOWFs+WItu+8jOea
-ruW4pu+8jOWNoeW6p++8jOWPo+e9qe+8jOaKpOWFt++8jOmZtueTt+eJh++8jOS6lOmHkemUge+8
-jOWOi+WWie+8jOihqOWjs++8jOihqOeblu+8jOaJi+WKqOW3peWFt++8jOacuuWjs++8jOawtOm+
-meWktO+8jOmTgei9tO+8jOacqOWutuenge+8jOa4hea0geWJgu+8jOacuuaisOi9tOaJv++8jOeD
-memTgeWSgO+8jOepuueZvee6v+i3r+adv++8jOiEmui4j+i9pumbtuS7tg0K77+lMTUva2cNCkUg
-57G7DQrkvY7ku7flgLzov5DliqjnlKjlk4HvvIznlLXnrZLvvIzkvY7ku7flgLznga/ppbDvvIzn
-lLXliLbvvIzooaPmnI3vvIzpnovmoLfvvIzmqKHlhbfvvIzlnKPor57nga/ppbDvvIznga/lhbfv
-vIzlnLDmr6/vvIzorqHnrpfmnLrmjqXnur/vvIznmq7lrrbnp4HvvIzmu6TolYrvvIznga/nrrHv
-vIznqbrloqjnm5LvvIznqbrnorPpvJPvvIzkv53muKnmna/vvIzplZzniYfvvIzllrfmnqrvvIzm
-srnloqjvvIzljqjlhbfvvIznlLXot6/lvIDlhbPliLbvvIznoJTno6joho/vvIznhIrplKHoho/v
-vIzmtqbmu5HmsrnvvIznm7jmnLrnlKjog7blo7PvvIzog7bmjInpkq7vvIzpkrvlkoDvvIznlLXl
-majnlKjovbTmib/vvIznlLXnrrHvvIznq6/lrZDvvIzmma7pgJrnlLXmsaDvvIzliIfnurjmnLrj
-gIINCu+/pTE2L2tnDQpGIOexuw0K5Yqg54Ot5qOS77yM5L2O5YC85Y+Y5Y6L5Zmo77yM55S16KGo
-77yM6ICz562S77yM6ICz5py66YWN5Lu277yM5rCU5Y6L6YWN5Lu277yM5rO177yM56m65Y6L6KGo
-77yM5rS75aGe546v77yM55S154Ot566h77yM5bel5Lia55So55S15rqQ5byA5YWz77yM5L2O5YC8
-5py65qKw6Zu26YWN5Lu277yM5rCU5Yqo6YWN5Lu277yM5L2O5YC85YWF55S15Zmo77yM5pWj54Ot
-5omH6Zu25Lu277yM5Lid5be+77yM6aKG5bim77yM6ZKI6L2m6YWN5Lu277yM5Y6L5Yqb6KGo77yM
-5rK55Y6L6KGo77yM5rCU5Y6L6KGo77yM5Y+R54Ot57q/77yM6L2m6ZKI77yM5py65qKw6ZiA6Zeo
-77yM5aSq6Ziz6Iac77yMIExFRCDlsI/nlLXnga/vvIzpsbznq7/vvIzmu5Hmnb/ovabvvIznlLXm
-r6/vvIzovpfliIDlkozpm7bku7bjgIINCu+/pTIxL2tnDQpHIOexuw0K5LqM5p6B566h77yM5LiJ
-5p6B566h77yM55S15a6577yM55S16Zi777yM55S15Yqo6LW35a2Q77yM5rip5bqm6K6hICgg55S1
-5a2QIC8g5ray5L2TICkg77yM5L2O5YC85LmQ5Zmo77yM6aOO5omH77yM56Kz57KJ77yM55S15Yqo
-5bel5YW377yM5Lyg5aOw5py677yM6bqm5YWL6aOO77yM6K6h5pWw5py677yM55S15a2Q5pWw5a2X
-5p2/77yM5pqW6aOO5py677yMIEQvVi9DRCDlpJblo7PvvIzlubLmiYvmnLrvvIzogLPlkqrnur/v
-vIzmipXluIHlmajphY3ku7bvvIzmuLjmiI/mnLrmjqfliLbmnYbvvIzov4fmu6TlmajvvIznnLzp
-lZzvvIznlLXno4HpmIDvvIzml7bpkp/vvIzljLvnlpfljavnlJ/lk4HvvIzno6jmspnmnLrvvIzl
-gYflj5HvvIznu6fnlLXlmajvvIznlLXor53mnLrjgIINCu+/pTM2L2tnDQpIIOexuw0K5L2O5YC8
-5ray5pm25pi+56S654mH77yM5rip5o6n5Zmo77yM54Of6Zu+5oSf5bqU5Zmo77yM6Z+z566x77yM
-5a6a5pe25Zmo77yM5L2O5YC857yd57qr5py677yM5Yqp5ZCs5Zmo77yM5o6i5aS077yM5py65Zmo
-55So5rCU57y477yM55S15a2Q5a+G56CB6ZSB77yM5oSf5bqU5Zmo77yM5Y+Y6aKR5Zmo77yM5Y+Y
-6YCf5Zmo77yM5YGl6Lqr5Zmo5p2Q77yM5bel5Lia55So5Y+Y5Y6L5Zmo77yM5Ya25YW377yM5Y2h
-54mH6ZiF6K+75py677yM6ZKf6KGo6YWN5Lu277yM5omL6KGo6YWN5Lu277yM6Iie5Y+w5bCE54Gv
-44CCDQrvv6U0MS9rZw0KSSDnsbsNCuaJk+WNsOacuu+8jOaJq+eehOS7qu+8jOiuoeeul+acuuac
-uueuse+8jOaYvuekuuWZqO+8jOi3r+eUseWZqO+8jOmbhue6v+WZqO+8jOaOpee6v+ebku+8jOi9
-rOaNouWZqO+8jOmBpeaOp+WZqO+8jOS8oOecn+acuu+8jOeDp+W9leWZqO+8jCBJQyDvvIznur/o
-t6/mnb/vvIzpopHnjoflmajvvIzorqHnrpfmnLrphY3ku7bvvIzljLvnlpflmajmnZDvvIzmtojp
-mLLlmajmnZDlj4rphY3ku7bvvIzpkq7miaPnlLXmsaDvvIzoj7LnkLPvvIznm7jmnLrvvIzkuZDl
-majvvIzlip/mlL7jgIINCu+/pTUzLTgzL2tnDQoNCkJFU1QgUkVHQVJEUw0K5pu+55SfICANCkhB
-T0NISU5HIElOVCdMIExPR0lTVElDUyBMVEQNCihNLlApODYtMTM0MzA4NzMxMTcNCihURUwpODUy
-LTMxNzYzODkxDQoo5b6u5L+hKTEzNDMwODczMTE3DQooUVEpMjkyNjQ0MjY5Mg0KKFNLWVBFKUhB
-T0NIRU5HSEsxOTg3DQooRS1NQUlMKUhBT0NIRU5HSEsxOTg3QDE2My5DT00NCg==
+Op 01-10-16 om 19:17 schreef Denys Vlasenko:
+> ash-glob/glob2.tests:
+>     Evidently, dash supports \f -> ^L escape.
+>     This test uses \f as invalid backslash escape,
+>     hence differences.
 
+The test uses the "echo" builtin, which is very very unportable and
+explicitly not standardised by POSIX for this case. A test failure based
+on a difference in how "echo" interprets backslash escapes is not really
+relevant. Use printf instead.
+
+http://pubs.opengroup.org/onlinepubs/9699919799/utilities/echo.html#tag_20_37_16
+"It is not possible to use echo portably across all POSIX systems unless
+both -n (as the first argument) and escape sequences are omitted."
+
+> ash-misc/echo_write_error.tests
+>     EPIPE errors in echo are not reported
+
+They're reported as an I/O error in echo. While that is not as specific,
+it's still accurate. I don't really see a problem.
+
+> ash-misc/func2.tests
+>     $((i++)) not supported
+
+This is not required by POSIX. Use $((i+=1)) instead.
+http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_04
+"The sizeof() operator and the prefix and postfix "++" and "--"
+operators are not required."
+
+> ash-misc/local1.tests
+>     Doesn't unset as described:
+>         local a
+>         # the above line unsets $a
+>         echo "A2:'$a'"
+
+From the dash man page:
+"When a variable is made local, it inherits the initial value and
+exported and readonly flags from the variable with the same name in the
+surrounding scope, if there is one.  Otherwise, the variable is
+initially unset."
+
+Looks to me like dash behaves as advertised. Local variables aren't
+standardised so implementations are free to do as they please.
+
+(This is an interesting difference though, one I wasn't aware of until now.)
+
+> ash-misc/shift1.tests
+>     "shift N" fails if fewer than N argv[i] exists
+>     (likely not a bug, but bash does it differently)
+
+POSIX explicitly allows either behaviour:
+http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_26_14
+"If the n operand is invalid or is greater than "$#", this may be
+considered a syntax error and a non-interactive shell may exit; if the
+shell does not exit in this case, a non-zero exit status shall be
+returned. Otherwise, zero shall be returned."
+
+Cross-platform scripts must check that the operand is less than or equal
+than $# before invoking 'shift'.
+
+> ash-redir/redir.tests
+>     echo errors due to closed stdout are not reported
+
+Again, they are in fact reported but as an I/O error. My response would
+be the same as for ash-misc/echo_write_error.tests above.
+
+> ash-redir/redir3.tests
+>     "echo foo >&9" correctly says "9: Bad file descriptor"
+>     and exitcode is 2 (in bash, it is 1).
+
+Not a bug, IMO. POSIX simply says: "A failure to open or create a file
+shall cause a redirection to fail" but does not specify with what exit
+status it should fail. Any non-zero exit status < 128 should be fine.
+
+> ash-redir/redir7.tests
+> ash-redir/redir8.tests
+>     uni\x81code filename is not found by uni?code glob pattern.
+
+dash does not support unicode; AFAIK, this is a design choice (I'm not a
+developer).
+
+> ash-signals/reap1.tests
+>     Builtins never wait for children. This loop will not ever stop:
+>     sleep 1 &
+>     PID=$!
+>     while kill -0 $PID >/dev/null 2>&1; do
+>         true
+>     done
+
+Interesting bug.
+
+The behaviour seems to depend on the presence of a 'while' loop.
+Executed manually without a loop, it behaves as expected:
+
+$ sleep 10 & PID=$!
+$ kill -0 $PID
+$ kill -0 $PID
+[...etc...]
+$ kill -0 $PID
+[1] + Done                       sleep 10
+$ kill -0 $PID
+dash: 11: kill: No such process
+
+Executed with a loop it's infinite even in an interactive shell, but
+only the first time around:
+
+$ sleep 10 & PID=$!
+$ while kill -0 $PID; do :; done
+^C
+[1] + Done                       sleep 10
+$ while kill -0 $PID; do :; done
+dash: 15: kill: No such process
+
+Strange behaviour and certainly looks like a rather obscure bug.
+
+> ash-signals/savetrap.tests
+>     `trap` does not work as expected
+
+Again, the SIG prefix is not required to be supported in POSIX (see above).
+
+Unfortunately, according to POSIX, the feature that a subshell
+containing only a single "trap" command with no operands inherits the
+parent shell's traps so that they can be stored like save_traps=$(trap),
+is optional! Hence this can't be considered a bug in dash, although I'd
+certainly like to submit it as a feature request.
+
+POSIX:
+http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_28
+"When a subshell is entered, traps that are not being ignored shall be
+set to the default actions, except in the case of a command substitution
+containing only a single trap command, when the traps need not be
+altered. Implementations may check for this case using only lexical
+analysis [...]."
+
+Only bash, yash, AT&T ksh93 and busybox ash currently support this
+optional feature. This makes it extremely inconvenient to store the
+output of 'trap' in a variable in a cross-platform manner.
+
+(In my cross-platform shell library, modernish, which offers stack-based
+traps, I've had to implement a workaround involving the atomic,
+parallel-proof creation of a temporary file. Since 'mktemp' isn't
+cross-platform either, that has been an interesting exercise involving
+output redirection under 'set -C' in a subshell.)
+
+> ash-signals/sigint1.tests
+>     trap "exit 0" SIGINT - does not like name "SIGINT". "INT" works.
+
+Not a bug. The SIG prefix is an optional extension. Only "INT" without
+the prefix is mandated by POSIX.
+http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_28
+"The condition can be EXIT, 0 (equivalent to EXIT), or a signal
+specified using a symbolic name, without the SIG prefix, as listed in
+the tables of signal names in the <signal.h> header defined in XBD
+Headers; for example, HUP, INT, QUIT, TERM. Implementations may permit
+names with the SIG prefix or ignore case in signal names as an extension."
+
+> ash-signals/signal4.tests
+>     trap "echo Trapped" BADNAME TERM - abort seeing BADNAME.
+>     bash complains, but sets the trap for the second signal.
+
+I don't see how this is a bug.
+
+> ash-signals/signal8.tests
+>     "kill %1" in non-interactive shell does not find
+>     previously backgrounded task.
+
+Not a bug. '%1' is a job control job ID, but in a non-interactive shell
+there's no job control. Either 'set -m' to turn on job control first
+(and deal with extra terminal clutter), or just use "$!" to kill by PID.
+
+> ash-vars/var-utf8-length.tests
+>     ${#VAR} counts unicode chars in bash
+
+dash does not support unicode; AFAIK, this is a design choice (I'm not a
+developer).
+
+> ash-vars/var_unbackslash.tests
+>     b=-$a-\t-\\-\"-\`-\--\z-\*-\?-
+>     b="-$a-\t-\\-\"-\`-\--\z-\*-\?-"
+>     b='-$a-\t-\\-\"-\`-\--\z-\*-\?-'
+>     b1=$b
+>     "b1=$b"
+>     You can imagine... not everything went well here...
+
+Again, this is probably down to legitimate differences in the
+notoriously unportable "echo" builtin. Test this using printf instead.
+
+> ash-vars/var_unbackslash.tests
+
+ITYM ash-vars/var_unbackslash1.tests
+
+>     echo Forty two:$\
+>     (\
+>     (\
+>     42\
+>     )\
+>     )
+>     dash says: Syntax error: Missing '))'
+
+Yes, but it's not clear to me that it shouldn't.
+
+Hmm... maybe this is indeed a bug:
+http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_01
+"A <backslash> that is not quoted shall preserve the literal value of
+the following character, with the exception of a <newline>. If a
+<newline> follows the <backslash>, the shell shall interpret this as
+line continuation. The <backslash> and <newline> shall be removed before
+splitting the input into tokens. Since the escaped <newline> is removed
+entirely from the input and is not replaced by any white space, it
+cannot serve as a token separator."
+
+So, unless I'm misreading this, it looks like backslashes need to be
+parsed before *any* other kind of lexical analysis.
+
+
+I hope some of the above was useful.
+
+- M.
 
 
