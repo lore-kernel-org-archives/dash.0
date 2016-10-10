@@ -1,243 +1,277 @@
-From: Martijn Dekker <martijn@inlv.org>
+From: Harald van Dijk <harald@gigawatt.nl>
 Subject: Re: dash tested against ash testsuite: 17 failures
-Date: Sat, 8 Oct 2016 21:42:12 +0200
-Message-ID: <7d291bb2-a968-471d-d2a0-87adfd0bc38d@inlv.org>
+Date: Mon, 10 Oct 2016 22:20:07 +0200
+Message-ID: <503584db-0131-3264-397e-0bc784eed58d@gigawatt.nl>
 References: <CAK1hOcMma=uH2R=vWX1Z6r2xf9PcW7MPSEPYOk76Zn97LD-7Jw@mail.gmail.com>
+ <7d291bb2-a968-471d-d2a0-87adfd0bc38d@inlv.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed;
+ boundary="------------A40A70E4B58CBDCB1B24AE14"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from kahlil.inlv.org ([37.59.109.123]:53808 "EHLO kahlil.inlv.org"
+Received: from home.gigawatt.nl ([83.163.3.213]:54174 "EHLO home.gigawatt.nl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751729AbcJHU2S (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sat, 8 Oct 2016 16:28:18 -0400
-Received: from breedzicht.local ([145.15.244.33])
-        (authenticated bits=0)
-        by kahlil.inlv.org (8.14.9/8.14.4) with ESMTP id u98JgC5A027347
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO)
-        for <dash@vger.kernel.org>; Sat, 8 Oct 2016 21:42:13 +0200
-In-Reply-To: <CAK1hOcMma=uH2R=vWX1Z6r2xf9PcW7MPSEPYOk76Zn97LD-7Jw@mail.gmail.com>
+        id S1751821AbcJJU1V (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 10 Oct 2016 16:27:21 -0400
+In-Reply-To: <7d291bb2-a968-471d-d2a0-87adfd0bc38d@inlv.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Martijn Dekker <martijn@inlv.org>, dash@vger.kernel.org
 
-Op 01-10-16 om 19:17 schreef Denys Vlasenko:
-> ash-glob/glob2.tests:
->     Evidently, dash supports \f -> ^L escape.
->     This test uses \f as invalid backslash escape,
->     hence differences.
+This is a multi-part message in MIME format.
+--------------A40A70E4B58CBDCB1B24AE14
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The test uses the "echo" builtin, which is very very unportable and
-explicitly not standardised by POSIX for this case. A test failure based
-on a difference in how "echo" interprets backslash escapes is not really
-relevant. Use printf instead.
+On 08/10/16 21:42, Martijn Dekker wrote:
+> Op 01-10-16 om 19:17 schreef Denys Vlasenko:
+>> ash-vars/var_unbackslash.tests
+>
+> ITYM ash-vars/var_unbackslash1.tests
+>
+>>     echo Forty two:$\
+>>     (\
+>>     (\
+>>     42\
+>>     )\
+>>     )
+>>     dash says: Syntax error: Missing '))'
+>
+> Yes, but it's not clear to me that it shouldn't.
+>
+> Hmm... maybe this is indeed a bug:
+> http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_01
+> "A <backslash> that is not quoted shall preserve the literal value of
+> the following character, with the exception of a <newline>. If a
+> <newline> follows the <backslash>, the shell shall interpret this as
+> line continuation. The <backslash> and <newline> shall be removed before
+> splitting the input into tokens. Since the escaped <newline> is removed
+> entirely from the input and is not replaced by any white space, it
+> cannot serve as a token separator."
+>
+> So, unless I'm misreading this, it looks like backslashes need to be
+> parsed before *any* other kind of lexical analysis.
 
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/echo.html#tag_20_37_16
-"It is not possible to use echo portably across all POSIX systems unless
-both -n (as the first argument) and escape sequences are omitted."
+There does appear to be one exception: a comment may end with a 
+backslash. This does not cause the next line to be treated as a comment: 
+once a # is seen, the remaining characters on the line are not subjected 
+to the regular lexical analysis, so the above does not apply.
 
-> ash-misc/echo_write_error.tests
->     EPIPE errors in echo are not reported
+I would have expected another exception to be in alias expansions that 
+end in a backslash. Shells are not entirely in agreement there, but most 
+appear to treat this the regular way, meaning
 
-They're reported as an I/O error in echo. While that is not as specific,
-it's still accurate. I don't really see a problem.
+   dash -c 'alias bs=\\
+   bs
+   '
 
-> ash-misc/func2.tests
->     $((i++)) not supported
+prints nothing.
 
-This is not required by POSIX. Use $((i+=1)) instead.
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_04
-"The sizeof() operator and the prefix and postfix "++" and "--"
-operators are not required."
+dash has a pgetc_eatbnl function already in parser.c which skips any 
+backslash-newline combinations. It's not used everywhere it could be. 
+There is also some duplicated backslash-newline handling elsewhere in 
+parser.c. Replacing all the calls to pgetc() to call pgetc_eatbnl() 
+instead, with the exception of the one that handles comments, and 
+removing the duplicated backslash-newline handling, lets this test case 
+work, as well as several other similar ones, such as:
 
-> ash-misc/local1.tests
->     Doesn't unset as described:
->         local a
->         # the above line unsets $a
->         echo "A2:'$a'"
+   : &\
+   & :
 
-From the dash man page:
-"When a variable is made local, it inherits the initial value and
-exported and readonly flags from the variable with the same name in the
-surrounding scope, if there is one.  Otherwise, the variable is
-initially unset."
+   : \
+   <\
+   <\
+   EO\
+   F
+   123
+   E\
+   OF
 
-Looks to me like dash behaves as advertised. Local variables aren't
-standardised so implementations are free to do as they please.
+A nice benefit is that the removal of the duplicated BSNL handling 
+causes a reduction in code size.
 
-(This is an interesting difference though, one I wasn't aware of until now.)
+There are probably a few corner cases I'm not handling correctly in this 
+patch, though. Feedback welcome.
 
-> ash-misc/shift1.tests
->     "shift N" fails if fewer than N argv[i] exists
->     (likely not a bug, but bash does it differently)
+Cheers,
+Harald van Dijk
 
-POSIX explicitly allows either behaviour:
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_26_14
-"If the n operand is invalid or is greater than "$#", this may be
-considered a syntax error and a non-interactive shell may exit; if the
-shell does not exit in this case, a non-zero exit status shall be
-returned. Otherwise, zero shall be returned."
+--------------A40A70E4B58CBDCB1B24AE14
+Content-Type: text/x-patch;
+ name="parser-bnl.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="parser-bnl.patch"
 
-Cross-platform scripts must check that the operand is less than or equal
-than $# before invoking 'shift'.
+--- a/src/parser.c
++++ b/src/parser.c
+@@ -106,6 +106,7 @@ STATIC void parseheredoc(void);
+ STATIC int peektoken(void);
+ STATIC int readtoken(void);
+ STATIC int xxreadtoken(void);
++STATIC int pgetc_eatbnl();
+ STATIC int readtoken1(int, char const *, char *, int);
+ STATIC void synexpect(int) __attribute__((__noreturn__));
+ STATIC void synerror(const char *) __attribute__((__noreturn__));
+@@ -656,7 +657,7 @@ parseheredoc(void)
+ 		if (needprompt) {
+ 			setprompt(2);
+ 		}
+-		readtoken1(pgetc(), here->here->type == NHERE? SQSYNTAX : DQSYNTAX,
++		readtoken1(pgetc_eatbnl(), here->here->type == NHERE? SQSYNTAX : DQSYNTAX,
+ 				here->eofmark, here->striptabs);
+ 		n = (union node *)stalloc(sizeof (struct narg));
+ 		n->narg.type = NARG;
+@@ -782,7 +783,7 @@ xxreadtoken(void)
+ 		setprompt(2);
+ 	}
+ 	for (;;) {	/* until token or start of word found */
+-		c = pgetc();
++		c = pgetc_eatbnl();
+ 		switch (c) {
+ 		case ' ': case '\t':
+ 		case PEOA:
+@@ -791,30 +792,23 @@ xxreadtoken(void)
+ 			while ((c = pgetc()) != '\n' && c != PEOF);
+ 			pungetc();
+ 			continue;
+-		case '\\':
+-			if (pgetc() == '\n') {
+-				nlprompt();
+-				continue;
+-			}
+-			pungetc();
+-			goto breakloop;
+ 		case '\n':
+ 			nlnoprompt();
+ 			RETURN(TNL);
+ 		case PEOF:
+ 			RETURN(TEOF);
+ 		case '&':
+-			if (pgetc() == '&')
++			if (pgetc_eatbnl() == '&')
+ 				RETURN(TAND);
+ 			pungetc();
+ 			RETURN(TBACKGND);
+ 		case '|':
+-			if (pgetc() == '|')
++			if (pgetc_eatbnl() == '|')
+ 				RETURN(TOR);
+ 			pungetc();
+ 			RETURN(TPIPE);
+ 		case ';':
+-			if (pgetc() == ';')
++			if (pgetc_eatbnl() == ';')
+ 				RETURN(TENDCASE);
+ 			pungetc();
+ 			RETURN(TSEMI);
+@@ -822,11 +816,9 @@ xxreadtoken(void)
+ 			RETURN(TLP);
+ 		case ')':
+ 			RETURN(TRP);
+-		default:
+-			goto breakloop;
+ 		}
++		break;
+ 	}
+-breakloop:
+ 	return readtoken1(c, BASESYNTAX, (char *)NULL, 0);
+ #undef RETURN
+ }
+@@ -903,7 +895,7 @@ readtoken1(int firstc, char const *syntax, char *eofmark, int striptabs)
+ 			attyline();
+ 			if (syntax == BASESYNTAX)
+ 				return readtoken();
+-			c = pgetc();
++			c = pgetc_eatbnl();
+ 			goto loop;
+ 		}
+ #endif
+@@ -916,7 +908,7 @@ readtoken1(int firstc, char const *syntax, char *eofmark, int striptabs)
+ 					goto endword;	/* exit outer loop */
+ 				USTPUTC(c, out);
+ 				nlprompt();
+-				c = pgetc();
++				c = pgetc_eatbnl();
+ 				goto loop;		/* continue outer loop */
+ 			case CWORD:
+ 				USTPUTC(c, out);
+@@ -997,7 +989,7 @@ quotemark:
+ 					USTPUTC(c, out);
+ 					--parenlevel;
+ 				} else {
+-					if (pgetc() == ')') {
++					if (pgetc_eatbnl() == ')') {
+ 						USTPUTC(CTLENDARI, out);
+ 						if (!--arinest)
+ 							syntax = prevsyntax;
+@@ -1025,7 +1017,7 @@ quotemark:
+ 					USTPUTC(c, out);
+ 				}
+ 			}
+-			c = pgetc();
++			c = pgetc_eatbnl();
+ 		}
+ 	}
+ endword:
+@@ -1132,7 +1124,7 @@ parseredir: {
+ 	np = (union node *)stalloc(sizeof (struct nfile));
+ 	if (c == '>') {
+ 		np->nfile.fd = 1;
+-		c = pgetc();
++		c = pgetc_eatbnl();
+ 		if (c == '>')
+ 			np->type = NAPPEND;
+ 		else if (c == '|')
+@@ -1145,7 +1137,7 @@ parseredir: {
+ 		}
+ 	} else {	/* c == '<' */
+ 		np->nfile.fd = 0;
+-		switch (c = pgetc()) {
++		switch (c = pgetc_eatbnl()) {
+ 		case '<':
+ 			if (sizeof (struct nfile) != sizeof (struct nhere)) {
+ 				np = (union node *)stalloc(sizeof (struct nhere));
+@@ -1154,7 +1146,7 @@ parseredir: {
+ 			np->type = NHERE;
+ 			heredoc = (struct heredoc *)stalloc(sizeof (struct heredoc));
+ 			heredoc->here = np;
+-			if ((c = pgetc()) == '-') {
++			if ((c = pgetc_eatbnl()) == '-') {
+ 				heredoc->striptabs = 1;
+ 			} else {
+ 				heredoc->striptabs = 0;
+@@ -1336,21 +1328,12 @@ parsebackq: {
+ 			if (needprompt) {
+ 				setprompt(2);
+ 			}
+-			switch (pc = pgetc()) {
++			switch (pc = pgetc_eatbnl()) {
+ 			case '`':
+ 				goto done;
+ 
+ 			case '\\':
+-                                if ((pc = pgetc()) == '\n') {
+-					nlprompt();
+-					/*
+-					 * If eating a newline, avoid putting
+-					 * the newline into the new character
+-					 * stream (via the STPUTC after the
+-					 * switch).
+-					 */
+-					continue;
+-				}
++                                pc = pgetc_eatbnl();
+                                 if (pc != '\\' && pc != '`' && pc != '$'
+                                     && (!dblquote || pc != '"'))
+                                         STPUTC('\\', pout);
+@@ -1529,7 +1512,7 @@ expandstr(const char *ps)
+ 	saveprompt = doprompt;
+ 	doprompt = 0;
+ 
+-	readtoken1(pgetc(), DQSYNTAX, FAKEEOFMARK, 0);
++	readtoken1(pgetc_eatbnl(), DQSYNTAX, FAKEEOFMARK, 0);
+ 
+ 	doprompt = saveprompt;
+ 
 
-> ash-redir/redir.tests
->     echo errors due to closed stdout are not reported
-
-Again, they are in fact reported but as an I/O error. My response would
-be the same as for ash-misc/echo_write_error.tests above.
-
-> ash-redir/redir3.tests
->     "echo foo >&9" correctly says "9: Bad file descriptor"
->     and exitcode is 2 (in bash, it is 1).
-
-Not a bug, IMO. POSIX simply says: "A failure to open or create a file
-shall cause a redirection to fail" but does not specify with what exit
-status it should fail. Any non-zero exit status < 128 should be fine.
-
-> ash-redir/redir7.tests
-> ash-redir/redir8.tests
->     uni\x81code filename is not found by uni?code glob pattern.
-
-dash does not support unicode; AFAIK, this is a design choice (I'm not a
-developer).
-
-> ash-signals/reap1.tests
->     Builtins never wait for children. This loop will not ever stop:
->     sleep 1 &
->     PID=$!
->     while kill -0 $PID >/dev/null 2>&1; do
->         true
->     done
-
-Interesting bug.
-
-The behaviour seems to depend on the presence of a 'while' loop.
-Executed manually without a loop, it behaves as expected:
-
-$ sleep 10 & PID=$!
-$ kill -0 $PID
-$ kill -0 $PID
-[...etc...]
-$ kill -0 $PID
-[1] + Done                       sleep 10
-$ kill -0 $PID
-dash: 11: kill: No such process
-
-Executed with a loop it's infinite even in an interactive shell, but
-only the first time around:
-
-$ sleep 10 & PID=$!
-$ while kill -0 $PID; do :; done
-^C
-[1] + Done                       sleep 10
-$ while kill -0 $PID; do :; done
-dash: 15: kill: No such process
-
-Strange behaviour and certainly looks like a rather obscure bug.
-
-> ash-signals/savetrap.tests
->     `trap` does not work as expected
-
-Again, the SIG prefix is not required to be supported in POSIX (see above).
-
-Unfortunately, according to POSIX, the feature that a subshell
-containing only a single "trap" command with no operands inherits the
-parent shell's traps so that they can be stored like save_traps=$(trap),
-is optional! Hence this can't be considered a bug in dash, although I'd
-certainly like to submit it as a feature request.
-
-POSIX:
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_28
-"When a subshell is entered, traps that are not being ignored shall be
-set to the default actions, except in the case of a command substitution
-containing only a single trap command, when the traps need not be
-altered. Implementations may check for this case using only lexical
-analysis [...]."
-
-Only bash, yash, AT&T ksh93 and busybox ash currently support this
-optional feature. This makes it extremely inconvenient to store the
-output of 'trap' in a variable in a cross-platform manner.
-
-(In my cross-platform shell library, modernish, which offers stack-based
-traps, I've had to implement a workaround involving the atomic,
-parallel-proof creation of a temporary file. Since 'mktemp' isn't
-cross-platform either, that has been an interesting exercise involving
-output redirection under 'set -C' in a subshell.)
-
-> ash-signals/sigint1.tests
->     trap "exit 0" SIGINT - does not like name "SIGINT". "INT" works.
-
-Not a bug. The SIG prefix is an optional extension. Only "INT" without
-the prefix is mandated by POSIX.
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_28
-"The condition can be EXIT, 0 (equivalent to EXIT), or a signal
-specified using a symbolic name, without the SIG prefix, as listed in
-the tables of signal names in the <signal.h> header defined in XBD
-Headers; for example, HUP, INT, QUIT, TERM. Implementations may permit
-names with the SIG prefix or ignore case in signal names as an extension."
-
-> ash-signals/signal4.tests
->     trap "echo Trapped" BADNAME TERM - abort seeing BADNAME.
->     bash complains, but sets the trap for the second signal.
-
-I don't see how this is a bug.
-
-> ash-signals/signal8.tests
->     "kill %1" in non-interactive shell does not find
->     previously backgrounded task.
-
-Not a bug. '%1' is a job control job ID, but in a non-interactive shell
-there's no job control. Either 'set -m' to turn on job control first
-(and deal with extra terminal clutter), or just use "$!" to kill by PID.
-
-> ash-vars/var-utf8-length.tests
->     ${#VAR} counts unicode chars in bash
-
-dash does not support unicode; AFAIK, this is a design choice (I'm not a
-developer).
-
-> ash-vars/var_unbackslash.tests
->     b=-$a-\t-\\-\"-\`-\--\z-\*-\?-
->     b="-$a-\t-\\-\"-\`-\--\z-\*-\?-"
->     b='-$a-\t-\\-\"-\`-\--\z-\*-\?-'
->     b1=$b
->     "b1=$b"
->     You can imagine... not everything went well here...
-
-Again, this is probably down to legitimate differences in the
-notoriously unportable "echo" builtin. Test this using printf instead.
-
-> ash-vars/var_unbackslash.tests
-
-ITYM ash-vars/var_unbackslash1.tests
-
->     echo Forty two:$\
->     (\
->     (\
->     42\
->     )\
->     )
->     dash says: Syntax error: Missing '))'
-
-Yes, but it's not clear to me that it shouldn't.
-
-Hmm... maybe this is indeed a bug:
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_01
-"A <backslash> that is not quoted shall preserve the literal value of
-the following character, with the exception of a <newline>. If a
-<newline> follows the <backslash>, the shell shall interpret this as
-line continuation. The <backslash> and <newline> shall be removed before
-splitting the input into tokens. Since the escaped <newline> is removed
-entirely from the input and is not replaced by any white space, it
-cannot serve as a token separator."
-
-So, unless I'm misreading this, it looks like backslashes need to be
-parsed before *any* other kind of lexical analysis.
-
-
-I hope some of the above was useful.
-
-- M.
-
-
+--------------A40A70E4B58CBDCB1B24AE14--
