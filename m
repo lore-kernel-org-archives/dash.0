@@ -1,105 +1,131 @@
-From: Tim Ruehsen <tim.ruehsen@gmx.de>
-Subject: Re: ':' noop results in ':: not found'
-Date: Fri, 28 Oct 2016 15:08:15 +0200
-Message-ID: <1749484.J6nWIO8AN1@blitz-lx>
-References: <56849947.Cgj98o2q7x@blitz-lx> <c5b4a25d-bdf6-eb44-2401-c9af897f9b23@gigawatt.nl>
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Subject: Re: [BUG] Interactive (d)ash exits on assigning to readonly from
+ 'command eval'
+Date: Fri, 28 Oct 2016 15:55:59 +0200
+Message-ID: <CAK1hOcO25fYP71DRxk=Dga5UZ6=FfmdDHTj6AWNNGSu_J0B+Dw@mail.gmail.com>
+References: <177dba07-fb53-4958-3455-e047c7f32ee6@inlv.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart7020303.XagNDhLkTl"; micalg="pgp-sha512"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mo4-p05-ob.smtp.rzone.de ([81.169.146.183]:29654 "EHLO
-        mo4-p05-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757923AbcJ1NIZ (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 28 Oct 2016 09:08:25 -0400
-In-Reply-To: <c5b4a25d-bdf6-eb44-2401-c9af897f9b23@gigawatt.nl>
+Received: from mail-qk0-f195.google.com ([209.85.220.195]:35638 "EHLO
+        mail-qk0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753243AbcJ1N4V (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 28 Oct 2016 09:56:21 -0400
+Received: by mail-qk0-f195.google.com with SMTP id v138so2198373qka.2
+        for <dash@vger.kernel.org>; Fri, 28 Oct 2016 06:56:20 -0700 (PDT)
+In-Reply-To: <177dba07-fb53-4958-3455-e047c7f32ee6@inlv.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org
+To: Martijn Dekker <martijn@inlv.org>, Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org, busybox <busybox@busybox.net>
 
---nextPart7020303.XagNDhLkTl
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+This will probably be mangled by gmail, but here is the proposed fix:
 
-On Friday, October 28, 2016 1:22:20 PM CEST Harald van Dijk wrote:
-> On 28/10/16 12:54, Tim Ruehsen wrote:
-> > Hi,
-> > 
-> > maybe you can enlighten me :-)
-> > 
-> > I try to use dash (0.5.8-2.3) on Debian unstable for executing ./configure
-> > scripts. Since Debian builds with --disable-lineno, all ./configure
-> > scripts
-> > silently fall back to bash (I created bug report #842242 to get this
-> > fixed).
-> As you found there, this is intentional, specifically to force configure
-> scripts to continue to be run with bash, which is what happened with
-> older dash versions. I asked at the time why they don't just call bash
-> explicitly (bash configure instead of ./configure) if that's the goal,
-> but didn't get a response.
-> 
-> > Next I rebuilt the package from the (Debian) sources without
-> > --disable-lineno and installed it. Now I see error messages from dash
-> > when it comes to the do nothing operator :.
-> > 
-> > $ dash -c 'test -n "a" && :'
-> > dash: 1: :: not found
-> > $ echo $?
-> > 127
-> > 
-> > $ bash -c 'test -n "a" && :'
-> > $ echo $?
-> > 0
-> > 
-> > Since this : construct is wildly used and I know that dash on other
-> > systems
-> > work with it, I wonder what is wrong here.
-> > 
-> > Is there a known bug, maybe fixed on recent dash versions ?
-> > Or has this some simple reason my stupidity doesn't see ?
-> 
-> This is likely to happen if you have the LC_ALL environment variable set
-> when building dash, and I can reproduce your results with 0.5.8 by
-> setting LC_ALL to en_GB.UTF-8. It was fixed in 0.5.9. (Specifically,
-> where a fixed sort order was needed, 0.5.8 only forced LC_COLLATE=C, but
-> that still allowed LC_ALL to override it.)
+Date: Fri, 28 Oct 2016 15:43:50 +0200
+Subject: [PATCH] ash: fix interactive "command eval STRING" exiting on errors.
 
-Harald !!!
-That's it !
-I wish you could see me grinning from ear to ear !
+This bug is also present in current dash
 
-> dash won't be the only program that has problems with this; if you're
-> building software yourself, setting LANG should generally be okay, but
-> LC_ALL is best avoided. Unless you're doing it specifically to find and
-> report/fix bugs, anyway.
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ shell/ash.c                             | 25 ++++++++++++++++++++++++-
+ shell/ash_test/ash-vars/readonly1.right |  2 ++
+ shell/ash_test/ash-vars/readonly1.tests |  7 +++++++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
+ create mode 100644 shell/ash_test/ash-vars/readonly1.right
+ create mode 100755 shell/ash_test/ash-vars/readonly1.tests
 
-In fact, I use LC_ALL to find bugs. Especially turkish and greek have some 
-nifty casing pitfalls ;-)
+diff --git a/shell/ash.c b/shell/ash.c
+index 1ef02b8..fe11245 100644
+--- a/shell/ash.c
++++ b/shell/ash.c
+@@ -2180,6 +2180,7 @@ setvareq(char *s, int flags)
+             if (flags & VNOSAVE)
+                 free(s);
+             n = vp->var_text;
++            exitstatus = 1;
+             ash_msg_and_raise_error("%.*s: is read only",
+strchrnul(n, '=') - n, n);
+         }
 
-Thank you so much, Harald !
+@@ -9599,7 +9600,7 @@ evalcommand(union node *cmd, int flags)
+         if (evalbltin(cmdentry.u.cmd, argc, argv, flags)) {
+             if (exception_type == EXERROR && spclbltin <= 0) {
+                 FORCE_INT_ON;
+-                break;
++                goto readstatus;
+             }
+  raise:
+             longjmp(exception_handler->loc, 1);
+@@ -12280,6 +12281,10 @@ expandstr(const char *ps)
+ static int
+ evalstring(char *s, int flags)
+ {
++    struct jmploc *volatile savehandler = exception_handler;
++    struct jmploc jmploc;
++    int ex;
++
+     union node *n;
+     struct stackmark smark;
+     int status;
+@@ -12289,6 +12294,19 @@ evalstring(char *s, int flags)
+     setstackmark(&smark);
 
-Tim
+     status = 0;
++    /* On exception inside execution loop, we must popfile().
++     * Try interactively:
++     *    readonly a=a
++     *    command eval "a=b"  # throws "is read only" error
++     * "command BLTIN" is not supposed to abort (even in non-interactive use).
++     * But if we skip popfile(), we hit EOF in eval's string, and exit.
++     */
++    savehandler = exception_handler;
++    exception_handler = &jmploc;
++    ex = setjmp(jmploc.loc);
++    if (ex)
++        goto out;
++
+     while ((n = parsecmd(0)) != NODE_EOF) {
+         int i;
 
---nextPart7020303.XagNDhLkTl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+@@ -12299,10 +12317,15 @@ evalstring(char *s, int flags)
+         if (evalskip)
+             break;
+     }
++ out:
+     popstackmark(&smark);
+     popfile();
+     stunalloc(s);
 
------BEGIN PGP SIGNATURE-----
++    exception_handler = savehandler;
++    if (ex)
++                longjmp(exception_handler->loc, ex);
++
+     return status;
+ }
 
-iQIcBAABCgAGBQJYE02/AAoJEAgwLbaiZwQo/cYP+wfir95v382aHX9Z43o6TJoE
-XdZmzV8RMDZyeSvxame9sviKJm6oFogZNR6MTWkcjc7uLsd/dndHZuzvlO6p+2Ow
-wvUY9QnfB9+BJiR8tfyBig7DZmkqu7CCeQSbcStzV8xwFYJCWzYKnH7RypC8jeCR
-V0bHEnB2cNpcfVjxOfL0bshr+f18CQ9uxBsCd/qvtSHAFXhmjZ1/THokWC/xsM4e
-xaMzJpx8eSUXhYU3QgC5DHNDlwl79uX0YgdLGHgvWPSuaux/pRKCxqFDulMk+2NP
-QFwliUW0m6Ur6lFc4MJlh3g6xmJfLhhPrtx+9qcqXTrk50W+KIkQc8m5xDwWb00a
-AfzV+wBI9MWMQSwa1XpQe6SjfvuC09SreP7ivQUcTFHHtmoZlE7X93huFGFYVdG9
-4tcTfeqHs6NFY0B5A8v6e5p1/VrrBLa6dEJUuQ+f1gJHvCuCdPTjxEZI3sKa12T1
-w5Wvfi78iQ63b55phOMaUAEtHzmvP31LYGL2o/c9LOaftWFGXlXypjxzHBeP/kQm
-Bh2YyQm8oyAl4QXAosdABsjG2SZpuQltWW/G/ntCv5GOUCxUip8iysKYgZp0k42A
-tpU9JYi5QQrEHDhJoRy9JSMc/i8jHMh3GXiZhECN8EzRjpVJQS9u8E1rxKi67/rd
-gIClDn5RVGLm20L/Dh6l
-=sNhc
------END PGP SIGNATURE-----
-
---nextPart7020303.XagNDhLkTl--
-
+diff --git a/shell/ash_test/ash-vars/readonly1.right
+b/shell/ash_test/ash-vars/readonly1.right
+new file mode 100644
+index 0000000..2b363e3
+--- /dev/null
++++ b/shell/ash_test/ash-vars/readonly1.right
+@@ -0,0 +1,2 @@
++One:1
++One:1
+diff --git a/shell/ash_test/ash-vars/readonly1.tests
+b/shell/ash_test/ash-vars/readonly1.tests
+new file mode 100755
+index 0000000..81b461f
+--- /dev/null
++++ b/shell/ash_test/ash-vars/readonly1.tests
+@@ -0,0 +1,7 @@
++readonly bla=123
++# Bare "eval bla=123" should abort ("eval" is a special builtin):
++(eval bla=123 2>/dev/null; echo BUG)
++echo One:$?
++# "command BLTIN" disables "special-ness", should not abort:
++command eval bla=123 2>/dev/null
++echo One:$?
+-- 
+2.9.2
