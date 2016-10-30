@@ -1,78 +1,44 @@
-From: "Paul Tsang" <haochenghk1987@163.com>
-Subject: =?utf-8?B?UmU76aaZ5riv5LiA6Iis6LS45piT6L+b5Y+j5Yiw5aSn6Zm477yMMeWZuOiyqOS7peS4ig==?=
-        =?utf-8?B?5LqM5aSp5Y+v5Yiw5aSn6Zm444CC?=
-Date: Sun, 30 Oct 2016 22:07:33 +0800
-Message-ID: <20161030220745832170@yun151.com>
-Reply-To: <haochenghk1987@163.com>
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Subject: Re: [BUG] Interactive (d)ash exits on assigning to readonly from
+ 'command eval'
+Date: Sun, 30 Oct 2016 18:32:20 +0100
+Message-ID: <CAK1hOcPrFvLy=C9La+69_N2w22XWp8stGPR9S8+TxyVNOeYe-Q@mail.gmail.com>
+References: <177dba07-fb53-4958-3455-e047c7f32ee6@inlv.org>
+ <CAK1hOcO25fYP71DRxk=Dga5UZ6=FfmdDHTj6AWNNGSu_J0B+Dw@mail.gmail.com> <501f83a0-9a46-f4af-dc56-ba8db958bad1@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from [61.176.221.2] ([61.176.221.2]:4616 "EHLO mail.yun151.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751012AbcJ3OIX (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 30 Oct 2016 10:08:23 -0400
-Received: from localhost by mail.yun151.com (MDaemon PRO v10.1.1)
-        with ESMTP id md50159501378.msg
-        for <dash@vger.kernel.org>; Sun, 30 Oct 2016 22:07:52 +0800
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:34472 "EHLO
+        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754458AbcJ3Rcm (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 30 Oct 2016 13:32:42 -0400
+Received: by mail-qt0-f195.google.com with SMTP id l20so453412qta.1
+        for <dash@vger.kernel.org>; Sun, 30 Oct 2016 10:32:41 -0700 (PDT)
+In-Reply-To: <501f83a0-9a46-f4af-dc56-ba8db958bad1@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: Martijn Dekker <martijn@inlv.org>, Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org, busybox <busybox@busybox.net>
 
-RGVhciBTaXIvTWlzcw0KVGhpcyBpcyB0aGUgZS1tYWlsIGZyb20gUGF1bCBvZiBIQU9DSElORyBJ
-TlQnTCBMT0dJU1RJQ1MgTFREIGluIENoaW5hLiBPdXIgY29tcGFueSBpcyBhIHdlbGwtc3RhZmZl
-ZCBmcmVpZ2h0IGZvcndhcmRpbmcgYW5kIGxvZ2lzdGljcyBzZXJ2aWNlIGNvbXBhbnkgbG9jYXRl
-ZCBpbiBTaGVuemhlbi9Eb25nZ3Vhbi9HdWFuZ3pob3UvSHVpWmhvdS9aaG9uZ3NoYW4gR3VhbmdE
-b25nIFByb3ZpbmNlIGNoaW5h77yMYW5kIHByb3ZpZGUgc2FmZXR5LCBjb252ZW5pZW50IGFuZCBz
-cGVlZHkgbG9naXN0aWMgc2VydmljZS4gQXMgYSB5b3VuZyBhbmQgdmlicmFudCBjb21wYW55ICx3
-ZSBhcmUgYWxsIGZ1bGwgb2YgZW50aHVzaWFzbSBhbmQgcG93ZXIuU3VyZWx5LGl0IGlzIGd1YXJh
-bnRlZWQgd2Ugd2lsbCBwcm92aWRlIHRoZSBiZXN0IHNlcnZpY2UgZm9yIGltcG9ydCBhbmQgZXhw
-b3J0IGJvdGggb2Ygb2NlYW4gYW5kIGFpciBmcmVpZ2h0IC5UbyBtZW50aW9uIHdpdGggLFdlJ3Zl
-IGdvdCBub3Qgb25seSBhIGdyZWF0IGFkdmFudGFnZSBpbiB0aGUgc3BlY2lhbCBjb250YWluZXIg
-dHJhbnNwb3J0YXRpb24gaW4gYWxsIGxpbmVzIG92ZXIgdGhlIHdvcmxkLGJ1dCB3ZSBhbHNvIGhh
-dmUgcXVpdGUgYSBmZXcgc2hpcHBpbmcgbGluZXMgICBpbmNsdWRpbmc6WklNLENTQ0wsRU1DLFdI
-TCxPT0NMLEtNVEMsWU1MLEFOTCxITU0gYW5kIHNvIG9uIC4NClNwZWNpZmljYXRpb25zDQoxLklt
-cG9ydCBhbmQgZXhwb3J0IHNlcnZpY2UNCjIuV2FyZWhvdXNpbmcgYW5kIGxvZ2lzdGljcw0KMy5P
-dmVyIDEwIHllYXJzIG9mIGV4cGVyaWVuY2UNCjQudGhlIHN0cm9uZ2VzdCBhYmlsaXR5IG9mIEN1
-c3RvbXMgQ2xlYXJhbmNlDQo1LkRvb3IgdG8gRG9vciBkZWxpdmVyeSAoZnJvbSBob25na29uZyB0
-byBjaGluYW1haW5sYW5kKS8oZnJvbSBjaGluYW1haW5sYW5kIHRvIGhvbmdrb25nICkNCjYuIHBy
-b2Zlc3Npb25hbCBpbXBvcnQgbG9naXN0aWNzDQo3LiBDb2xsZWN0aW5nLXBheWluZyBzZXJ2aWNl
-Ow0KV2Ugb2ZmZXI6DQoxLkN1c3RvbXMgY2xlYXJhbmNlDQoyLkNvbW1vZGl0eSBjb25zb2xpZGF0
-aW9uDQozLkRvbWVzdGljIHRyYW5zcG9ydGF0aW9uDQo0LkNvbmNlYWwgaWRlbnRpdHkgb2YgdHJ1
-ZSBzaGlwcGVyIG9yIHJlYWwgY29uc2lnbmVlDQo1LkV4cG9ydCBMaWNlbmNlDQo2LkZyZWlnaHQg
-Y29sbGVjdA0KSWYgeW91IGhhdmUgYW55IHJlcXVpcmVtZW50IHdlIGNhbiBkbyBmb3IgeW91LCBw
-bGVhc2Ugc2VudCBlLW1haWwgKCBIQU9DSEVOR0hLQFlBSE9PLkNPTS5ISykgYXMgc29vbiBhcyBw
-b3NzaWJsZS4gSG9waW5nIHdlIGNhbiBlc3RhYmxpc2ggdGhlIHdpbuKAlXdpbiBjb29wZXJhdGlv
-biBsYXRlciBmb3IgYSBsb25nIHRpbWUuIFRoYW5rIGZvciByZWFkaW5nIG15IGUtbWFpbC4NCg0K
-DQrmnKzlhazlj7jntpPnh5/lpKfpmbjlkozpppnmuK/kuYvplpPmlaPpm5zosqjlvoDov5Tnianm
-tYHmnI3li5ku6aaZ5riv5LiK6LKo5aSn6Zm45Lul5b+r5Lu25oiW5LiA6Iis6LK/5piT5aCx6Zec
-5pa55byP5Yiw6LKo5aSn6Zm45ZCE55yB5biC77yM54K65rKS5ZCI5ZCM5omL5YaK5aCx6Zec55qE
-5a6i5oi25o+Q5L6b5L6/5Yip44CB6aCG5pqi44CB5a6J5YWo55qE5LiA56uZ5byP5pyN5YuZLuac
-rOWFrOWPuOmmmea4r+aUtuiyqOWcsOWdgOWmguS4i++8mg0KMS4g6aaZ5riv5paw55WM6JG15raM
-6JG15Zac6KGXMS0xMeWPt+i+vuWIqeWbvemZheS4reW/gyANCjIu6aaZ5riv5Lmd6b6N54Gj5a6P
-6ZaL6YGTMTXomZ/kuZ3pvo3ngaPlt6Xmpa3kuK3lv4M55qiTICANCjMuIOmmmea4r+S5nem+mea5
-vuWQr+WFtOmBkzLlj7flpKrlubPmtIvotLjmmJPkuK3lv4MxNTE25a6kDQo0LiDokbXmtozlpKfo
-v57mjpLpgZMxNDQtMTUw5Y+36YeR5Liw5bel5Lia5aSn5Y6m5LiA5pyf5Zyw5LiLICANCjUuIOS5
-nem+mea5vuS4tOWFtOihl+e+jue9l+S4reW/gzMy5Y+35LiA5pyf5Zyw5LiLDQo2LiDokbXmtozo
-tKfmn5znoIHlpLTot681MS02M+WPt+iRtemhuuW3peS4muS4reW/gzEx5qW8DQo3LiDpppnmuK/o
-kbXmtozljY7mmJ/ooZc4LTEw5Y+35Y2O6L6+5Lit5b+DQuW6pzgwMS04MDLlrqQNCjguIOaWsOeV
-jOiRtea5p+Wci+eRnui3rzg46Jmf5paw6LGQ5bel5qWt5Lit5b+DQeW6pzPmqJMzMDXlrqQNCjku
-6JG15rmn5omT56Oa5Z2q6KGXNzDomZ/pupfmmbbkuK3lv4NC5bqnDQoNCuacrOWFrOWPuOW4uOim
-i+Wkp+aJuemHj+mAsuWHuuWPo+eUouWTgeaciee6see6v+OAgeW4g+aWmeOAgeacjeijheOAgeeJ
-m+earue0meOAgeaLiemPiOOAgee0meizquW9qeebkuOAgeacqOijveWMheijneebkuOAgeiqquaY
-juabuOOAgUE057SZ44CB5Lq66YCg6Z2p44CB5YeP6YCf5Zmo44CB5Yqg6YCf5Zmo44CB6b2/6L2u
-77yM6ZiA6Zeo44CB5rCU57y45Y+K5rCU5Yqo6YWN5Lu244CB5aGR6IO257KS44CB5qmh6IO25Y6f
-5p2Q5paZ44CB56GF6IO25Y6f5p2Q5paZ44CB5YyW5bel5Y6f5paZ44CB546755KD6IO244CB5a+G
-5bCB6IO244CB54Ot54aU6IO244CB57KY5ZCI5YmC44CB6L+b5Y+j5ram5ruR5rK544CB5ram5ruR
-6ISC44CB55S15a2Q6IO257q444CB54Or6YeR57q444CB5rKZ57q/44CB6ZOd566U44CB5aOB57q4
-44CB5rC06ZK744CB5LiN5bmy6IO257q444CB56Kz5bim44CB6Imy5bim44CB6IO26Iac44CB6I+y
-5p6X44CB56Kz57KJ44CB5YGP5YWJ54mH44CB5rK55ryG44CB5raC5paZ562JDQoNCuaXtuaViOaW
-uemdou+8muS7iuaXpeWcqOmmmea4r+aPkOi0p++8jOesrOS6jOaXpeiyqOa4hemXnOWIsOadseiO
-nu+8jOWDueagvOS9juiHs1JNQjEwL0tHDQoNCg0KQkVTVCBSRUdBUkRTDQrmm77nlJ8gIA0KSEFP
-Q0hJTkcgSU5UJ0wgTE9HSVNUSUNTIExURA0KKE0uUCk4Ni0xMzQzMDg3MzExNw0KKFRFTCk4NTIt
-MzE3NjM4OTENCijlvq7kv6EpMTM0MzA4NzMxMTcNCihRUSkyOTI2NDQyNjkyDQooU0tZUEUpSEFP
-Q0hFTkdISzE5ODcNCihFLU1BSUwpSEFPQ0hFTkdISzE5ODdAMTYzLkNPTQ0K
+On Sat, Oct 29, 2016 at 8:22 PM, Harald van Dijk <harald@gigawatt.nl> wrote:
+> On 28/10/16 15:55, Denys Vlasenko wrote:
+>>
+>> This will probably be mangled by gmail, but here is the proposed fix:
+>
+>
+> This looks about the right approach, but it causes problems in subshells, a
+> double free:
+>
+> $ ./busybox ash -c 'readonly x; echo $(command eval x=2)'
+> ash: eval: line 1: x: is read only
+> *** Error in `./busybox': free(): invalid pointer: 0x000055a784c1c300 ***
+> [...]
+>
+> That's with busybox checked out from git (commit
+> 9db74e49e5b462089c6eec0182d819c0d4708e57), where your patch is applied,
+> completely unpatched and completely default config.
+>
+> I omitted the backtrace output, but it's popfile() getting called, after
+> popallfiles() has already been called.
 
-
-
+Thanks! Hopefully fixed in git, please try it.
