@@ -1,89 +1,45 @@
-From: Thomas DEBESSE <thomas.debesse@gmail.com>
-Subject: problem with utf8 name completion
-Date: Tue, 8 Nov 2016 04:37:23 +0100
-Message-ID: <CALpuBKxcOLBXGx81ZheagX75GSh4d63M1SYnjwTWHjM3m3VJpg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: Andreas Bofjall <andreas@gazonk.org>
+Subject: [PATCH] trap: fix memory leak in exitshell()
+Date: Mon, 21 Nov 2016 22:40:52 +0100
+Message-ID: <20161121214052.32428-1-andreas@gazonk.org>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-yw0-f181.google.com ([209.85.161.181]:35546 "EHLO
-        mail-yw0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752426AbcKHDid (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 7 Nov 2016 22:38:33 -0500
-Received: by mail-yw0-f181.google.com with SMTP id i145so66293441ywg.2
-        for <dash@vger.kernel.org>; Mon, 07 Nov 2016 19:37:24 -0800 (PST)
+Received: from h-85-24-133-13.na.cust.bahnhof.se ([85.24.133.13]:33086 "HELO
+        gazonk.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+        id S1754248AbcKUVsh (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 21 Nov 2016 16:48:37 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: DASH mailing list <dash@vger.kernel.org>
+To: dash@vger.kernel.org
+Cc: Andreas Bofjall <andreas@gazonk.org>
 
-Hi, I discovered dash has problems with some UTF-8 characters, I'm
-running dash 0.5.8
-See this proof of concept:
+After dash had executed the exit trap handler, the trap was reset but
+the pointer was never freed. This leak can be demonstrated by running
+dash through valgrind and executing the following shell script:
 
-$ echo $LANG
-C.UTF-8
+	foo() {
+	    true
+	}
+	trap foo EXIT
 
-$ cat proof.sh
-#! /bin/sh
+Fix by properly freeing the trap pointer in exitshell().
 
-listO () {
-    # latin 'o'
-    echo 'o'
-    # greek 'o' (omicron)
-    echo '=CE=BF'
-    # cyrillic 'o'
-    echo '=D0=BE'
-}
+Signed-off-by: Andreas Bofjall <andreas@gazonk.org>
+---
+ src/trap.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-for i in $(listO)
-do
-    for j in $(listO)
-    do
-        for k in $(listO)
-        do
-            touch "${i}${j}${k}"
-        done
-    done
-done
+diff --git a/src/trap.c b/src/trap.c
+index edb9938..5418b07 100644
+--- a/src/trap.c
++++ b/src/trap.c
+@@ -389,6 +389,7 @@ exitshell(void)
+ 		trap[0] = NULL;
+ 		evalskip = 0;
+ 		evalstring(p, 0);
++		ckfree(p);
+ 	}
+ out:
+ 	/*
+-- 
+2.10.2
 
-ls -1 [o=CE=BF=D0=BE][o=CE=BF=D0=BE][o=CE=BF=D0=BE]
-
-#EOF
-
-$ dash proof.sh
-ooo
-
-$ bash proof.sh
-ooo
-oo=CE=BF
-oo=D0=BE
-o=CE=BFo
-o=CE=BF=CE=BF
-o=CE=BF=D0=BE
-o=D0=BEo
-o=D0=BE=CE=BF
-o=D0=BE=D0=BE
-=CE=BFoo
-=CE=BFo=CE=BF
-=CE=BFo=D0=BE
-=CE=BF=CE=BFo
-=CE=BF=CE=BF=CE=BF
-=CE=BF=CE=BF=D0=BE
-=CE=BF=D0=BEo
-=CE=BF=D0=BE=CE=BF
-=CE=BF=D0=BE=D0=BE
-=D0=BEoo
-=D0=BEo=CE=BF
-=D0=BEo=D0=BE
-=D0=BE=CE=BFo
-=D0=BE=CE=BF=CE=BF
-=D0=BE=CE=BF=D0=BE
-=D0=BE=D0=BEo
-=D0=BE=D0=BE=CE=BF
-=D0=BE=D0=BE=D0=BE
-
-The expected result is the one provided by bash, as they are 3
-different characters.
-
---=20
-Thomas DEBESSE
