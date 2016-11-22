@@ -1,78 +1,62 @@
-From: "Matias A. Fonzo" <selk@dragora.org>
-Subject: --with-libedit errors
-Date: Mon, 21 Nov 2016 20:36:43 -0300
-Message-ID: <20161121203643.68a26b1a@rafaela>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: [PATCH] trap: fix memory leak in exitshell()
+Date: Tue, 22 Nov 2016 22:51:03 +0100
+Message-ID: <20161122215103.GA91593@stack.nl>
+References: <20161121214052.32428-1-andreas@gazonk.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
- boundary="Sig_/xVLRdBgwdF6.t3UTL53_rgQ"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from dragora.org ([69.61.93.52]:38640 "EHLO mail.dragora.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752774AbcKUXck (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 21 Nov 2016 18:32:40 -0500
-Received: from rafaela (unknown [200.3.217.68])
-        by mail.dragora.org (Postfix) with ESMTPSA id 9A0D7342239
-        for <dash@vger.kernel.org>; Mon, 21 Nov 2016 23:24:30 +0000 (UTC)
+Received: from mailout05.stack.nl ([131.155.140.202]:44640 "EHLO
+        mailout.stack.nl" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751433AbcKVVvH (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 22 Nov 2016 16:51:07 -0500
+Content-Disposition: inline
+In-Reply-To: <20161121214052.32428-1-andreas@gazonk.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Andreas Bofjall <andreas@gazonk.org>
+Cc: dash@vger.kernel.org
 
---Sig_/xVLRdBgwdF6.t3UTL53_rgQ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, Nov 21, 2016 at 10:40:52PM +0100, Andreas Bofjall wrote:
+> After dash had executed the exit trap handler, the trap was reset but
+> the pointer was never freed. This leak can be demonstrated by running
+> dash through valgrind and executing the following shell script:
 
-Hi there,
+> 	foo() {
+> 	    true
+> 	}
+> 	trap foo EXIT
 
-I was trying to compile dash against libedit under a native musl-based
-environment, using --with-libedit.  In the first instance, I was getting
-this error:
+> Fix by properly freeing the trap pointer in exitshell().
 
-  http://sprunge.us/BKWK
+> Signed-off-by: Andreas Bofjall <andreas@gazonk.org>
+> ---
+>  src/trap.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/src/trap.c b/src/trap.c
+> index edb9938..5418b07 100644
+> --- a/src/trap.c
+> +++ b/src/trap.c
+> @@ -389,6 +389,7 @@ exitshell(void)
+>  		trap[0] = NULL;
+>  		evalskip = 0;
+>  		evalstring(p, 0);
+> +		ckfree(p);
+>  	}
+>  out:
+>  	/*
 
-I solved this issue adding #include <getopt.h> (suggested by Laurent
-Bercot) to the file src/histedit.c -- as my patch shows at:
+This patch will shut up valgrind in the common case, but does not handle
+the general case. The command string may contain an error or invoke the
+exit builtin and in either case the command string will be leaked
+(SIGINT might be expected to have a similar effect, but behaves
+strangely from an EXIT trap in dash).
 
-  http://dragora.org/repo.fsl/artifact/068a14902e390487
+You can probably use the exception handling already present in the
+function to fix this. Note that ckfree() should only be used while
+INTOFF is in effect, both to avoid longjmp'ing out of free() and to
+ensure exactly one free in the presence of interruptions and errors.
 
-Next, I've started receiving this error messages:
-
-  http://sprunge.us/iQjf
-
-To sort out this problem I've removed the option --with-libedit, using
-LIBS=3D-ledit for the ./configure invocation.  "ldd" reports:
-
-  libedit.so.0 =3D> /lib/libedit.so.0 (0x7f2db97a3000)
-and
-  libncursesw.so.6 =3D> /lib/libncursesw.so.6 (0x7f2db954e000)
-
-Right now I have a working dash compiled with libedit support.  :-)
-
-Also, my default LDFLAGS has the value "-s" to strip all the symbols,
-but dash/configure does not seem to pick up the value...
-
-
---Sig_/xVLRdBgwdF6.t3UTL53_rgQ
-Content-Type: application/pgp-signature
-Content-Description: Firma digital OpenPGP
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQJ8BAEBCgBmBQJYM4ULXxSAAAAAAC4AKGlzc3Vlci1mcHJAbm90YXRpb25zLm9w
-ZW5wZ3AuZmlmdGhob3JzZW1hbi5uZXQzNUJEQjlENDZCNTZCNUZBQ0I2NDdDOUIz
-QUFGMUNFQzIwM0E5OUQ1AAoJEDqvHOwgOpnVnq0P/irnBW/Qz+u1icTOCd/Ku7QZ
-0DpqAdqQ7uPxy7ZAd0hTxK3c+3DqUOjAYmO+l0dVSov81ZzSmcULKSdHyf79E1GG
-pE77NOVtydXDQFSsLTnwAhMM3dtN4llQSgXtu34t9ykNWYiYbPTyn4ZUhWM3Es4l
-43t9wHVdflBPgNvzQGpD2Gm9PaKUFNpVbYxqOU9WZ0ZBVsK2PkfshKGccT/F2dhD
-s0Zhwz2EiUuJKfrUjrnVoyDCtXv+DWC7NN+k/q4SS6/q+fHTOFhAM4vzoKOwQnfK
-T0CFBikTKEzzwM+ojx9YX3DekvJz8Zd4WCNi4V4IEfoJOxiPSqBgwpNoQF3FmUkl
-oMmKlHhbkH+UDLvL5bEMFPC2T6ZDPeJBhcu5xXf8GYtbIh11J3ox+xZWwcV4ZvlW
-lyuuOjQkiqLE2dpxHegv0C30Z9b4M0+9GGt3RQ4eedFxjacQzmfZCNfNOyD0wRTS
-kYH4jaIegScOEKKQd6yPkCt6MWaRl2CrVFaBmvLeKQdCjQ1M3iG5rdLq5yD7qT1c
-+IvGOjrpjuPbVmbJ8NUfb21CbhgysqKA3LTE10otNveYui75t445k4h1tM3awA6G
-cvRlyMGoYXLU4mud3Z7ZdrtvmMcej/RT/kH6+jkrb7nMrlxQfBzypqL/aIyJLOog
-KfYGXEgc2Ds67ans1RRx
-=XI0w
------END PGP SIGNATURE-----
-
---Sig_/xVLRdBgwdF6.t3UTL53_rgQ--
+-- 
+Jilles Tjoelker
