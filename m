@@ -1,58 +1,76 @@
-From: Andreas Bofjall <andreas@gazonk.org>
-Subject: [PATCH v2] trap: fix memory leak in exitshell()
-Date: Thu,  1 Dec 2016 22:17:07 +0100
-Message-ID: <20161201211707.4710-1-andreas@gazonk.org>
+From: Mihail Konev <k.mvc@ya.ru>
+Subject: [PATCH] builtin: Fix 'echo --' handling
+Date: Mon, 19 Dec 2016 01:16:06 +0500
+Message-ID: <20161218201606.GA19607@localhost>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from h-85-24-133-13.na.cust.bahnhof.se ([85.24.133.13]:33630 "HELO
-        gazonk.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-        id S1751198AbcLAVRT (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 1 Dec 2016 16:17:19 -0500
+Received: from forward16p.cmail.yandex.net ([87.250.241.143]:33766 "EHLO
+        forward16p.cmail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753709AbcLRUXf (ORCPT
+        <rfc822;dash@vger.kernel.org>); Sun, 18 Dec 2016 15:23:35 -0500
+Received: from smtp1h.mail.yandex.net (smtp1h.mail.yandex.net [84.201.187.144])
+        by forward16p.cmail.yandex.net (Yandex) with ESMTP id EFC5921A1F
+        for <dash@vger.kernel.org>; Sun, 18 Dec 2016 23:16:15 +0300 (MSK)
+Received: from smtp1h.mail.yandex.net (localhost.localdomain [127.0.0.1])
+        by smtp1h.mail.yandex.net (Yandex) with ESMTP id CC70F8C0D5B
+        for <dash@vger.kernel.org>; Sun, 18 Dec 2016 23:16:15 +0300 (MSK)
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
-Cc: Andreas Bofjall <andreas@gazonk.org>
 
-After dash had executed the exit trap handler, the trap was reset but
-the pointer was never freed. This leak can be demonstrated by running
-dash through valgrind and executing the following shell script:
+Ignore first "--", as the end of options.
 
-	foo() {
-	    true
-	}
-	trap foo EXIT
+Breaks uses that expect 'echo' to output arguments verbatim, but
+fixes those that expect 'echo --' to do so (such as 'echo -- -n').
 
-Fix by properly freeing the trap pointer in exitshell().
-
-Signed-off-by: Andreas Bofjall <andreas@gazonk.org>
+Signed-off-by: Mihail Konev <k.mvc@ya.ru>
 ---
-v2: move ckfree() to out path
+ src/bltin/printf.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
- src/trap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/src/trap.c b/src/trap.c
-index edb9938..0824223 100644
---- a/src/trap.c
-+++ b/src/trap.c
-@@ -378,7 +378,7 @@ void
- exitshell(void)
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index a626cee2c60e..1b3df313f02d 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -450,20 +450,29 @@ int
+ echocmd(int argc, char **argv)
  {
- 	struct jmploc loc;
--	char *p;
-+	char *p = NULL;
+ 	int nonl;
++	int dashdash_met = 0;
  
- 	savestatus = exitstatus;
- 	TRACE(("pid %d, exitshell(%d)\n", getpid(), savestatus));
-@@ -391,6 +391,9 @@ exitshell(void)
- 		evalstring(p, 0);
- 	}
- out:
-+	INTOFF;
-+	ckfree(p);
-+	INTON;
- 	/*
- 	 * Disable job control so that whoever had the foreground before we
- 	 * started can get it back.
+-	nonl = *++argv ? equal(*argv, "-n") : 0;
++	nonl = (*++argv && !dashdash_met) ? equal(*argv, "-n") : 0;
+ 	argv += nonl;
+ 
+ 	do {
+-		int c;
+-
+-		if (likely(*argv))
+-			nonl += print_escape_str("%s", NULL, NULL, *argv++);
++		int c = 1;
++
++		if (likely(*argv)) {
++			if (unlikely(equal(*argv, "--") && !dashdash_met)) {
++				dashdash_met = 1;
++				c = 0;
++			} else
++				nonl += print_escape_str("%s", NULL, NULL, *argv);
++			argv++;
++		}
+ 		if (likely((nonl + !*argv) > 1))
+ 			break;
+ 
+-		c = *argv ? ' ' : '\n';
+-		out1c(c);
++		if (c) {
++			c = *argv ? ' ' : '\n';
++			out1c(c);
++		}
+ 	} while (*argv);
+ 	return 0;
+ }
 -- 
-2.10.2
+2.9.2
 
