@@ -1,28 +1,55 @@
-From: "dylopezm@contraloriadf.gob.mx" <dylopezm@contraloriadf.gob.mx>
-Subject: COMPLIMENT OF THE SEASON (READ AND REPLY)!!!
-Date: Mon, 9 Jan 2017 06:32:52 -0600 (CST)
-Message-ID: <150149100.3668004.1483965172563.JavaMail.zimbra@contraloriadf.gob.mx>
-Reply-To: STEVEN KING ROBERT <stevenking_r@yahoo.com>
+From: Michael Greenberg <Michael.Greenberg@pomona.edu>
+Subject: [PATCH] unset/null variables should expand to 0 during arithmetic
+ expansion
+Date: Thu, 19 Jan 2017 21:06:51 +0000
+Message-ID: <A7A04C3C-65D2-404B-B65F-0053A4D2E78C@pomona.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail1.contraloriadf.gob.mx ([187.141.34.35]:38614 "EHLO
-        contraloriadf.gob.mx" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932300AbdAIMj2 (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 9 Jan 2017 07:39:28 -0500
+Received: from esa2.pomona.iphmx.com ([68.232.143.226]:18098 "EHLO
+        esa2.pomona.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751349AbdASVNG (ORCPT <rfc822;dash@vger.kernel.org>);
+        Thu, 19 Jan 2017 16:13:06 -0500
+Content-Language: en-US
+Content-ID: <F1FD48CAFA43534BBB4C907B595625B8@pomona.edu>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
+To: "dash@vger.kernel.org" <dash@vger.kernel.org>
+Cc: Austin John Blatt <ajb22014@MyMail.pomona.edu>
 
-
-
-
-I have a proposal for your consideration and acceptance. Should you be interested, do reply back for more details.
-
-Note: I do not need your money.
-
-Regards
-
-STEVEN KING ROBERT
-Email: stevenking_r@yahoo.com
-invest@scanalloysbvllc.com
+SGksDQoNCkl0IHNlZW1zIGxpa2UgZGFzaCBoYXMgYSBzdWJ0bHkgaW5jb3JyZWN0IGFyaXRobWV0
+aWMgZXhwYW5zaW9uIGZvciB2YXJpYWJsZXMgdGhhdCBhcmUgdW5zZXQuIEZvciBleGFtcGxlLCBj
+b25zaWRlciB0aGUgZm9sbG93aW5nIHByb2dyYW06DQoNCnVuc2V0IHggOyBlY2hvICQoKHgrPTIp
+KQ0KDQpSdW5uaW5nIGJhc2ggb24gdGhpcyBwcm9ncmFtIGVjaG9lcyB0aGUgbnVtYmVyIDIgdG8g
+c3RhbmRhcmQgb3V0IGFuZCBzZXRzIHggdG8gMi4gUnVubmluZyBkYXNoIChnaXQgSEVBRC9yZWxl
+YXNlIDAuNS45LjEpIHlpZWxkcyBhbiBlcnJvcjoNCg0Kc3JjL2Rhc2g6IDE6IElsbGVnYWwgbnVt
+YmVyOiANCg0KTm93LCBiYXNoIGFuZCBkYXNoIGRpc2FncmVlaW5nIGlzbuKAmXQgc3VjaCBhIGJp
+ZyBkZWFsLiBCdXQgaXQgc2VlbXMgbGlrZSB0aGUgc3RhbmRhcmQgaW5kaWNhdGVzIGJhc2jigJlz
+IGRlZmF1bHRpbmcgaXMgY29ycmVjdCBmb3IgdW5zZXQgdmFyaWFibGVzLiBBY2NvcmRpbmcgdG8g
+PGh0dHA6Ly9wdWJzLm9wZW5ncm91cC5vcmcvb25saW5lcHVicy85Njk5OTE5Nzk5L3V0aWxpdGll
+cy9WM19jaGFwMDIuaHRtbCN0YWdfMThfMDZfMDQ+LCDigJx0aGUgYXJpdGhtZXRpYyBleHByZXNz
+aW9uIHNoYWxsIGJlIHByb2Nlc3NlZCBhY2NvcmRpbmcgdG8gdGhlIHJ1bGVzIGdpdmVuIGluIEFy
+aXRobWV0aWMgUHJlY2lzaW9uIGFuZCBPcGVyYXRpb25z4oCdLCB3aGljaCBzYXlzIOKAnGFsbCB2
+YXJpYWJsZXMgc2hhbGwgYmUgaW5pdGlhbGl6ZWQgdG8gemVybyBpZiB0aGV5IGFyZSBub3Qgb3Ro
+ZXJ3aXNlIGFzc2lnbmVkIGJ5IHRoZSBpbnB1dCB0byB0aGUgYXBwbGljYXRpb27igJ0gPGh0dHA6
+Ly9wdWJzLm9wZW5ncm91cC5vcmcvb25saW5lcHVicy85Njk5OTE5Nzk5L3V0aWxpdGllcy9WM19j
+aGFwMDEuaHRtbCN0YWdfMTdfMDFfMDJfMDE+Lg0KDQpUaGUgc3RhbmRhcmQgaXMgYSBsaXR0bGUg
+Yml0IHVuY2xlYXIgYWJvdXQgd2hhdCB0byBkbyBmb3IgdmFyaWFibGVzIHRoYXQgYXJlIHNldCB0
+byBudWxsIChvciBub24tbnVtZXJpYyB2YWx1ZXMpLiBJ4oCZZCBpbnRlcnByZXQgdGhlIHN0YW5k
+YXJkIGFzIGRlZmF1bHRpbmcgZm9yIHVuc2V0IHZhcmlhYmxlcywgaGF2aW5nIG51bGwgYW5kIG90
+aGVyIG5vbi1udW1lcmljIHN0cmluZ3MgY2F1c2Ugc29tZSBraW5kIG9mIGVycm9yLiBiYXNoLCBh
+cyB1c3VhbCwgZ29lcyB3ZWxsIGJleW9uZCB3aGF0IHRoZSBzdGFuZGFyZCBpbmRpY2F0ZXM6IGFu
+eSBub24tbnVtZXJpY2FsIHZhbHVlIGlzIGRlZmF1bHRlZCB0byAwLiBTbzoNCg0KeD0iIiA7IGVj
+aG8gJCgoeCs9MikpDQoNCng94oCceW/igJ0gOyBlY2hvICQoKHgrPTIpKQ0KDQpib3RoIHlpZWxk
+IDIhIElmIHlvdSBhc2sgbWUsIHRoYXTigJlzIGEgYnJpZGdlIHRvbyBmYXLigJRhbmQgYXNraW5n
+IGZvciBidWdzLg0KDQpJIHNob3VsZCBhZGQgdGhhdCBteSBzdHVkZW50IChBdXN0aW4gQmxhdHQs
+IENDLWVkKSBub3RpY2VkIHRoaXMgaXNzdWU7IEkgd3JvdGUgdGhlIGF0dGFjaGVkLCBzaW5nbGUt
+bGluZSBmaXguDQoNCkNoZWVycywNCk1pY2hhZWwNCg0KU2lnbmVkLW9mZi1ieTogTWljaGFlbCBH
+cmVlbmJlcmcgPG1pY2hhZWwuZ3JlZW5iZXJnQHBvbW9uYS5lZHU+DQrigJQNCmRpZmYgLS1naXQg
+YS9zcmMvdmFyLmMgYi9zcmMvdmFyLmMNCmluZGV4IGNjNmY3ZjIuLmUzNGY5Y2YgMTAwNjQ0DQot
+LS0gYS9zcmMvdmFyLmMNCisrKyBiL3NyYy92YXIuYw0KQEAgLTM1Myw3ICszNTMsNyBAQCBsb29r
+dXB2YXIoY29uc3QgY2hhciAqbmFtZSkNCiANCiBpbnRtYXhfdCBsb29rdXB2YXJpbnQoY29uc3Qg
+Y2hhciAqbmFtZSkNCiB7DQotCXJldHVybiBhdG9tYXgobG9va3VwdmFyKG5hbWUpID86IG51bGxz
+dHIsIDApOw0KKwlyZXR1cm4gYXRvbWF4KGxvb2t1cHZhcihuYW1lKSA/OiAiMCIsIDApOw0KIH0N
+CiANCiANCg0KIA0KDQoNCg==
