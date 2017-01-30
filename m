@@ -1,55 +1,46 @@
-From: Michael Greenberg <Michael.Greenberg@pomona.edu>
-Subject: [PATCH] unset/null variables should expand to 0 during arithmetic
+From: Martijn Dekker <martijn@inlv.org>
+Subject: Re: [PATCH] unset/null variables should expand to 0 during arithmetic
  expansion
-Date: Thu, 19 Jan 2017 21:06:51 +0000
-Message-ID: <A7A04C3C-65D2-404B-B65F-0053A4D2E78C@pomona.edu>
+Date: Mon, 30 Jan 2017 00:13:42 +0000
+Message-ID: <cc2914b7-c2f3-82a0-3b2a-6e4885c5f34f@inlv.org>
+References: <A7A04C3C-65D2-404B-B65F-0053A4D2E78C@pomona.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from esa2.pomona.iphmx.com ([68.232.143.226]:18098 "EHLO
-        esa2.pomona.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751349AbdASVNG (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 19 Jan 2017 16:13:06 -0500
-Content-Language: en-US
-Content-ID: <F1FD48CAFA43534BBB4C907B595625B8@pomona.edu>
+Received: from kahlil.inlv.org ([37.59.109.123]:50384 "EHLO kahlil.inlv.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750835AbdA3Aeg (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 29 Jan 2017 19:34:36 -0500
+In-Reply-To: <A7A04C3C-65D2-404B-B65F-0053A4D2E78C@pomona.edu>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "dash@vger.kernel.org" <dash@vger.kernel.org>
+To: Michael Greenberg <Michael.Greenberg@pomona.edu>, "dash@vger.kernel.org" <dash@vger.kernel.org>
 Cc: Austin John Blatt <ajb22014@MyMail.pomona.edu>
 
-SGksDQoNCkl0IHNlZW1zIGxpa2UgZGFzaCBoYXMgYSBzdWJ0bHkgaW5jb3JyZWN0IGFyaXRobWV0
-aWMgZXhwYW5zaW9uIGZvciB2YXJpYWJsZXMgdGhhdCBhcmUgdW5zZXQuIEZvciBleGFtcGxlLCBj
-b25zaWRlciB0aGUgZm9sbG93aW5nIHByb2dyYW06DQoNCnVuc2V0IHggOyBlY2hvICQoKHgrPTIp
-KQ0KDQpSdW5uaW5nIGJhc2ggb24gdGhpcyBwcm9ncmFtIGVjaG9lcyB0aGUgbnVtYmVyIDIgdG8g
-c3RhbmRhcmQgb3V0IGFuZCBzZXRzIHggdG8gMi4gUnVubmluZyBkYXNoIChnaXQgSEVBRC9yZWxl
-YXNlIDAuNS45LjEpIHlpZWxkcyBhbiBlcnJvcjoNCg0Kc3JjL2Rhc2g6IDE6IElsbGVnYWwgbnVt
-YmVyOiANCg0KTm93LCBiYXNoIGFuZCBkYXNoIGRpc2FncmVlaW5nIGlzbuKAmXQgc3VjaCBhIGJp
-ZyBkZWFsLiBCdXQgaXQgc2VlbXMgbGlrZSB0aGUgc3RhbmRhcmQgaW5kaWNhdGVzIGJhc2jigJlz
-IGRlZmF1bHRpbmcgaXMgY29ycmVjdCBmb3IgdW5zZXQgdmFyaWFibGVzLiBBY2NvcmRpbmcgdG8g
-PGh0dHA6Ly9wdWJzLm9wZW5ncm91cC5vcmcvb25saW5lcHVicy85Njk5OTE5Nzk5L3V0aWxpdGll
-cy9WM19jaGFwMDIuaHRtbCN0YWdfMThfMDZfMDQ+LCDigJx0aGUgYXJpdGhtZXRpYyBleHByZXNz
-aW9uIHNoYWxsIGJlIHByb2Nlc3NlZCBhY2NvcmRpbmcgdG8gdGhlIHJ1bGVzIGdpdmVuIGluIEFy
-aXRobWV0aWMgUHJlY2lzaW9uIGFuZCBPcGVyYXRpb25z4oCdLCB3aGljaCBzYXlzIOKAnGFsbCB2
-YXJpYWJsZXMgc2hhbGwgYmUgaW5pdGlhbGl6ZWQgdG8gemVybyBpZiB0aGV5IGFyZSBub3Qgb3Ro
-ZXJ3aXNlIGFzc2lnbmVkIGJ5IHRoZSBpbnB1dCB0byB0aGUgYXBwbGljYXRpb27igJ0gPGh0dHA6
-Ly9wdWJzLm9wZW5ncm91cC5vcmcvb25saW5lcHVicy85Njk5OTE5Nzk5L3V0aWxpdGllcy9WM19j
-aGFwMDEuaHRtbCN0YWdfMTdfMDFfMDJfMDE+Lg0KDQpUaGUgc3RhbmRhcmQgaXMgYSBsaXR0bGUg
-Yml0IHVuY2xlYXIgYWJvdXQgd2hhdCB0byBkbyBmb3IgdmFyaWFibGVzIHRoYXQgYXJlIHNldCB0
-byBudWxsIChvciBub24tbnVtZXJpYyB2YWx1ZXMpLiBJ4oCZZCBpbnRlcnByZXQgdGhlIHN0YW5k
-YXJkIGFzIGRlZmF1bHRpbmcgZm9yIHVuc2V0IHZhcmlhYmxlcywgaGF2aW5nIG51bGwgYW5kIG90
-aGVyIG5vbi1udW1lcmljIHN0cmluZ3MgY2F1c2Ugc29tZSBraW5kIG9mIGVycm9yLiBiYXNoLCBh
-cyB1c3VhbCwgZ29lcyB3ZWxsIGJleW9uZCB3aGF0IHRoZSBzdGFuZGFyZCBpbmRpY2F0ZXM6IGFu
-eSBub24tbnVtZXJpY2FsIHZhbHVlIGlzIGRlZmF1bHRlZCB0byAwLiBTbzoNCg0KeD0iIiA7IGVj
-aG8gJCgoeCs9MikpDQoNCng94oCceW/igJ0gOyBlY2hvICQoKHgrPTIpKQ0KDQpib3RoIHlpZWxk
-IDIhIElmIHlvdSBhc2sgbWUsIHRoYXTigJlzIGEgYnJpZGdlIHRvbyBmYXLigJRhbmQgYXNraW5n
-IGZvciBidWdzLg0KDQpJIHNob3VsZCBhZGQgdGhhdCBteSBzdHVkZW50IChBdXN0aW4gQmxhdHQs
-IENDLWVkKSBub3RpY2VkIHRoaXMgaXNzdWU7IEkgd3JvdGUgdGhlIGF0dGFjaGVkLCBzaW5nbGUt
-bGluZSBmaXguDQoNCkNoZWVycywNCk1pY2hhZWwNCg0KU2lnbmVkLW9mZi1ieTogTWljaGFlbCBH
-cmVlbmJlcmcgPG1pY2hhZWwuZ3JlZW5iZXJnQHBvbW9uYS5lZHU+DQrigJQNCmRpZmYgLS1naXQg
-YS9zcmMvdmFyLmMgYi9zcmMvdmFyLmMNCmluZGV4IGNjNmY3ZjIuLmUzNGY5Y2YgMTAwNjQ0DQot
-LS0gYS9zcmMvdmFyLmMNCisrKyBiL3NyYy92YXIuYw0KQEAgLTM1Myw3ICszNTMsNyBAQCBsb29r
-dXB2YXIoY29uc3QgY2hhciAqbmFtZSkNCiANCiBpbnRtYXhfdCBsb29rdXB2YXJpbnQoY29uc3Qg
-Y2hhciAqbmFtZSkNCiB7DQotCXJldHVybiBhdG9tYXgobG9va3VwdmFyKG5hbWUpID86IG51bGxz
-dHIsIDApOw0KKwlyZXR1cm4gYXRvbWF4KGxvb2t1cHZhcihuYW1lKSA/OiAiMCIsIDApOw0KIH0N
-CiANCiANCg0KIA0KDQoNCg==
+Op 19-01-17 om 21:06 schreef Michael Greenberg:
+> unset x ; echo $((x+=2))
+> 
+> Running bash on this program echoes the number 2 to standard out and sets x to 2. Running dash (git HEAD/release 0.5.9.1) yields an error:
+> 
+> src/dash: 1: Illegal number: 
+
+Yes, looks like a dash-specific bug. The related shells Busybox ash and
+FreeBSD /bin/sh act like POSIX says they should.
+
+> The standard is a little bit unclear about what to do for variables that are set to null (or non-numeric values). I’d interpret the standard as defaulting for unset variables, having null and other non-numeric strings cause some kind of error. bash, as usual, goes well beyond what the standard indicates: any non-numerical value is defaulted to 0. So:
+> 
+> x="" ; echo $((x+=2))
+> 
+> x=“yo” ; echo $((x+=2))
+> 
+> both yield 2! If you ask me, that’s a bridge too far—and asking for bugs.
+
+That's recursive arithmetic expression parsing in bash, ksh and zsh; if
+the value of a variable is an arithmetic expression (including simply
+another variable name, such as "yo") this is evaluated, which in this
+case means the value of "x" is taken as the value of "yo" which is taken
+as zero. That behaviour is not specified by POSIX, of course.
+
+- M.
+
