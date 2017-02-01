@@ -1,40 +1,53 @@
-From: Parke <parke.nexus@gmail.com>
-Subject: Re: why does dash save, dup, and restore redirected descriptor in the
- parent, rather than redirect in the child?
-Date: Tue, 31 Jan 2017 18:27:00 -0800
-Message-ID: <CAPxz1+au53RAak7Goisz7QKrzUSvtZidLFZ4b7sgV1QR_JeK5Q@mail.gmail.com>
-References: <2132582962.805179.1485892834849.ref@mail.yahoo.com> <2132582962.805179.1485892834849@mail.yahoo.com>
+From: Michael Greenberg <Michael.Greenberg@pomona.edu>
+Subject: Re: [PATCH] unset/null variables should expand to 0 during
+ arithmetic expansion
+Date: Wed, 1 Feb 2017 18:28:52 +0000
+Message-ID: <83950DC1-1C85-4C0C-804D-FD795F6EA558@pomona.edu>
+References: <A7A04C3C-65D2-404B-B65F-0053A4D2E78C@pomona.edu>
+ <cc2914b7-c2f3-82a0-3b2a-6e4885c5f34f@inlv.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-qt0-f182.google.com ([209.85.216.182]:32902 "EHLO
-        mail-qt0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750796AbdBAC1m (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 31 Jan 2017 21:27:42 -0500
-Received: by mail-qt0-f182.google.com with SMTP id v23so252145119qtb.0
-        for <dash@vger.kernel.org>; Tue, 31 Jan 2017 18:27:41 -0800 (PST)
-In-Reply-To: <2132582962.805179.1485892834849@mail.yahoo.com>
+Received: from esa2.pomona.iphmx.com ([68.232.143.226]:20096 "EHLO
+        esa2.pomona.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750777AbdBAS2y (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 1 Feb 2017 13:28:54 -0500
+In-Reply-To: <cc2914b7-c2f3-82a0-3b2a-6e4885c5f34f@inlv.org>
+Content-Language: en-US
+Content-ID: <6C4D5BF13B0284448402AD066AD8F7B0@pomona.edu>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "dash@vger.kernel.org" <dash@vger.kernel.org>
+To: Martijn Dekker <martijn@inlv.org>
+Cc: "dash@vger.kernel.org" <dash@vger.kernel.org>, Austin John Blatt <ajb22014@MyMail.pomona.edu>
 
-On Tue, Jan 31, 2017 at 12:00 PM, Mark Galeck <mark_galeck@pacbell.net> wrote:
-> This is strange. Why save, dup and dup again to restore, descriptors in the parent, when it would be much simpler to just dup in the child, and not have to save and restore. This is simpler and I checked it works the same:
-
-> I am sure there must be a good reason and I am not understanding something deeper. What is it?
-
-I am not a dash developer, but one reason to make system calls in the
-parent is that it is much simpler to handle errors in the parent.
-
-In your example:
-
-> if (!fork()) {
->     fd = open64("foobar.txt", O_WRONLY|O_CREAT);
->     dup2(fd, 1);
->     execl("/bin/date", "date", (char *)NULL);
-> }
-
-What happens if open64 fails?  How should the child inform the parent
-of this specific error?
-
--Parke
+SGkgTWFydGlqbiwNCg0KPiBPbiBKYW4gMjksIDIwMTcsIGF0IDQ6MTMgUE0sIE1hcnRpam4gRGVr
+a2VyIDxtYXJ0aWpuQGlubHYub3JnPiB3cm90ZToNCj4gDQo+IE9wIDE5LTAxLTE3IG9tIDIxOjA2
+IHNjaHJlZWYgTWljaGFlbCBHcmVlbmJlcmc6DQo+PiB1bnNldCB4IDsgZWNobyAkKCh4Kz0yKSkN
+Cj4+IA0KPj4gUnVubmluZyBiYXNoIG9uIHRoaXMgcHJvZ3JhbSBlY2hvZXMgdGhlIG51bWJlciAy
+IHRvIHN0YW5kYXJkIG91dCBhbmQgc2V0cyB4IHRvIDIuIFJ1bm5pbmcgZGFzaCAoZ2l0IEhFQUQv
+cmVsZWFzZSAwLjUuOS4xKSB5aWVsZHMgYW4gZXJyb3I6DQo+PiANCj4+IHNyYy9kYXNoOiAxOiBJ
+bGxlZ2FsIG51bWJlcjogDQo+IA0KPiBZZXMsIGxvb2tzIGxpa2UgYSBkYXNoLXNwZWNpZmljIGJ1
+Zy4gVGhlIHJlbGF0ZWQgc2hlbGxzIEJ1c3lib3ggYXNoIGFuZA0KPiBGcmVlQlNEIC9iaW4vc2gg
+YWN0IGxpa2UgUE9TSVggc2F5cyB0aGV5IHNob3VsZC4NCg0KR3JlYXQhIFBsZWFzZSBwYXJkb24g
+bXkgbmFpdmV0ZSwgYnV0IGlzIHRoZXJlIGFueXRoaW5nIGVsc2UgSSBjYW4gb3Igc2hvdWxkIGRv
+IHRvIHNlZSB0aGF0IHRoaXMgYnVnIHBhdGNoIGdldHMgYWNjZXB0ZWQgYW5kIGFwcGxpZWQ/DQoN
+Cj4+IFRoZSBzdGFuZGFyZCBpcyBhIGxpdHRsZSBiaXQgdW5jbGVhciBhYm91dCB3aGF0IHRvIGRv
+IGZvciB2YXJpYWJsZXMgdGhhdCBhcmUgc2V0IHRvIG51bGwgKG9yIG5vbi1udW1lcmljIHZhbHVl
+cykuIEnigJlkIGludGVycHJldCB0aGUgc3RhbmRhcmQgYXMgZGVmYXVsdGluZyBmb3IgdW5zZXQg
+dmFyaWFibGVzLCBoYXZpbmcgbnVsbCBhbmQgb3RoZXIgbm9uLW51bWVyaWMgc3RyaW5ncyBjYXVz
+ZSBzb21lIGtpbmQgb2YgZXJyb3IuIGJhc2gsIGFzIHVzdWFsLCBnb2VzIHdlbGwgYmV5b25kIHdo
+YXQgdGhlIHN0YW5kYXJkIGluZGljYXRlczogYW55IG5vbi1udW1lcmljYWwgdmFsdWUgaXMgZGVm
+YXVsdGVkIHRvIDAuIFNvOg0KPj4gDQo+PiB4PSIiIDsgZWNobyAkKCh4Kz0yKSkNCj4+IA0KPj4g
+eD3igJx5b+KAnSA7IGVjaG8gJCgoeCs9MikpDQo+PiANCj4+IGJvdGggeWllbGQgMiEgSWYgeW91
+IGFzayBtZSwgdGhhdOKAmXMgYSBicmlkZ2UgdG9vIGZhcuKAlGFuZCBhc2tpbmcgZm9yIGJ1Z3Mu
+DQo+IA0KPiBUaGF0J3MgcmVjdXJzaXZlIGFyaXRobWV0aWMgZXhwcmVzc2lvbiBwYXJzaW5nIGlu
+IGJhc2gsIGtzaCBhbmQgenNoOyBpZg0KPiB0aGUgdmFsdWUgb2YgYSB2YXJpYWJsZSBpcyBhbiBh
+cml0aG1ldGljIGV4cHJlc3Npb24gKGluY2x1ZGluZyBzaW1wbHkNCj4gYW5vdGhlciB2YXJpYWJs
+ZSBuYW1lLCBzdWNoIGFzICJ5byIpIHRoaXMgaXMgZXZhbHVhdGVkLCB3aGljaCBpbiB0aGlzDQo+
+IGNhc2UgbWVhbnMgdGhlIHZhbHVlIG9mICJ4IiBpcyB0YWtlbiBhcyB0aGUgdmFsdWUgb2YgInlv
+IiB3aGljaCBpcyB0YWtlbg0KPiBhcyB6ZXJvLiBUaGF0IGJlaGF2aW91ciBpcyBub3Qgc3BlY2lm
+aWVkIGJ5IFBPU0lYLCBvZiBjb3Vyc2UuDQoNClJpZ2h0LiBJIG9ubHkgbWVudGlvbmVkIGl0IGJl
+Y2F1c2UgSeKAlGFzIEkgdGhpbmsgd2UgYm90aCBhZ3JlZeKAlHRoaXMgYmVoYXZpb3IgaXMgdW5k
+ZXJzcGVjaWZpZWQgYW5kIHByb2JhYmx5IGdvb2QgYXMtaXMuIDopDQoNCkNoZWVycywNCk1pY2hh
+ZWw=
