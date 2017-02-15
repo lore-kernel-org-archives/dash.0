@@ -1,156 +1,78 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: [PATCH] Don't execute binary files if execve() returned ENOEXEC.
-Date: Wed, 8 Feb 2017 23:11:24 +0100
-Message-ID: <20170208221123.GA9111@stack.nl>
-References: <20170207083307.14881-1-kilobyte@angband.pl>
- <20170207225208.GA743@stack.nl>
- <20170208080233.ekkaosleemxbw6ml@angband.pl>
+From: Eric Blake <eblake@redhat.com>
+Subject: where to obtain dash 0.5.9.1?
+Date: Wed, 15 Feb 2017 15:07:15 -0600
+Message-ID: <24cd7280-3c78-f612-34b6-ac66c4240134@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="k9bixaXxl0xQqG9mpONcGED0CFnGUS1u0"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailout05.stack.nl ([131.155.140.202]:39971 "EHLO
-        mailout.stack.nl" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752240AbdBHWLd (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 8 Feb 2017 17:11:33 -0500
-Content-Disposition: inline
-In-Reply-To: <20170208080233.ekkaosleemxbw6ml@angband.pl>
+Received: from mx1.redhat.com ([209.132.183.28]:52798 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750719AbdBOVHS (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 15 Feb 2017 16:07:18 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com (int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 020393A7697
+        for <dash@vger.kernel.org>; Wed, 15 Feb 2017 21:07:19 +0000 (UTC)
+Received: from [10.10.123.249] (ovpn-123-249.rdu2.redhat.com [10.10.123.249] (may be forged))
+        by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP id v1FL7IsS006195
+        for <dash@vger.kernel.org>; Wed, 15 Feb 2017 16:07:18 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Adam Borowski <kilobyte@angband.pl>
-Cc: dash@vger.kernel.org
+To: dash <dash@vger.kernel.org>
 
-On Wed, Feb 08, 2017 at 09:02:33AM +0100, Adam Borowski wrote:
-> On Tue, Feb 07, 2017 at 11:52:08PM +0100, Jilles Tjoelker wrote:
-> > On Tue, Feb 07, 2017 at 09:33:07AM +0100, Adam Borowski wrote:
-> > > Both "dash -c foo" and "./foo" are supposed to be able to run hashbang-less
-> > > scripts, but attempts to execute common binary files tend to be nasty:
-> > > especially both ELF and PE tend to make dash create a bunch of files with
-> > > unprintable names, that in turn confuse some tools up to causing data loss.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--k9bixaXxl0xQqG9mpONcGED0CFnGUS1u0
+Content-Type: multipart/mixed; boundary="OsUXPm5Tjn8tlqxGCj0G3dkWTFiqrQPVF";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: dash <dash@vger.kernel.org>
+Message-ID: <24cd7280-3c78-f612-34b6-ac66c4240134@redhat.com>
+Subject: where to obtain dash 0.5.9.1?
 
-> > > Thus, let's read the first line and see if it looks like text.  This is a
-> > > variant of the approach used by bash and zsh; mksh instead checks for
-> > > signatures of a bunch of common file types.
+--OsUXPm5Tjn8tlqxGCj0G3dkWTFiqrQPVF
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> > > POSIX says: "If the executable file is not a text file, the shell may bypass
-> > > this command execution.".
+I see in dash.git checked out from
+git://git.kernel.org/pub/scm/utils/dash/dash.git that dash 0.5.9.1 was
+released several months ago.  But all my attempts to connect to
+http://gondor.apana.org.au/~herbert/dash/files/ (as recommended by
+google) to obtain the official tarball are timing out. Is there another
+location that mirrors the official dash tarballs?  Has the project
+website moved somewhere, and google just not caught up to the new
+location?  Or is it a transient failure that will be fixed soon now that
+I've called attention to it?  Or am I expected to build from git rather
+than from tarball these days?
 
-> > In FreeBSD sh, I have done this slightly differently (since 2011), based
-> > on POSIX's definition of a text file in XBD 3:
+Thanks in advance for any answers you can give.
 
-> > ] A file that contains characters organized into zero or more lines. The
-> > ] lines do not contain NUL characters and none can exceed {LINE_MAX} bytes
-> > ] in length, including the <newline> character.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-> Using that definition would require reading the whole file, which can
-> obviously be slow and/or lead to DoS.
 
-> Also, it would reject some scripts currently accepted by popular shells,
-> including bash, mksh and present version of dash -- none of which ban
-> lines above LINE_MAX (2048) in length.
+--OsUXPm5Tjn8tlqxGCj0G3dkWTFiqrQPVF--
 
-The part you quoted has does not require that the shell bypass the
-execution (of the shell) for any file that is not a text file, but that
-the shell not bypass the execution for any file that is a text file.
+--k9bixaXxl0xQqG9mpONcGED0CFnGUS1u0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Therefore, the shell may (but is not required to) bypass the execution
-if the file contains 0 bytes, contains invalid byte sequences that do
-not form a character, contains lines longer than {LINE_MAX} or ends with
-a character that is not a newline. Otherwise, the shell must perform the
-execution.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-The line length is indeed somewhat strange: the INPUT FILES section of
-XCU 4 Utilities -> sh requires the shell to read scripts without the
-{LINE_MAX} limit, but the part you quoted does not use this modified
-definition of a text file. In practice this is not relevant since shells
-are not going to read more than {LINE_MAX} for this check anyway, as you
-say.
+iQEcBAEBCAAGBQJYpMMDAAoJEKeha0olJ0NqzWwH/0ErX1fxc6c091RBZnfmEd1P
+tNFZCRycfvl77MqimHrkhIYjc8boVu1M649uIpFSzXJvXteKyF2vPHIBooVqP8IC
+upefPLqrSLIJfHT04dy3me5xZaHI7l9OdTG5Olk7H+xhhSjgXTPIw3d4MxhxndFB
+atEBkiT9RhoQIN4i9xQM+ZfbYoKaBbQfPGwXSTh7p0t0+iLG3nPbdJfqvHIzGg6G
+vwGY3mCkJpiDdCBkY1sVVVtzN6g6TLfQuGxGS970ywNlFEmJqO45dBG9X9NfA/LL
+eWpe+qzduEByYqJ21KPEAoHQxD+QyFCMG612xukAT5dKMfDGg5V7B0xzIDmPHv8=
+=Caiz
+-----END PGP SIGNATURE-----
 
-> > The check is simply for a 0 byte in the first 256 bytes (how many bytes
-> > are read by pread() for 256 bytes). A file containing the byte 8, for
-> > example, can still be a text file per POSIX's definition.
-
-> The XBD 3 cannot possibly specify allowed byte values, as it doesn't even
-> know which is the newline, nor does it require even its own "portable
-> character set" being directly accessible (merely that it's included in one
-> of shiftable sets provided by a locale).
-
-> On the other hand, not only dash assumes 8-bit bytes and ASCII-compatible
-> charset (what a limitation!), but we also have knowledge about which byte
-> values are not a part of any printable string in any locale on a supported
-> platform.  And the set of supported character sets is going to only
-> decrease[1].
-
-Text files need not contain printable characters only.
-
-> > This check might cause a terse script with binary to fail to execute,
-> > but I have not received bug reports about that.
-
-> In today's brave "curl|sudo sh" world, it's a concern I wouldn't dismiss.
-> The first line will be a legitimate command to the shell, the rest is often
-> arbitrary binary junk.
-
-I think problems are unlikely because most scripts use the #! method
-instead of relying on this shell feature.
-
-> > Stopping the check with a \n will cause a PNG header to be considered
-> > text.
-
-> Good point.  It does fool bash and mksh (with mksh's different approach)
-> too.  On the other hand, PNG files are not something that's likely to have a
-> bogus +x permission, and unlike PE or ELF files, empirically I didn't notice
-> any nasty results.  It's still bad -- not sure what's the best solution.
-
-Anything can have a bogus +x permission on FAT, NTFS and other
-filesystems that do not support executable permissions at all.
-
-> > Also, FreeBSD sh uses O_NONBLOCK when opening the file and pread() to
-> > read the data, in order to minimize the potential for modifying things
-> > by reading.
-
-> The manpage for open(2) on Linux says that, while currently O_NONBLOCK has
-> no effect for regular files and block devices, the expected semantics might
-> eventually be implemented -- and I guess you're not going to prefault the
-> beginning of the file before reading, are you?  Thus, O_NONBLOCK is a bad
-> idea.
-
-Hmm, I doubt such a basic thing will ever be changed.
-
-> As for pread, dash execs a new process (via /bin/sh which might or might not
-> be dash) so there's no optimization in not reopening the file.  As for
-> avoiding fifos, the kernel has just checked whether it's a valid executable
-> anyway.  Am I missing something else?
-
-This guards against a file change between execve and open in the parent
-shell, but not against a file change between open in the parent and
-newly executed shell.
-
-The O_NOCTTY you added is similar. I did not add this because O_NOCTTY
-has no effect in the FreeBSD kernel.
-
-> Meow!
-
-> [1]. I've recently gathered stats about use of ancient encodings, and it's
-> so close to zero that I plan to raise discussion about dropping support for
-> non-UTF8 in Debian soon.  You might be reluctant to do so in dash for now,
-> but having a single encoding for all locales would make it easy to fix a
-> number of POSIX requirements dash fails at because you consider locale
-> support to be infeasible.  Like, making ${#foo} give length in characters is
-> a matter of counting bytes outside 0x80..0xBF if assuming well-formed
-> strings is okay, or not a lot more complex even if full validation is
-> required.
-
-I think UTF-8 and character=byte are the useful options for character
-encodings these days. The latter is useful to process non-character data
-without [EILSEQ] problems, or to process ASCII data with higher
-performance (such as in sort(1)).
-
-FreeBSD sh supports these two options and nothing more. The handling for
-${#foo} in an UTF-8 locale is, in fact, what you are suggesting here.
-
-Some advantages compared to generic approaches based on mbrtowc() or
-similar are higher performance, simpler code and the possibility to
-design handling for invalid sequences for each situation (most users do
-not like the shell aborting at random places because of invalid UTF-8).
-
--- 
-Jilles Tjoelker
+--k9bixaXxl0xQqG9mpONcGED0CFnGUS1u0--
