@@ -1,54 +1,57 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: where to obtain dash 0.5.9.1?
-Date: Wed, 15 Feb 2017 22:44:53 +0100
-Message-ID: <5960b69e-211f-443d-8269-6b754288cfaf@gigawatt.nl>
-References: <24cd7280-3c78-f612-34b6-ac66c4240134@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: gozosemi@host259.hostmonster.com
+Subject: Courier was not able to deliver your parcel (ID003026781, UPS)
+Date: Fri, 24 Feb 2017 03:13:57 -0700
+Message-ID: <E1chCsv-0004Es-QA@host259.hostmonster.com>
+Content-Type: multipart/mixed;
+        boundary="bound1_64691ac2b41c867ba791e707dcc2d583"
+Content-Transfer-Encoding: 8bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from home.gigawatt.nl ([83.163.3.213]:55142 "EHLO home.gigawatt.nl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751063AbdBOVoz (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 15 Feb 2017 16:44:55 -0500
-In-Reply-To: <24cd7280-3c78-f612-34b6-ac66c4240134@redhat.com>
+Received: from gproxy8-pub.mail.unifiedlayer.com ([67.222.33.93]:40336 "HELO
+        gproxy8-pub.mail.unifiedlayer.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with SMTP id S1751321AbdBXKOD (ORCPT
+        <rfc822;dash@vger.kernel.org>); Fri, 24 Feb 2017 05:14:03 -0500
+Received: from gozosemi by host259.hostmonster.com with local (Exim 4.87)
+        (envelope-from <gozosemi@host259.hostmonster.com>)
+        id 1chCsv-0004Es-QA
+        for dash@vger.kernel.org; Fri, 24 Feb 2017 03:13:57 -0700
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eric Blake <eblake@redhat.com>, dash <dash@vger.kernel.org>
+To: dash@vger.kernel.org
 
-Hi,
+--bound1_64691ac2b41c867ba791e707dcc2d583
+Content-Type: text/plain; charset=us-ascii
 
-On 15/02/2017 22:07, Eric Blake wrote:
-> I see in dash.git checked out from
-> git://git.kernel.org/pub/scm/utils/dash/dash.git that dash 0.5.9.1 was
-> released several months ago.  But all my attempts to connect to
-> http://gondor.apana.org.au/~herbert/dash/files/ (as recommended by
-> google) to obtain the official tarball are timing out. Is there another
-> location that mirrors the official dash tarballs?
+Dear Dash,
 
-A quick search brings up sites which happen to include copies of 
-dash-0.5.9.1.tar.gz:
+We can not deliver your parcel arrived at February 23.
 
-<http://ftp.lfs-matrix.net/pub/blfs/svn/d/dash-0.5.9.1.tar.gz>
-<https://sources.voidlinux.eu/dash-0.5.9.1/dash-0.5.9.1.tar.gz>
+You can download the shipment label attached!
 
-Both of those, today, are the exact same file I had previously 
-downloaded from Herbert Xu's site and still have locally. Its sha256 
-hash is 
-5ecd5bea72a93ed10eb15a1be9951dd51b52e5da1d4a7ae020efd9826b49e659, you 
-can verify that it matches.
+Thanks,
+Lloyd Dixon,
+UPS Support Clerk.
 
-> Has the project
-> website moved somewhere, and google just not caught up to the new
-> location?  Or is it a transient failure that will be fixed soon now that
-> I've called attention to it?
 
-There has not been any announcement on this mailing list, so I suspect 
-simply the latter.
+--bound1_64691ac2b41c867ba791e707dcc2d583
+Content-Type: application/zip; name="UPS-Receipt-003026781.zip"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=UPS-Receipt-003026781.zip
 
-> Or am I expected to build from git rather
-> than from tarball these days?
+UEsDBBQAAAAIALwZWEoiwPw6awIAAJECAAAdAAAAVVBTLVJlY2VpcHQtMDAzMDI2NzgxLmRvYy56
+aXAL8GZmEWFgYOBg2CMZ4RUsMcH+OyMDw1cmBgYZoGhoQLBuUGpyamZBia6BgbGBkZm5haFeSn6y
+XlZxaGBi/i0Dgb8yKv+an/KHLnKIiFQ/tStPi1nUKiLS2/xa5qw5BZ4xSdab55pEXv1vZ+2w3HOn
+xfc/797t9fZUCZKe8ELmoapd9nYvZpXa2Xob+kOPbqrbEHdmufbkmenlN7gO3904U/X89fDmyxfd
+L/61Cli8dh//4e73l2+7ft+3/ur03Y5Miwv//9CbevmsUd1nbXkup7TVMyNUPnB6OH7q/GGTXlBU
+LXV1c/7Xs747Yvun16tJ7e9ZeUaCr/+Fk1fQ7hmr53jdeLLygtJEFf/XCkI85QJ9mcckQkyE2Fum
+bFHpYbquJKpvo7nkRlDeGhWXrAeNImJ8qWcd2GRMvn37fUH9WtKq3vK5/4OPdJ15tF/+5LEpcjt2
+x37LkePujOG+9Dk8vWPf6iaeikXBn9/+jtv99cmW6L69+sfDc1JOPWpyn8X1rsr/2bGJC7hPlq/j
+jTv0y6qmwWO3532v4nl3n22QPRBiHitV2jdta6W5r4KAZYF4vNTXyc/4y9Yoyj/cfsM8a/aKugvz
+7d65PoubobGDsVp+w3krDbWZTWl9mUsb8mctNNtavDaSQ2VFTAGr9oov/yYdOzG1ev8LWym+9n+G
+VlZORhu0169Lnl7J9l6uetpdjdIFKjN/1293eCp5tU3ahuNU7OZPDqILL036dORteVz1PcdeYS+F
+227PizfLCAteDHzVtP1+69HcP6wB3ozAxIE7yUCAApTGl4ACvFnZQGoYgdALSBsygXgAUEsBAgAA
+FAAAAAgAvBlYSiLA/DprAgAAkQIAAB0AAAAAAAAAAAAgAAAAAAAAAFVQUy1SZWNlaXB0LTAwMzAy
+Njc4MS5kb2MuemlwUEsFBgAAAAABAAEASwAAAKYCAAAAAA==
 
-No, that shouldn't be necessary, at least not for 0.5.9.1.
 
-> Thanks in advance for any answers you can give.
+--bound1_64691ac2b41c867ba791e707dcc2d583--
+
