@@ -1,94 +1,292 @@
 From: Martijn Dekker <martijn@inlv.org>
 Subject: Re: [PATCH] quote arguments in xtrace output
-Date: Mon, 27 Feb 2017 21:08:10 +0100
-Message-ID: <6e8434e8-87e3-db2a-9d80-147f064c4793@inlv.org>
+Date: Tue, 28 Feb 2017 00:17:57 +0100
+Message-ID: <9092df1b-e6b6-a879-1268-596932892a58@inlv.org>
 References: <e50519c3-4055-ab2a-b9f3-0776369e4106@inlv.org>
  <f9c5d0a5-69bc-c543-7de8-59e5e9cb105b@gigawatt.nl>
+ <6e8434e8-87e3-db2a-9d80-147f064c4793@inlv.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed;
+ boundary="------------0C6B1E0CF915D7D7CE5B949D"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from kahlil.inlv.org ([37.59.109.123]:43342 "EHLO kahlil.inlv.org"
+Received: from kahlil.inlv.org ([37.59.109.123]:52966 "EHLO kahlil.inlv.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751714AbdB0WFq (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 27 Feb 2017 17:05:46 -0500
-In-Reply-To: <f9c5d0a5-69bc-c543-7de8-59e5e9cb105b@gigawatt.nl>
+        id S1751505AbdB1BBK (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 27 Feb 2017 20:01:10 -0500
+In-Reply-To: <6e8434e8-87e3-db2a-9d80-147f064c4793@inlv.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
 
-Op 27-02-17 om 20:24 schreef Harald van Dijk:
-> The general approach looks nice. I think this misses a few cases though
-> if you're aiming to make it suitable for re-entry:
-> 
->   $ src/dash -c 'set -x; \!'
->   + !
->   src/dash: 1: !: not found
-> 
->   $ src/dash -c 'set -x; \a=b'
->   + a=b
->   src/dash: 1: a=b: not found
-> 
->   $ src/dash -c 'set -x; \if'
->   + if
->   src/dash: 1: if: not found
-> 
-> I could create binaries by those names to get rid of the errors.
-> Regardless, in none these cases would the original command be
-> re-executed if the set -x output were entered into the shell.
+This is a multi-part message in MIME format.
+--------------0C6B1E0CF915D7D7CE5B949D
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Good point.
+Op 27-02-17 om 21:08 schreef Martijn Dekker:
+> Shell reserved words (a.k.a. shell keywords) such as "if" are harder to
+> fix. The single_quote() routine, if told to quote conditionally, would
+> have to iterate through the internal list of shell reserved words and
+> quote the string if it matches one of those. I will see if I can make
+> that happen.
 
-The first and second cases would be fixed by simply removing "!" and "="
-from SHELLSAFECHARS. Not a big loss.
+Here is a version that does that, and removes '=' and '!' from the list
+of shell-safe characters. This should fix all the issues you were
+reporting, hopefully making the xtrace output completely safe for shell
+re-entry. It introduces a new function is_kwd() that checks if a string
+is identical to a shell keyword/reserved word.
 
-Shell reserved words (a.k.a. shell keywords) such as "if" are harder to
-fix. The single_quote() routine, if told to quote conditionally, would
-have to iterate through the internal list of shell reserved words and
-quote the string if it matches one of those. I will see if I can make
-that happen.
-
-Actually, after testing bash, yash, zsh, ksh93 and mksh as well as dash,
-it looks like no current shell manages to quote strings that would
-otherwise be shell keywords in xtrace output, with the exception of the
-"!" keyword. So fixing this would make dash's xtrace output better than
-any other shell's. :)
-
-Since shell reserved words are part of the grammar, they never show up
-in xtrace output, so at least the output is unambiguous: you know
-anything that looks like a reserved word isn't.
-
-> It may be okay to leave this as it is and acknowledge that it doesn't
-> handle all cases, as long as it handles enough of them to be an
-> improvement.
-
-Yes. I would still remove "!" and "=" from SHELLSAFECHARS though; at
-least that way you won't get output that looks like a negation or
-assignment but isn't.
-
-> If the modification to single_quote can handle all cases (perhaps
-> quoting unnecessarily if it's unclear), then the conditional
-> parameter could be removed and applied unconditionally: as far as I
-> can tell, there are no existing calls that require the single quotes
-> for simple words.
-
-True, but this would change the output of something like:
-
-$ dash -c 'alias stuff=xyz; trap true EXIT; alias; trap'
-
-from:
-
-stuff='xyz'
-trap -- 'true' EXIT
-
-to:
-
-stuff=xyz
-trap -- true EXIT
-
-While there is technically nothing wrong with this, I think it's nicer
-to leave those quoted unconditionally, because that facilitates editing
-the output of those commands to feed it back to the shell.
+Attached are two patches: one incremental to my previous one, and one
+against pristine dash 0.5.9.1.
 
 - M.
 
+
+--------------0C6B1E0CF915D7D7CE5B949D
+Content-Type: text/x-patch;
+ name="dash-shellquoted-xtrace-v2-incremental.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="dash-shellquoted-xtrace-v2-incremental.patch"
+
+diff -ur dash-0.5.9.1.orig/src/mystring.c dash-0.5.9.1/src/mystring.c
+--- dash-0.5.9.1.orig/src/mystring.c	2017-02-28 00:14:47.000000000 +0100
++++ dash-0.5.9.1/src/mystring.c	2017-02-28 00:10:40.000000000 +0100
+@@ -55,6 +55,7 @@
+ #include "memalloc.h"
+ #include "parser.h"
+ #include "system.h"
++#include "token_vars.h"
+ 
+ 
+ char nullstr[1];		/* zero length string */
+@@ -181,11 +182,29 @@
+ 	return 1;
+ }
+ 
++/*
++ * Check if a string is identical to a shell keyword (reserved word).
++ */
++
++int
++is_kwd(const char *s)
++{
++	int i = 0;
++
++	do {
++		if (strcmp(s, parsekwd[i++]) == 0)
++			return 1;
++	} while (*parsekwd[i-1] != '}');  /* assuming that "}" is last entry */
++	
++	return 0;
++}
++	
+ 
+ /*
+  * Produce a possibly single quoted string suitable as input to the shell.
+  * If 'conditional' is nonzero, quoting is only done if the string contains
+- * non-shellsafe characters; if it is zero, quoting is always done.
++ * non-shellsafe characters, or is identical to a shell keyword (reserved
++ * word); if it is zero, quoting is always done.
+  * If quoting was done, the return string is allocated on the stack,
+  * otherwise a pointer to the original string is returned.
+  */
+@@ -194,7 +213,7 @@
+ single_quote(const char *s, int conditional) {
+ 	char *p;
+ 
+-	if (conditional && s[strspn(s, SHELLSAFECHARS)] == '\0')
++	if (conditional && s[strspn(s, SHELLSAFECHARS)] == '\0' && ! is_kwd(s))
+ 		return (char *)s;
+ 
+ 	STARTSTACKSTR(p);
+diff -ur dash-0.5.9.1.orig/src/mystring.h dash-0.5.9.1/src/mystring.h
+--- dash-0.5.9.1.orig/src/mystring.h	2017-02-28 00:14:47.000000000 +0100
++++ dash-0.5.9.1/src/mystring.h	2017-02-28 00:10:40.000000000 +0100
+@@ -63,4 +63,4 @@
+ #define scopy(s1, s2)	((void)strcpy(s2, s1))
+ 
+ /* Characters that don't need quoting before re-entry into the shell */
+-#define SHELLSAFECHARS "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz%+,./:=@_^!-"
++#define SHELLSAFECHARS "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz%+,./:@_^-"
+
+--------------0C6B1E0CF915D7D7CE5B949D
+Content-Type: text/x-patch;
+ name="dash-shellquoted-xtrace-v2.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="dash-shellquoted-xtrace-v2.patch"
+
+diff -ur dash-0.5.9.1.orig/src/alias.c dash-0.5.9.1/src/alias.c
+--- dash-0.5.9.1.orig/src/alias.c	2014-09-28 10:19:32.000000000 +0200
++++ dash-0.5.9.1/src/alias.c	2017-02-28 00:10:40.000000000 +0100
+@@ -197,7 +197,7 @@
+ 
+ void
+ printalias(const struct alias *ap) {
+-	out1fmt("%s=%s\n", ap->name, single_quote(ap->val));
++	out1fmt("%s=%s\n", ap->name, single_quote(ap->val, 0));
+ }
+ 
+ STATIC struct alias **
+diff -ur dash-0.5.9.1.orig/src/eval.c dash-0.5.9.1/src/eval.c
+--- dash-0.5.9.1.orig/src/eval.c	2016-09-02 16:12:23.000000000 +0200
++++ dash-0.5.9.1/src/eval.c	2017-02-28 00:10:40.000000000 +0100
+@@ -95,7 +95,8 @@
+ STATIC int evalbltin(const struct builtincmd *, int, char **, int);
+ STATIC int evalfun(struct funcnode *, int, char **, int);
+ STATIC void prehash(union node *);
+-STATIC int eprintlist(struct output *, struct strlist *, int);
++STATIC int eprintvarlist(struct output *, struct strlist *, int);
++STATIC void eprintarglist(struct output *, struct strlist *, int);
+ STATIC int bltincmd(int, char **);
+ 
+ 
+@@ -786,8 +787,8 @@
+ 		out = &preverrout;
+ 		outstr(expandstr(ps4val()), out);
+ 		sep = 0;
+-		sep = eprintlist(out, varlist.list, sep);
+-		eprintlist(out, arglist.list, sep);
++		sep = eprintvarlist(out, varlist.list, sep);
++		eprintarglist(out, arglist.list, sep);
+ 		outcslow('\n', out);
+ #ifdef FLUSHERR
+ 		flushout(out);
+@@ -1107,16 +1108,35 @@
+ 
+ 
+ STATIC int
+-eprintlist(struct output *out, struct strlist *sp, int sep)
++eprintvarlist(struct output *out, struct strlist *sp, int sep)
+ {
+ 	while (sp) {
+ 		const char *p;
++		int i;
+ 
+-		p = " %s" + (1 - sep);
++		if (sep)
++			outfmt(out, " ");
+ 		sep |= 1;
+-		outfmt(out, p, sp->text);
++		i = 0;
++		while (sp->text[i] != '=' && sp->text[i] != '\0')
++			outfmt(out, "%c", sp->text[i++]);
++		if (sp->text[i] == '=')
++			outfmt(out, "=%s", single_quote(sp->text+i+1, 1));
+ 		sp = sp->next;
+ 	}
+ 
+ 	return sep;
+ }
++
++STATIC void
++eprintarglist(struct output *out, struct strlist *sp, int sep)
++{
++	while (sp) {
++		const char *p;
++
++		p = " %s" + (1 - sep);
++		sep |= 1;
++		outfmt(out, p, single_quote(sp->text, 1));
++		sp = sp->next;
++	}
++}
+diff -ur dash-0.5.9.1.orig/src/mystring.c dash-0.5.9.1/src/mystring.c
+--- dash-0.5.9.1.orig/src/mystring.c	2014-09-28 10:19:32.000000000 +0200
++++ dash-0.5.9.1/src/mystring.c	2017-02-28 00:10:40.000000000 +0100
+@@ -55,6 +55,7 @@
+ #include "memalloc.h"
+ #include "parser.h"
+ #include "system.h"
++#include "token_vars.h"
+ 
+ 
+ char nullstr[1];		/* zero length string */
+@@ -181,16 +182,40 @@
+ 	return 1;
+ }
+ 
++/*
++ * Check if a string is identical to a shell keyword (reserved word).
++ */
++
++int
++is_kwd(const char *s)
++{
++	int i = 0;
++
++	do {
++		if (strcmp(s, parsekwd[i++]) == 0)
++			return 1;
++	} while (*parsekwd[i-1] != '}');  /* assuming that "}" is last entry */
++	
++	return 0;
++}
++	
+ 
+ /*
+  * Produce a possibly single quoted string suitable as input to the shell.
+- * The return string is allocated on the stack.
++ * If 'conditional' is nonzero, quoting is only done if the string contains
++ * non-shellsafe characters, or is identical to a shell keyword (reserved
++ * word); if it is zero, quoting is always done.
++ * If quoting was done, the return string is allocated on the stack,
++ * otherwise a pointer to the original string is returned.
+  */
+ 
+ char *
+-single_quote(const char *s) {
++single_quote(const char *s, int conditional) {
+ 	char *p;
+ 
++	if (conditional && s[strspn(s, SHELLSAFECHARS)] == '\0' && ! is_kwd(s))
++		return (char *)s;
++
+ 	STARTSTACKSTR(p);
+ 
+ 	do {
+diff -ur dash-0.5.9.1.orig/src/mystring.h dash-0.5.9.1/src/mystring.h
+--- dash-0.5.9.1.orig/src/mystring.h	2014-09-28 10:19:32.000000000 +0200
++++ dash-0.5.9.1/src/mystring.h	2017-02-28 00:10:40.000000000 +0100
+@@ -54,10 +54,13 @@
+ intmax_t atomax10(const char *);
+ int number(const char *);
+ int is_number(const char *);
+-char *single_quote(const char *);
++char *single_quote(const char *, int);
+ char *sstrdup(const char *);
+ int pstrcmp(const void *, const void *);
+ const char *const *findstring(const char *, const char *const *, size_t);
+ 
+ #define equal(s1, s2)	(strcmp(s1, s2) == 0)
+ #define scopy(s1, s2)	((void)strcpy(s2, s1))
++
++/* Characters that don't need quoting before re-entry into the shell */
++#define SHELLSAFECHARS "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz%+,./:@_^-"
+diff -ur dash-0.5.9.1.orig/src/trap.c dash-0.5.9.1/src/trap.c
+--- dash-0.5.9.1.orig/src/trap.c	2016-09-02 16:12:23.000000000 +0200
++++ dash-0.5.9.1/src/trap.c	2017-02-28 00:10:40.000000000 +0100
+@@ -107,7 +107,7 @@
+ 			if (trap[signo] != NULL) {
+ 				out1fmt(
+ 					"trap -- %s %s\n",
+-					single_quote(trap[signo]),
++					single_quote(trap[signo], 0),
+ 					signal_names[signo]
+ 				);
+ 			}
+diff -ur dash-0.5.9.1.orig/src/var.c dash-0.5.9.1/src/var.c
+--- dash-0.5.9.1.orig/src/var.c	2014-10-07 16:30:35.000000000 +0200
++++ dash-0.5.9.1/src/var.c	2017-02-28 00:10:40.000000000 +0100
+@@ -417,7 +417,7 @@
+ 		p = strchrnul(*ep, '=');
+ 		q = nullstr;
+ 		if (*p)
+-			q = single_quote(++p);
++			q = single_quote(++p, 0);
+ 
+ 		out1fmt("%s%s%.*s%s\n", prefix, sep, (int)(p - *ep), *ep, q);
+ 	}
+
+--------------0C6B1E0CF915D7D7CE5B949D--
