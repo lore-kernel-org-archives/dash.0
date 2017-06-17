@@ -1,27 +1,46 @@
-From: "Seydou Thieba" <seydouthieba@tiscali.co.uk>
-Subject: Investment Interest & Offer
-Date: Sat, 03 Jun 2017 00:01:51 +0100
-Message-ID: <201706022301.v52MWded028747__24196.2580512793$1496897978$gmane$org@www.brfliseberg.se>
-Reply-To: seydouthiebaconsultant@gmail.com
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+From: Larry Hynes <larry@larryhynes.com>
+Subject: Small cleanup to src/dash.1 - Command Line Editing
+Date: Sat, 17 Jun 2017 15:53:26 +0100
+Message-ID: <6csf1e-9n5.ln1@sabon.larryhynes.com>
 Return-path: <dash-owner@vger.kernel.org>
-Received: from www.brfliseberg.se ([213.242.162.1]:37178 "EHLO
-        www.brfliseberg.se" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750917AbdFHE7S (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 8 Jun 2017 00:59:18 -0400
-Content-Description: Mail message body
+Received: from [195.159.176.226] ([195.159.176.226]:53966 "EHLO
+        blaine.gmane.org" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
+        with ESMTP id S1751977AbdFQOzP (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 17 Jun 2017 10:55:15 -0400
+Received: from list by blaine.gmane.org with local (Exim 4.84_2)
+        (envelope-from <gcsd-dash@m.gmane.org>)
+        id 1dMF7y-0004w6-GH
+        for dash@vger.kernel.org; Sat, 17 Jun 2017 16:55:06 +0200
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Recipients <seydouthieba@tiscali.co.uk>
+To: dash@vger.kernel.org
 
-We are a Fund management company located in the United Kingdom, we specialize in searching for potential investments opportunities for our high net-worth clients globally. Should this be of interest to you, please do not hesitate to email me for  further information.
+Hi
 
-Thanks
-Seydou Thieba
+src/dash.1, under Command Line Editing, states:
 
----
-This email has been checked for viruses by AVG.
-http://www.avg.com
+	It's similar to vi: typing <ESC> will throw you into command
+	VI command mode.
+
+- There appears to be no need for both occurrences of 'command'
+- I can't see a reason for VI to be capitalised
+- 'will throw you into' seems a little... enthusiastic
+
+Following diff changes it to
+
+	It's similar to vi: typing <ESC> enters vi command mode.
+
+diff --git a/src/dash.1 b/src/dash.1
+index 8b8026d..f35d89d 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -2232,7 +2232,7 @@ enabled, sh can be switched between insert mode and command mode.
+ The editor is not described in full here, but will be in a later document.
+ It's similar to vi: typing
+ .Aq ESC
+-will throw you into command VI command mode.
++enters vi command mode.
+ Hitting
+ .Aq return
+ while in command mode will pass the line to the shell.
 
