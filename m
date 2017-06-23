@@ -1,62 +1,36 @@
-From: =?UTF-8?B?UGV0ciBTa2/EjcOtaw==?= <pskocik@gmail.com>
-Subject: Greater resolution in test -nt / test -ot
-Date: Thu, 22 Jun 2017 10:30:02 +0200
-Message-ID: <9903b02c-041f-38b6-e510-06b9f8744fbb@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: where to obtain dash 0.5.9.1?
+Date: Fri, 23 Jun 2017 17:02:15 +0800
+Message-ID: <20170623090215.GA30813@gondor.apana.org.au>
+References: <24cd7280-3c78-f612-34b6-ac66c4240134@redhat.com>
+ <20170309104159.GA7168@gondor.apana.org.au>
+ <CAOSMAuuM_j79BxJv4o++pE7gc8NwMSCicaNJKFZUuwcvqmJ8CQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:33885 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751116AbdFVIaD (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 22 Jun 2017 04:30:03 -0400
-Received: by mail-lf0-f68.google.com with SMTP id l200so1190372lfg.1
-        for <dash@vger.kernel.org>; Thu, 22 Jun 2017 01:30:02 -0700 (PDT)
-Received: from [10.10.0.2] (147.213.broadband18.iol.cz. [109.81.213.147])
-        by smtp.googlemail.com with ESMTPSA id r28sm558845edd.33.2017.06.22.01.30.00
-        for <dash@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 22 Jun 2017 01:30:00 -0700 (PDT)
-Content-Language: en-US
+Received: from orcrist.hmeau.com ([104.223.48.154]:36072 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753969AbdFWJ2q (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 23 Jun 2017 05:28:46 -0400
+Content-Disposition: inline
+In-Reply-To: <CAOSMAuuM_j79BxJv4o++pE7gc8NwMSCicaNJKFZUuwcvqmJ8CQ@mail.gmail.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Eduardo Bustamante <dualbus@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, dash@vger.kernel.org
 
-Hi,
+On Thu, May 11, 2017 at 09:55:46AM -0500, Eduardo Bustamante wrote:
+> On Thu, Mar 9, 2017 at 5:41 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> [...]
+> > I'm in the process of fixing it.  For the time being the git tree
+> > is the best place to get the source code.
+> 
+> Hi Herbert, any news in getting http://gondor.apana.org.au back up again?
 
-would you be willing to pull something like this?
+It's back up now.
 
-diff --git a/src/bltin/test.c b/src/bltin/test.c
-index 58c05fe..7ea02f2 100644
---- a/src/bltin/test.c
-+++ b/src/bltin/test.c
-@@ -478,7 +478,9 @@ newerf (const char *f1, const char *f2)
-
- 	return (stat (f1, &b1) == 0 &&
- 		stat (f2, &b2) == 0 &&
--		b1.st_mtime > b2.st_mtime);
-+		( b1.st_mtim.tv_sec > b2.st_mtim.tv_sec ||
-+		 (b1.st_mtim.tv_sec == b2.st_mtim.tv_sec && (b1.st_mtim.tv_nsec >
-b2.st_mtim.tv_nsec )))
-+	);
- }
-
- static int
-@@ -488,7 +490,9 @@ olderf (const char *f1, const char *f2)
-
- 	return (stat (f1, &b1) == 0 &&
- 		stat (f2, &b2) == 0 &&
--		b1.st_mtime < b2.st_mtime);
-+		(b1.st_mtim.tv_sec < b2.st_mtim.tv_sec ||
-+		 (b1.st_mtim.tv_sec == b2.st_mtim.tv_sec && (b1.st_mtim.tv_nsec <
-b2.st_mtim.tv_nsec )))
-+	);
- }
-
- static int
-
-I could use greater resolution in `test -nt` / `test -ot`, and st_mtim
-field is standardized under POSIX.1-2008 (or so stat(2) says).
-
-Best Regards,
-Petr Skocik
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
