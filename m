@@ -1,36 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: where to obtain dash 0.5.9.1?
-Date: Fri, 23 Jun 2017 17:02:15 +0800
-Message-ID: <20170623090215.GA30813@gondor.apana.org.au>
-References: <24cd7280-3c78-f612-34b6-ac66c4240134@redhat.com>
- <20170309104159.GA7168@gondor.apana.org.au>
- <CAOSMAuuM_j79BxJv4o++pE7gc8NwMSCicaNJKFZUuwcvqmJ8CQ@mail.gmail.com>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: Small cleanup to src/dash.1 - Command Line Editing
+Date: Fri, 23 Jun 2017 16:41:28 +0200
+Message-ID: <20170623144128.GA15837@stack.nl>
+References: <6csf1e-9n5.ln1@sabon.larryhynes.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:36072 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753969AbdFWJ2q (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 23 Jun 2017 05:28:46 -0400
+Received: from mailout05.stack.nl ([131.155.140.202]:38439 "EHLO
+        mailout.stack.nl" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750932AbdFWOuP (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 23 Jun 2017 10:50:15 -0400
 Content-Disposition: inline
-In-Reply-To: <CAOSMAuuM_j79BxJv4o++pE7gc8NwMSCicaNJKFZUuwcvqmJ8CQ@mail.gmail.com>
+In-Reply-To: <6csf1e-9n5.ln1@sabon.larryhynes.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Eduardo Bustamante <dualbus@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, dash@vger.kernel.org
+To: Larry Hynes <larry@larryhynes.com>
+Cc: dash@vger.kernel.org
 
-On Thu, May 11, 2017 at 09:55:46AM -0500, Eduardo Bustamante wrote:
-> On Thu, Mar 9, 2017 at 5:41 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> [...]
-> > I'm in the process of fixing it.  For the time being the git tree
-> > is the best place to get the source code.
-> 
-> Hi Herbert, any news in getting http://gondor.apana.org.au back up again?
+On Sat, Jun 17, 2017 at 03:53:26PM +0100, Larry Hynes wrote:
+> src/dash.1, under Command Line Editing, states:
 
-It's back up now.
+> 	It's similar to vi: typing <ESC> will throw you into command
+> 	VI command mode.
 
-Cheers,
+> - There appears to be no need for both occurrences of 'command'
+> - I can't see a reason for VI to be capitalised
+> - 'will throw you into' seems a little... enthusiastic
+
+> Following diff changes it to
+
+> 	It's similar to vi: typing <ESC> enters vi command mode.
+
+> diff --git a/src/dash.1 b/src/dash.1
+> index 8b8026d..f35d89d 100644
+> --- a/src/dash.1
+> +++ b/src/dash.1
+> @@ -2232,7 +2232,7 @@ enabled, sh can be switched between insert mode and command mode.
+>  The editor is not described in full here, but will be in a later document.
+>  It's similar to vi: typing
+>  .Aq ESC
+> -will throw you into command VI command mode.
+> +enters vi command mode.
+>  Hitting
+>  .Aq return
+>  while in command mode will pass the line to the shell.
+
+I agree. If you're changing things here anyway, I suggest getting rid of
+the contraction as well (changing It's to It is). The fairly formal
+style of man pages avoids contractions, just like it avoids "you".
+
+The reference to the "later document" can probably be removed as well,
+since said document does not exist yet after many years.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jilles Tjoelker
