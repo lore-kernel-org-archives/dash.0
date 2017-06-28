@@ -1,45 +1,34 @@
 From: Zando Fardones <bluesun654@gmail.com>
-Subject: [BUG] Here-document redirection with vi/emacs on
-Date: Tue, 27 Jun 2017 16:29:32 +0200
-Message-ID: <CAPLrsYe1hemq+pOTRERmxc3M0-QrHhGm9PUOhs7pJUN5-cOk6A@mail.gmail.com>
+Subject: [BUG] Can't see accented letters with vi/emacs on
+Date: Wed, 28 Jun 2017 21:35:45 +0200
+Message-ID: <CAPLrsYdCeA=pYyCnpo2u6VcpbnUo+79DK69YM3JGEPit2J87EA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:37126 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752758AbdF0O3f (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 27 Jun 2017 10:29:35 -0400
-Received: by mail-wm0-f44.google.com with SMTP id i127so28672269wma.0
-        for <dash@vger.kernel.org>; Tue, 27 Jun 2017 07:29:34 -0700 (PDT)
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:38570 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751501AbdF1Tfr (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 28 Jun 2017 15:35:47 -0400
+Received: by mail-wm0-f52.google.com with SMTP id b184so69473208wme.1
+        for <dash@vger.kernel.org>; Wed, 28 Jun 2017 12:35:46 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Hello,
+> set +o vi
+> # =C3=A8
+> # ^ OK, as long as vi is off.
+> set -o vi
+> # \U+00C3\U+00A8
+> # ^ this is what I see when I type "=C3=A8", with *vi* on
 
-I think I've found a bug when using the here-document redirection in
-an interactive shell. What basically happens is that you can't see the
-command output if you set the "vi" or "emacs" options. Please take a
-look:
+> set +o emacs
+> # =C3=A8
+> # ^ OK, as long as emacs is off.
+> set -o emacs
+> #
+> # ^ when I type "=C3=A8" with *emacs* on, I see nothing
 
-$ set -o vi
-$ cat << EOF
-> test
-> EOF
-$ set +o vi
-$ cat << EOF
-> test
-> EOF
-test
-^ you can see the "test" output only when the vi option is *not* set
-
-$ set -o emacs
-$ cat << EOF
-> test
-> EOF
-$ set +o emacs
-$ cat << EOF
-> test
-> EOF
-test
-^ you can see the "test" output only when the emacs option is *not* set
+Of course you need to compile DASH with "--with-libedit" in order to
+reproduce the issue.
