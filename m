@@ -1,102 +1,82 @@
-From: Eric Blake <eblake@redhat.com>
+From: Bosco <jbosco.gg@gmail.com>
 Subject: Re: echo "\\1"?
-Date: Thu, 27 Jul 2017 07:54:23 -0500
-Message-ID: <7253a908-22d2-03e3-5493-418ca31e5590@redhat.com>
+Date: Thu, 27 Jul 2017 13:13:06 +0000
+Message-ID: <CAC4gepdsPNvUJyW4Zwto9wZGc1Naq5kMsnz+RdCyAurEZzGLZw@mail.gmail.com>
 References: <CAC4gepeczuKhmanuBqYybUTjvo6eNeZk6FyqHjOhx8n-qDfCSw@mail.gmail.com>
+ <7253a908-22d2-03e3-5493-418ca31e5590@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="M5VXtlIpL9APvO4GuMGGCCje7I23NQfM2"
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39560 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751444AbdG0MyY (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 27 Jul 2017 08:54:24 -0400
-In-Reply-To: <CAC4gepeczuKhmanuBqYybUTjvo6eNeZk6FyqHjOhx8n-qDfCSw@mail.gmail.com>
+Received: from mail-qk0-f171.google.com ([209.85.220.171]:38528 "EHLO
+        mail-qk0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751696AbdG0NN1 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Thu, 27 Jul 2017 09:13:27 -0400
+Received: by mail-qk0-f171.google.com with SMTP id x191so35850016qka.5
+        for <dash@vger.kernel.org>; Thu, 27 Jul 2017 06:13:27 -0700 (PDT)
+In-Reply-To: <7253a908-22d2-03e3-5493-418ca31e5590@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Bosco <jbosco.gg@gmail.com>, dash@vger.kernel.org
+To: Eric Blake <eblake@redhat.com>, dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---M5VXtlIpL9APvO4GuMGGCCje7I23NQfM2
-Content-Type: multipart/mixed; boundary="8PrMh2xdl4aqbKWvfxL3ea6XkeIVjHKBr";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Bosco <jbosco.gg@gmail.com>, dash@vger.kernel.org
-Message-ID: <7253a908-22d2-03e3-5493-418ca31e5590@redhat.com>
-Subject: Re: echo "\\1"?
-References: <CAC4gepeczuKhmanuBqYybUTjvo6eNeZk6FyqHjOhx8n-qDfCSw@mail.gmail.com>
-In-Reply-To: <CAC4gepeczuKhmanuBqYybUTjvo6eNeZk6FyqHjOhx8n-qDfCSw@mail.gmail.com>
+On 27 July 2017 at 12:54, Eric Blake <eblake@redhat.com> wrote:
+> Which man pages?  Echo is one of those programs that varies widely, and
+> you are MUCH better off using printf(1) instead of echo(1) if you are
+> trying to get newline suppression, trying to print something that might
+> begin with -, or trying to print something that might contain \.
 
---8PrMh2xdl4aqbKWvfxL3ea6XkeIVjHKBr
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Sorry, maybe I did't explain it correctly, I mean the man pages of the
+dash source:
+https://git.kernel.org/pub/scm/utils/dash/dash.git/tree/src/dash.1#n1202
 
-On 07/27/2017 07:23 AM, Bosco wrote:
-> According the man pages,
+And because of this, I got an error compiling zziplib, you may see
+https://github.com/gdraheim/zziplib/blob/v0.13.67/configure#L17542
 
-Which man pages?  Echo is one of those programs that varies widely, and
-you are MUCH better off using printf(1) instead of echo(1) if you are
-trying to get newline suppression, trying to print something that might
-begin with -, or trying to print something that might contain \.
+>
+>> for echo command, "\\" should print '\'
+>> character, and \0digits should print the byte in octal base.
+>> But the command
+>>
+>> echo "\\1"
+>
+> This is the same as
+> echo '\1'
+>
+> which is NOT defined by POSIX as being a valid escape sequence that echo
+> must recognize.
+>
+> (Did you mean to test
+> echo '\\1'
+> instead?)
+>
 
-> for echo command, "\\" should print '\'
-> character, and \0digits should print the byte in octal base.
-> But the command
->=20
-> echo "\\1"
+I refer the following commands
 
-This is the same as
-echo '\1'
+echo "\\1"
 
-which is NOT defined by POSIX as being a valid escape sequence that echo
-must recognize.
+or
 
-(Did you mean to test
-echo '\\1'
-instead?)
-
-Here's the POSIX list of required escape sequences:
-
-http://pubs.opengroup.org/onlinepubs/9699919799/utilities/echo.html
-
->=20
-> outputs the byte 0x01 in hexadecimal (or 001 in octal).
-> Is this a bad behavior or is intentional?
-
-Arguably, since it is not required by POSIX, we don't have to do it. But
-I also can't argue that POSIX forbids us to support \1 as an extension
-(it says nothing about whether implementations can have additional
-escape sequences).  So I'll argue that it is intentional as a dash
-extension.  But if you can make dash smaller by getting rid of the
-extension, that might be an acceptable patch.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+echo \\1
 
 
---8PrMh2xdl4aqbKWvfxL3ea6XkeIVjHKBr--
 
---M5VXtlIpL9APvO4GuMGGCCje7I23NQfM2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> Here's the POSIX list of required escape sequences:
+>
+> http://pubs.opengroup.org/onlinepubs/9699919799/utilities/echo.html
+>
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+There, it says the same as the man page of dash.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll54n8ACgkQp6FrSiUn
-Q2q/lggApSmOeCunrP+z/lDk6Lj2+WdEUssobVT/nJoxeYm70P0j4d3EUnFsjo+9
-5lf/Xj6kYpah169G6LY8H5B27zS34iqX6ikASDjT5wuYJCbPM43w0Pn0Sj1N0NJd
-Pe40SShuYKA1FXm/SnNzEcn/sbjpQLGNWY3irqEFoCD5EoZE5YV+bam9wlXiOx7g
-XGjqe2AFCOAC4YsxXWpFyqQrfVojw7k0raJnOmcsJtyYIuXsAc3yd+OBwEm/2kAg
-MvdQE5f3AW9UApWHnlLbyPUslNeG0NecSxUB3gGk8TR/5R1C8Tl9mgfTdQKKgqSl
-3fxKGI53nkfpAjhxHa4x9sH3N1thwg==
-=o9Pt
------END PGP SIGNATURE-----
+I understand that \\ is converted to '\' character.
 
---M5VXtlIpL9APvO4GuMGGCCje7I23NQfM2--
+> Arguably, since it is not required by POSIX, we don't have to do it. But
+> I also can't argue that POSIX forbids us to support \1 as an extension
+> (it says nothing about whether implementations can have additional
+> escape sequences).  So I'll argue that it is intentional as a dash
+> extension.  But if you can make dash smaller by getting rid of the
+> extension, that might be an acceptable patch.
+
+In that case, I think, the man page of dash should be modified with
+that extension.
+
+Thank you.
+Bosco.
