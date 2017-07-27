@@ -1,114 +1,77 @@
-From: Eric Blake <eblake@redhat.com>
+From: Bosco <jbosco.gg@gmail.com>
 Subject: Re: echo "\\1"?
-Date: Thu, 27 Jul 2017 09:51:25 -0500
-Message-ID: <bf53bb8a-a967-023f-a83b-c0245702c1a4@redhat.com>
+Date: Thu, 27 Jul 2017 15:10:22 +0000
+Message-ID: <CAC4gepdMmWSdheZbfw44fn3eexJ4Wg3gSkj7pMChLNodB3UyTw@mail.gmail.com>
 References: <CAC4gepeczuKhmanuBqYybUTjvo6eNeZk6FyqHjOhx8n-qDfCSw@mail.gmail.com>
- <7253a908-22d2-03e3-5493-418ca31e5590@redhat.com>
- <CAC4gepdsPNvUJyW4Zwto9wZGc1Naq5kMsnz+RdCyAurEZzGLZw@mail.gmail.com>
- <68dddf01-263e-77bd-ffc7-8e7df386ee8f@redhat.com>
- <CAC4gepcv49NcWqS-3jB50YrhJP8xYOhHyTFeL2TkifeJXRrQXA@mail.gmail.com>
+ <7253a908-22d2-03e3-5493-418ca31e5590@redhat.com> <CAC4gepdsPNvUJyW4Zwto9wZGc1Naq5kMsnz+RdCyAurEZzGLZw@mail.gmail.com>
+ <68dddf01-263e-77bd-ffc7-8e7df386ee8f@redhat.com> <CAC4gepcv49NcWqS-3jB50YrhJP8xYOhHyTFeL2TkifeJXRrQXA@mail.gmail.com>
+ <bf53bb8a-a967-023f-a83b-c0245702c1a4@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="JXPtD0oMqvjDv7J3wCl3NvGVoBDLHn5ig"
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48074 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751643AbdG0Ov1 (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 27 Jul 2017 10:51:27 -0400
-In-Reply-To: <CAC4gepcv49NcWqS-3jB50YrhJP8xYOhHyTFeL2TkifeJXRrQXA@mail.gmail.com>
+Received: from mail-qk0-f178.google.com ([209.85.220.178]:35576 "EHLO
+        mail-qk0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750981AbdG0PKn (ORCPT <rfc822;dash@vger.kernel.org>);
+        Thu, 27 Jul 2017 11:10:43 -0400
+Received: by mail-qk0-f178.google.com with SMTP id d145so98046434qkc.2
+        for <dash@vger.kernel.org>; Thu, 27 Jul 2017 08:10:43 -0700 (PDT)
+In-Reply-To: <bf53bb8a-a967-023f-a83b-c0245702c1a4@redhat.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Bosco <jbosco.gg@gmail.com>
+To: Eric Blake <eblake@redhat.com>
 Cc: dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JXPtD0oMqvjDv7J3wCl3NvGVoBDLHn5ig
-Content-Type: multipart/mixed; boundary="4mDxjGBoPquoVqNh3iOvj22IJqlSnk7QK";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Bosco <jbosco.gg@gmail.com>
-Cc: dash@vger.kernel.org
-Message-ID: <bf53bb8a-a967-023f-a83b-c0245702c1a4@redhat.com>
-Subject: Re: echo "\\1"?
-References: <CAC4gepeczuKhmanuBqYybUTjvo6eNeZk6FyqHjOhx8n-qDfCSw@mail.gmail.com>
- <7253a908-22d2-03e3-5493-418ca31e5590@redhat.com>
- <CAC4gepdsPNvUJyW4Zwto9wZGc1Naq5kMsnz+RdCyAurEZzGLZw@mail.gmail.com>
- <68dddf01-263e-77bd-ffc7-8e7df386ee8f@redhat.com>
- <CAC4gepcv49NcWqS-3jB50YrhJP8xYOhHyTFeL2TkifeJXRrQXA@mail.gmail.com>
-In-Reply-To: <CAC4gepcv49NcWqS-3jB50YrhJP8xYOhHyTFeL2TkifeJXRrQXA@mail.gmail.com>
+That script of zziplib isn't mine, I only had to compile it once
+because it was necessary for compile other program (TeX Live).
 
---4mDxjGBoPquoVqNh3iOvj22IJqlSnk7QK
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I'm not talking about POSIX, and I don't mind what it said. I'm
+talking about the man page of dash, that said:
 
-On 07/27/2017 09:44 AM, Bosco wrote:
-> I don't have any problem, I only show you one case where I had to fix
-> an script in order to work a compilation in dash.
->=20
-> I'm using dash because of simplicity, unfortunately I don't understand
-> how things work.
->=20
-> I think the problem is of dash, I only want to report that dash fails
-> at parse scape sequence.
-> For instance, the command
->=20
->   echo \\\\
->=20
-> prints
->=20
->   \
+>  echo [-n] args...
+>            Print the arguments on the standard output, separated by spaces.
+>            Unless the -n  option is present, a newline is output following the
+>            arguments.
+>
 
-Correct, per POSIX.  Incorrect, for portable code (since not all echo
-implementations obey POSIX; many require to type
+According to
 
-echo -e \\\\
+>            If any of the following sequences of characters is encountered
+>            during output, the sequence is not output.  Instead, the specified
+>            action is performed:
 
-to get single output, but -e is not POSIX).
+when \\ is reached is replaced by \.
 
->=20
-> I think it should print
-> \\
+>
+>            \b      A backspace character is output.
+>
+>            \c      Subsequent output is suppressed.  This is normally used at
+>                    the end of the last argument to suppress the trailing
+>                    newline that e ec ch ho o would otherwise output.
+>
+>            \f      Output a form feed.
+>
+>            \n      Output a newline character.
+>
+>            \r      Output a carriage return.
+>
+>            \t      Output a (horizontal) tab character.
+>
+>            \v      Output a vertical tab.
+>
+>            \0digits
+>                    Output the character whose value is given by zero to three
+>                    octal digits.  If there are zero digits, a nul character
+>                    is output.
+>
+>            \\      Output a backslash.
+>
+>            All other backslash sequences elicit undefined behaviour.
+>
 
-Wrong per POSIX, but it matches what you get on bash if you don't turn
-on 'shopt -s xpg_echo' and 'set -o posix' simultaneously (yes, bash has
-two separate knobs that BOTH have to be on to get POSIX behavior).
+Then, in the command
+  echo \\\\
+because \\ is reached first, then it will be replaced by '\'
+character, immediately after that another \\ is reached, then it will
+be replaced by another '\' character. It turns out the ouput '\\'.
 
->=20
-> I don't have to decided how dash should understand things because it
-> isn't my project. I only advise of a bad behavior, of course from my
-> point of view.
-
-The bad behavior is not in dash, but in your non-portable use of echo
-with a \ in the argument.  Use printf instead, if you want your script
-to work in more than one shell.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---4mDxjGBoPquoVqNh3iOvj22IJqlSnk7QK--
-
---JXPtD0oMqvjDv7J3wCl3NvGVoBDLHn5ig
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAll5/e0ACgkQp6FrSiUn
-Q2qURQgAoXqFp+syrmKy7YJBcTu0z4kJjgZVMX2gu18QoGOZ7aDs3cIajBjouPeB
-TwVt06QfrabCwvr8Rjs6Cv22brD8TTcMuJdHF8oCORON43u6asJ7jqYuyVNN+5zW
-cQ2sOq9DyP71ZINpBQTnqJsnyvzSMf+cxdvlcT4mQwxOmBMso6hLd3aDbvsWKOaU
-uXt+C+yHfq6TCeRjAWkR8Wmsib0DlGWqbm1Sk2KZyEPiSFtnR5M/2HXngqHILyXK
-j9DpPfHlfdK8063wQ+i6RE23Fd/ixJ9O8d0Ww6W6UOQZjgn1TDCrQZ8q/Q0WZBJa
-6x5FRrZVbNev7KJnrDU9nUnbQJ2a6Q==
-=lYpn
------END PGP SIGNATURE-----
-
---JXPtD0oMqvjDv7J3wCl3NvGVoBDLHn5ig--
+Bosco.
