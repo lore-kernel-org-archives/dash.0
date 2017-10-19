@@ -1,147 +1,49 @@
-From: <matthias.foerster@st-michael-bergedorf.de>
-Subject: (unknown)
-Date: Sun, 08 Oct 2017 19:00:24 -0000
-Message-ID: <150748922486.32756.12368718058813214668@scapriotti.plus.com>
+From: "G.raud" <graud@gmx.com>
+Subject: Re: [NO-BUG] quoted substring parameter expansion ignores
+ single-quotes in the arg
+Date: Thu, 19 Oct 2017 12:41:30 +0200
+Message-ID: <20171019104103.7gzflupyi27artlg@gmx.com>
+References: <20170926034148.ohemy3jubd2nskyj@gmx.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="434071651431.zip"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from scapriotti.plus.com ([81.174.168.8]:40142 "HELO
-        scapriotti.plus.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1751623AbdJHTA2 (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 8 Oct 2017 15:00:28 -0400
-Subject: 
-Content-Disposition: attachment
+Received: from mout.gmx.net ([212.227.15.18]:50096 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751311AbdJSKl4 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Thu, 19 Oct 2017 06:41:56 -0400
+Received: from gmx.com ([176.121.10.44]) by mail.gmx.com (mrgmx003
+ [212.227.17.184]) with ESMTPSA (Nemesis) id 0M54L0-1dI9Jn2xri-00zI6p for
+ <dash@vger.kernel.org>; Thu, 19 Oct 2017 12:41:54 +0200
+Content-Disposition: inline
+In-Reply-To: <20170926034148.ohemy3jubd2nskyj@gmx.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-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
-AQBaAAAAHBwAAAAA
+Wrong bug report.
+
+In fact the beahviour of dash on "a=\\'a\\'; echo \"\${a%'}\"" is that
+of POSIX and of zsh 5.  However 'bash --posix', 'mksh -o posix' and
+pdksh fail to parse the command and ksh does not remove the quote from
+$a.
+
+On Tue, Sep 26, 2017 at 05:41:48AM +0200, G.raud wrote:
+> Subject: [BUG] quoted substring parameter expansion ignores single-quotes
+>  in the arg
+> 
+> To test that the single quotes are considered ordinary chars when
+> double-quoting the parameter expansion:
+> 
+> $ dash -c "a=\\'a\\'; echo \"\${a%'}\""
+> 
+> The result is surprising and non consistent with a non double-quoted
+> expansion where the single-quotes act as quotes:
+> 
+> $ dash -c "a=a%; echo \${a%'%'}"
+> 
+> Additionally the manual states that the arg to substring processing is
+> processed as an ordinary word (as probably POSIX too).
+
+-- 
+G.raud Meyer
+graud@gmx.com
