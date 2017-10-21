@@ -1,76 +1,65 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: [BUG] Redirection bug in subshell's EXIT trap
-Date: Thu, 19 Oct 2017 23:57:46 +0200
-Message-ID: <8790d678-ee72-fdb5-750b-d2bb64cf2ec2@gigawatt.nl>
-References: <20171019174410.GA22649@ghost.hq.kp4.ru>
+From: Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: [BUG] quoted substring parameter expansion ignores single-quotes
+ in the arg
+Date: Sat, 21 Oct 2017 14:13:43 +0200
+Message-ID: <20171021121343.GA29646@stack.nl>
+References: <20170926034148.ohemy3jubd2nskyj@gmx.com>
+ <20171019104103.7gzflupyi27artlg@gmx.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from home.gigawatt.nl ([83.163.3.213]:46358 "EHLO home.gigawatt.nl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753282AbdJSWG1 (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 19 Oct 2017 18:06:27 -0400
-In-Reply-To: <20171019174410.GA22649@ghost.hq.kp4.ru>
-Content-Language: en-US
+Received: from mailout05.stack.nl ([131.155.140.202]:58899 "EHLO
+        mailout.stack.nl" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1753358AbdJUMVu (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 21 Oct 2017 08:21:50 -0400
+Content-Disposition: inline
+In-Reply-To: <20171019104103.7gzflupyi27artlg@gmx.com>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Vitaly Sinilin <vs@kp4.ru>, dash@vger.kernel.org
+To: "G.raud" <graud@gmx.com>
+Cc: dash@vger.kernel.org
 
-On 19/10/17 19:44, Vitaly Sinilin wrote:
-> Hi,
-> 
-> I've recently written a quite unusual script and faced a strange dash
-> behavior that seems not POSIX-ly correct to me.
-> 
-> Here is the script with a lot of debugging extra output.
-> 
-> (I am sorry about posting a pretty lengthy script, but I feel like a
-> shorten version will look just insane without the context.)
+On Thu, Oct 19, 2017 at 12:41:30PM +0200, G.raud wrote:
+> Wrong bug report.
 
-A shortened version is easier to debug:
+> In fact the beahviour of dash on "a=\\'a\\'; echo \"\${a%'}\"" is that
+> of POSIX and of zsh 5.  However 'bash --posix', 'mksh -o posix' and
+> pdksh fail to parse the command and ksh does not remove the quote from
+> $a.
 
-   dash -c 'f()(trap cat EXIT);f<&-'
+I think your original bug report is actually valid. Although the POSIX
+standard may be hard to interpret (make sure to use the latest (2016)
+edition), I think it is sufficiently clear that various special
+characters are active in ${param#word}, whether the outer substitution
+is within double-quotes or not. See this sentence in 2.6.2 Parameter
+Expansion:
 
-This is supposed to print error messages. With dash, it doesn't.
+] Enclosing the full parameter expansion string in double-quotes shall
+] not cause the following four varieties of pattern characters to be
+] quoted, whereas quoting characters within the braces shall have this
+] effect.
 
-> The problem here is that although getch is run in a subshell and it
-> got FD#4 as stdin it somehow has parent's stdin in its EXIT trap.
-> 
-> POSIX says: "The environment in which the shell executes a trap on
-> EXIT shall be identical to the environment immediately after the
-> last command executed before the trap on EXIT was taken."
+More generally, if bash --posix and ksh93 agree about something, it is
+usually correct (use something like "${a#'*'}", since "${a#'}" is
+wrong). Although zsh is a good interactive shell, it does not follow
+POSIX as closely; not even in sh or ksh emulation mode.
 
-Yes, it is a bug. The problem is that dash, just before checking whether 
-to execute the EXIT handler, has already reset everything to continue 
-parsing and evaluating the next command. Which is not supposed to 
-happen, never going to happen, and messes up the execution of the handler.
+Also note that dash does implement this correctly if a metacharacter is
+quoted using a single-quote or a backslash:
 
-This resetting is done by the reset() function, and although the simple 
-fix would be to move its call after exitshell(), the old ChangeLog shows 
-that it was originally (about 15 years ago) the other way around and 
-intentionally switched to how it is now, because some of what reset() 
-does is necessary even here:
+$ v=**
+$ echo "${v#*}"
+**
+$ echo "${v#"*"}"
+*
+$ echo "${v#\*}"
+*
 
->  -- Herbert Xu <herbert@debian.org>  Sat, 26 Oct 2002 21:28:33 +1000
-> 
-> dash (0.4.2) unstable; urgency=low
-> 
->   [...]
->   * Call reset() before exitshell() is called.  This fixes the bug where
->     returning an error from a function running under set -e caused the exit
->     trap to be taken with evalskip set.
+In dash's internals, this bug is caused by not distinguishing between
++/-/=/? and #/##/%/%% varieties in the parser. Not maintaining state for
+eacg nesting level makes the parser more elegant, but it is untenable
+since there is no way one can parse both "${v+'}" and "${v#'*'}"
+correctly without it.
 
-Aside from the issue with redirections, the current order has other 
-problems too:
-
-   dash -c 'f()(local cmd="echo good";trap \$cmd EXIT);cmd="echo bad";f'
-
-This is supposed to print "good". With dash, it prints "bad". With the 
-call to reset() moved after exitshell(), it prints "good".
-
-I suspect reset() needs to be split into two separate functions, but it 
-may be a bit tricky to determine exactly what is supposed to go where.
-
-Cheers,
-Harald van Dijk
+-- 
+Jilles Tjoelker
