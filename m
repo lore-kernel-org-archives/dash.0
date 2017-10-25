@@ -1,65 +1,48 @@
-From: Jilles Tjoelker <jilles@stack.nl>
+From: Martijn Dekker <martijn@inlv.org>
 Subject: Re: [BUG] quoted substring parameter expansion ignores single-quotes
  in the arg
-Date: Sat, 21 Oct 2017 14:13:43 +0200
-Message-ID: <20171021121343.GA29646@stack.nl>
+Date: Wed, 25 Oct 2017 12:08:42 +0200
+Message-ID: <a2539560-b359-e465-e427-9b85cdd8a545@inlv.org>
 References: <20170926034148.ohemy3jubd2nskyj@gmx.com>
- <20171019104103.7gzflupyi27artlg@gmx.com>
+ <20171019104103.7gzflupyi27artlg@gmx.com> <20171021121343.GA29646@stack.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mailout05.stack.nl ([131.155.140.202]:58899 "EHLO
-        mailout.stack.nl" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1753358AbdJUMVu (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sat, 21 Oct 2017 08:21:50 -0400
-Content-Disposition: inline
-In-Reply-To: <20171019104103.7gzflupyi27artlg@gmx.com>
+Received: from kahlil.inlv.org ([37.59.109.123]:35332 "EHLO kahlil.inlv.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932321AbdJYKP7 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 25 Oct 2017 06:15:59 -0400
+Received: from breedzicht.local ([145.15.244.16])
+        (authenticated bits=0)
+        by kahlil.inlv.org (8.14.9/8.14.4) with ESMTP id v9PA8hFM007121
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO)
+        for <dash@vger.kernel.org>; Wed, 25 Oct 2017 12:08:44 +0200
+In-Reply-To: <20171021121343.GA29646@stack.nl>
+Content-Language: en-GB
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "G.raud" <graud@gmx.com>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Thu, Oct 19, 2017 at 12:41:30PM +0200, G.raud wrote:
-> Wrong bug report.
+Op 21-10-17 om 14:13 schreef Jilles Tjoelker:
+[...]
+> I think it is sufficiently clear that various special
+> characters are active in ${param#word}, whether the outer substitution
+> is within double-quotes or not.
 
-> In fact the beahviour of dash on "a=\\'a\\'; echo \"\${a%'}\"" is that
-> of POSIX and of zsh 5.  However 'bash --posix', 'mksh -o posix' and
-> pdksh fail to parse the command and ksh does not remove the quote from
-> $a.
+Yes -- this came up on austin-group-l some time ago as well.
+https://www.mail-archive.com/austin-group-l@opengroup.org/msg00197.html
 
-I think your original bug report is actually valid. Although the POSIX
-standard may be hard to interpret (make sure to use the latest (2016)
-edition), I think it is sufficiently clear that various special
-characters are active in ${param#word}, whether the outer substitution
-is within double-quotes or not. See this sentence in 2.6.2 Parameter
-Expansion:
+> Although zsh is a good interactive shell, it does not follow
+> POSIX as closely; not even in sh or ksh emulation mode.
 
-] Enclosing the full parameter expansion string in double-quotes shall
-] not cause the following four varieties of pattern characters to be
-] quoted, whereas quoting characters within the braces shall have this
-] effect.
+I think that may have changed. Try the latest version. Over the last
+year or two, many POSIX compliance bugs have been fixed. I believe the
+latest version is about as compliant as bash or dash.
 
-More generally, if bash --posix and ksh93 agree about something, it is
-usually correct (use something like "${a#'*'}", since "${a#'}" is
-wrong). Although zsh is a good interactive shell, it does not follow
-POSIX as closely; not even in sh or ksh emulation mode.
+Zsh does still accept the wrong "${param#'}" expansion like dash does,
+but handling non-compliant input is more like an extension than actual
+non-compliance. Zsh acts correctly on "${param#\'}", like dash. It also
+acts correctly on "${param#'foo'}", *unlike* dash.
 
-Also note that dash does implement this correctly if a metacharacter is
-quoted using a single-quote or a backslash:
-
-$ v=**
-$ echo "${v#*}"
-**
-$ echo "${v#"*"}"
-*
-$ echo "${v#\*}"
-*
-
-In dash's internals, this bug is caused by not distinguishing between
-+/-/=/? and #/##/%/%% varieties in the parser. Not maintaining state for
-eacg nesting level makes the parser more elegant, but it is untenable
-since there is no way one can parse both "${v+'}" and "${v#'*'}"
-correctly without it.
-
--- 
-Jilles Tjoelker
+- M.
