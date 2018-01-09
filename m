@@ -1,42 +1,34 @@
-From: "G.raud" <graud@gmx.com>
-Subject: Please document the peculiar $ENV processing
-Date: Sun, 17 Dec 2017 19:00:34 +0100
-Message-ID: <20171217175910.42kia52d2pfbklyi@gmx.com>
+From: "Sandra Younes" <mamg7610885@angel.ocn.ne.jp>
+Subject: Re: A cry for help, please don't ignore!
+Date: Tue, 9 Jan 2018 16:19:56 +0200
+Message-ID: <201801091419.w09EJq68050756@mf-smf-ucb003.ocn.ad.jp>
+Reply-To: <tdavalvse@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain;
+        charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.15]:49482 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752393AbdLQSBI (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 17 Dec 2017 13:01:08 -0500
-Received: from gmx.com ([164.132.51.91]) by mail.gmx.com (mrgmx001
- [212.227.17.184]) with ESMTPSA (Nemesis) id 0Lt2BW-1fABam3vbe-012ayC for
- <dash@vger.kernel.org>; Sun, 17 Dec 2017 19:01:06 +0100
-Content-Disposition: inline
+Received: from mbkd0323.ocn.ad.jp ([153.149.236.24]:52238 "EHLO
+        mbkd0323.ocn.ad.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754494AbeAIO2P (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 9 Jan 2018 09:28:15 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
 
-The processing of the $ENV variable is not at all mentioned in the
-manpage.  POSIX only requires that parameter substitution is applied to
-it.
+Good Day,
 
-In fact in dash the value of $ENV is subject to parameter and command
-substitutions and to arithmetic expansion.  This should be documented,
-as this behaviour is more complex that what POSIX requires and is
-different from other shells: ksh93 and pdksh/mksh additionally subject
-it to tilde expansion.
+Forgive my indignation if this message comes to you as a surprise and may offend your personality for contacting you without your prior consent and writing through this channel.
 
-Here is a proposed text change of one sentence:
+I came across your name and contact on the course of my personal searching when i was searching for a foreign reliable partner. I was assured of your capability and reliability after going true your profile.
 
- If the environment variable ENV is set on entry to an interactive shell,
- or is set in the .profile of a login shell, the shell next reads
--commands from the file named in ENV.
-+commands from the file named by ENV after subjecting its value to
-+parameter expansion, command substitution and arithmetic expansion.
+I'm (Miss. Sandra) from Benghazi libya, My father of blessed memory by name late General Abdel Fattah Younes who was shot death by Islamist-linked militia within the anti-Gaddafi forces on 28th July, 2011 and after two days later my mother with my two brothers was killed one early morning by the rebels as result of civil war that is going on in my country Libya, then after the burial of my parents, my uncles conspired and sold my father's properties and left nothing for me. On a faithful morning, I opened my father's briefcase and discover a document which he has deposited ($6.250M USD) in a bank in a Turkish Bank which has a small branch in Canada with my name as the legitimate/next of kin. Meanwhile i have located the bank,and have also discussed the possiblity of transfering the fund. M
+ y father left a clause to the bank that i must introduce a trusted foreign partner who would be my trustee to help me invest this fund; hence the need for your assistance,i request that you be my ru
+ stee and assist me in thi
 
-Regards,
+You will also be responsible for the investment and management of the fund for me and also you will help me get a good school where i will further my education.
+I agreed to give you 40% of the $6.250M once the transfer is done. this is my true life story, I will be glad to receive your respond soonest for more details to enable us start and champion the transfer less than 14 banking days as i was informed by the bank manager.
 
---
-G.raud Meyer
-graud@gmx.com
+Thanks for giving me your attention,
+
+Yours sincerely,
+Miss. Sandra Younes
