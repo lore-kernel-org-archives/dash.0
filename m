@@ -1,69 +1,50 @@
-From: Rink Springer <rink@rink.nu>
-Subject: [PATCH] Remove dependency on fmatch.h if it does not exit
-Date: Fri, 2 Feb 2018 08:44:55 +0100
-Message-ID: <20180202074455.GD1669@rink.nu>
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Subject: dash bug: double-quoted "\" breaks glob protection for next char
+Date: Tue, 13 Feb 2018 14:53:42 +0100
+Message-ID: <CAK1hOcPW_MZ5Nq-0z-aMMMgzZbOZYXD_9kkxz1w+U-HY+E4gbw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="8t9RHnE3ZwKMSgU+"
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.zhmu.nl ([37.247.37.64]:30282 "EHLO mail.zhmu.nl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750795AbeBBHy2 (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 2 Feb 2018 02:54:28 -0500
-Received: from mail.zhmu.nl (mail.zhmu.nl [37.247.37.64])
-        by mail.zhmu.nl (Postfix) with ESMTP id 4EC3E6433
-        for <dash@vger.kernel.org>; Fri,  2 Feb 2018 08:44:56 +0100 (CET)
-Received: from mail.zhmu.nl ([37.247.37.64])
-        by mail.zhmu.nl (anathema.codehulu.net [37.247.37.64]) (amavisd-new, port 10024)
-        with ESMTP id FpGAj58FAPZg for <dash@vger.kernel.org>;
-        Fri,  2 Feb 2018 08:44:55 +0100 (CET)
-Received: from gloom.zhmu.nl (mail.zhmu.nl [37.247.37.64])
-        by mail.zhmu.nl (Postfix) with ESMTP id C41756426
-        for <dash@vger.kernel.org>; Fri,  2 Feb 2018 08:44:55 +0100 (CET)
-Content-Disposition: inline
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:52735 "EHLO
+        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S964859AbeBMNyE (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 13 Feb 2018 08:54:04 -0500
+Received: by mail-wm0-f43.google.com with SMTP id j199so4056533wmj.2
+        for <dash@vger.kernel.org>; Tue, 13 Feb 2018 05:54:03 -0800 (PST)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
 
+$ >'\zzzz'
+$ >'\wwww'
+$ dash -c 'echo "\*"'
+\wwww \zzzz
 
---8t9RHnE3ZwKMSgU+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The cause: uses "\\*" pattern instead of "\\\*".
+The fix:
 
-[ Ugh; forgot to attach patch - apologies, I need more coffee ]
-
-Dear all,
-
-Attached is a trivial patch that removes the assumption that fnmatch.h
-is available - the configure script already checks for fnmatch(3) and
-supplies its own implementation if necessary, but fnmatch.h is always
-included.
-
-Let me know what you think.
-
-Regards,
-Rink
-
---8t9RHnE3ZwKMSgU+
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="dash-fnmatch.diff"
-
-Do not assume we can include fnmatch.h
-
-Signed-off-by: Rink Springer <rink@rink.nu>
-
-diff --git a/src/expand.c b/src/expand.c
-index 2a50830..1ab5757 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -45,7 +45,9 @@
- #include <inttypes.h>
- #include <limits.h>
- #include <string.h>
-+#ifdef HAVE_FNMATCH
- #include <fnmatch.h>
-+#endif
- #ifdef HAVE_GLOB
- #include <glob.h>
- #endif
-
---8t9RHnE3ZwKMSgU+--
+                        /* backslash */
+                        case CBACK:
+                                c = pgetc2();
+                                if (c == PEOF) {
+                                        USTPUTC(CTLESC, out);
+                                        USTPUTC('\\', out);
+                                        pungetc();
+                                } else if (c == '\n') {
+                                        nlprompt();
+                                } else {
+                                        if (
+                                                dblquote &&
+                                                c != '\\' && c != '`' &&
+                                                c != '$' && (
+                                                        c != '"' ||
+                                                        eofmark != NULL
+                                                )
+                                        ) {
+USTPUTC(CTLESC, out); // add this line
+                                                USTPUTC('\\', out);
+                                        }
+                                        USTPUTC(CTLESC, out);
+                                        USTPUTC(c, out);
+                                        quotef++;
+                                }
