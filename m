@@ -1,55 +1,45 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: dash bug: double-quoted "\" breaks glob protection for next char
-Date: Wed, 14 Feb 2018 23:50:19 +0100
-Message-ID: <5a9d8ab5-ec2d-8101-2853-ac3be6b0c4f6@gigawatt.nl>
-References: <CAK1hOcPW_MZ5Nq-0z-aMMMgzZbOZYXD_9kkxz1w+U-HY+E4gbw@mail.gmail.com>
- <5e1ee06d-d1ca-6442-51de-786e2739d4df@gigawatt.nl>
- <297b41c4-0e15-e0d8-f088-d68acfcc3c0f@gigawatt.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Return-path: <dash-owner@vger.kernel.org>
-Received: from home.gigawatt.nl ([83.163.3.213]:34212 "EHLO home.gigawatt.nl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1031852AbeBNWtg (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 14 Feb 2018 17:49:36 -0500
-In-Reply-To: <297b41c4-0e15-e0d8-f088-d68acfcc3c0f@gigawatt.nl>
-Content-Language: en-US
-Sender: dash-owner@vger.kernel.org
+From: Alexander Dahl <ada@thorsis.com>
+Subject: Bug#541544: [PATCH] ash: reset tokpushback before prompting while parsing heredoc
+Date: Fri, 23 Nov 2018 15:09:06 +0100
+Message-ID: <1789278.1EysXevFyG@ada>
+References: <20181111125958.8282-1-develop@kristov.de> <20181120192142.Horde.sRKu4zTrClxweN4nccD6CkI@localhost> <5bf482fd.f2mWn8/w5XhV9NAO%rmy@pobox.com> <20090814183723.7281.91998.reportbug@localhost.localdomain>
+Reply-To: Alexander Dahl <ada@thorsis.com>, 541544@bugs.debian.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Return-path: <bounce-debian-bugs-dist=glddb-debian-bugs-dist2=m.gmane.org@lists.debian.org>
+Resent-To: debian-bugs-dist@lists.debian.org
+Resent-Message-ID: <handler.541544.B541544.154298254313620@bugs.debian.org>
+In-Reply-To: <5bf482fd.f2mWn8/w5XhV9NAO%rmy@pobox.com>
+List-URL: <https://lists.debian.org/debian-bugs-dist/>
+List-Post: <mailto:debian-bugs-dist@lists.debian.org>
+List-Help: <mailto:debian-bugs-dist-request@lists.debian.org?subject=help>
+List-Subscribe: <mailto:debian-bugs-dist-request@lists.debian.org?subject=subscribe>
+List-Unsubscribe: <mailto:debian-bugs-dist-request@lists.debian.org?subject=unsubscribe>
+To: busybox@busybox.net
+Cc: Ron Yorston <rmy@pobox.com>, vda.linux@googlemail.com, develop@kristov.de, 541544@bugs.debian.org, Jack Bates <ms419@freezone.co.uk>, dash@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Denys Vlasenko <vda.linux@googlemail.com>, Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
 
-On 2/14/18 10:44 PM, Harald van Dijk wrote:
-> On 2/14/18 9:03 PM, Harald van Dijk wrote:
->> On 13/02/2018 14:53, Denys Vlasenko wrote:
->>> $ >'\zzzz'
->>> $ >'\wwww'
->>> $ dash -c 'echo "\*"'
->>> \wwww \zzzz
->>
->> [...]
->>
->> Currently:
->>
->> $ dash -c 'foo=a; echo "<${foo#[a\]]}>"'
->> <>
->>
->> This is what I expect, and also what bash, ksh and posh do.
->>
->> With your patch:
->>
->> $ dash -c 'foo=a; echo "<${foo#[a\]]}>"'
->> <a>
+Hei hei,
+
+I just stumbled over an old entry in the Debian Bug tracker.
+
+Am Dienstag, 20. November 2018, 21:56:13 CET schrieb Ron Yorston:
+> Christoph Schulz wrote:
+> >I could not reproduce the problem with dash, neither with git dash nor
+> >with older versions (0.5.8, 0.5.9.1, 0.5.10.2, to name a few).
+> >Something must be handled differently. But I haven't compared busybox
+> >ash and dash sources thoroughly either.
 > 
-> Does the attached look right as an alternative? It treats a quoted 
-> backslash the same way as if it were preceded by CTLESC in _rmescapes. 
-> It passes your test case and mine, but I'll do more extensive testing.
+> The same issue is present in dash and has been discussed in a mailing
+> list thread starting here:
+> 
+>    https://www.spinics.net/lists/dash/msg01652.html
 
-It causes preglob's string to potentially grow larger than the original. 
-When called with RMESCAPE_ALLOC, that can be handled by increasing the 
-buffer size, but preglob also gets called without RMESCAPE_ALLOC to 
-modify a string in-place. That's never going to work with this approach. 
-Back to the drawing board...
+By chance, is that old Debian Bug here referencing the same problem?
 
-Cheers,
-Harald van Dijk
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541544
+
+Maybe someone could tell Debian, then?
+
+o.O
+Alex
