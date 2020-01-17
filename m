@@ -1,31 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] expand: Fix trailing newlines processing in backquote
- expanding
-Date: Wed, 15 Jan 2020 14:00:16 +0800
-Message-ID: <20200115060016.v4f6d3uk4m3lwthz@gondor.apana.org.au>
-References: <20190429141337.6804-1-n.merinov@inango-systems.com>
- <130240790.41627.1578917285464.JavaMail.zimbra@inango-systems.com>
+Subject: Re: EXIT trap handling in subshells broken
+Date: Fri, 17 Jan 2020 16:51:24 +0800
+Message-ID: <20200117085124.ub53qala7c636owf@gondor.apana.org.au>
+References: <c1a9c062-0917-d3f3-8826-811b5a4fd802@gigawatt.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hmeau.com ([216.24.177.18]:40266 "EHLO deadmen.hmeau.com"
+Received: from helcar.hmeau.com ([216.24.177.18]:48050 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725962AbgAOGAS (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 15 Jan 2020 01:00:18 -0500
+        id S1729447AbgAQIv2 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 17 Jan 2020 03:51:28 -0500
 Content-Disposition: inline
-In-Reply-To: <130240790.41627.1578917285464.JavaMail.zimbra@inango-systems.com>
+In-Reply-To: <c1a9c062-0917-d3f3-8826-811b5a4fd802@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Nikolai Merinov <n.merinov@inango-systems.com>
-Cc: dash@vger.kernel.org, os <os@inango-systems.com>
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: DASH shell mailing list <dash@vger.kernel.org>
 
-On Mon, Jan 13, 2020 at 02:08:05PM +0200, Nikolai Merinov wrote:
-> Hi Herbert,
-> 
-> Do you want any changes to this patch from us? This patch in state "Under Review" more then 8 months.
+On Mon, Jan 06, 2020 at 09:57:20PM +0000, Harald van Dijk wrote:
+>
+> One way to fix this is to install an exception handler in evaltree(nr) to
+> prevent exceptions bubbling up too far. It can just call exitshell() from
+> there. It is not clear to me yet whether this is the best way.
 
-Sorry I just had no time to work on dash patches.  I'll try to
-work on the backlog fairly soon.
+Thanks for the report.  I think what we should do is drop the
+relevant state when we enter the subshell.
 
 Cheers,
 -- 
