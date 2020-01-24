@@ -1,41 +1,62 @@
-From: Simon Ser <contact@emersion.fr>
-Subject: Re: [PATCH] parser: Catch errors in expandstr
-Date: Tue, 21 Jan 2020 17:06:15 +0000
-Message-ID: <ifdF-mI9buGzqHAdD-wIuCKj--uNOthFkm1545tsyG3vVhkMqEqZKbx_ZEnu1vK8JQr347hcsbicRHWEo5Lsk2SNtxp4UNoQTfwe1qiR8jA=@emersion.fr>
-References: <SJhI_AW9YJmphaap5RzzVqYTGsA529iV7GOEBafT9ilDPGFpMRRJlNt3TrMBwh0uqKQltSvsH2P8x_2in6enHT5DzygjAtrRSvWl5xHofeY=@emersion.fr>
- <20200121063959.tel7ty76fkz33xpn@gondor.apana.org.au>
-Reply-To: Simon Ser <contact@emersion.fr>
+From: Martijn Dekker <martijn@inlv.org>
+Subject: Alias/heredoc/cmdsubst regression
+Date: Sat, 25 Jan 2020 00:48:51 +0100
+Message-ID: <40db0aa1-195b-f29e-5068-01fa101affd9@inlv.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-40131.protonmail.ch ([185.70.40.131]:53827 "EHLO
-        mail-40131.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726714AbgAURGV (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 21 Jan 2020 12:06:21 -0500
-In-Reply-To: <20200121063959.tel7ty76fkz33xpn@gondor.apana.org.au>
+Received: from kahlil.inlv.org ([37.59.109.123]:59536 "EHLO kahlil.inlv.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387458AbgAYAPK (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 24 Jan 2020 19:15:10 -0500
+Received: from breedzicht.fritz.box (inlv.demon.nl [82.161.110.186])
+        (authenticated bits=0)
+        by kahlil.inlv.org (8.15.2/8.15.2) with ESMTPSA id 00ONmpKi028260
+        (version=TLSv1.2 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO)
+        for <dash@vger.kernel.org>; Sat, 25 Jan 2020 00:48:52 +0100
+Content-Language: en-GB
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "dash@vger.kernel.org" <dash@vger.kernel.org>
+To: DASH shell mailing list <dash@vger.kernel.org>
 
-On Tuesday, January 21, 2020 7:39 AM, Herbert Xu <herbert@gondor.apana.org.=
-au> wrote:
+There is a regression involving alias expansion, a here-document, and a 
+command substitution. The following worked fine until dash 0.5.8; it 
+throws a syntax error as of dash 0.5.9.
 
-> On Fri, Dec 13, 2019 at 02:51:34PM +0000, Simon Ser wrote:
->
-> > Just noticed another dash bug: when setting invalid PS1 values dash
-> > enters an infinite loop.
-> > For instance, setting PS1=3D'$(' makes dash print many of these:
-> > dash: 1: Syntax error: end of file unexpected (expecting ")")
-> > It would be nice to fallback to the default PS1 value on error.
->
-> This patch fixes it by using the literal value of PS1 should an
-> error occur during expansion.
->
-> Reported-by: Simon Ser <contact@emersion.fr>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+alias BEGIN='{' END='}'
+BEGIN
+cat <<eof
+$(echo hi)
+eof
+END
 
-Thanks, works!
+With some git brute-forcing I determined this was the commit that broke it:
 
-Tested-by: Simon Ser <contact@emersion.fr>
+> commit 7c245aa8ed33ba5db30eef9369d67036a05b0371
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Tue Oct 28 17:22:16 2014 +0800
+> 
+>     [PARSER] Simplify EOF/newline handling in list parser
+> 
+>     This patch simplifies the EOF and new handling in the list parser.
+>     In particular, it eliminates a case where we may leave here-documents
+>     unfinished upon EOF.
+> 
+>     It also removes special EOF/newline handling from parsecmd.
+
+Related shells:
+- I've confirmed the test case to work fine on:
+	FreeBSD sh 9, 10, 11 and 12
+	NetBSD sh 8 and 9.0RC1
+	busybox ash 1.20 - 1.24
+- I've confirmed the test case broken on:
+	busyboxy ash 1.25 through current
+
+Since busybox ash tracks dash, it's not surprising it broke there as well.
+
+- M.
+
+-- 
+modernish -- harness the shell
+https://github.com/modernish/modernish
