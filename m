@@ -1,94 +1,89 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: Another alias substitution bug, now involving case statements
-Date: Sat, 25 Jan 2020 17:55:59 +0000
-Message-ID: <0f37bf49-bda8-bc55-f235-b5f6987590b6@gigawatt.nl>
-References: <f35c1096-18b2-f438-f6d7-19c9d5e335ab@gigawatt.nl>
+From: Martijn Dekker <martijn@inlv.org>
+Subject: Bizarre interaction bug involving bash w/ lastpipe + Almquist 'wait'
+Date: Thu, 6 Feb 2020 16:12:06 +0000
+Message-ID: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.gigawatt.nl ([51.68.198.76]:48882 "EHLO mail.gigawatt.nl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726293AbgAYR5B (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sat, 25 Jan 2020 12:57:01 -0500
-In-Reply-To: <f35c1096-18b2-f438-f6d7-19c9d5e335ab@gigawatt.nl>
-Content-Language: en-US
-Sender: dash-owner@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Return-path: <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.gnu.org/mailman/options/bug-bash>,
+ <mailto:bug-bash-request@gnu.org?subject=unsubscribe>
+List-Archive: <https://lists.gnu.org/archive/html/bug-bash>
+List-Post: <mailto:bug-bash@gnu.org>
+List-Help: <mailto:bug-bash-request@gnu.org?subject=help>
+List-Subscribe: <https://lists.gnu.org/mailman/listinfo/bug-bash>,
+ <mailto:bug-bash-request@gnu.org?subject=subscribe>
+Errors-To: bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org
+Sender: "bug-bash" <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
+To: DASH shell mailing list <dash@vger.kernel.org>, busybox <busybox@busybox.net>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Robert Elz <kre@munnari.OZ.AU>, Jilles Tjoelker <jilles@stack.nl>, Harald van Dijk <harald@gigawatt.nl>
 List-Id: dash@vger.kernel.org
-To: DASH shell mailing list <dash@vger.kernel.org>, Martijn Dekker <martijn@inlv.org>
 
-On 25/01/2020 17:29, Harald van Dijk wrote:
-> Hi,
-> 
-> Checking alias substitution handling in more detail after Martijn 
-> Dekker's report, I found another case where I believe dash's behaviour 
-> is incorrect. First, please consider this test:
-> 
->    alias a="case x in " b=x
->    a b) echo hi ;; esac
-> 
-> bash, ksh and pdksh never check whether a case pattern is a valid alias 
-> name, so they print nothing.
-> 
-> bosh, dash, mksh, yash and zsh do allow the space at the end of a's 
-> definition to cause b to be considered as an alias name.
-> 
-> Based on the literal text of the current standard, I believe 
-> bash/ksh/pdksh's behaviour is correct. Based on accepted new wording for 
-> the standard, new wording that was drafted without considering this 
-> special case, I believe the bosh/dash/mksh/yash/zsh behaviour is 
-> correct. I would not at this time consider this a bug in any of the shells.
-> 
-> Now, consider this modified version:
-> 
->    alias a="case x in " b=x
->    a
->    b) echo hi ;; esac
-> 
-> Here, the next token after "a" is a newline token, not b. Here, b must 
-> definitely not be considered as an alias name. bosh, dash, mksh and zsh 
-> do perform alias substitution anyway, yash does not.
-> 
-> The problem here is in the "eat newlines" behaviour of readtoken(). 
-> There are two reasons why CHKALIAS might be set. It might be set because 
-> the parser is in a state where the next token could be the start of a 
-> simple command, or it might be set because the parser processed a blank 
-> at the end of a prior alias definition. In the first case, after eating 
-> a newline, the parser is still in a state where the next token could be 
-> the start of a simple command, so CHKALIAS should not be dropped. In the 
-> second case, the blank should only affect a single token, and upon 
-> eating a newline CHKALIAS should be dropped. readtoken() has no way of 
-> distinguishing between these two cases with just a single CHKALIAS flag, 
-> so this will require a bit more complicated work to fix.
+This is probably the strangest bug (or maybe pair of bugs) I've run into 
+in nearly five years of breaking shells by developing modernish.
 
-Not very complicated after all. One flag in kwd and one flag in checkkwd 
-will do the job. kwd tracks whether CHKALIAS was set prior to the call 
-to readtoken(), i.e. whether this is potentially the start of a simple 
-command. checkkwd tracks whether CHKALIAS was/got set at the last 
-xxreadtoken() call.
+I've traced it to an interaction between bash >= 4.2 (i.e.: bash with 
+shopt -s lastpipe) and variants of the Almquist shell, at least: dash, 
+gwsh, Busybox ash, FreeBSD sh, and NetBSD 9.0rc2 sh.
 
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -713,6 +713,7 @@ top:
-         if (kwd & CHKNL) {
-                 while (t == TNL) {
-                         parseheredoc();
-+                       checkkwd = 0;
-                         t = xxreadtoken();
-                 }
-         }
-@@ -734,7 +735,7 @@ top:
-                 }
-         }
+Symptom: if 'return' is invoked on bash in the last element of a pipe 
+executed in the main shell environment, then if you subsequently 'exec' 
+an Almquist shell variant so that it has the same PID, its 'wait' 
+builtin breaks.
 
--       if (checkkwd & CHKALIAS) {
-+       if ((checkkwd | kwd) & CHKALIAS) {
-                 struct alias *ap;
-                 if ((ap = lookupalias(wordtext, 1)) != NULL) {
-                         if (*ap->val) {
+I can consistently reproduce this on Linux, macOS, FreeBSD, NetBSD 
+9.0rc2, OpenBSD, and Solaris.
 
-I have checked that this handles both my cases here and the test cases 
-in Martijn Dekker's thread.
+To reproduce this, you need bash >= 4.2, some Almquist shell variant, 
+and these two test scripts:
 
-> Cheers,
-> Harald van Dijk
+---begin test.bash---
+fn() {
+	: | return
+}
+shopt -s lastpipe || exit
+fn
+exec "${1:-dash}" test.ash
+---end test.bash---
+
+---begin test.ash---
+echo '*ash-begin'
+: &
+echo '*ash-middle'
+wait "$!"
+echo '*ash-end'
+---end test.ash---
+
+When executing test.bash with dash, gwsh, Busybox ash, or FreeBSD sh, 
+then test.ash simply waits forever on executing 'wait "$!"'.
+
+$ bash test.bash <some-almquist-shell>
+*ash-begin
+*ash-middle
+(nothing until ^C)
+
+NetBSD sh behaves differently. NetBSD 8.1 sh (as installed on sdf.org 
+and sdf-eu.org) seem to act completely normally, but NetBSD 9.0rc2 sh 
+(on my VirtualBox test VM) segfaults. Output on NetBSD 9.0rc2:
+
+$ bash test.bash /bin/sh
+*ash-begin
+*ash-middle
+[1]   Segmentation fault       bash test.bash sh
+
+I don't know if the different NetBSD sh behaviour is because the older 
+NetBSD sh doesn't have the bug, or because some factor on the sdf*.org 
+systems causes it to not be triggered.
+
+To me, this smells like the use of some uninitialised value on various 
+Almquist shells. Tracing that is beyond my expertise though.
+
+Whether this also represents a bug in bash or not, I can't say. But no 
+other shells trigger this that I've found, not even ksh93 and zsh which 
+also execute the last element of a pipe in the main shell environment.
+
+- Martijn
+
+-- 
+modernish -- harness the shell
+https://github.com/modernish/modernish
