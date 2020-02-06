@@ -1,66 +1,58 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist
- 'wait'
-Date: Thu, 6 Feb 2020 19:29:41 +0000
-Message-ID: <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
-References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
+From: Robert Elz <kre@munnari.OZ.AU>
+Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist 'wait'
+Date: Fri, 07 Feb 2020 03:43:40 +0700
+Message-ID: <15235.1581021820@jinx.noi.kre.to>
+References: <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl> <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8BIT
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.gigawatt.nl ([51.68.198.76]:60104 "EHLO mail.gigawatt.nl"
+Received: from munnari.OZ.AU ([202.29.151.3]:51700 "EHLO munnari.OZ.AU"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726990AbgBFTbO (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 6 Feb 2020 14:31:14 -0500
-In-Reply-To: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
-Content-Language: en-US
+        id S1727711AbgBFVCO (ORCPT <rfc822;dash@vger.kernel.org>);
+        Thu, 6 Feb 2020 16:02:14 -0500
+In-Reply-To: <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Martijn Dekker <martijn@inlv.org>, DASH shell mailing list <dash@vger.kernel.org>, busybox <busybox@busybox.net>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Robert Elz <kre@munnari.OZ.AU>, Jilles Tjoelker <jilles@stack.nl>
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: Martijn Dekker <martijn@inlv.org>, DASH shell mailing list <dash@vger.kernel.org>, busybox <busybox@busybox.net>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Jilles Tjoelker <jilles@stack.nl>
 
-On 06/02/2020 16:12, Martijn Dekker wrote:
-> This is probably the strangest bug (or maybe pair of bugs) I've run into 
-> in nearly five years of breaking shells by developing modernish.
-> 
-> I've traced it to an interaction between bash >= 4.2 (i.e.: bash with 
-> shopt -s lastpipe) and variants of the Almquist shell, at least: dash, 
-> gwsh, Busybox ash, FreeBSD sh, and NetBSD 9.0rc2 sh.
-> 
-> Symptom: if 'return' is invoked on bash in the last element of a pipe 
-> executed in the main shell environment, then if you subsequently 'exec' 
-> an Almquist shell variant so that it has the same PID, its 'wait' 
-> builtin breaks.
-> 
-> I can consistently reproduce this on Linux, macOS, FreeBSD, NetBSD 
-> 9.0rc2, OpenBSD, and Solaris.
-> 
-> To reproduce this, you need bash >= 4.2, some Almquist shell variant, 
-> and these two test scripts:
-> 
-> ---begin test.bash---
-> fn() {
->      : | return
-> }
-> shopt -s lastpipe || exit
-> fn
-> exec "${1:-dash}" test.ash
-> ---end test.bash---
-> 
-> ---begin test.ash---
-> echo '*ash-begin'
-> : &
-> echo '*ash-middle'
-> wait "$!"
-> echo '*ash-end'
-> ---end test.ash---
-> 
-> When executing test.bash with dash, gwsh, Busybox ash, or FreeBSD sh, 
-> then test.ash simply waits forever on executing 'wait "$!"'.
+    Date:        Thu, 6 Feb 2020 19:29:41 +0000
+    From:        Harald van Dijk <harald@gigawatt.nl>
+    Message-ID:  <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
 
-Nice test. bash leaves the process in a state where SIGCHLD is blocked, 
-and the various ash-based shells do not unblock it. Because of that, 
-they do not pick up on the fact that the child process has terminated. I 
-would consider this a bug both in bash and in the ash-based shells.
+  | Nice test.
 
-Cheers,
-Harald van Dijk
+Yes!
+
+  | and the various ash-based shells do not unblock it.
+
+We do now, the fix for that will be in 9.0 when it is released.
+("now" as in as of the past half hour...)
+
+  | Because of that, 
+  | they do not pick up on the fact that the child process has terminated.
+
+It was actually a race condition, for me it 'worked' about half the time
+(seems to depend whether the wait happens in the parent before or after
+the sub-process exits).
+
+kre
+
+ps: that core dump was an "impossible to happen" condition that this
+actually made happen, that will be fixed as well, both by actually now
+making it impossible like it was supposed to be (by not blocking or
+ignoring SIGCHLD, ever) and by testing for it happening anyway...
+
+The secondary fix for that one is still to be committed after I investigate
+some more - I know what happened, just need to make sure what will happen
+now if this situation which should never occur ever does happen again.
+
+That the 8.1 NetBSD sh seems to work is more just an artifact of how
+it runs the race I believe (or guess) - the wait & process invocation code
+has changed a lot in 9 (well, 9.0RC2 for now) which seems to have made the
+race a close call, instead of one sided.   But that was not an artifact of
+the environment for the test, it happens for me on a real -8(ish) type
+system as well.
+
+kre
