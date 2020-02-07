@@ -1,89 +1,63 @@
-From: Walter Harms <wharms@bfs.de>
-Subject: AW: Bizarre interaction bug involving bash w/ lastpipe + Almquist
+From: Martijn Dekker <martijn@inlv.org>
+Subject: Re: AW: Bizarre interaction bug involving bash w/ lastpipe + Almquist
  'wait'
-Date: Fri, 7 Feb 2020 11:19:28 +0000
-Message-ID: <cbe5644f6db94eb89e4088141c426f8a@bfs.de>
-References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>,
+Date: Fri, 7 Feb 2020 14:33:46 +0000
+Message-ID: <967b5a41-31b7-0ec1-fb04-62af1617a86b@inlv.org>
+References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
  <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
+ <cbe5644f6db94eb89e4088141c426f8a@bfs.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
-In-Reply-To: <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
-Content-Language: de-DE
-List-Unsubscribe: <https://lists.gnu.org/mailman/options/bug-bash>,
- <mailto:bug-bash-request@gnu.org?subject=unsubscribe>
-List-Archive: <https://lists.gnu.org/archive/html/bug-bash>
-List-Post: <mailto:bug-bash@gnu.org>
-List-Help: <mailto:bug-bash-request@gnu.org?subject=help>
-List-Subscribe: <https://lists.gnu.org/mailman/listinfo/bug-bash>,
- <mailto:bug-bash-request@gnu.org?subject=subscribe>
-Errors-To: bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org
-Sender: "bug-bash" <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
-To: Harald van Dijk <harald@gigawatt.nl>, Martijn Dekker <martijn@inlv.org>, DASH shell mailing list <dash@vger.kernel.org>, busybox <busybox@busybox.net>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Robert Elz <kre@munnari.OZ.AU>, Jilles Tjoelker <jilles@stack.nl>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Return-path: <dash-owner@vger.kernel.org>
+Received: from kahlil.inlv.org ([37.59.109.123]:58198 "EHLO kahlil.inlv.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726867AbgBGOeQ (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 7 Feb 2020 09:34:16 -0500
+In-Reply-To: <cbe5644f6db94eb89e4088141c426f8a@bfs.de>
+Content-Language: en-GB
+Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
+To: Walter Harms <wharms@bfs.de>, Harald van Dijk <harald@gigawatt.nl>, DASH shell mailing list <dash@vger.kernel.org>, busybox <busybox@busybox.net>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Robert Elz <kre@munnari.OZ.AU>, Jilles Tjoelker <jilles@stack.nl>
 
-IMHO is the bug on bash side. ash can assume to get an "healthy" environmen=
-t from the caller. You can simply not fix everything that can possible go w=
-rong.
+Op 07-02-20 om 12:19 schreef Walter Harms:
+> IMHO is the bug on bash side. ash can assume to get an "healthy"
+> environment from the caller. You can simply not fix everything that
+> can possible go wrong.
 
-Obviously it should not segfault but so far i understand it is bsd as that =
-does, not busybox ash.
+That is a rather fallacious argument. Of course you cannot fix 
+*everything* that could possibly go wrong. You can certainly fix *this* 
+thing, though. I know, because every non-Almquist shell does it.
 
-re,
- wh
-________________________________________
-Von: busybox <busybox-bounces@busybox.net> im Auftrag von Harald van Dijk <=
-harald@gigawatt.nl>
-Gesendet: Donnerstag, 6. Februar 2020 20:29
-An: Martijn Dekker; DASH shell mailing list; busybox; Bug reports for the G=
-NU Bourne Again SHell; Robert Elz; Jilles Tjoelker
-Betreff: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist =
-'wait'
+These days, no program can realistically assume a "healthy" environment. 
+Computers have become unimaginably complex machines, built on thousands 
+of interdependent abstraction layers, each as fallible as the humans 
+that designed and implemented them. So "unhealthy" environments happen 
+all the time, due to all sorts of unforeseen causes.
 
-On 06/02/2020 16:12, Martijn Dekker wrote:
-> This is probably the strangest bug (or maybe pair of bugs) I've run into
-> in nearly five years of breaking shells by developing modernish.
->
-> I've traced it to an interaction between bash >=3D 4.2 (i.e.: bash with
-> shopt -s lastpipe) and variants of the Almquist shell, at least: dash,
-> gwsh, Busybox ash, FreeBSD sh, and NetBSD 9.0rc2 sh.
->
-> Symptom: if 'return' is invoked on bash in the last element of a pipe
-> executed in the main shell environment, then if you subsequently 'exec'
-> an Almquist shell variant so that it has the same PID, its 'wait'
-> builtin breaks.
->
-> I can consistently reproduce this on Linux, macOS, FreeBSD, NetBSD
-> 9.0rc2, OpenBSD, and Solaris.
->
-> To reproduce this, you need bash >=3D 4.2, some Almquist shell variant,
-> and these two test scripts:
->
-> ---begin test.bash---
-> fn() {
->      : | return
-> }
-> shopt -s lastpipe || exit
-> fn
-> exec "${1:-dash}" test.ash
-> ---end test.bash---
->
-> ---begin test.ash---
-> echo '*ash-begin'
-> : &
-> echo '*ash-middle'
-> wait "$!"
-> echo '*ash-end'
-> ---end test.ash---
->
-> When executing test.bash with dash, gwsh, Busybox ash, or FreeBSD sh,
-> then test.ash simply waits forever on executing 'wait "$!"'.
+It's well past time to accept that the 1980s are behind us. In 2020, 
+systems have to be programmed robustly and defensively.
 
-Nice test. bash leaves the process in a state where SIGCHLD is blocked,
-and the various ash-based shells do not unblock it. Because of that,
-they do not pick up on the fact that the child process has terminated. I
-would consider this a bug both in bash and in the ash-based shells.
+> Obviously it should not segfault but so far i understand it is bsd as
+> that does, not busybox ash.
 
-Cheers,
-Harald van Dijk
+True. But instead, it simply gets stuck forever, with no message or 
+other indicator of what went wrong. How is that better?
+
+(Going slightly off-topic below...)
+
+Segfaulting is actually a good thing: it's one form of failing reliably. 
+And failing reliably is vastly better than what often happens instead, 
+especially in shell scripts: subtle breakage, which can take a lot of 
+detective work to trace, and in some cases can cause serious damage due 
+to the program functioning inconsistently and incorrectly (instead of 
+not at all).
+
+Failing reliably is something the shell is ATROCIOUSLY bad at, and it's 
+one of the first things modernish aims to fix.
+
+- Martijn
+
+-- 
+modernish -- harness the shell
+https://github.com/modernish/modernish
