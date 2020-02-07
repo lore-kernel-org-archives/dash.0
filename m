@@ -1,13 +1,16 @@
-From: Robert Elz <kre@munnari.OZ.AU>
-Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist
+From: Walter Harms <wharms@bfs.de>
+Subject: AW: Bizarre interaction bug involving bash w/ lastpipe + Almquist
  'wait'
-Date: Fri, 07 Feb 2020 09:41:27 +0700
-Message-ID: <5461.1581043287@jinx.noi.kre.to>
-References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
+Date: Fri, 7 Feb 2020 11:19:28 +0000
+Message-ID: <cbe5644f6db94eb89e4088141c426f8a@bfs.de>
+References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>,
+ <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
-In-Reply-To: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
+In-Reply-To: <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
+Content-Language: de-DE
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/bug-bash>,
  <mailto:bug-bash-request@gnu.org?subject=unsubscribe>
 List-Archive: <https://lists.gnu.org/archive/html/bug-bash>
@@ -17,40 +20,70 @@ List-Subscribe: <https://lists.gnu.org/mailman/listinfo/bug-bash>,
  <mailto:bug-bash-request@gnu.org?subject=subscribe>
 Errors-To: bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org
 Sender: "bug-bash" <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
-To: Martijn Dekker <martijn@inlv.org>
-Cc: busybox <busybox@busybox.net>, Harald van Dijk <harald@gigawatt.nl>, DASH shell mailing list <dash@vger.kernel.org>, Jilles Tjoelker <jilles@stack.nl>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>
+To: Harald van Dijk <harald@gigawatt.nl>, Martijn Dekker <martijn@inlv.org>, DASH shell mailing list <dash@vger.kernel.org>, busybox <busybox@busybox.net>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Robert Elz <kre@munnari.OZ.AU>, Jilles Tjoelker <jilles@stack.nl>
 List-Id: dash@vger.kernel.org
 
-    Date:        Thu, 6 Feb 2020 16:12:06 +0000
-    From:        Martijn Dekker <martijn@inlv.org>
-    Message-ID:  <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
+IMHO is the bug on bash side. ash can assume to get an "healthy" environmen=
+t from the caller. You can simply not fix everything that can possible go w=
+rong.
 
-  | NetBSD sh behaves differently. NetBSD 8.1 sh (as installed on sdf.org 
-  | and sdf-eu.org) seem to act completely normally, but NetBSD 9.0rc2 sh 
-  | (on my VirtualBox test VM) segfaults. Output on NetBSD 9.0rc2:
+Obviously it should not segfault but so far i understand it is bsd as that =
+does, not busybox ash.
 
-I have updated my opinion on that, I think it is "don't have the bug",
-though it is possible a blocked SIGCHLD acts differently on NetBSD than
-on other systems.   On NetBSD it seems to affect nothing (the shell does
-not rely upon receiving SIGCHLD so not getting it is irrelevant) and
-the wait code when given an arg (as your script did) would always wait
-until that process exited, and return as soon as it did.
+re,
+ wh
+________________________________________
+Von: busybox <busybox-bounces@busybox.net> im Auftrag von Harald van Dijk <=
+harald@gigawatt.nl>
+Gesendet: Donnerstag, 6. Februar 2020 20:29
+An: Martijn Dekker; DASH shell mailing list; busybox; Bug reports for the G=
+NU Bourne Again SHell; Robert Elz; Jilles Tjoelker
+Betreff: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist =
+'wait'
 
-None of that is changed in -9 ... but the wait command now has -n, which
-also works with a list of pids, and while waiting for any process in its
-list to exit, gets told each time a process is reaped (from lower level
-code) which job that process was from (new code of mine) so it can see if
-the process that completed finished one of the jobs for which it is waiting.\
-I wasn't expecting to see exiting children that are not the shell's children,
-which is what happens here - the
-	: | return
-creates a child (of bash) to run the ':' command, then the function
-returns without waiting for that one.  You then exec the NetBSD shell,
-which inherits that child (a child of the same process) but is unaware of
-it.   If that one happens to exit while the ash script running on the
-NetBSD sh is doing the wait command, core would dump.   (Fix for that is
-now in the tree).   If the bash invoked ':' command exited some other time
-and was noticed (eg: between commands) as having finished, it would simply
-have been ignored.   I saw both happen.
+On 06/02/2020 16:12, Martijn Dekker wrote:
+> This is probably the strangest bug (or maybe pair of bugs) I've run into
+> in nearly five years of breaking shells by developing modernish.
+>
+> I've traced it to an interaction between bash >=3D 4.2 (i.e.: bash with
+> shopt -s lastpipe) and variants of the Almquist shell, at least: dash,
+> gwsh, Busybox ash, FreeBSD sh, and NetBSD 9.0rc2 sh.
+>
+> Symptom: if 'return' is invoked on bash in the last element of a pipe
+> executed in the main shell environment, then if you subsequently 'exec'
+> an Almquist shell variant so that it has the same PID, its 'wait'
+> builtin breaks.
+>
+> I can consistently reproduce this on Linux, macOS, FreeBSD, NetBSD
+> 9.0rc2, OpenBSD, and Solaris.
+>
+> To reproduce this, you need bash >=3D 4.2, some Almquist shell variant,
+> and these two test scripts:
+>
+> ---begin test.bash---
+> fn() {
+>      : | return
+> }
+> shopt -s lastpipe || exit
+> fn
+> exec "${1:-dash}" test.ash
+> ---end test.bash---
+>
+> ---begin test.ash---
+> echo '*ash-begin'
+> : &
+> echo '*ash-middle'
+> wait "$!"
+> echo '*ash-end'
+> ---end test.ash---
+>
+> When executing test.bash with dash, gwsh, Busybox ash, or FreeBSD sh,
+> then test.ash simply waits forever on executing 'wait "$!"'.
 
-kre
+Nice test. bash leaves the process in a state where SIGCHLD is blocked,
+and the various ash-based shells do not unblock it. Because of that,
+they do not pick up on the fact that the child process has terminated. I
+would consider this a bug both in bash and in the ash-based shells.
+
+Cheers,
+Harald van Dijk
