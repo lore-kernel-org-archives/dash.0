@@ -1,58 +1,56 @@
 From: Robert Elz <kre@munnari.OZ.AU>
-Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist 'wait'
-Date: Fri, 07 Feb 2020 03:43:40 +0700
-Message-ID: <15235.1581021820@jinx.noi.kre.to>
-References: <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl> <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
+Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist
+ 'wait'
+Date: Fri, 07 Feb 2020 09:41:27 +0700
+Message-ID: <5461.1581043287@jinx.noi.kre.to>
+References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8BIT
-Return-path: <dash-owner@vger.kernel.org>
-Received: from munnari.OZ.AU ([202.29.151.3]:51700 "EHLO munnari.OZ.AU"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727711AbgBFVCO (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 6 Feb 2020 16:02:14 -0500
-In-Reply-To: <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
-Sender: dash-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
+In-Reply-To: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
+List-Unsubscribe: <https://lists.gnu.org/mailman/options/bug-bash>,
+ <mailto:bug-bash-request@gnu.org?subject=unsubscribe>
+List-Archive: <https://lists.gnu.org/archive/html/bug-bash>
+List-Post: <mailto:bug-bash@gnu.org>
+List-Help: <mailto:bug-bash-request@gnu.org?subject=help>
+List-Subscribe: <https://lists.gnu.org/mailman/listinfo/bug-bash>,
+ <mailto:bug-bash-request@gnu.org?subject=subscribe>
+Errors-To: bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org
+Sender: "bug-bash" <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
+To: Martijn Dekker <martijn@inlv.org>
+Cc: busybox <busybox@busybox.net>, Harald van Dijk <harald@gigawatt.nl>, DASH shell mailing list <dash@vger.kernel.org>, Jilles Tjoelker <jilles@stack.nl>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Martijn Dekker <martijn@inlv.org>, DASH shell mailing list <dash@vger.kernel.org>, busybox <busybox@busybox.net>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Jilles Tjoelker <jilles@stack.nl>
 
-    Date:        Thu, 6 Feb 2020 19:29:41 +0000
-    From:        Harald van Dijk <harald@gigawatt.nl>
-    Message-ID:  <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
+    Date:        Thu, 6 Feb 2020 16:12:06 +0000
+    From:        Martijn Dekker <martijn@inlv.org>
+    Message-ID:  <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
 
-  | Nice test.
+  | NetBSD sh behaves differently. NetBSD 8.1 sh (as installed on sdf.org 
+  | and sdf-eu.org) seem to act completely normally, but NetBSD 9.0rc2 sh 
+  | (on my VirtualBox test VM) segfaults. Output on NetBSD 9.0rc2:
 
-Yes!
+I have updated my opinion on that, I think it is "don't have the bug",
+though it is possible a blocked SIGCHLD acts differently on NetBSD than
+on other systems.   On NetBSD it seems to affect nothing (the shell does
+not rely upon receiving SIGCHLD so not getting it is irrelevant) and
+the wait code when given an arg (as your script did) would always wait
+until that process exited, and return as soon as it did.
 
-  | and the various ash-based shells do not unblock it.
-
-We do now, the fix for that will be in 9.0 when it is released.
-("now" as in as of the past half hour...)
-
-  | Because of that, 
-  | they do not pick up on the fact that the child process has terminated.
-
-It was actually a race condition, for me it 'worked' about half the time
-(seems to depend whether the wait happens in the parent before or after
-the sub-process exits).
-
-kre
-
-ps: that core dump was an "impossible to happen" condition that this
-actually made happen, that will be fixed as well, both by actually now
-making it impossible like it was supposed to be (by not blocking or
-ignoring SIGCHLD, ever) and by testing for it happening anyway...
-
-The secondary fix for that one is still to be committed after I investigate
-some more - I know what happened, just need to make sure what will happen
-now if this situation which should never occur ever does happen again.
-
-That the 8.1 NetBSD sh seems to work is more just an artifact of how
-it runs the race I believe (or guess) - the wait & process invocation code
-has changed a lot in 9 (well, 9.0RC2 for now) which seems to have made the
-race a close call, instead of one sided.   But that was not an artifact of
-the environment for the test, it happens for me on a real -8(ish) type
-system as well.
+None of that is changed in -9 ... but the wait command now has -n, which
+also works with a list of pids, and while waiting for any process in its
+list to exit, gets told each time a process is reaped (from lower level
+code) which job that process was from (new code of mine) so it can see if
+the process that completed finished one of the jobs for which it is waiting.\
+I wasn't expecting to see exiting children that are not the shell's children,
+which is what happens here - the
+	: | return
+creates a child (of bash) to run the ':' command, then the function
+returns without waiting for that one.  You then exec the NetBSD shell,
+which inherits that child (a child of the same process) but is unaware of
+it.   If that one happens to exit while the ash script running on the
+NetBSD sh is doing the wait command, core would dump.   (Fix for that is
+now in the tree).   If the bash invoked ':' command exited some other time
+and was noticed (eg: between commands) as having finished, it would simply
+have been ignored.   I saw both happen.
 
 kre
