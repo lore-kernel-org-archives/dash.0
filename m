@@ -1,43 +1,67 @@
-From: Chet Ramey <chet.ramey@case.edu>
+From: Harald van Dijk <harald@gigawatt.nl>
 Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist
  'wait'
-Date: Fri, 7 Feb 2020 11:16:15 -0500
-Message-ID: <ec73159a-2c24-b91c-c23e-5429339752aa@case.edu>
+Date: Sat, 8 Feb 2020 18:39:38 +0000
+Message-ID: <2b436500-671b-b143-a4bb-2230f157e1b7@gigawatt.nl>
 References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
- <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
-Reply-To: chet.ramey@case.edu
+ <5461.1581043287@jinx.noi.kre.to>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
-In-Reply-To: <f8b210f5-dd59-2c7f-05d4-be0a89316d3d@gigawatt.nl>
+Return-path: <dash-owner@vger.kernel.org>
+Received: from mail.gigawatt.nl ([51.68.198.76]:39314 "EHLO mail.gigawatt.nl"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727471AbgBHSlO (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 8 Feb 2020 13:41:14 -0500
+In-Reply-To: <5461.1581043287@jinx.noi.kre.to>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.gnu.org/mailman/options/bug-bash>,
- <mailto:bug-bash-request@gnu.org?subject=unsubscribe>
-List-Archive: <https://lists.gnu.org/archive/html/bug-bash>
-List-Post: <mailto:bug-bash@gnu.org>
-List-Help: <mailto:bug-bash-request@gnu.org?subject=help>
-List-Subscribe: <https://lists.gnu.org/mailman/listinfo/bug-bash>,
- <mailto:bug-bash-request@gnu.org?subject=subscribe>
-Errors-To: bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org
-Sender: "bug-bash" <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
-To: Harald van Dijk <harald@gigawatt.nl>, Martijn Dekker <martijn@inlv.org>, DASH shell mailing list <dash@vger.kernel.org>, busybox <busybox@busybox.net>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Robert Elz <kre@munnari.OZ.AU>, Jilles Tjoelker <jilles@stack.nl>
-Cc: chet.ramey@case.edu
+Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
+To: Robert Elz <kre@munnari.OZ.AU>, Martijn Dekker <martijn@inlv.org>
+Cc: DASH shell mailing list <dash@vger.kernel.org>, busybox <busybox@busybox.net>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Jilles Tjoelker <jilles@stack.nl>
 
-On 2/6/20 2:29 PM, Harald van Dijk wrote:
-> On 06/02/2020 16:12, Martijn Dekker wrote:
-
->> When executing test.bash with dash, gwsh, Busybox ash, or FreeBSD sh,
->> then test.ash simply waits forever on executing 'wait "$!"'.
+On 07/02/2020 02:41, Robert Elz wrote:
+>      Date:        Thu, 6 Feb 2020 16:12:06 +0000
+>      From:        Martijn Dekker <martijn@inlv.org>
+>      Message-ID:  <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
 > 
-> Nice test. bash leaves the process in a state where SIGCHLD is blocked, and
-> the various ash-based shells do not unblock it. 
+>    | NetBSD sh behaves differently. NetBSD 8.1 sh (as installed on sdf.org
+>    | and sdf-eu.org) seem to act completely normally, but NetBSD 9.0rc2 sh
+>    | (on my VirtualBox test VM) segfaults. Output on NetBSD 9.0rc2:
+> 
+> I have updated my opinion on that, I think it is "don't have the bug",
+> though it is possible a blocked SIGCHLD acts differently on NetBSD than
+> on other systems.   On NetBSD it seems to affect nothing (the shell does
+> not rely upon receiving SIGCHLD so not getting it is irrelevant) and
+> the wait code when given an arg (as your script did) would always wait
+> until that process exited, and return as soon as it did.
 
-Thanks for the investigation. Bash does leave SIGCHLD blocked in this exact
-set of circumstances (lastpipe+function+return at end of pipeline+exec).
+I think you're right that this isn't SIGCHLD behaving differently on 
+NetBSD, it's that NetBSD sh does not have the same problem the other 
+ash-based shells do. The problem is with sigsuspend, which in dash looks 
+like:
 
--- 
-``The lyf so short, the craft so long to lerne.'' - Chaucer
-		 ``Ars longa, vita brevis'' - Hippocrates
-Chet Ramey, UTech, CWRU    chet@case.edu    http://tiswww.cwru.edu/~chet/
+> 		sigblockall(&oldmask);
+> 
+> 		while (!gotsigchld && !pending_sig)
+> 			sigsuspend(&oldmask);
+> 
+> 		sigclearmask();
+
+<https://git.kernel.org/pub/scm/utils/dash/dash.git/tree/src/jobs.c?id=f30bd155ccbc3f084bbf03d56f9cc43f4b02af2a#n1170>
+
+This clearly cannot work when oldmask blocks SIGCHLD.
+
+NetBSD sh does not use sigsuspend here, so avoids that problem.
+
+I changed gwsh to call sigclearmask() on shell startup, but plan to 
+check whether this loop is really necessary at some later time. It was 
+added to dash to fix a race condition, where that race condition was 
+apparently introduced by a fix for another race condition. If NetBSD sh 
+manages to avoid this pattern, and assuming NetBSD sh is not still 
+susceptible to one of those race conditions, the fix for it in the other 
+shells would seem to be more complicated than necessary, and simplifying 
+things would be good.
+
+Cheers,
+Harald van Dijk
