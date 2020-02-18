@@ -1,120 +1,76 @@
-From: Jilles Tjoelker <jilles@stack.nl>
-Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist
- 'wait'
-Date: Sun, 9 Feb 2020 20:03:22 +0100
-Message-ID: <20200209190322.GA28226@stack.nl>
-References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
- <5461.1581043287@jinx.noi.kre.to>
- <2b436500-671b-b143-a4bb-2230f157e1b7@gigawatt.nl>
+From: Michael Greenberg <michael.greenberg@pomona.edu>
+Subject: [PATCH] mktokens relative TMPDIR
+Date: Mon, 17 Feb 2020 19:50:50 -0800
+Message-ID: <m2k14k4kpx.fsf@pomona.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
-Content-Disposition: inline
-In-Reply-To: <2b436500-671b-b143-a4bb-2230f157e1b7@gigawatt.nl>
-List-Unsubscribe: <https://lists.gnu.org/mailman/options/bug-bash>,
- <mailto:bug-bash-request@gnu.org?subject=unsubscribe>
-List-Archive: <https://lists.gnu.org/archive/html/bug-bash>
-List-Post: <mailto:bug-bash@gnu.org>
-List-Help: <mailto:bug-bash-request@gnu.org?subject=help>
-List-Subscribe: <https://lists.gnu.org/mailman/listinfo/bug-bash>,
- <mailto:bug-bash-request@gnu.org?subject=subscribe>
-Errors-To: bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org
-Sender: "bug-bash" <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: busybox <busybox@busybox.net>, Martijn Dekker <martijn@inlv.org>, DASH shell mailing list <dash@vger.kernel.org>, Robert Elz <kre@munnari.OZ.AU>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>
+Content-Type: text/plain
+Return-path: <dash-owner@vger.kernel.org>
+Received: from mail-dm6nam12on2068.outbound.protection.outlook.com ([40.107.243.68]:23807
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726261AbgBRDuz (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 17 Feb 2020 22:50:55 -0500
+Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
+To: "dash@vger.kernel.org" <dash@vger.kernel.org>
 
-On Sat, Feb 08, 2020 at 06:39:38PM +0000, Harald van Dijk wrote:
-> On 07/02/2020 02:41, Robert Elz wrote:
-> >      Date:        Thu, 6 Feb 2020 16:12:06 +0000
-> >      From:        Martijn Dekker <martijn@inlv.org>
-> >      Message-ID:  <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
+The mktokens script fails when /tmp isn't writable (e.g., when building
+in a sandbox with a different TMPDIR). Replace absolute references to
+/tmp to relative references to TMPDIR. If TMPDIR is unset or null,
+default to /tmp.
 
-> >    | NetBSD sh behaves differently. NetBSD 8.1 sh (as installed on sdf.org
-> >    | and sdf-eu.org) seem to act completely normally, but NetBSD 9.0rc2 sh
-> >    | (on my VirtualBox test VM) segfaults. Output on NetBSD 9.0rc2:
+The mkbuiltins script was already hardened to work relative to TMPDIR,
+also defaulting to /tmp.
 
-> > I have updated my opinion on that, I think it is "don't have the bug",
-> > though it is possible a blocked SIGCHLD acts differently on NetBSD than
-> > on other systems.   On NetBSD it seems to affect nothing (the shell does
-> > not rely upon receiving SIGCHLD so not getting it is irrelevant) and
-> > the wait code when given an arg (as your script did) would always wait
-> > until that process exited, and return as soon as it did.
+Signed-off-by: Michael Greenberg <michael.greenberg@pomona.edu>
 
-> I think you're right that this isn't SIGCHLD behaving differently on NetBSD,
-> it's that NetBSD sh does not have the same problem the other ash-based
-> shells do. The problem is with sigsuspend, which in dash looks like:
-
-> > 		sigblockall(&oldmask);
-> > 
-> > 		while (!gotsigchld && !pending_sig)
-> > 			sigsuspend(&oldmask);
-> > 
-> > 		sigclearmask();
-
-> <https://git.kernel.org/pub/scm/utils/dash/dash.git/tree/src/jobs.c?id=f30bd155ccbc3f084bbf03d56f9cc43f4b02af2a#n1170>
-
-> This clearly cannot work when oldmask blocks SIGCHLD.
-
-> NetBSD sh does not use sigsuspend here, so avoids that problem.
-
-> I changed gwsh to call sigclearmask() on shell startup, but plan to check
-> whether this loop is really necessary at some later time. It was added to
-> dash to fix a race condition, where that race condition was apparently
-> introduced by a fix for another race condition. If NetBSD sh manages to
-> avoid this pattern, and assuming NetBSD sh is not still susceptible to one
-> of those race conditions, the fix for it in the other shells would seem to
-> be more complicated than necessary, and simplifying things would be good.
-
-I have not tested whether the bug actually happens in NetBSD sh but I
-think the complexity is necessary. The problem is that the wait builtin
-must wait for either process termination or a signal, and relying on an
-[EINTR] error return to abort a blocking waitpid() or similar leaves a
-window where a signal could come in after which the program goes asleep.
-
-In a script this could look like
-
-trap 'echo cleaning up; exit' TERM
-slow_process_1 &
-slow_process_2 &
-wait
-
-and if a TERM signal comes in just before the wait system call is
-invoked, the signal handler sets a flag but the trap is not taken until
-a process terminates or another signal comes in.
-
-FreeBSD sh also has a -T flag that causes traps to be taken immediately
-while waiting for a process to terminate. This has the same issue with
-waiting for process termination or a signal.
-
-There are various solutions here:
-
-* Make sure SIGCHLD is caught, reducing the problem to waiting for
-  signals only. This can then be done using sigsuspend() or sigwait().
-
-  Most ash variants that have closed this race window have chosen this
-  option.
-
-  The SIGCHLD handler could be installed globally or only for the
-  duration of the wait builtin.
-
-* Call longjmp() from the signal handler. The blocking wait will have to
-  be changed to waitid() with WNOWAIT so no exit statuses are lost when
-  a signal comes in just after waitid() returns.
-
-  Note that ash variants already call longjmp() from a SIGINT signal
-  handler in certain situations in interactive mode, so it is not a
-  really strange thing to do.
-
-* Use musl's solution for [EINTR] in the context of pthread
-  cancellation, checking the saved program counter when a signal
-  arrives. Although theoretically portable, it requires writing
-  architecture-specific code in practice.
-
-* Use FreeBSD libthr's solution for [EINTR] in the context of pthread
-  cancellation, asking the kernel to abort the next blocking system call
-  with [EINTR] immediately from the signal handler. This is not portable
-  to other kernels.
-
--- 
-Jilles Tjoelker
+diff --git a/src/mktokens b/src/mktokens
+index cd52241..3ab7bc5 100644
+--- a/src/mktokens
++++ b/src/mktokens
+@@ -37,7 +37,9 @@
+ # token marks the end of a list.  The third column is the name to print in
+ # error messages.
+ 
+-cat > /tmp/ka$$ <<\!
++: ${TMPDIR:=/tmp}
++
++cat > $TMPDIR/ka$$ <<\!
+ TEOF	1	end of file
+ TNL	0	newline
+ TSEMI	0	";"
+@@ -68,28 +70,28 @@ TWHILE	0	"while"
+ TBEGIN	0	"{"
+ TEND	1	"}"
+ !
+-nl=`wc -l /tmp/ka$$`
++nl=`wc -l ${TMPDIR}/ka$$`
+ exec > token.h
+-awk '{print "#define " $1 " " NR-1}' /tmp/ka$$
++awk '{print "#define " $1 " " NR-1}' ${TMPDIR}/ka$$
+ 
+ exec > token_vars.h
+ 
+ echo '
+ /* Array indicating which tokens mark the end of a list */
+ static const char tokendlist[] = {'
+-awk '{print "\t" $2 ","}' /tmp/ka$$
++awk '{print "\t" $2 ","}' ${TMPDIR}/ka$$
+ echo '};
+ 
+ static const char *const tokname[] = {'
+ sed -e 's/"/\\"/g' \
+     -e 's/[^	 ]*[	 ][	 ]*[^	 ]*[	 ][	 ]*\(.*\)/	"\1",/' \
+-    /tmp/ka$$
++    ${TMPDIR}/ka$$
+ echo '};
+ '
+-sed 's/"//g' /tmp/ka$$ | awk '
++sed 's/"//g' ${TMPDIR}/ka$$ | awk '
+ /TNOT/{print "#define KWDOFFSET " NR-1; print ""; 
+       print "static const char *const parsekwd[] = {"}
+ /TNOT/,/neverfound/{if (last) print "	\"" last "\","; last = $3}
+ END{print "	\"" last "\"\n};"}'
+ 
+-rm /tmp/ka$$
++rm ${TMPDIR}/ka$$
