@@ -1,76 +1,50 @@
-From: Michael Greenberg <michael.greenberg@pomona.edu>
-Subject: [PATCH] mktokens relative TMPDIR
-Date: Mon, 17 Feb 2020 19:50:50 -0800
-Message-ID: <m2k14k4kpx.fsf@pomona.edu>
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist 'wait'
+Date: Tue, 18 Feb 2020 17:46:23 +0100
+Message-ID: <CAK1hOcO_S_T=5SWJ0jpZWxDYwdUFqJisw_nC+JysnQvZ6XUuKw@mail.gmail.com>
+References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
+ <5461.1581043287@jinx.noi.kre.to> <2b436500-671b-b143-a4bb-2230f157e1b7@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-dm6nam12on2068.outbound.protection.outlook.com ([40.107.243.68]:23807
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726261AbgBRDuz (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 17 Feb 2020 22:50:55 -0500
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:33076 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726399AbgBRQqg (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 18 Feb 2020 11:46:36 -0500
+Received: by mail-ed1-f67.google.com with SMTP id r21so25597322edq.0
+        for <dash@vger.kernel.org>; Tue, 18 Feb 2020 08:46:35 -0800 (PST)
+In-Reply-To: <2b436500-671b-b143-a4bb-2230f157e1b7@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: "dash@vger.kernel.org" <dash@vger.kernel.org>
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: Robert Elz <kre@munnari.oz.au>, Martijn Dekker <martijn@inlv.org>, busybox <busybox@busybox.net>, DASH shell mailing list <dash@vger.kernel.org>, Jilles Tjoelker <jilles@stack.nl>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>
 
-The mktokens script fails when /tmp isn't writable (e.g., when building
-in a sandbox with a different TMPDIR). Replace absolute references to
-/tmp to relative references to TMPDIR. If TMPDIR is unset or null,
-default to /tmp.
+On Sat, Feb 8, 2020 at 7:41 PM Harald van Dijk <harald@gigawatt.nl> wrote:
+> I changed gwsh to call sigclearmask() on shell startup, but plan to
+> check whether this loop is really necessary at some later time. It was
+> added to dash to fix a race condition, where that race condition was
+> apparently introduced by a fix for another race condition.
 
-The mkbuiltins script was already hardened to work relative to TMPDIR,
-also defaulting to /tmp.
+sigsuspend() is needed to make "wait" builtin interruptible by signals.
 
-Signed-off-by: Michael Greenberg <michael.greenberg@pomona.edu>
+Attempts to use EINTR error return of waitpid() a-la:
 
-diff --git a/src/mktokens b/src/mktokens
-index cd52241..3ab7bc5 100644
---- a/src/mktokens
-+++ b/src/mktokens
-@@ -37,7 +37,9 @@
- # token marks the end of a list.  The third column is the name to print in
- # error messages.
- 
--cat > /tmp/ka$$ <<\!
-+: ${TMPDIR:=/tmp}
-+
-+cat > $TMPDIR/ka$$ <<\!
- TEOF	1	end of file
- TNL	0	newline
- TSEMI	0	";"
-@@ -68,28 +70,28 @@ TWHILE	0	"while"
- TBEGIN	0	"{"
- TEND	1	"}"
- !
--nl=`wc -l /tmp/ka$$`
-+nl=`wc -l ${TMPDIR}/ka$$`
- exec > token.h
--awk '{print "#define " $1 " " NR-1}' /tmp/ka$$
-+awk '{print "#define " $1 " " NR-1}' ${TMPDIR}/ka$$
- 
- exec > token_vars.h
- 
- echo '
- /* Array indicating which tokens mark the end of a list */
- static const char tokendlist[] = {'
--awk '{print "\t" $2 ","}' /tmp/ka$$
-+awk '{print "\t" $2 ","}' ${TMPDIR}/ka$$
- echo '};
- 
- static const char *const tokname[] = {'
- sed -e 's/"/\\"/g' \
-     -e 's/[^	 ]*[	 ][	 ]*[^	 ]*[	 ][	 ]*\(.*\)/	"\1",/' \
--    /tmp/ka$$
-+    ${TMPDIR}/ka$$
- echo '};
- '
--sed 's/"//g' /tmp/ka$$ | awk '
-+sed 's/"//g' ${TMPDIR}/ka$$ | awk '
- /TNOT/{print "#define KWDOFFSET " NR-1; print ""; 
-       print "static const char *const parsekwd[] = {"}
- /TNOT/,/neverfound/{if (last) print "	\"" last "\","; last = $3}
- END{print "	\"" last "\"\n};"}'
- 
--rm /tmp/ka$$
-+rm ${TMPDIR}/ka$$
+               if (got_sigs) { handle signals }
+               got_sigs = 0;
+               pid = waitpid(...);  /* without WNOHANG */
+               if (pid < 0 && errno == EINTR) { handle signals }
+
+are racy, since signals can be delivered not only while waitpid() syscall
+is in kernel, but also when we are only about to enter the kernel
+- and in this case, the shell's sighandler will set the flag variable,
+but then we enter the kernel and sleep.
+
+Masking signals doesn't help, since you need to unmask them just before
+waitpid() if you want to get EINTR on a signal, hence there is still
+a window for the race.
+
+> If NetBSD sh
+> manages to avoid this pattern, and assuming NetBSD sh is not still
+> susceptible to one of those race conditions
+
+Please let us know what you discovered.
