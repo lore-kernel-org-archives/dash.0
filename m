@@ -1,50 +1,71 @@
-From: Denys Vlasenko <vda.linux@googlemail.com>
-Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist 'wait'
-Date: Tue, 18 Feb 2020 17:46:23 +0100
-Message-ID: <CAK1hOcO_S_T=5SWJ0jpZWxDYwdUFqJisw_nC+JysnQvZ6XUuKw@mail.gmail.com>
-References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
- <5461.1581043287@jinx.noi.kre.to> <2b436500-671b-b143-a4bb-2230f157e1b7@gigawatt.nl>
+From: Robert Elz <kre@munnari.OZ.AU>
+Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist
+ 'wait'
+Date: Wed, 19 Feb 2020 01:17:02 +0700
+Message-ID: <17729.1582049822@jinx.noi.kre.to>
+References: <CAK1hOcO_S_T=5SWJ0jpZWxDYwdUFqJisw_nC+JysnQvZ6XUuKw@mail.gmail.com>
+ <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
+ <5461.1581043287@jinx.noi.kre.to>
+ <2b436500-671b-b143-a4bb-2230f157e1b7@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:33076 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726399AbgBRQqg (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 18 Feb 2020 11:46:36 -0500
-Received: by mail-ed1-f67.google.com with SMTP id r21so25597322edq.0
-        for <dash@vger.kernel.org>; Tue, 18 Feb 2020 08:46:35 -0800 (PST)
-In-Reply-To: <2b436500-671b-b143-a4bb-2230f157e1b7@gigawatt.nl>
-Sender: dash-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
+In-Reply-To: <CAK1hOcO_S_T=5SWJ0jpZWxDYwdUFqJisw_nC+JysnQvZ6XUuKw@mail.gmail.com>
+List-Unsubscribe: <https://lists.gnu.org/mailman/options/bug-bash>,
+ <mailto:bug-bash-request@gnu.org?subject=unsubscribe>
+List-Archive: <https://lists.gnu.org/archive/html/bug-bash>
+List-Post: <mailto:bug-bash@gnu.org>
+List-Help: <mailto:bug-bash-request@gnu.org?subject=help>
+List-Subscribe: <https://lists.gnu.org/mailman/listinfo/bug-bash>,
+ <mailto:bug-bash-request@gnu.org?subject=subscribe>
+Errors-To: bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org
+Sender: "bug-bash" <bug-bash-bounces+gnu-bug-bash-3=m.gmane-mx.org@gnu.org>
+To: Denys Vlasenko <vda.linux@googlemail.com>
+Cc: Jilles Tjoelker <jilles@stack.nl>, busybox <busybox@busybox.net>, DASH shell mailing list <dash@vger.kernel.org>, Harald van Dijk <harald@gigawatt.nl>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>, Martijn Dekker <martijn@inlv.org>
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Robert Elz <kre@munnari.oz.au>, Martijn Dekker <martijn@inlv.org>, busybox <busybox@busybox.net>, DASH shell mailing list <dash@vger.kernel.org>, Jilles Tjoelker <jilles@stack.nl>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>
 
-On Sat, Feb 8, 2020 at 7:41 PM Harald van Dijk <harald@gigawatt.nl> wrote:
-> I changed gwsh to call sigclearmask() on shell startup, but plan to
-> check whether this loop is really necessary at some later time. It was
-> added to dash to fix a race condition, where that race condition was
-> apparently introduced by a fix for another race condition.
+    Date:        Tue, 18 Feb 2020 17:46:23 +0100
+    From:        Denys Vlasenko <vda.linux@googlemail.com>
+    Message-ID:  <CAK1hOcO_S_T=5SWJ0jpZWxDYwdUFqJisw_nC+JysnQvZ6XUuKw@mail.gmail.com>
 
-sigsuspend() is needed to make "wait" builtin interruptible by signals.
+  | > If NetBSD sh
+  | > manages to avoid this pattern, and assuming NetBSD sh is not still
+  | > susceptible to one of those race conditions
+  |
+  | Please let us know what you discovered.
 
-Attempts to use EINTR error return of waitpid() a-la:
+It is very likley that it is racy as described, though no-one has ever
+filed a bug report on it (ie: it hasn't happened to anyone in a way that
+they'd complain about it).
 
-               if (got_sigs) { handle signals }
-               got_sigs = 0;
-               pid = waitpid(...);  /* without WNOHANG */
-               if (pid < 0 && errno == EINTR) { handle signals }
+I suspect it also isn't a conformance problem - POSIX says very
+little about when traps are executed ... really only that they don't
+interrupt waiting for a foreground command to complete, and that if a
+trap occurs while waiting in the wait command, then that command ends
+with an exit status indicating the signal.
 
-are racy, since signals can be delivered not only while waitpid() syscall
-is in kernel, but also when we are only about to enter the kernel
-- and in this case, the shell's sighandler will set the flag variable,
-but then we enter the kernel and sleep.
+What that means is that using traps for anything much more than cleanup
+activities isn't really safe (or perhaps, s/safe/sane/) as there's no
+guarantee when the trap will actually run.
 
-Masking signals doesn't help, since you need to unmask them just before
-waitpid() if you want to get EINTR on a signal, hence there is still
-a window for the race.
+Given that, losing the race in the situation cited (ie: getting the
+signal just before running the waitpid() (or whichever) sys call when
+implementing the wait command - and then going ahead and doing the
+sys call, hanging until some process terminates (perhaps until a particular
+process terminates) seems fully conformant to me (the signal doesn't
+arrive while waiting, so no error return from wait is required).
 
-> If NetBSD sh
-> manages to avoid this pattern, and assuming NetBSD sh is not still
-> susceptible to one of those race conditions
+It isn't nice, and ideally wouldn't happen (and in real life, seems
+not to ... the window is quite small after all) but nothing should really
+break badly because of it - or at least nothing portable should.
 
-Please let us know what you discovered.
+We do now unilaterally reset SIGCHLD to SIG_DFL/unblocked at startup
+(SIGCHLD is the one signal we're not required to pass on to exec'd
+processes in the same state we received it, so that's OK) so we could
+adopt the block, catch SIGCHLD, and sigsuspend() approach if that ever
+seemed like a necessary thing to do.
+
+kre
+
+ps: the observed core dump problem is also fixed, that was a related,
+but quite different, issue - not connected to SIGCHLD in any way at all.
