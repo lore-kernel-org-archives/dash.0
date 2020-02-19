@@ -1,93 +1,65 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: Bizarre interaction bug involving bash w/ lastpipe + Almquist
- 'wait'
-Date: Tue, 18 Feb 2020 21:59:37 +0000
-Message-ID: <f2a928d6-4feb-d123-23b4-17c8edfeda2f@gigawatt.nl>
-References: <10e3756b-5e8f-ba00-df0d-b36c93fa2281@inlv.org>
- <5461.1581043287@jinx.noi.kre.to>
- <2b436500-671b-b143-a4bb-2230f157e1b7@gigawatt.nl>
- <CAK1hOcO_S_T=5SWJ0jpZWxDYwdUFqJisw_nC+JysnQvZ6XUuKw@mail.gmail.com>
+From: Denys Vlasenko <dvlasenk@redhat.com>
+Subject: [PATCH] Rename DOWAIT_NORMAL to DOWAIT_NONBLOCK
+Date: Wed, 19 Feb 2020 11:30:08 +0100
+Message-ID: <20200219103008.22230-1-dvlasenk@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.gigawatt.nl ([51.68.198.76]:55634 "EHLO mail.gigawatt.nl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726339AbgBRWBa (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 18 Feb 2020 17:01:30 -0500
-In-Reply-To: <CAK1hOcO_S_T=5SWJ0jpZWxDYwdUFqJisw_nC+JysnQvZ6XUuKw@mail.gmail.com>
-Content-Language: en-US
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45945 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726270AbgBSKaS (ORCPT
+        <rfc822;dash@vger.kernel.org>); Wed, 19 Feb 2020 05:30:18 -0500
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Denys Vlasenko <vda.linux@googlemail.com>
-Cc: Robert Elz <kre@munnari.oz.au>, Martijn Dekker <martijn@inlv.org>, busybox <busybox@busybox.net>, DASH shell mailing list <dash@vger.kernel.org>, Jilles Tjoelker <jilles@stack.nl>, Bug reports for the GNU Bourne Again SHell <bug-bash@gnu.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
+Cc: Denys Vlasenko <dvlasenk@redhat.com>
 
-On 18/02/2020 16:46, Denys Vlasenko wrote:
-> On Sat, Feb 8, 2020 at 7:41 PM Harald van Dijk <harald@gigawatt.nl> wrote:
->> If NetBSD sh
->> manages to avoid this pattern, and assuming NetBSD sh is not still
->> susceptible to one of those race conditions
-> 
-> Please let us know what you discovered.
+To make it clearer what it is doing: nonblocking wait()
 
-Okay, please take a look. I hope I managed to avoid race conditions in 
-the test shell script.
+Signed-off-by: Denys Vlasenko <dvlasenk@redhat.com>
+---
+ src/jobs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-test1.sh:
-
-   i=1
-   while test "$i" -lt 100000
-   do
-     printf "%d\r" "$i"
-     "$@" test2.sh
-     i=$((i + 1))
-   done
-
-test2.sh
-
-   trap 'kill $!; exit 0' TERM
-   { kill $$; exec sleep 1000; } &
-   wait $!
-
-To run:
-
-   sh test1.sh $shell
-
-For instance:
-
-   sh test1.sh busybox ash
-
-test1.sh will repeatedly run test2.sh and increment and print a counter 
-variable to display progress.
-
-test2.sh will immediately exit, in a complicated way, if all goes well. 
-It may sleep for 1000s or fail to clean up its background process if 
-something goes wrong.
-
-On my system, I see:
-
-   bash 5.0.11        - sleeps after a while
-   bosh 2019-11-11    - sleeps after a while
-   busybox 1.31.1 ash - ok
-   dash 0.5.10.2      - ok
-   dash (current)     - sleeps immediately
-   fbsh 12.1          - ok *
-   gwsh (current)     - leaves subprocesses
-   ksh 93v            - sleeps after a while
-   ksh 2020.0.0       - sleeps after a while
-   mksh 57            - sleeps after a while
-   nbsh (current)     - sleeps after a while *
-   pdksh 5.2.14       - leaves subprocesses + sleeps after a while
-   posh 0.13.1        - ok
-   yash               - ok
-   zsh                - sleeps after a while
-
-* Because of the way I was running FreeBSD sh and NetBSD sh on qemu, I 
-could not easily check what happens to the subprocesses.
-
-I think that confirms that NetBSD sh does have a problem with a race 
-condition, but that many shells have that same problem. It also tells me 
-that there is another different problem in my shell that I should look at.
-
-Cheers,
-Harald van Dijk
+diff --git a/src/jobs.c b/src/jobs.c
+index 26a6248..d0cf708 100644
+--- a/src/jobs.c
++++ b/src/jobs.c
+@@ -77,7 +77,7 @@
+ #define CUR_STOPPED 0
+=20
+ /* mode flags for dowait */
+-#define DOWAIT_NORMAL 0
++#define DOWAIT_NONBLOCK 0
+ #define DOWAIT_BLOCK 1
+ #define DOWAIT_WAITCMD 2
+=20
+@@ -557,7 +557,7 @@ showjobs(struct output *out, int mode)
+ 	TRACE(("showjobs(%x) called\n", mode));
+=20
+ 	/* If not even one one job changed, there is nothing to do */
+-	dowait(DOWAIT_NORMAL, NULL);
++	dowait(DOWAIT_NONBLOCK, NULL);
+=20
+ 	for (jp =3D curjob; jp; jp =3D jp->prev_job) {
+ 		if (!(mode & SHOW_CHANGED) || jp->changed)
+@@ -1013,7 +1013,7 @@ waitforjob(struct job *jp)
+ 	int st;
+=20
+ 	TRACE(("waitforjob(%%%d) called\n", jp ? jobno(jp) : 0));
+-	dowait(jp ? DOWAIT_BLOCK : DOWAIT_NORMAL, jp);
++	dowait(jp ? DOWAIT_BLOCK : DOWAIT_NONBLOCK, jp);
+ 	if (!jp)
+ 		return exitstatus;
+=20
+@@ -1123,7 +1123,7 @@ out:
+=20
+ static int dowait(int block, struct job *jp)
+ {
+-	int pid =3D block =3D=3D DOWAIT_NORMAL ? gotsigchld : 1;
++	int pid =3D block =3D=3D DOWAIT_NONBLOCK ? gotsigchld : 1;
+=20
+ 	while (jp ? jp->state =3D=3D JOBRUNNING : pid > 0) {
+ 		if (!jp)
+--=20
+2.25.0
