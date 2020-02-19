@@ -1,65 +1,34 @@
-From: Denys Vlasenko <dvlasenk@redhat.com>
-Subject: [PATCH] Rename DOWAIT_NORMAL to DOWAIT_NONBLOCK
-Date: Wed, 19 Feb 2020 11:30:08 +0100
-Message-ID: <20200219103008.22230-1-dvlasenk@redhat.com>
-Mime-Version: 1.0
+From: Zygmunt Krynicki <zygoon@me.com>
+Subject: Infinite loop expanding PS1='${PWD/#foo/bar} '
+Date: Wed, 19 Feb 2020 12:46:02 +0100
+Message-ID: <0F40565C-5717-491C-8450-A747614F86A9@me.com>
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Content-Type: text/plain;
+        charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Return-path: <dash-owner@vger.kernel.org>
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45945 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726270AbgBSKaS (ORCPT
-        <rfc822;dash@vger.kernel.org>); Wed, 19 Feb 2020 05:30:18 -0500
+Received: from mr85p00im-ztdg06021801.me.com ([17.58.23.195]:43408 "EHLO
+        mr85p00im-ztdg06021801.me.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726632AbgBSLwW (ORCPT
+        <rfc822;dash@vger.kernel.org>); Wed, 19 Feb 2020 06:52:22 -0500
+Received: from [192.168.3.138] (178.182.246.167.nat.umts.dynamic.t-mobile.pl [178.182.246.167])
+        by mr85p00im-ztdg06021801.me.com (Postfix) with ESMTPSA id AB2DD1805E9
+        for <dash@vger.kernel.org>; Wed, 19 Feb 2020 11:46:05 +0000 (UTC)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
-Cc: Denys Vlasenko <dvlasenk@redhat.com>
+To: dash@vger.kernel.org
 
-To make it clearer what it is doing: nonblocking wait()
+Hello
 
-Signed-off-by: Denys Vlasenko <dvlasenk@redhat.com>
----
- src/jobs.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+I am no subscribed so please CC me on the relies to this thread.
 
-diff --git a/src/jobs.c b/src/jobs.c
-index 26a6248..d0cf708 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -77,7 +77,7 @@
- #define CUR_STOPPED 0
-=20
- /* mode flags for dowait */
--#define DOWAIT_NORMAL 0
-+#define DOWAIT_NONBLOCK 0
- #define DOWAIT_BLOCK 1
- #define DOWAIT_WAITCMD 2
-=20
-@@ -557,7 +557,7 @@ showjobs(struct output *out, int mode)
- 	TRACE(("showjobs(%x) called\n", mode));
-=20
- 	/* If not even one one job changed, there is nothing to do */
--	dowait(DOWAIT_NORMAL, NULL);
-+	dowait(DOWAIT_NONBLOCK, NULL);
-=20
- 	for (jp =3D curjob; jp; jp =3D jp->prev_job) {
- 		if (!(mode & SHOW_CHANGED) || jp->changed)
-@@ -1013,7 +1013,7 @@ waitforjob(struct job *jp)
- 	int st;
-=20
- 	TRACE(("waitforjob(%%%d) called\n", jp ? jobno(jp) : 0));
--	dowait(jp ? DOWAIT_BLOCK : DOWAIT_NORMAL, jp);
-+	dowait(jp ? DOWAIT_BLOCK : DOWAIT_NONBLOCK, jp);
- 	if (!jp)
- 		return exitstatus;
-=20
-@@ -1123,7 +1123,7 @@ out:
-=20
- static int dowait(int block, struct job *jp)
- {
--	int pid =3D block =3D=3D DOWAIT_NORMAL ? gotsigchld : 1;
-+	int pid =3D block =3D=3D DOWAIT_NONBLOCK ? gotsigchld : 1;
-=20
- 	while (jp ? jp->state =3D=3D JOBRUNNING : pid > 0) {
- 		if (!jp)
---=20
-2.25.0
+I=E2=80=99d like to report a bug.
+
+While working on another project I managed to reproduce and debug a =
+problem in dash.
+Setting PS1 to something that does not expand correctly, like the =
+example in the title, causes
+Dash to enter an infinite loop.
+
+I didn=E2=80=99t attempt to fix it yet as I=E2=80=99m not familiar with =
+dash internals.=
