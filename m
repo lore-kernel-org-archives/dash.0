@@ -1,85 +1,63 @@
-From: Denys Vlasenko <dvlasenk@redhat.com>
-Subject: [PATCH] Remove poplocalvars() always-zero argument, make it static
-Date: Wed, 19 Feb 2020 17:39:13 +0100
-Message-ID: <20200219163913.11951-1-dvlasenk@redhat.com>
+From: Ron Yorston <rmy@frippery.org>
+Subject: Re: [PATCH] parser: Catch errors in expandstr
+Date: Wed, 26 Feb 2020 21:12:04 +0000
+Message-ID: <5e56df24.H24u7mxAPbLPL6fI%rmy@frippery.org>
+References: <SJhI_AW9YJmphaap5RzzVqYTGsA529iV7GOEBafT9ilDPGFpMRRJlNt3TrMBwh0uqKQltSvsH2P8x_2in6enHT5DzygjAtrRSvWl5xHofeY=@emersion.fr>
+ <20200121063959.tel7ty76fkz33xpn@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43499 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726700AbgBSQjW (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:39:22 -0500
+Received: from sov.nat64.mythic-beasts.com ([93.93.129.128]:35700 "EHLO
+        frippery.frippery.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727446AbgBZVMG (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 26 Feb 2020 16:12:06 -0500
+In-Reply-To: <20200121063959.tel7ty76fkz33xpn@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
-Cc: Denys Vlasenko <dvlasenk@redhat.com>
+To: herbert@gondor.apana.org.au, contact@emersion.fr
+Cc: dash@vger.kernel.org
 
-Signed-off-by: Denys Vlasenko <dvlasenk@redhat.com>
+Herbert Xu wrote:
+>This patch fixes it by using the literal value of PS1 should an
+>error occur during expansion.
+
+There's another case that should be handled.  PS1='`xxx(`' causes the
+shell to exit because the old-style backquote leaves an additional file
+on the stack.
+
+Signed-off-by: Ron Yorston <rmy@pobox.com>
 ---
- src/var.c | 24 ++++--------------------
- src/var.h |  1 -
- 2 files changed, 4 insertions(+), 21 deletions(-)
+ src/parser.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/src/var.c b/src/var.c
-index 0d7e1db..b146018 100644
---- a/src/var.c
-+++ b/src/var.c
-@@ -504,8 +504,8 @@ void mklocal(char *name, int flags)
-  * Interrupts must be off.
-  */
-=20
--void
--poplocalvars(int keep)
-+static void
-+poplocalvars(void)
+diff --git a/src/parser.c b/src/parser.c
+index 201d5bd..d7e717a 100644
+--- a/src/parser.c
++++ b/src/parser.c
+@@ -1572,12 +1572,14 @@ const char *
+ expandstr(const char *ps)
  {
- 	struct localvar_list *ll;
- 	struct localvar *lvp, *next;
-@@ -522,23 +522,7 @@ poplocalvars(int keep)
- 		next =3D lvp->next;
- 		vp =3D lvp->vp;
- 		TRACE(("poplocalvar %s\n", vp ? vp->text : "-"));
--		if (keep) {
--			int bits =3D VSTRFIXED;
--
--			if (lvp->flags !=3D VUNSET) {
--				if (vp->text =3D=3D lvp->text)
--					bits |=3D VTEXTFIXED;
--				else if (!(lvp->flags & (VTEXTFIXED|VSTACK)))
--					ckfree(lvp->text);
--			}
--
--			vp->flags &=3D ~bits;
--			vp->flags |=3D (lvp->flags & bits);
--
--			if ((vp->flags &
--			     (VEXPORT|VREADONLY|VSTRFIXED|VUNSET)) =3D=3D VUNSET)
--				unsetvar(vp->text);
--		} else if (vp =3D=3D NULL) {	/* $- saved */
-+		if (vp =3D=3D NULL) {	/* $- saved */
- 			memcpy(optlist, lvp->text, sizeof(optlist));
- 			ckfree(lvp->text);
- 			optschanged();
-@@ -586,7 +570,7 @@ out:
- void unwindlocalvars(struct localvar_list *stop)
- {
- 	while (localvar_stack !=3D stop)
--		poplocalvars(0);
-+		poplocalvars();
+ 	struct jmploc *volatile savehandler;
++	struct parsefile *file_stop;
+ 	const char *volatile result;
+ 	volatile int saveprompt;
+ 	struct jmploc jmploc;
+ 	union node n;
+ 	int err;
+ 
++	file_stop = parsefile;
+ 	/* XXX Fix (char *) cast. */
+ 	setinputstring((char *)ps);
+ 
+@@ -1605,7 +1607,7 @@ out:
+ 		longjmp(handler->loc, 1);
+ 
+ 	doprompt = saveprompt;
+-	popfile();
++	unwindfiles(file_stop);
+ 
+ 	return result;
  }
-=20
-=20
-diff --git a/src/var.h b/src/var.h
-index cd0477f..aa7575a 100644
---- a/src/var.h
-+++ b/src/var.h
-@@ -148,7 +148,6 @@ int exportcmd(int, char **);
- int localcmd(int, char **);
- void mklocal(char *name, int flags);
- struct localvar_list *pushlocalvars(int push);
--void poplocalvars(int);
- void unwindlocalvars(struct localvar_list *stop);
- int unsetcmd(int, char **);
- void unsetvar(const char *);
---=20
-2.25.0
+-- 
+2.24.1
