@@ -1,124 +1,48 @@
-From: Dirk Fieldhouse <fieldhouse@gmx.net>
-Subject: 'return' from subshell in function doesn't
-Date: Sun, 8 Mar 2020 12:35:17 +0000
-Message-ID: <9b3a55fb-df00-8ac3-7a1e-b60e24aa2970@gmx.net>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: 'return' from subshell in function doesn't
+Date: Sun, 8 Mar 2020 13:44:46 +0000
+Message-ID: <98ce2d03-e647-48b2-e4dd-3ceb810f2b24@gigawatt.nl>
 References: <S1726267AbgCHLof/20200308114435Z+1505@vger.kernel.org>
+ <9b3a55fb-df00-8ac3-7a1e-b60e24aa2970@gmx.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.17.21]:56423 "EHLO mout.gmx.net"
+Received: from mail.gigawatt.nl ([51.68.198.76]:60928 "EHLO mail.gigawatt.nl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726281AbgCHMfT (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 8 Mar 2020 08:35:19 -0400
-Received: from [192.168.77.222] ([51.6.64.192]) by mail.gmx.com (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MOiHf-1izbAX0Jfb-00Q8UL for
- <dash@vger.kernel.org>; Sun, 08 Mar 2020 13:35:18 +0100
-In-Reply-To: <S1726267AbgCHLof/20200308114435Z+1505@vger.kernel.org>
+        id S1726270AbgCHNq7 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 8 Mar 2020 09:46:59 -0400
+In-Reply-To: <9b3a55fb-df00-8ac3-7a1e-b60e24aa2970@gmx.net>
+Content-Language: en-US
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: DASH mailing list <dash@vger.kernel.org>
+To: Dirk Fieldhouse <fieldhouse@gmx.net>, DASH mailing list <dash@vger.kernel.org>
 
-POSIX
-<https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html=
-#return>
-says, and has since at least 2004:
-"The return utility shall cause the shell to stop executing the current
-function or dot script. If the shell is not currently executing a
-function or dot script, the results are unspecified."
+On 08/03/2020 12:35, Dirk Fieldhouse wrote:
+> POSIX
+> <https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#return> 
+> 
+> says, and has since at least 2004:
+> "The return utility shall cause the shell to stop executing the current
+> function or dot script. If the shell is not currently executing a
+> function or dot script, the results are unspecified."
+>[...]
+> As POSIX refers to subshells explicitly elsewhere (eg 'exit') it's
+> difficult to believe that "subshell" was accidentally omitted from the
+> list of contexts that 'return' should return from, but implementation
+> behaviours consistently contradict the spec as written. Can they be made
+> conformant without breaking existing scripts?
 
-Clear enough, one would think, but consider this example:
+In the subshell, the shell should not be considered to still be 
+executing a function or dot script. As such, the results should be 
+unspecified, and any behaviour should be valid. The standard may be 
+underspecified here, but any other interpretation is not reasonable.
 
-foo() {
-  echo "$1" |
-    while read -r xx _; do
-      if [ "$xx" =3D fum ]; then
-        echo EQ
-        return 0
-      fi
-    done
-  echo NE
-  return 1
-}
+Subshells work by starting a new process. The parent process waits for 
+the subshell to finish and acts on its exit status. The child process 
+has very little ways to influence its parent process other than that, 
+and the parent process might not even still be running by the time the 
+child process gets to the return statement.
 
-According to the spec we expect:
-
-$ foo fum || echo WTF
-EQ
-$
-
-What actually happens, with DASH-0.5.8-2.1ubuntu2 and -0.5.9.1 built
-from source:
-
-$ foo fum || echo WTF
-EQ
-NE
-WTF
-$ foo baz || echo OK
-NE
-OK
-$
-
-Same with bash-4.3-14ubuntu1.4, busybox-static-1:1.22.0-15ubuntu1.4.
-
-A simpler test case shows that the issue is 'return' not breaking out of
-a subshell:
-
-bar() {
-( if [ "$1" =3D fum ]; then
-        echo EQ
-        return 0
-      fi )
-  echo NE
-  return 1
-}
-
-barbar() {
-  if [ "$1" =3D fum ]; then
-    echo EQ
-    return 0
-  fi
-  echo NE
-  return 1
-}
-
-$ bar fum || echo WTF
-EQ
-NE
-WTF
-$ bar baz || echo OK
-NE
-OK
-$ barbar fum || echo WTF
-EQ
-$
-
-As POSIX refers to subshells explicitly elsewhere (eg 'exit') it's
-difficult to believe that "subshell" was accidentally omitted from the
-list of contexts that 'return' should return from, but implementation
-behaviours consistently contradict the spec as written. Can they be made
-conformant without breaking existing scripts?
-
-A work-around is to make any subshell explicit and 'exit' from it:
-
-foo_wa() {
-  echo "$1" |
-    ( while read -r xx _; do
-      if [ "$xx" =3D fum ]; then
-        echo EQ
-        exit 0
-      fi
-    done; exit 1 ) && return
-  ret=3D$?
-  echo NE
-  return $ret
-}
-
-$ foo_wa fum || echo WTF
-EQ
-$
-
-
-=2D-
-London SW6
-UK
+Cheers,
+Harald van Dijk
