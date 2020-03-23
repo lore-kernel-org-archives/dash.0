@@ -1,138 +1,103 @@
-From: Dirk Fieldhouse <fieldhouse@gmx.net>
-Subject: Re: 'return' from subshell in function doesn't
-Date: Mon, 9 Mar 2020 12:43:28 +0000
-Message-ID: <320e79a9-0c93-8070-451b-ddc3b50b195e@gmx.net>
-References: <S1726267AbgCHLof/20200308114435Z+1505@vger.kernel.org>
- <9b3a55fb-df00-8ac3-7a1e-b60e24aa2970@gmx.net>
- <98ce2d03-e647-48b2-e4dd-3ceb810f2b24@gigawatt.nl>
- <4d8123c9-33e4-a525-930f-37bce1cb9d77@gmx.net>
- <71fc6831-8193-e977-3437-6181dc79842b@gigawatt.nl>
+From: n8dandy <n8dandy@protonmail.com>
+Subject: dash & IFS
+Date: Mon, 23 Mar 2020 08:20:23 +0000
+Message-ID: <dDYpzKRWD9p1jhFjsIjWZvAddv8e0CQYDq1UxXsV33DN8SvAxPj9gOakBk9LBcTu6j_qEZLUTIoebSKq3-yQ4LKNjGZG-jk-SMMy_RGE-hI=@protonmail.com>
+Reply-To: n8dandy <n8dandy@protonmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed;
+        boundary="b1_0d02899544f73aca8e687e50ae76b655"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.17.22]:42531 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725956AbgCIMnd (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 9 Mar 2020 08:43:33 -0400
-In-Reply-To: <71fc6831-8193-e977-3437-6181dc79842b@gigawatt.nl>
+Received: from mail-40130.protonmail.ch ([185.70.40.130]:50459 "EHLO
+        mail-40130.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727451AbgCWIUe (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 23 Mar 2020 04:20:34 -0400
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: DASH mailing list <dash@vger.kernel.org>
-Cc: Harald van Dijk <harald@gigawatt.nl>
+To: "dash@vger.kernel.org" <dash@vger.kernel.org>
 
-On 08/03/20 15:19, Harald van Dijk wrote:
-> On 08/03/2020 14:40, Dirk Fieldhouse wrote:
->> On 08/03/20 13:44, Harald van Dijk wrote:
->>> Subshells work by starting a new process. ...
->>
->> What the conforming implementation has to do shouldn't be of concern to
->> the shell programmer, especially since a subshell may, but need not, be
->> created implicitly in a pipeline; in particular any subshell processes
->> are transparent to the shell programmer ($! "shall expand to the same
->> value as that of the current shell").
->
-> I think you meant $$ there, but this is the difference between theory
-> and practice. In theory, the standard is perfect, and shell internals
-> are irrelevant, we can just look at what the standard says. In practice,
-> unfortunately, the standard is not perfect and there are numerous cases
-> where the standard is either ambiguous or contradicts implementations,
-> and where this is deemed a defect in the standard rather than in the
-> implementations. It need not even be because what the standard specifies
-> is unreasonable, it can just be because the what the standard specifies
-> is unintended.
+This is a multi-part message in MIME format.
 
-Yes obvs $$, thanks. If a supplier has to warrant conformance to the
-standard they have a problem if what the standard says is universally
-ignored. Something has to give. I think it's fair to say that
-historically there has been convergence from both directions. But this
-particular issue seems to have been a blind spot, perhaps because it
-seems so obvious to the implementers who also work on the spec (we've
-all been there).
+--b1_0d02899544f73aca8e687e50ae76b655
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 What POSIX says presumably means
->> that the implementation should wait for any subprocesses, threads or
->> whatever spawned in the course of executing a function to complete
->> (subject to &) before continuing to execute the next command. If the
->> calling script process or some spawned thread of control gets killed
->> before the return can be executed, that's just an exception, the sort o=
-f
->> thing that traps exist for.
->
-> Sure, for the parent process, but for the child process it leaves
-> questions unanswered such as what the expected output would be of:
->
->  =C2=A0 f() {
->  =C2=A0=C2=A0=C2=A0 (kill -9 $$; return; echo hello)
->  =C2=A0 }
->  =C2=A0 f
->  =C2=A0 echo bye
+Good morning,
 
-If you kill the shell (you're not supposed to know that kill only kills
-some main process) you shouldn't expect any subsequent command to have
-run. A better name for this f() is cut_off_the_branch_I_am_sitting_on().
+Few days ago, I noticed something strange with dash and IFS. It was
+verified with the following versions :
 
-> I would argue that even if you disagree that the behaviour should be
-> unspecified in your original example, it should still be unspecified in
-> mine.
->
->> However, as your interpretation seems to have been widely made by shell
->> implementations, is it necessary to abandon the behaviour currently
->> specified in favour of a more pragmatic specification?
->
-> I suspect so. There is a case I forgot about though:
->
->  =C2=A0 f() (
->  =C2=A0=C2=A0=C2=A0 return 0
->  =C2=A0=C2=A0=C2=A0 echo bug
->  =C2=A0 )
->  =C2=A0 f
->
-> This should not print 'bug', and does not in any shell I can think to
-> test. By your interpretation of the standard, this is currently
-> specified. By mine, it would be unspecified, but I would agree that it
-> should be fine for the whole function to be defined using a () compound
-> command, and to contain a return statement directly inside it.
+- 0.5.10.2 on Voidlinux
+- 0.5.10.2 on Debian Buster
+- 0.5.8 on Ubuntu 18.04.2 LTS (Bionic Beaver)
 
-+1. Apparently the consensus has been that 'return' in a subshell means
-'exit'. But should someone write a test suite with a test case similar
-to my original bar() against POSIX.1-2017 these implementations will all
-fail to pass.
+Here the issue :
 
-> The same problem applies to the 'break' and 'continue' statements too:
->
->  =C2=A0 for var in x y z
->  =C2=A0 do
->  =C2=A0=C2=A0=C2=A0 echo $var
->  =C2=A0=C2=A0=C2=A0 (break)
->  =C2=A0 done
+$ ls
+file.sign  file1  file2  other.sign  whileifs*
+$ cat whileifs
+#!/bin/dash
 
-As Stephane (instigator of the relevant defect report) pointed out, this
-has been addressed in the 2017 text, so that your 'break' example is
-unspecified behaviour (unenclosed break or continue). Of course similar
-wording could have been used to restrict the specified behaviour of
-'return' as well -- but wasn't.
+find . -type f | sort -d | while IFS=3D$'\n' read -r F; do
+=09printf "%s\n" "$F"
+done
+$ ./whileifs
+./file1
+./file2
+./file.sig
+./other.sig
+./whileifs
 
-> This is looking like a giant can of worms I'm not sure I'm ready to see
-> opened. :)
+file.sig and other.sig are returned instead of file.sign and other.sign.
 
-Otherwise it would have been sorted out before and I wouldn't have
-raised it!
+Here the result with bash :
+$ bash whileifs
+./file1
+./file2
+./file.sign
+./other.sign
+./whileifs
 
-This <https://www.austingroupbugs.net/view.php?id=3D1042> POSIX DR touches
-on the same issue but doesn't come to grips with 'return'.
+Here the result with mksh :
+$ mksh whileifs
+./file1
+./file2
+./file.sign
+./other.sign
+./whileifs
 
-This <https://www.austingroupbugs.net/view.php?id=3D1247> DR identifies at
-least one other case where an implicit subshell is used.
+Here the result with lksh :
+$ lksh whileifs
+./file1
+./file2
+./file.sign
+./other.sign
+./whileifs
 
-I suppose further discussion should be at austin-group-l?
+Here the result with busybox ash (1.31.0) :
+$ /tmp/busybox-x86_64 ash whileifs
+./file1
+./file2
+./file.sign
+./other.sign
+./whileifs
 
-regards
-/df
+I attached the test directory. Can you reproduce it ?
 
-=2D-
-London SW6
-UK
+Sincerely
+Y
+
+
+--b1_0d02899544f73aca8e687e50ae76b655
+Content-Type: application/gzip; name="dashifs.tar.gz"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=dashifs.tar.gz
+
+H4sIAAAAAAAAA+3Uu07DMBQG4KzkKQ6hqFMa27kNiDUSM2uXoDgkEjiVbYSQeHicQCtVDFErnA78
+3xDnJh1bv4+tNLapTZcE/jCnzPNx5GXOpmeeZdP4I+BpkRasyLKUB4xzIYqAco9zOngzttZEQfc6
+95/UZokJLcvu83/v+hfZtz6WOJc/T8t9/kUqhMtflCULiHmYyy//PP+b6+SpV8m4BcKw7VVDG4rt
+x05SS59kBm0pbtzdtD3ooXq8X623ak1a1g3Fmqo7aobwaqd7ZVuKbs1WRRStqihsBiXDSy8PZhz6
+f7Cd1BvTP6s/rzH2ePHd73Pnv7u699ydAin6fwmH/FvX337iPyd/JjjyX8JR/sJPjdPzF+Nn5L+A
+o/y5nxpn5Y/zHwAAAAAAAAAAAAAAAOBkXxmVJnEAKAAA
+
+
+--b1_0d02899544f73aca8e687e50ae76b655--
