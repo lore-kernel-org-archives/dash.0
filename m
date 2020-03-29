@@ -1,76 +1,65 @@
-From: "Vitaly Zuevsky" <vitaly.zuevsky@gmail.com>
-Subject: RE: Bug#953421: dash: Resident Set Size growth is unbound (memory leak) on an infinite shell loop
-Date: Sun, 29 Mar 2020 18:54:14 +0100
-Message-ID: <07ce01d605f3$103f1610$30bd4230$@gmail.com>
-References: <158376996556.31988.8584094104007124674.reportbug@ec2-34-240-101-198.eu-west-1.compute.amazonaws.com> <CACujMDPfs5mJs8CVaxqM6wkCRANYQ71wTUkvHiNvOg+MPSTECQ@mail.gmail.com>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: Bug#953421: dash: Resident Set Size growth is unbound (memory
+ leak) on an infinite shell loop
+Date: Sun, 29 Mar 2020 20:06:31 +0100
+Message-ID: <a2efaae8-db1b-39ae-d7c2-8d119a4f14d4@gigawatt.nl>
+References: <158376996556.31988.8584094104007124674.reportbug@ec2-34-240-101-198.eu-west-1.compute.amazonaws.com>
+ <CACujMDPfs5mJs8CVaxqM6wkCRANYQ71wTUkvHiNvOg+MPSTECQ@mail.gmail.com>
+ <07ce01d605f3$103f1610$30bd4230$@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:39799 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728319AbgC2RyT (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 29 Mar 2020 13:54:19 -0400
-Received: by mail-wm1-f67.google.com with SMTP id e9so6736884wme.4
-        for <dash@vger.kernel.org>; Sun, 29 Mar 2020 10:54:17 -0700 (PDT)
-In-Reply-To: <CACujMDPfs5mJs8CVaxqM6wkCRANYQ71wTUkvHiNvOg+MPSTECQ@mail.gmail.com>
-Content-Language: en-gb
+Received: from mail.gigawatt.nl ([51.68.198.76]:38068 "EHLO mail.gigawatt.nl"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727606AbgC2TI6 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 29 Mar 2020 15:08:58 -0400
+In-Reply-To: <07ce01d605f3$103f1610$30bd4230$@gmail.com>
+Content-Language: en-US
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: 'Andrej Shadura' <andrew@shadura.me>, 953421@bugs.debian.org, dash@vger.kernel.org
+To: Vitaly Zuevsky <vitaly.zuevsky@gmail.com>, 'Andrej Shadura' <andrew@shadura.me>, 953421@bugs.debian.org, dash@vger.kernel.org
 Cc: 'Debian Bug Tracking System' <submit@bugs.debian.org>
 
-I have now fixed this bug locally.
+Hi Vitaly,
 
-The leak is in jobtab array (jobs.c). I concluded that the most logical =
-approach would be eliminating inconsistency between makejob() and =
-dowait() functions. My fix in a forked repo:
+On 29/03/2020 18:54, Vitaly Zuevsky wrote:
+> I have now fixed this bug locally.
+> 
+> The leak is in jobtab array (jobs.c). I concluded that the most logical approach would be eliminating inconsistency between makejob() and dowait() functions. My fix in a forked repo:
+> 
+> https://salsa.debian.org/psvz-guest/dash/-/commit/5e3ea90cb3355d1308c482661a471883d36af5e7
 
-https://salsa.debian.org/psvz-guest/dash/-/commit/5e3ea90cb3355d1308c4826=
-61a471883d36af5e7
+This change is incorrect. The reason dash keeps on allocating memory is 
+because dash needs to keep on allocating memory. Consider this script:
 
-I suspect that imbalance between allocating and freeing jobtab slots was =
-introduced at evolving SIGCHLD handling, because I can see two =
-waitforjob() calls, wherein the first call could wait for both done jobs =
-and gotsigchld is set. At the second call, gotsigchld is cleared and =
-waitforjob() does nothing. So 1 of 2 jobtab slots goes astray.
+   set -- $(seq 1 100)
+   for i
+   do
+     : &
+     sleep .1
+   done
+   for i
+   do
+     wait %$i
+   done
 
-Simplified bug repro steps:
+This is a valid script and works fine in dash. Your change breaks this 
+by not keeping the jobs around long enough, and I hope this test script 
+shows that there is no way to keep the jobs around long enough but by 
+allocating ever more memory.
 
-Script
--------
-while true
-do
-  true &
-  sleep .1
-done
+Your change makes it impossible to keep track of the background 
+process's status, but if you do not care about that anyway, you can 
+avoid the increasing memory use without modifying dash by launching a 
+background process without including it in the current shell's job 
+table, by launching it from a subshell:
 
-Execution
--------------
-# dash Script &
-
-You can now observe resident set size (RSS) is bumped every several =
-seconds:
-# ps aux |grep 'RSS\|dash'
-
-What do I do to have it peer-reviewed and, potentially, merged into =
-mainline?
+   while true
+   do
+     (true &)
+     sleep .1
+   done
 
 Cheers,
-Vitaly
-----------fixDetails:
-Function makejob() calls freejob() when appropriate.
-Specifically, it detects a free slot in jobtab array by this condition:
-
-(jp->state !=3D JOBDONE || !jp->waited)
-
-The problem is that dowait() never sets waited flag together with =
-JOBDONE state.
-Consequently, jobtab may leak: repro steps are provided in a bug report =
-#953421.
-
-One solution could be not relying on waited flag at all, i.e. converting
-the makejob()'s condition into (jp->state !=3D JOBDONE). As an =
-alternative,
-I am setting waited flag in dowait().
+Harald van Dijk
