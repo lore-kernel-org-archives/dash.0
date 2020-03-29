@@ -1,65 +1,87 @@
-From: Harald van Dijk <harald@gigawatt.nl>
+From: Jilles Tjoelker <jilles@stack.nl>
 Subject: Re: Bug#953421: dash: Resident Set Size growth is unbound (memory
  leak) on an infinite shell loop
-Date: Sun, 29 Mar 2020 20:06:31 +0100
-Message-ID: <a2efaae8-db1b-39ae-d7c2-8d119a4f14d4@gigawatt.nl>
+Date: Mon, 30 Mar 2020 00:07:06 +0200
+Message-ID: <20200329220706.GA13241@stack.nl>
 References: <158376996556.31988.8584094104007124674.reportbug@ec2-34-240-101-198.eu-west-1.compute.amazonaws.com>
  <CACujMDPfs5mJs8CVaxqM6wkCRANYQ71wTUkvHiNvOg+MPSTECQ@mail.gmail.com>
  <07ce01d605f3$103f1610$30bd4230$@gmail.com>
+ <a2efaae8-db1b-39ae-d7c2-8d119a4f14d4@gigawatt.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.gigawatt.nl ([51.68.198.76]:38068 "EHLO mail.gigawatt.nl"
+Received: from blade.stack.nl ([51.15.111.152]:50380 "EHLO mail04.stack.nl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727606AbgC2TI6 (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 29 Mar 2020 15:08:58 -0400
-In-Reply-To: <07ce01d605f3$103f1610$30bd4230$@gmail.com>
-Content-Language: en-US
+        id S1727903AbgC2WQn (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 29 Mar 2020 18:16:43 -0400
+Content-Disposition: inline
+In-Reply-To: <a2efaae8-db1b-39ae-d7c2-8d119a4f14d4@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Vitaly Zuevsky <vitaly.zuevsky@gmail.com>, 'Andrej Shadura' <andrew@shadura.me>, 953421@bugs.debian.org, dash@vger.kernel.org
-Cc: 'Debian Bug Tracking System' <submit@bugs.debian.org>
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: Vitaly Zuevsky <vitaly.zuevsky@gmail.com>, 'Andrej Shadura' <andrew@shadura.me>, 953421@bugs.debian.org, dash@vger.kernel.org, 'Debian Bug Tracking System' <submit@bugs.debian.org>
 
-Hi Vitaly,
+On Sun, Mar 29, 2020 at 08:06:31PM +0100, Harald van Dijk wrote:
+> On 29/03/2020 18:54, Vitaly Zuevsky wrote:
+> > I have now fixed this bug locally.
 
-On 29/03/2020 18:54, Vitaly Zuevsky wrote:
-> I have now fixed this bug locally.
-> 
-> The leak is in jobtab array (jobs.c). I concluded that the most logical approach would be eliminating inconsistency between makejob() and dowait() functions. My fix in a forked repo:
-> 
-> https://salsa.debian.org/psvz-guest/dash/-/commit/5e3ea90cb3355d1308c482661a471883d36af5e7
+> > The leak is in jobtab array (jobs.c). I concluded that the most
+> > logical approach would be eliminating inconsistency between
+> > makejob() and dowait() functions. My fix in a forked repo:
 
-This change is incorrect. The reason dash keeps on allocating memory is 
-because dash needs to keep on allocating memory. Consider this script:
+> > https://salsa.debian.org/psvz-guest/dash/-/commit/5e3ea90cb3355d1308c482661a471883d36af5e7
 
-   set -- $(seq 1 100)
-   for i
-   do
-     : &
-     sleep .1
-   done
-   for i
-   do
-     wait %$i
-   done
+> This change is incorrect. The reason dash keeps on allocating memory is
+> because dash needs to keep on allocating memory. Consider this script:
 
-This is a valid script and works fine in dash. Your change breaks this 
-by not keeping the jobs around long enough, and I hope this test script 
-shows that there is no way to keep the jobs around long enough but by 
-allocating ever more memory.
+>   set -- $(seq 1 100)
+>   for i
+>   do
+>     : &
+>     sleep .1
+>   done
+>   for i
+>   do
+>     wait %$i
+>   done
 
-Your change makes it impossible to keep track of the background 
-process's status, but if you do not care about that anyway, you can 
-avoid the increasing memory use without modifying dash by launching a 
-background process without including it in the current shell's job 
-table, by launching it from a subshell:
+> This is a valid script and works fine in dash. Your change breaks this by
+> not keeping the jobs around long enough, and I hope this test script shows
+> that there is no way to keep the jobs around long enough but by allocating
+> ever more memory.
 
-   while true
-   do
-     (true &)
-     sleep .1
-   done
+I agree that the change is incorrect, but I do not agree that this kind
+of script must leak memory. Per POSIX.1-2008 XCU 2.9.3.1 Asynchronous
+Lists, an implementation has additional ways to forget about jobs than
+just an appropriate completion of the wait utility: if another
+asynchronous job is started when $! was not referenced or if the number
+of known process IDs would exceed {CHILD_MAX} (which tends to be rather
+big, though).
 
-Cheers,
-Harald van Dijk
+POSIX does not seem to expect using %<jobid> in scripts like this; it
+seems highly fragile to me anyway (although $! has problems with process
+ID reuse).
+
+FreeBSD sh implements forgetting when $! was not referenced (and the job
+has terminated), but not the {CHILD_MAX} limit. This avoids the
+increasing memory usage in the example script.
+
+> Your change makes it impossible to keep track of the background process's
+> status, but if you do not care about that anyway, you can avoid the
+> increasing memory use without modifying dash by launching a background
+> process without including it in the current shell's job table, by launching
+> it from a subshell:
+
+>   while true
+>   do
+>     (true &)
+>     sleep .1
+>   done
+
+Certainly a good idea.
+
+Another option may be to include regular invocations of the wait utility
+without parameters, although this is not suitable for all scripts.
+
+-- 
+Jilles Tjoelker
