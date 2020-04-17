@@ -1,83 +1,53 @@
-From: "lunkov@gmail.com" <lunkov@gmail.com>
-Subject: Maybe a mistake
-Date: Fri, 17 Apr 2020 19:37:09 +0300
-Message-ID: <CAGQt5nnH+ZBXbKreCFyEzqed8Yq_P6YqT0ideKVzd7OU_4bTAg@mail.gmail.com>
+From: Harald van Dijk <harald@gigawatt.nl>
+Subject: Re: Maybe a mistake
+Date: Fri, 17 Apr 2020 17:51:01 +0100
+Message-ID: <617c7c35-e605-6042-a11c-ee8541979079@gigawatt.nl>
+References: <CAGQt5nnH+ZBXbKreCFyEzqed8Yq_P6YqT0ideKVzd7OU_4bTAg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <dash-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55292 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726022AbgDQQhr (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 17 Apr 2020 12:37:47 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1097DC061A0C
-        for <dash@vger.kernel.org>; Fri, 17 Apr 2020 09:37:47 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id z12so2692525ilb.10
-        for <dash@vger.kernel.org>; Fri, 17 Apr 2020 09:37:46 -0700 (PDT)
+Received: from mail.gigawatt.nl ([51.68.198.76]:54036 "EHLO mail.gigawatt.nl"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726420AbgDQQvd (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 17 Apr 2020 12:51:33 -0400
+In-Reply-To: <CAGQt5nnH+ZBXbKreCFyEzqed8Yq_P6YqT0ideKVzd7OU_4bTAg@mail.gmail.com>
+Content-Language: en-US
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
+To: "lunkov@gmail.com" <lunkov@gmail.com>, dash@vger.kernel.org
 
-Hello! I encountered a script execution error using dash. Other shells
-execute this script without error. Perhaps there is an error in dash.
-Please execute my script in dash and in bash, for example.
--------------------------------------------------------------------------------------------------
-#!/bin/dash
+On 17/04/2020 17:37, lunkov@gmail.com wrote:
+> Hello! I encountered a script execution error using dash. Other shells
+> execute this script without error. Perhaps there is an error in dash.
+> Please execute my script in dash and in bash, for example.
+> -------------------------------------------------------------------------------------------------
+[...]
+>          local F=`echo "${i}" | grep "${PATTERN}"`        # local
 
-DATA='
-1
-2
-${var}
-4
-5'
+Hi,
 
-test1()
-{
-    local PATTERN='${var}'
+The latest release version of dash does not support assignment syntax in 
+command arguments. Assignment syntax is special in that it prevents 
+field splitting. A shorter example is
 
-    echo ${DATA} | while read i; do
-        F=`echo "${i}" | grep "${PATTERN}"`
-        if [ "$F" ]; then
-            echo "FOUND"
-            break
-        fi
-    done
-}
+   x="1 y=2"
+   export x=$x
+   echo y=$y
 
-test2()
-{
-    local PATTERN='${var}'
+This prints y=2 in the latest release version, but prints y= in other 
+shells (unless you had previously set y yourself): without special 
+assignment syntax, x=$x is split into x=1 and y=2 before it is passed to 
+the export command, but with special assignment syntax x=$x is preserved 
+as a single word.
 
-    echo ${DATA} | while read i; do
-        local F=`echo "${i}" | grep "${PATTERN}"`        # local
-        if [ "$F" ]; then
-            echo "FOUND"
-            break
-        fi
-    done
-}
+You can work around this by adding quoting:
 
-test3()
-{
-    local PATTERN='${var}'
+   local F="`...`"
 
-    echo "${DATA}" | while read i; do                # quotes
-        local F=`echo "${i}" | grep "${PATTERN}"`        # local
-        if [ "$F" ]; then
-            echo "FOUND"
-            break
-        fi
-    done
-}
+The current git version of dash does support assignment syntax in 
+command arguments (like other shells, only for specific commands) and 
+accepts your script without modifications.
 
-echo "test1"
-test1
-
-echo "test2"
-test2    # Only in dash: ./test.sh: 28: local: 2: bad variable name
-
-echo "test3"
-test3
--------------------------------------------------------------------------------------------------
-
-Best regards.
+Cheers,
+Harald van Dijk
