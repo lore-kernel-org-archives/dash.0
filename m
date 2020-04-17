@@ -1,96 +1,83 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: jobs: Fix infinite loop in waitproc
-Date: Fri, 10 Apr 2020 21:03:09 +1000
-Message-ID: <20200410110309.GA13801@gondor.apana.org.au>
+From: "lunkov@gmail.com" <lunkov@gmail.com>
+Subject: Maybe a mistake
+Date: Fri, 17 Apr 2020 19:37:09 +0300
+Message-ID: <CAGQt5nnH+ZBXbKreCFyEzqed8Yq_P6YqT0ideKVzd7OU_4bTAg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hmeau.com ([216.24.177.18]:48170 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725930AbgDJLDM (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 10 Apr 2020 07:03:12 -0400
-Content-Disposition: inline
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55292 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726022AbgDQQhr (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 17 Apr 2020 12:37:47 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1097DC061A0C
+        for <dash@vger.kernel.org>; Fri, 17 Apr 2020 09:37:47 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id z12so2692525ilb.10
+        for <dash@vger.kernel.org>; Fri, 17 Apr 2020 09:37:46 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org, Harald van Dijk <harald@gigawatt.nl>
+To: dash@vger.kernel.org
 
-After we changed the resetting of gotsigchld so that it is only
-done if jp is NULL, we can now get an infinite loop in waitproc
-if gotsigchld is set but there is no outstanding child because
-everything had been waited for previously without gotsigchld being
-zeroed.
+Hello! I encountered a script execution error using dash. Other shells
+execute this script without error. Perhaps there is an error in dash.
+Please execute my script in dash and in bash, for example.
+-------------------------------------------------------------------------------------------------
+#!/bin/dash
 
-This patch fixes it by always zeroing gotsigchld as we did before.
-The bug that the previous patch was trying to fix is now resolved
-by switching the blocking mode to DOWAIT_NORMAL after the specified
-job has been completed so that we really do wait for all outstanding
-dead children.
+DATA='
+1
+2
+${var}
+4
+5'
 
-Reported-by: Harald van Dijk <harald@gigawatt.nl>
-Fixes: 6c691b3e5099 ("jobs: Only clear gotsigchld when waiting...")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+test1()
+{
+    local PATTERN='${var}'
 
-diff --git a/src/jobs.c b/src/jobs.c
-index 26a6248..72e7aa9 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -1123,15 +1123,28 @@ out:
- 
- static int dowait(int block, struct job *jp)
- {
--	int pid = block == DOWAIT_NORMAL ? gotsigchld : 1;
-+	int gotchld = *(volatile int *)&gotsigchld;
-+	int rpid;
-+	int pid;
-+
-+	if (jp && jp->state != JOBRUNNING)
-+		block = DOWAIT_NORMAL;
-+
-+	if (block == DOWAIT_NORMAL && !gotchld)
-+		return 1;
- 
--	while (jp ? jp->state == JOBRUNNING : pid > 0) {
--		if (!jp)
--			gotsigchld = 0;
-+	rpid = 1;
-+
-+	do {
-+		gotsigchld = 0;
- 		pid = waitone(block, jp);
--	}
-+		rpid &= !!pid;
- 
--	return pid;
-+		if (!pid || (jp && jp->state != JOBRUNNING))
-+			block = DOWAIT_NORMAL;
-+	} while (pid >= 0);
-+
-+	return rpid;
- }
- 
- /*
-@@ -1163,7 +1176,10 @@ waitproc(int block, int *status)
- #endif
- 
- 	do {
--		err = wait3(status, flags, NULL);
-+		do
-+			err = wait3(status, flags, NULL);
-+		while (err < 0 && errno == EINTR);
-+
- 		if (err || (err = -!block))
- 			break;
- 
-@@ -1173,8 +1189,6 @@ waitproc(int block, int *status)
- 			sigsuspend(&oldmask);
- 
- 		sigclearmask();
--
--		err = 0;
- 	} while (gotsigchld);
- 
- 	return err;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+    echo ${DATA} | while read i; do
+        F=`echo "${i}" | grep "${PATTERN}"`
+        if [ "$F" ]; then
+            echo "FOUND"
+            break
+        fi
+    done
+}
+
+test2()
+{
+    local PATTERN='${var}'
+
+    echo ${DATA} | while read i; do
+        local F=`echo "${i}" | grep "${PATTERN}"`        # local
+        if [ "$F" ]; then
+            echo "FOUND"
+            break
+        fi
+    done
+}
+
+test3()
+{
+    local PATTERN='${var}'
+
+    echo "${DATA}" | while read i; do                # quotes
+        local F=`echo "${i}" | grep "${PATTERN}"`        # local
+        if [ "$F" ]; then
+            echo "FOUND"
+            break
+        fi
+    done
+}
+
+echo "test1"
+test1
+
+echo "test2"
+test2    # Only in dash: ./test.sh: 28: local: 2: bad variable name
+
+echo "test3"
+test3
+-------------------------------------------------------------------------------------------------
+
+Best regards.
