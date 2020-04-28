@@ -1,130 +1,91 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH] parser: Catch errors in expandstr
-Date: Tue, 28 Apr 2020 16:17:58 +1000
-Message-ID: <20200428061758.GA1771@gondor.apana.org.au>
-References: <SJhI_AW9YJmphaap5RzzVqYTGsA529iV7GOEBafT9ilDPGFpMRRJlNt3TrMBwh0uqKQltSvsH2P8x_2in6enHT5DzygjAtrRSvWl5xHofeY=@emersion.fr>
- <20200121063959.tel7ty76fkz33xpn@gondor.apana.org.au>
- <5e56df24.H24u7mxAPbLPL6fI%rmy@frippery.org>
- <20200228004023.GA9163@gondor.apana.org.au>
+Subject: [PATCH] parser: Fix alias expansion after heredoc or newlines
+Date: Wed, 29 Apr 2020 00:19:59 +1000
+Message-ID: <20200428141958.GA18579@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hmeau.com ([216.24.177.18]:45346 "EHLO fornost.hmeau.com"
+Received: from helcar.hmeau.com ([216.24.177.18]:47784 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726284AbgD1GSV (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 28 Apr 2020 02:18:21 -0400
+        id S1726868AbgD1OUE (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 28 Apr 2020 10:20:04 -0400
 Content-Disposition: inline
-In-Reply-To: <20200228004023.GA9163@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Ron Yorston <rmy@frippery.org>
-Cc: contact@emersion.fr, dash@vger.kernel.org
+To: dash@vger.kernel.org, Harald van Dijk <harald@gigawatt.nl>, Martijn Dekker <martijn@inlv.org>
 
-On Fri, Feb 28, 2020 at 11:40:23AM +1100, Herbert Xu wrote:
-> On Wed, Feb 26, 2020 at 09:12:04PM +0000, Ron Yorston wrote:
-> > Herbert Xu wrote:
-> > >This patch fixes it by using the literal value of PS1 should an
-> > >error occur during expansion.
-> > 
-> > There's another case that should be handled.  PS1='`xxx(`' causes the
-> > shell to exit because the old-style backquote leaves an additional file
-> > on the stack.
-> > 
-> > Signed-off-by: Ron Yorston <rmy@pobox.com>
-> > ---
-> >  src/parser.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> When you send a patch to an existing thread could you please change
-> the Subject line? Otherwise your patch will be silently dropped by
-> patchwork.
+The following patch is meant to be applied on top of:
 
-As I haven't received another patch, I'm going to fold yours into
-my original patch.
+https://patchwork.kernel.org/patch/11512439/
 
 ---8<---
-On Fri, Dec 13, 2019 at 02:51:34PM +0000, Simon Ser wrote:
-> Just noticed another dash bug: when setting invalid PS1 values dash
-> enters an infinite loop.
-> 
-> For instance, setting PS1='$(' makes dash print many of these:
-> 
->    dash: 1: Syntax error: end of file unexpected (expecting ")")
-> 
-> It would be nice to fallback to the default PS1 value on error.
+This script should print OK:
 
-This patch fixes it by using the literal value of PS1 should an
-error occur during expansion.
+	alias a="case x in " b=x
+	a
+	b) echo BAD;; esac
 
-On Wed, Feb 26, 2020 at 09:12:04PM +0000, Ron Yorston wrote:
-> 
-> There's another case that should be handled.  PS1='`xxx(`' causes the
-> shell to exit because the old-style backquote leaves an additional file
-> on the stack.
+	alias BEGIN={ END=}
+	BEGIN
+		cat <<- EOF > /dev/null
+			$(:)
+		EOF
+	END
 
-Ron's change has been folded into this patch.
+	: <<- EOF &&
+		$(:)
+	EOF
+	BEGIN
+		echo OK
+	END
 
-Reported-by: Simon Ser <contact@emersion.fr>
-Reported-by: Ron Yorston <rmy@pobox.com>
+However, because the value of checkkwd is either zeroed when it
+shouldn't, or isn't zeroed when it should, dash currently gets
+it wrong in every case.
+
+This patch fixes it by saving checkkwd and zeroing it where needed.
+
+Suggested-by: Harald van Dijk <harald@gigawatt.nl>
+Reported-by: Harald van Dijk <harald@gigawatt.nl>
+Reported-by: Martijn Dekker <martijn@inlv.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/src/parser.c b/src/parser.c
-index b318b08..5e36929 100644
+index 5c9e9a0..be84f8b 100644
 --- a/src/parser.c
 +++ b/src/parser.c
-@@ -1571,28 +1571,46 @@ setprompt(int which)
- const char *
- expandstr(const char *ps)
- {
-+	struct parsefile *volatile file_stop;
-+	struct jmploc *volatile savehandler;
-+	const char *volatile result;
-+	volatile int saveprompt;
-+	struct jmploc jmploc;
- 	union node n;
--	int saveprompt;
-+	int err;
+@@ -704,10 +704,14 @@ top:
+ 	if (kwd & CHKNL) {
+ 		while (t == TNL) {
+ 			parseheredoc();
++			checkkwd = 0;
+ 			t = xxreadtoken();
+ 		}
+ 	}
+ 
++	kwd |= checkkwd;
++	checkkwd = 0;
 +
-+	file_stop = parsefile;
+ 	if (t != TWORD || quoteflag) {
+ 		goto out;
+ 	}
+@@ -725,7 +729,7 @@ top:
+ 		}
+ 	}
  
- 	/* XXX Fix (char *) cast. */
- 	setinputstring((char *)ps);
- 
- 	saveprompt = doprompt;
- 	doprompt = 0;
-+	result = ps;
-+	savehandler = handler;
-+	if (unlikely(err = setjmp(jmploc.loc)))
-+		goto out;
-+	handler = &jmploc;
- 
- 	readtoken1(pgetc_eatbnl(), DQSYNTAX, FAKEEOFMARK, 0);
- 
--	doprompt = saveprompt;
--
--	popfile();
--
- 	n.narg.type = NARG;
- 	n.narg.next = NULL;
- 	n.narg.text = wordtext;
- 	n.narg.backquote = backquotelist;
- 
- 	expandarg(&n, NULL, EXP_QUOTED);
--	return stackblock();
-+	result = stackblock();
-+
-+out:
-+	handler = savehandler;
-+	if (err && exception != EXERROR)
-+		longjmp(handler->loc, 1);
-+
-+	doprompt = saveprompt;
-+	unwindfiles(file_stop);
-+
-+	return result;
- }
- 
- /*
+-	if (checkkwd & CHKALIAS) {
++	if (kwd & CHKALIAS) {
+ 		struct alias *ap;
+ 		if ((ap = lookupalias(wordtext, 1)) != NULL) {
+ 			if (*ap->val) {
+@@ -735,7 +739,6 @@ top:
+ 		}
+ 	}
+ out:
+-	checkkwd = 0;
+ #ifdef DEBUG
+ 	if (!alreadyseen)
+ 	    TRACE(("token %s %s\n", tokname[t], t == TWORD ? wordtext : ""));
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
