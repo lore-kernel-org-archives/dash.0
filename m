@@ -1,66 +1,81 @@
-From: Denys Vlasenko <dvlasenk@redhat.com>
-Subject: [PATCH] Remove unused expandmeta() flag parameter
-Date: Wed, 29 Apr 2020 08:29:53 +0200
-Message-ID: <20200429062953.19042-1-dvlasenk@redhat.com>
+From: Michael Greenberg <michael.greenberg@pomona.edu>
+Subject: [v2 PATCH] mktokens relative TMPDIR
+Date: Wed, 29 Apr 2020 10:51:41 -0700
+Message-ID: <m21ro6w576.fsf@pomona.edu>
+References: <m2k14k4kpx.fsf@pomona.edu> <20200429055923.GA17016@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Return-path: <dash-owner@vger.kernel.org>
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41633 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726158AbgD2GaI (ORCPT
-        <rfc822;dash@vger.kernel.org>); Wed, 29 Apr 2020 02:30:08 -0400
+Received: from mail-eopbgr680062.outbound.protection.outlook.com ([40.107.68.62]:45108
+        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726423AbgD2RwG (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 29 Apr 2020 13:52:06 -0400
+In-Reply-To: <20200429055923.GA17016@gondor.apana.org.au>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
-Cc: Denys Vlasenko <dvlasenk@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "dash@vger.kernel.org" <dash@vger.kernel.org>
 
-Signed-off-by: Denys Vlasenko <dvlasenk@redhat.com>
----
- src/expand.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+The mktokens script fails when /tmp isn't writable (e.g., when building
+in a sandbox with a different TMPDIR). Replace absolute references to
+/tmp to relative references to TMPDIR. If TMPDIR is unset or null,
+default to /tmp.
 
-diff --git a/src/expand.c b/src/expand.c
-index 4a5d75a..985cd70 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -118,7 +118,7 @@ STATIC char *evalvar(char *, int);
- static size_t strtodest(const char *p, int flags);
- static size_t memtodest(const char *p, size_t len, int flags);
- STATIC ssize_t varvalue(char *, int, int, int);
--STATIC void expandmeta(struct strlist *, int);
-+STATIC void expandmeta(struct strlist *);
- #ifdef HAVE_GLOB
- STATIC void addglob(const glob_t *);
- #else
-@@ -205,7 +205,7 @@ expandarg(union node *arg, struct arglist *arglist, i=
-nt flag)
- 		ifsbreakup(p, -1, &exparg);
- 		*exparg.lastp =3D NULL;
- 		exparg.lastp =3D &exparg.list;
--		expandmeta(exparg.list, flag);
-+		expandmeta(exparg.list);
- 	} else {
- 		sp =3D (struct strlist *)stalloc(sizeof (struct strlist));
- 		sp->text =3D p;
-@@ -1155,9 +1155,7 @@ out:
-=20
- #ifdef HAVE_GLOB
- STATIC void
--expandmeta(str, flag)
--	struct strlist *str;
--	int flag;
-+expandmeta(struct strlist *str)
- {
- 	/* TODO - EXP_REDIR */
-=20
-@@ -1221,7 +1219,7 @@ STATIC unsigned expdir_max;
-=20
-=20
- STATIC void
--expandmeta(struct strlist *str, int flag)
-+expandmeta(struct strlist *str)
- {
- 	static const char metachars[] =3D {
- 		'*', '?', '[', 0
---=20
-2.25.0
+The mkbuiltins script was already hardened to work relative to TMPDIR,
+also defaulting to /tmp.
+
+v2 ensures that TMPDIR is quoted.
+
+Signed-off-by: Michael Greenberg <michael.greenberg@pomona.edu>
+
+diff --git a/src/mktokens b/src/mktokens
+index cd52241..3ab7bc5 100644
+--- a/src/mktokens
++++ b/src/mktokens
+@@ -37,7 +37,9 @@
+ # token marks the end of a list.  The third column is the name to print in
+ # error messages.
+
+-cat > /tmp/ka$$ <<\!
++: ${TMPDIR:=/tmp}
++
++cat > "${TMPDIR}"/ka$$ <<\!
+ TEOF	1	end of file
+ TNL	0	newline
+ TSEMI	0	";"
+@@ -68,28 +70,28 @@ TWHILE	0	"while"
+ TBEGIN	0	"{"
+ TEND	1	"}"
+ !
+-nl=`wc -l /tmp/ka$$`
++nl=`wc -l "${TMPDIR}"/ka$$`
+ exec > token.h
+-awk '{print "#define " $1 " " NR-1}' /tmp/ka$$
++awk '{print "#define " $1 " " NR-1}' "${TMPDIR}"/ka$$
+
+ exec > token_vars.h
+
+ echo '
+ /* Array indicating which tokens mark the end of a list */
+ static const char tokendlist[] = {'
+-awk '{print "\t" $2 ","}' /tmp/ka$$
++awk '{print "\t" $2 ","}' "${TMPDIR}"/ka$$
+ echo '};
+
+ static const char *const tokname[] = {'
+ sed -e 's/"/\\"/g' \
+     -e 's/[^	 ]*[	 ][	 ]*[^	 ]*[	 ][	 ]*\(.*\)/	"\1",/' \
+-    /tmp/ka$$
++    "${TMPDIR}"/ka$$
+ echo '};
+ '
+-sed 's/"//g' /tmp/ka$$ | awk '
++sed 's/"//g' "${TMPDIR}"/ka$$ | awk '
+ /TNOT/{print "#define KWDOFFSET " NR-1; print ""; 
+       print "static const char *const parsekwd[] = {"}
+ /TNOT/,/neverfound/{if (last) print "	\"" last "\","; last = $3}
+ END{print "	\"" last "\"\n};"}'
+
+-rm /tmp/ka$$
++rm "${TMPDIR}"/ka$$
