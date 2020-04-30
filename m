@@ -1,81 +1,89 @@
-From: Michael Greenberg <michael.greenberg@pomona.edu>
-Subject: [v3 PATCH] mktokens relative TMPDIR
-Date: Wed, 29 Apr 2020 20:04:21 -0700
-Message-ID: <m27dxxr7wq.fsf@pomona.edu>
-References: <m2k14k4kpx.fsf@pomona.edu> <20200429055923.GA17016@gondor.apana.org.au> <m21ro6w576.fsf@pomona.edu> <20200430025705.GA12900@gondor.apana.org.au>
+From: Denton Liu <liu.denton@gmail.com>
+Subject: [BUG] one-shot variables aren't propagated past functions
+Date: Thu, 30 Apr 2020 06:00:01 -0400
+Message-ID: <20200430100001.GA30093@generichostname>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail-dm6nam11on2071.outbound.protection.outlook.com ([40.107.223.71]:6078
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726180AbgD3DEc (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 29 Apr 2020 23:04:32 -0400
-In-Reply-To: <20200430025705.GA12900@gondor.apana.org.au>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46862 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726826AbgD3KAG (ORCPT
+        <rfc822;dash@vger.kernel.org>); Thu, 30 Apr 2020 06:00:06 -0400
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92968C035494
+        for <dash@vger.kernel.org>; Thu, 30 Apr 2020 03:00:04 -0700 (PDT)
+Received: by mail-qt1-x835.google.com with SMTP id h26so4405738qtu.8
+        for <dash@vger.kernel.org>; Thu, 30 Apr 2020 03:00:04 -0700 (PDT)
+Received: from generichostname (CPE18593399858a-CM185933998587.cpe.net.cable.rogers.com. [174.112.65.113])
+        by smtp.gmail.com with ESMTPSA id c6sm1469248qka.58.2020.04.30.03.00.02
+        for <dash@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2020 03:00:03 -0700 (PDT)
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>, "dash@vger.kernel.org" <dash@vger.kernel.org>
+To: dash@vger.kernel.org
 
-The mktokens script fails when /tmp isn't writable (e.g., when building
-in a sandbox with a different TMPDIR). Replace absolute references to
-/tmp to relative references to TMPDIR. If TMPDIR is unset or null,
-default to /tmp.
+Hi all,
 
-The mkbuiltins script was already hardened to work relative to TMPDIR,
-also defaulting to /tmp.
+I believe that I've encountered a bug in dash 0.5.10.2. With the
+following input
+	
+	f () {
+		echo $var
+	}
 
-v2 ensures that TMPDIR is quoted.
-v3 adds an extra quotation that prevents extra pathname expansions.
+	var=test f
+	echo $var
 
-Signed-off-by: Michael Greenberg <michael.greenberg@pomona.edu>
+I would expect the output to be
+	
+	test
+	test
 
-diff --git a/src/mktokens b/src/mktokens
-index cd52241..3ab7bc5 100644
---- a/src/mktokens
-+++ b/src/mktokens
-@@ -37,7 +37,9 @@
- # token marks the end of a list.  The third column is the name to print in
- # error messages.
+but the output is actually
 
--cat > /tmp/ka$$ <<\!
-+: "${TMPDIR:=/tmp}"
-+
-+cat > "${TMPDIR}"/ka$$ <<\!
- TEOF	1	end of file
- TNL	0	newline
- TSEMI	0	";"
-@@ -68,28 +70,28 @@ TWHILE	0	"while"
- TBEGIN	0	"{"
- TEND	1	"}"
- !
--nl=`wc -l /tmp/ka$$`
-+nl=`wc -l "${TMPDIR}"/ka$$`
- exec > token.h
--awk '{print "#define " $1 " " NR-1}' /tmp/ka$$
-+awk '{print "#define " $1 " " NR-1}' "${TMPDIR}"/ka$$
+	test
+	<blank>
 
- exec > token_vars.h
+It seems like this violates the POSIX spec. Quoting Junio C Hamano[1]:
+> Johannes Sixt <j.sixt@viscovery.net> writes:
+> 
+> > Tarmigan Casebolt schrieb:
+> >>         REQUEST_METHOD="GET" some_shell_function
+> >
+> >> I can't tell from my reading of the POSIX spec whether my usage was
+> >> wrong or if dash is wrong,
+> >
+> > According to POSIX, variables set as shown above for shell functions are
+> > not exported and retain their value after the function returns.
+> 
+> I actually looked for this yesterday, but didn't find a relevant
+> definition.  But "2.9.5 Function Definition Command" [*1*] seems to
+> address the issue: "When a function is executed, it shall have the
+> syntax-error and variable-assignment properties described for special
+> built-in utilities...".
+> 
+> And "2.14 Special Built-in Utilities" section [*2*] says "2. Variable
+> assignments specified with special built-in utilities remain in effect
+> after the built-in completes...".  Taking both together, it seems that
+> the assignment should be in effect after the function returns.
+> 
+[...]
+> 
+> [References]
+> 
+> *1* http://www.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_09_05
+> *2* http://www.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_14
 
- echo '
- /* Array indicating which tokens mark the end of a list */
- static const char tokendlist[] = {'
--awk '{print "\t" $2 ","}' /tmp/ka$$
-+awk '{print "\t" $2 ","}' "${TMPDIR}"/ka$$
- echo '};
+It also seems like on bash 5.0.16, running with --posix produces the
+expected output, although without --posix it produces the blank line.
 
- static const char *const tokname[] = {'
- sed -e 's/"/\\"/g' \
-     -e 's/[^	 ]*[	 ][	 ]*[^	 ]*[	 ][	 ]*\(.*\)/	"\1",/' \
--    /tmp/ka$$
-+    "${TMPDIR}"/ka$$
- echo '};
- '
--sed 's/"//g' /tmp/ka$$ | awk '
-+sed 's/"//g' "${TMPDIR}"/ka$$ | awk '
- /TNOT/{print "#define KWDOFFSET " NR-1; print ""; 
-       print "static const char *const parsekwd[] = {"}
- /TNOT/,/neverfound/{if (last) print "	\"" last "\","; last = $3}
- END{print "	\"" last "\"\n};"}'
+Originally discussed here[2].
 
--rm /tmp/ka$$
-+rm "${TMPDIR}"/ka$$
+Thanks,
+
+Denton
+
+[1]: https://lore.kernel.org/git/7vljfzz0yd.fsf@alter.siamese.dyndns.org/
+[2]: https://lore.kernel.org/git/20200430092220.GA25331@generichostname/
