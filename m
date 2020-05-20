@@ -1,86 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] parser: Save and restore heredoclist in expandstr
-Date: Sun, 17 May 2020 23:36:25 +1000
-Message-ID: <20200517133625.GA15227@gondor.apana.org.au>
-References: <SJhI_AW9YJmphaap5RzzVqYTGsA529iV7GOEBafT9ilDPGFpMRRJlNt3TrMBwh0uqKQltSvsH2P8x_2in6enHT5DzygjAtrRSvWl5xHofeY=@emersion.fr>
- <20200121063959.tel7ty76fkz33xpn@gondor.apana.org.au>
- <5e56df24.H24u7mxAPbLPL6fI%rmy@frippery.org>
- <20200228004023.GA9163@gondor.apana.org.au>
- <20200428061758.GA1771@gondor.apana.org.au>
- <15d522d8-e0f5-be2a-f2a2-8b17290fce31@gigawatt.nl>
+From: Martin Michlmayr <tbm@cyrius.com>
+Subject: [PATCH] Fix typos
+Date: Wed, 20 May 2020 16:08:36 +0800
+Message-ID: <20200520080836.GA19305@jirafa.cyrius.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hmeau.com ([216.24.177.18]:44960 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727898AbgEQNgw (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 17 May 2020 09:36:52 -0400
+Received: from relay12.mail.gandi.net ([217.70.178.232]:40709 "EHLO
+        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726436AbgETIIu (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 20 May 2020 04:08:50 -0400
+Received: from jirafa.cyrius.com (unknown [110.54.246.209])
+        (Authenticated sender: tbm@cyrius.com)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id E851E20000B
+        for <dash@vger.kernel.org>; Wed, 20 May 2020 08:08:47 +0000 (UTC)
 Content-Disposition: inline
-In-Reply-To: <15d522d8-e0f5-be2a-f2a2-8b17290fce31@gigawatt.nl>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Ron Yorston <rmy@frippery.org>, contact@emersion.fr, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On Sun, May 17, 2020 at 01:19:28PM +0100, Harald van Dijk wrote:
->
-> This still does not restore the state completely. It does not clean up any
-> pending heredocs. I see:
-> 
->   $ PS1='$(<<EOF "'
->   src/dash: 1: Syntax error: Unterminated quoted string
->   $(<<EOF ":
->   >
-> 
-> That is, after entering the ':' command, the shell is still trying to read
-> the heredoc from the prompt.
+Signed-off-by: Martin Michlmayr <tbm@cyrius.com>
 
-This patch saves and restores the heredoclist in expandstr.
-
-It also removes a bunch of unnecessary volatiles as those variables
-are only referenced in case of a longjmp other than one started by
-a signal like SIGINT.
-
-Reported-by: Harald van Dijk <harald@gigawatt.nl>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/src/parser.c b/src/parser.c
-index 3131045..54c2861 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -1565,10 +1565,11 @@ setprompt(int which)
- const char *
- expandstr(const char *ps)
- {
--	struct parsefile *volatile file_stop;
-+	struct parsefile *file_stop;
- 	struct jmploc *volatile savehandler;
--	const char *volatile result;
--	volatile int saveprompt;
-+	struct heredoc *saveheredoclist;
-+	const char *result;
-+	int saveprompt;
- 	struct jmploc jmploc;
- 	union node n;
- 	int err;
-@@ -1578,6 +1579,8 @@ expandstr(const char *ps)
- 	/* XXX Fix (char *) cast. */
- 	setinputstring((char *)ps);
+diff --git a/src/TOUR b/src/TOUR
+index 056e79b..e30836e 100644
+--- a/src/TOUR
++++ b/src/TOUR
+@@ -100,7 +100,7 @@ string was going to be:
+         p = stackptr;
+         *p++ = c;       /* repeated as many times as needed */
+         stackptr = p;
+-The folloing three macros (defined in memalloc.h) perform these
++The following three macros (defined in memalloc.h) perform these
+ operations, but grow the stack if you run off the end:
+         STARTSTACKSTR(p);
+         STPUTC(c, p);   /* repeated as many times as needed */
+@@ -198,7 +198,7 @@ EXECUTION:  Command execution is handled by the following files:
+         eval.c     The top level routines.
+         redir.c    Code to handle redirection of input and output.
+         jobs.c     Code to handle forking, waiting, and job control.
+-        exec.c     Code to to path searches and the actual exec sys call.
++        exec.c     Code to path searches and the actual exec sys call.
+         expand.c   Code to evaluate arguments.
+         var.c      Maintains the variable symbol table.  Called from expand.c.
  
-+	saveheredoclist = heredoclist;
-+	heredoclist = NULL;
- 	saveprompt = doprompt;
- 	doprompt = 0;
- 	result = ps;
-@@ -1603,6 +1606,7 @@ out:
+diff --git a/src/jobs.c b/src/jobs.c
+index f65435d..0926360 100644
+--- a/src/jobs.c
++++ b/src/jobs.c
+@@ -557,7 +557,7 @@ showjobs(struct output *out, int mode)
  
- 	doprompt = saveprompt;
- 	unwindfiles(file_stop);
-+	heredoclist = saveheredoclist;
+ 	TRACE(("showjobs(%x) called\n", mode));
  
- 	return result;
- }
+-	/* If not even one one job changed, there is nothing to do */
++	/* If not even one job changed, there is nothing to do */
+ 	dowait(DOWAIT_NONBLOCK, NULL);
+ 
+ 	for (jp = curjob; jp; jp = jp->prev_job) {
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Martin Michlmayr
+https://www.cyrius.com/
