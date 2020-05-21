@@ -1,61 +1,75 @@
-From: Martin Michlmayr <tbm@cyrius.com>
-Subject: [PATCH] Fix typos
-Date: Wed, 20 May 2020 16:08:36 +0800
-Message-ID: <20200520080836.GA19305@jirafa.cyrius.com>
+From: Matt Whitlock <dash@mattwhitlock.name>
+Subject: Bug in Dash's unquoting of backslashes within backquoted strings
+Date: Thu, 21 May 2020 16:06:38 -0400
+Message-ID: <b2fe3536-23b8-4d04-8197-701ab50da86f@mattwhitlock.name>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Return-path: <dash-owner@vger.kernel.org>
-Received: from relay12.mail.gandi.net ([217.70.178.232]:40709 "EHLO
-        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726436AbgETIIu (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 20 May 2020 04:08:50 -0400
-Received: from jirafa.cyrius.com (unknown [110.54.246.209])
-        (Authenticated sender: tbm@cyrius.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id E851E20000B
-        for <dash@vger.kernel.org>; Wed, 20 May 2020 08:08:47 +0000 (UTC)
-Content-Disposition: inline
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51930 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726814AbgEUUJi (ORCPT <rfc822;dash@vger.kernel.org>);
+        Thu, 21 May 2020 16:09:38 -0400
+Received: from resqmta-ch2-04v.sys.comcast.net (resqmta-ch2-04v.sys.comcast.net [IPv6:2001:558:fe21:29:69:252:207:36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73A99C061A0E
+        for <dash@vger.kernel.org>; Thu, 21 May 2020 13:09:38 -0700 (PDT)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
 To: dash@vger.kernel.org
 
-Signed-off-by: Martin Michlmayr <tbm@cyrius.com>
+A minimal example:
 
-diff --git a/src/TOUR b/src/TOUR
-index 056e79b..e30836e 100644
---- a/src/TOUR
-+++ b/src/TOUR
-@@ -100,7 +100,7 @@ string was going to be:
-         p = stackptr;
-         *p++ = c;       /* repeated as many times as needed */
-         stackptr = p;
--The folloing three macros (defined in memalloc.h) perform these
-+The following three macros (defined in memalloc.h) perform these
- operations, but grow the stack if you run off the end:
-         STARTSTACKSTR(p);
-         STPUTC(c, p);   /* repeated as many times as needed */
-@@ -198,7 +198,7 @@ EXECUTION:  Command execution is handled by the following files:
-         eval.c     The top level routines.
-         redir.c    Code to handle redirection of input and output.
-         jobs.c     Code to handle forking, waiting, and job control.
--        exec.c     Code to to path searches and the actual exec sys call.
-+        exec.c     Code to path searches and the actual exec sys call.
-         expand.c   Code to evaluate arguments.
-         var.c      Maintains the variable symbol table.  Called from expand.c.
- 
-diff --git a/src/jobs.c b/src/jobs.c
-index f65435d..0926360 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -557,7 +557,7 @@ showjobs(struct output *out, int mode)
- 
- 	TRACE(("showjobs(%x) called\n", mode));
- 
--	/* If not even one one job changed, there is nothing to do */
-+	/* If not even one job changed, there is nothing to do */
- 	dowait(DOWAIT_NONBLOCK, NULL);
- 
- 	for (jp = curjob; jp; jp = jp->prev_job) {
+: `: "\\\\
+\\$(bug)"`
 
--- 
-Martin Michlmayr
-https://www.cyrius.com/
+That's one command, containing a newline character, embedded in a=20
+double-quoted string, embedded in a backquoted string. The command is an=20
+invocation of the : (colon) built-in, passing arguments obtained by word=20
+splitting the result of the backquoted command substitution.
+
+The Open Group says: "Within the backquoted style of command substitution,=20=
+
+backslash shall retain its literal meaning, except when followed by: '$',=20
+'`', or '\' (dollar sign, backquote, backslash)." Thus, each pair of=20
+backslashes between the backquotes is to be reduced to a single backslash.
+
+Thus, the subcommand to be executed is:
+
+: "\\
+\$(bug)"
+
+This subcommand is an invocation of the : (colon) built-in command, passing=20=
+
+a single argument obtained by performing quote removal on the double-quoted=20=
+
+string. After quote removal, the resulting argument consists of these eight=20=
+
+characters: backslash, newline, dollar sign, open parenthesis, b, u, g,=20
+close parenthesis.
+
+If the above subcommand is entered directly at the Dash command line, all=20
+is well. However, when it appears inside a backquoted subcommand (with the=20=
+
+backslash characters being appropriately escaped), such as given at the top=20=
+
+of this report, then Dash processes it incorrectly:
+
+/bin/sh: 1: bug: not found
+
+Dash apparently skips over the backslash immediately following the newline=20=
+
+embedded in the double-quoted string. Thus, Dash sees the dollar sign as=20
+introducing a command substitution rather than as a literal character.
+
+This does not happen if the backslashes preceding the embedded newline are=20=
+
+absent. It also does not happen if any other character, including linear=20
+whitespace, is inserted immediately after the embedded newline.
+
+Both Bash and Busybox Ash get it right. Dash is non-conformant.
+
+This bug has potentially grave security implications since Dash is=20
+interpreting a string literal as though it were a command and executing it.=20=
+
+If the word "bug" in my examples above had been "rm -rf /" instead, the=20
+results would have been catastrophic.
