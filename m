@@ -1,42 +1,70 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: Bug in Dash's unquoting of backslashes within backquoted strings
-Date: Thu, 21 May 2020 23:02:02 +0100
-Message-ID: <e8735922-37c2-0250-1956-079ea761f1fd@gigawatt.nl>
-References: <b2fe3536-23b8-4d04-8197-701ab50da86f@mattwhitlock.name>
- <5ec6f4d5.8pMzL3JNioCKa/Fi%rmy@frippery.org>
+From: Yaroslav Halchenko <yoh@onerussian.com>
+Subject: stalls whenever PS4 contains $() and set -x
+Date: Mon, 25 May 2020 09:41:15 -0400
+Message-ID: <20200525134115.GO423431@lena.dartmouth.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.gigawatt.nl ([51.68.198.76]:44796 "EHLO mail.gigawatt.nl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728327AbgEUWCq (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 21 May 2020 18:02:46 -0400
-In-Reply-To: <5ec6f4d5.8pMzL3JNioCKa/Fi%rmy@frippery.org>
-Content-Language: en-US
+Received: from washoe.dartmouth.edu ([129.170.30.229]:49452 "EHLO
+        smtp.onerussian.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2403849AbgEYOZm (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 25 May 2020 10:25:42 -0400
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Ron Yorston <rmy@frippery.org>, dash@vger.kernel.org, dash@mattwhitlock.name
+To: dash@vger.kernel.org
+Cc: Kyle Meyer <kyle@kyleam.com>
 
-On 21/05/2020 22:38, Ron Yorston wrote:
-> Matt Whitlock wrote:
->> A minimal example:
->>
->> : `: "\\\\
->> \\$(bug)"`
-> 
->> However, when it appears inside a backquoted subcommand (with the
->> backslash characters being appropriately escaped), such as given at the top
->> of this report, then Dash processes it incorrectly:
->>
->> /bin/sh: 1: bug: not found
-> 
-> This seems to have been introduced by commit 6bbc71d (parser: use
-> pgetc_eatbnl() in more places).  Reverting the following part of the
-> commit makes the problem go away:
+Dear DASH maintainer(s),
 
-Yes, that commit (a patch I had submitted) was buggy and the part that 
-you suggest reverting should be.
+I like to (ab)use PS4 and set -x for tracing execution of scripts.
+Reporting time and PID is very useful in this context.
 
-Cheers,
-Harald van Dijk
+I am not 100% certain if bash's behavior (of actually running the command
+embedded within PS4 string, probably eval'ing it) is actually POSIX
+compliant, posh seems to not do that; but I think it is definitely not
+desired for dash to just stall:
+
+- the script:
+
+#!/bin/sh
+set -x
+export PS4='+ $(date +%T.%N) [$$] '
+
+echo "lets go"
+sleep 1
+echo "done $var"
+
+- bash:
+
+/tmp > bash --posix test.sh 
++export 'PS4=+ $(date +%T.%N) [$$] '
++PS4='+ $(date +%T.%N) [$$] '
++ 09:15:48.982296333 [2764323] echo 'lets go'
+lets go
++ 09:15:48.987829613 [2764323] sleep 1
++ 09:15:49.994485037 [2764323] echo 'done '
+done 
+
+
+- posh:
+exit:130 /tmp > posh test.sh
++export PS4=+ $(date +%T.%N) [$$] 
++ $(date +%T.%N) [$$] echo lets go
+lets go
++ $(date +%T.%N) [$$] sleep 1
++ $(date +%T.%N) [$$] echo done 
+done 
+
+- dash: (stalls it set -x)
+
+/tmp > dash test.sh        
++export PS4=+ $(date +%T.%N) [$$] 
+^C^C
+
+-- 
+Yaroslav O. Halchenko
+Center for Open Neuroscience     http://centerforopenneuroscience.org
+Dartmouth College, 419 Moore Hall, Hinman Box 6207, Hanover, NH 03755
+Phone: +1 (603) 646-9834                       Fax: +1 (603) 646-1419
+WWW:   http://www.linkedin.com/in/yarik        
