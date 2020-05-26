@@ -1,70 +1,68 @@
-From: Yaroslav Halchenko <yoh@onerussian.com>
-Subject: stalls whenever PS4 contains $() and set -x
-Date: Mon, 25 May 2020 09:41:15 -0400
-Message-ID: <20200525134115.GO423431@lena.dartmouth.edu>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: parser: Fix double-backslash nl in old-style command sub
+Date: Tue, 26 May 2020 23:19:05 +1000
+Message-ID: <20200526131904.GA27783@gondor.apana.org.au>
+References: <5ec6f94c.cf6OsC6v8fwGBIKX%rmy@frippery.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from washoe.dartmouth.edu ([129.170.30.229]:49452 "EHLO
-        smtp.onerussian.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403849AbgEYOZm (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 25 May 2020 10:25:42 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:55652 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726437AbgEZNTN (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 26 May 2020 09:19:13 -0400
 Content-Disposition: inline
+In-Reply-To: <5ec6f94c.cf6OsC6v8fwGBIKX%rmy@frippery.org>
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: dash@vger.kernel.org
-Cc: Kyle Meyer <kyle@kyleam.com>
+To: Ron Yorston <rmy@frippery.org>
+Cc: dash@vger.kernel.org, dash@mattwhitlock.name
 
-Dear DASH maintainer(s),
+Ron Yorston <rmy@frippery.org> wrote:
+>
+> Alternatively I see that BusyBox ash did this:
+> 
+>            case '\\':
+> -               pc = pgetc();
+> -               if (pc == '\n') {
+> -                   nlprompt();
+> -                   /*
+> -                    * If eating a newline, avoid putting
+> -                    * the newline into the new character
+> -                    * stream (via the STPUTC after the
+> -                    * switch).
+> -                    */
+> -                   continue;
+> -               }
+> +               pc = pgetc(); /* or pgetc_eatbnl()? why (example)? */
 
-I like to (ab)use PS4 and set -x for tracing execution of scripts.
-Reporting time and PID is very useful in this context.
+Yes this is the correct fix.
 
-I am not 100% certain if bash's behavior (of actually running the command
-embedded within PS4 string, probably eval'ing it) is actually POSIX
-compliant, posh seems to not do that; but I think it is definitely not
-desired for dash to just stall:
+---8<---
+When handling backslashes within an old-style command substitution,
+we should not call pgetc_eatbnl because that would treat the next
+backslash character as another escape character if it was then
+followed by a new-line.
 
-- the script:
+This patch fixes it by calling pgetc.
 
-#!/bin/sh
-set -x
-export PS4='+ $(date +%T.%N) [$$] '
+Reported-by: Matt Whitlock <dash@mattwhitlock.name>
+Fixes: 6bbc71d84bea ("parser: use pgetc_eatbnl() in more places")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-echo "lets go"
-sleep 1
-echo "done $var"
-
-- bash:
-
-/tmp > bash --posix test.sh 
-+export 'PS4=+ $(date +%T.%N) [$$] '
-+PS4='+ $(date +%T.%N) [$$] '
-+ 09:15:48.982296333 [2764323] echo 'lets go'
-lets go
-+ 09:15:48.987829613 [2764323] sleep 1
-+ 09:15:49.994485037 [2764323] echo 'done '
-done 
-
-
-- posh:
-exit:130 /tmp > posh test.sh
-+export PS4=+ $(date +%T.%N) [$$] 
-+ $(date +%T.%N) [$$] echo lets go
-lets go
-+ $(date +%T.%N) [$$] sleep 1
-+ $(date +%T.%N) [$$] echo done 
-done 
-
-- dash: (stalls it set -x)
-
-/tmp > dash test.sh        
-+export PS4=+ $(date +%T.%N) [$$] 
-^C^C
-
+diff --git a/src/parser.c b/src/parser.c
+index 3131045..03c103b 100644
+--- a/src/parser.c
++++ b/src/parser.c
+@@ -1393,7 +1393,7 @@ parsebackq: {
+ 				goto done;
+ 
+ 			case '\\':
+-                                pc = pgetc_eatbnl();
++                                pc = pgetc();
+                                 if (pc != '\\' && pc != '`' && pc != '$'
+                                     && (!synstack->dblquote || pc != '"'))
+                                         STPUTC('\\', pout);
 -- 
-Yaroslav O. Halchenko
-Center for Open Neuroscience     http://centerforopenneuroscience.org
-Dartmouth College, 419 Moore Hall, Hinman Box 6207, Hanover, NH 03755
-Phone: +1 (603) 646-9834                       Fax: +1 (603) 646-1419
-WWW:   http://www.linkedin.com/in/yarik        
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
