@@ -1,49 +1,58 @@
-From: Harald van Dijk <harald@gigawatt.nl>
-Subject: Re: Improving xtrace output from subshells
-Date: Thu, 28 May 2020 12:57:27 +0100
-Message-ID: <d068031c-7ff4-22bd-4951-eeeaea278386@gigawatt.nl>
-References: <E1hJgiD-0002yZ-Qb@smtp.tt-solutions.com>
- <6102c49c-573b-0fee-9a5d-f844eab2e8c0@gigawatt.nl>
- <E1hKNxE-0007Iw-04@smtp.tt-solutions.com>
- <6e753e30-1df6-ec65-07c4-5337b9f93901@gigawatt.nl>
- <E1hL7Vk-0005Me-22@smtp.tt-solutions.com>
- <e9cdb884-89d6-9b9d-3cb8-38b9b862aa9d@gigawatt.nl>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH] shell: Enable fnmatch/glob by default
+Date: Thu, 28 May 2020 22:57:52 +1000
+Message-ID: <20200528125751.GA18863@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <dash-owner@vger.kernel.org>
-Received: from mail.gigawatt.nl ([51.68.198.76]:57902 "EHLO mail.gigawatt.nl"
+Received: from helcar.hmeau.com ([216.24.177.18]:36532 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389025AbgE1L5b (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 28 May 2020 07:57:31 -0400
-In-Reply-To: <e9cdb884-89d6-9b9d-3cb8-38b9b862aa9d@gigawatt.nl>
-Content-Language: en-US
+        id S2389884AbgE1M5z (ORCPT <rfc822;dash@vger.kernel.org>);
+        Thu, 28 May 2020 08:57:55 -0400
+Content-Disposition: inline
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Vadim Zeitlin <vz-dash@zeitlins.org>, dash@vger.kernel.org
+To: dash@vger.kernel.org
 
-On 29/04/2019 23:55, Harald van Dijk wrote:
-> On 29/04/2019 15:44, Vadim Zeitlin wrote:
->> On Sat, 27 Apr 2019 22:58:23 +0100 Harald van Dijk 
->> <harald@gigawatt.nl> wrote:
->> HvD> It wastes memory: the code should be re-worked so that output and
->> HvD> preverrout share the same buffer, given that there can never be 
->> pending
->> HvD> output for one when the other is being written to.
->>
->>   I'm a bit worried about this one, it doesn't seem completely obvious 
->> to me
->> that the 2 objects can't be used at the same time.
-> 
-> It's indeed not completely obvious, but all bits that print to output 
-> will flush the buffer when they're done, before a next command starts 
-> executing, before the next command requires an xtrace string to be 
-> printed. It's usually the flushall() in evalbltin() that handles this.
+As fnmatch(3) and glob(3) from glibc are now working consistently,
+this patch enables them by default.
 
-I have managed to verify that using a single buffer for all streams 
-(output, errout and preverrout) works well and simplifies logic so that 
-the shell with that change is actually smaller than the one without it. 
-I do not know whether there would be interest in getting that in dash.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Cheers,
-Harald van Dijk
+diff --git a/configure.ac b/configure.ac
+index dbd97d8..d73b2bf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -37,9 +37,10 @@ if test "$enable_static" = "yes"; then
+ 	export LDFLAGS="-static -Wl,--fatal-warnings"
+ fi
+ 
+-AC_ARG_ENABLE(fnmatch, AS_HELP_STRING(--enable-fnmatch, \
+-				      [Use fnmatch(3) from libc]))
+-AC_ARG_ENABLE(glob, AS_HELP_STRING(--enable-glob, [Use glob(3) from libc]))
++AC_ARG_ENABLE(fnmatch, AS_HELP_STRING(--disable-fnmatch, \
++				      [Do not use fnmatch(3) from libc]))
++AC_ARG_ENABLE(glob, AS_HELP_STRING(--disable-glob, \
++				   [Do not use glob(3) from libc]))
+ 
+ dnl Checks for libraries.
+ 
+@@ -122,12 +123,12 @@ if test "$enable_test_workaround" = "yes"; then
+ 		[Define if your faccessat tells root all files are executable])
+ fi
+ 
+-if test "$enable_fnmatch" = yes; then
++if test "$enable_fnmatch" != no; then
+ 	use_fnmatch=
+ 	AC_CHECK_FUNCS(fnmatch, use_fnmatch=yes)
+ fi
+ 
+-if test "$use_fnmatch" = yes && test "$enable_glob" = yes; then
++if test "$use_fnmatch" = yes && test "$enable_glob" != no; then
+ 	AC_CHECK_FUNCS(glob)
+ fi
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
