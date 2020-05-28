@@ -1,114 +1,72 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] eval: Prevent recursive PS4 expansion
-Date: Wed, 27 May 2020 13:19:10 +1000
-Message-ID: <20200527031910.GA6117@gondor.apana.org.au>
-References: <20200525134115.GO423431@lena.dartmouth.edu>
+From: tiemeezeiv@wilsonb.com
+Subject: Stack overflow on unbounded recursion
+Date: Thu, 28 May 2020 17:17:38 +0900
+Message-ID: <2PA16BT5WNILQ.2352UZK7LJF4P@wilsonb.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="----_=_317cf3be31fec3c4435fa102_=_"
 Return-path: <dash-owner@vger.kernel.org>
-Received: from helcar.hmeau.com ([216.24.177.18]:57846 "EHLO fornost.hmeau.com"
+Received: from m42-5.mailgun.net ([69.72.42.5]:64712 "EHLO m42-5.mailgun.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725893AbgE0DTQ (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 26 May 2020 23:19:16 -0400
-Content-Disposition: inline
-In-Reply-To: <20200525134115.GO423431@lena.dartmouth.edu>
+        id S1726635AbgE1IWx (ORCPT <rfc822;dash@vger.kernel.org>);
+        Thu, 28 May 2020 04:22:53 -0400
+Received: from localhost (KD111239205253.au-net.ne.jp [111.239.205.253])
+        by wilsonb.com (Postfix) with ESMTPSA id 7EE7CA1A90
+        for <dash@vger.kernel.org>; Thu, 28 May 2020 08:17:42 +0000 (UTC)
 Sender: dash-owner@vger.kernel.org
 List-Id: dash@vger.kernel.org
-To: Yaroslav Halchenko <yoh@onerussian.com>
-Cc: dash@vger.kernel.org, kyle@kyleam.com
+To: dash@vger.kernel.org
 
-Yaroslav Halchenko <yoh@onerussian.com> wrote:
-> 
-> I like to (ab)use PS4 and set -x for tracing execution of scripts.
-> Reporting time and PID is very useful in this context.
-> 
-> I am not 100% certain if bash's behavior (of actually running the command
-> embedded within PS4 string, probably eval'ing it) is actually POSIX
-> compliant, posh seems to not do that; but I think it is definitely not
-> desired for dash to just stall:
-> 
-> - the script:
-> 
-> #!/bin/sh
-> set -x
-> export PS4='+ $(date +%T.%N) [$$] '
-> 
-> echo "lets go"
-> sleep 1
-> echo "done $var"
-> 
-> - bash:
-> 
-> /tmp > bash --posix test.sh 
-> +export 'PS4=+ $(date +%T.%N) [$$] '
-> +PS4='+ $(date +%T.%N) [$$] '
-> + 09:15:48.982296333 [2764323] echo 'lets go'
-> lets go
-> + 09:15:48.987829613 [2764323] sleep 1
-> + 09:15:49.994485037 [2764323] echo 'done '
-> done 
-> 
-> 
-> - posh:
-> exit:130 /tmp > posh test.sh
-> +export PS4=+ $(date +%T.%N) [$$] 
-> + $(date +%T.%N) [$$] echo lets go
-> lets go
-> + $(date +%T.%N) [$$] sleep 1
-> + $(date +%T.%N) [$$] echo done 
-> done 
-> 
-> - dash: (stalls it set -x)
-> 
-> /tmp > dash test.sh        
-> +export PS4=+ $(date +%T.%N) [$$] 
-> ^C^C
+This is a multipart message in MIME format.
 
-This patch fixes the infinite loop caused by repeated expansions
-of PS4.
+------_=_317cf3be31fec3c4435fa102_=_
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="----_=_1504d8570700c56f60fd70c6_=_"
 
-Reported-by: Yaroslav Halchenko <yoh@onerussian.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+This is a multipart message in MIME format.
 
-diff --git a/src/eval.c b/src/eval.c
-index 1b5d61d..d10be38 100644
---- a/src/eval.c
-+++ b/src/eval.c
-@@ -78,6 +78,9 @@ int exitstatus;			/* exit status of last command */
- int back_exitstatus;		/* exit status of backquoted command */
- int savestatus = -1;		/* exit status of last command outside traps */
- 
-+/* Prevent PS4 nesting. */
-+MKINIT int inps4;
-+
- 
- #if !defined(__alpha__) || (defined(__GNUC__) && __GNUC__ >= 3)
- STATIC
-@@ -123,6 +126,7 @@ EXITRESET {
- 	}
- 	evalskip = 0;
- 	loopnest = 0;
-+	inps4 = 0;
- }
- #endif
- 
-@@ -855,12 +859,14 @@ bail:
- 	}
- 
- 	/* Print the command if xflag is set. */
--	if (xflag) {
-+	if (xflag && !inps4) {
- 		struct output *out;
- 		int sep;
- 
- 		out = &preverrout;
-+		inps4 = 1;
- 		outstr(expandstr(ps4val()), out);
-+		inps4 = 0;
- 		sep = 0;
- 		sep = eprintlist(out, varlist.list, sep);
- 		eprintlist(out, osp, sep);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+------_=_1504d8570700c56f60fd70c6_=_
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Tested this against master at commit 3e3e7af1:
+
+    $ src/dash -c 'f(){ f;};f'
+    segfault
+
+Of course this is a pathological command string, but it looks like a clear =
+case
+of stack overflow:
+
+    Program received signal SIGSEGV, Segmentation fault.
+    0x0000000000407762 in argstr (p=3D0x4204b0 "f", flag=3Dflag@entry=3D3) =
+at expand.c:249
+    249             int breakall =3D (flag & (EXP_WORD | EXP_QUOTED)) =3D=3D=
+ EXP_WORD;
+    (gdb) info proc mappings
+          ...
+          0x7ffff7ffe000     0x7ffff7fff000     0x1000        0x0
+          0x7fffff7ff000     0x7ffffffff000   0x800000        0x0 [stack]
+    (gdb) p/x $rsp
+    $1 =3D 0x7fffff7fef50
+    (gdb) x/i $rip
+    =3D> 0x407762 <argstr+34>:        sete   0x7(%rsp)
+
+Is this a bug or have I just stumbled into a known "feature"?
+
+------_=_1504d8570700c56f60fd70c6_=_--
+
+------_=_317cf3be31fec3c4435fa102_=_
+Content-Disposition: attachment; filename=signature.asc
+Content-Type: application/pgp-signature
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iI0EABYIADUWIQR15iG0PZfp3oY4hcqvddGpNAxWDQUCXs9zixccdGllbWVlemVp
+dkB3aWxzb25iLmNvbQAKCRCvddGpNAxWDeZjAP9gBMycVyEQuFbI1vaENf2XT790
+TTR+MVdUMaG/9o9vBAD6A0RHxK2LGqf5c43wlpAZH+kfQnsJDJViD1FrtSQh3wQ=
+=Zyxc
+-----END PGP SIGNATURE-----
+
+------_=_317cf3be31fec3c4435fa102_=_--
