@@ -1,106 +1,96 @@
-Return-Path: <SRS0=ZXI1=EF=vger.kernel.org=dash-owner@kernel.org>
+Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FAKE_REPLY_A1,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB9A7C388F9
-	for <linux-dash@archiver.kernel.org>; Fri, 30 Oct 2020 12:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50632C5519F
+	for <linux-dash@archiver.kernel.org>; Sat, 14 Nov 2020 13:38:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 70FCE2087E
-	for <linux-dash@archiver.kernel.org>; Fri, 30 Oct 2020 12:29:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAA7C22252
+	for <linux-dash@archiver.kernel.org>; Sat, 14 Nov 2020 13:38:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="U+uO4CdQ"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="KLIs4ob/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725975AbgJ3MUW (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Fri, 30 Oct 2020 08:20:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42596 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726529AbgJ3MTn (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 30 Oct 2020 08:19:43 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69305C0613CF
-        for <dash@vger.kernel.org>; Fri, 30 Oct 2020 05:19:43 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id r10so5039002pgb.10
-        for <dash@vger.kernel.org>; Fri, 30 Oct 2020 05:19:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=7TwH7k82nYPUuE9h8CuKexHnUl2ljtCKaHaz6lQR0E8=;
-        b=U+uO4CdQPixQ5C0sQDePoqRYQgRNLUTbE8K055DhE92Xj06Te7SCPpHoEuVLbrRv+i
-         dODfF3xnAd15xD/Dgg3WFuNODAd1NRZsVOvmxArsI2F6jSsmdae93aoGXnNvIAbZnXrl
-         kpS3mYHbco8s7ItwbL2SXEVbX2T1m6Uta9JrwTgovDJEqYcpvvGsYRD4tdnLvtE3EV7K
-         Faz4vMF6fPtEX1YJIqoGFpJQAM+bnE8CBZexy5iWa8i9DeVmnWfiVu99CXlyoeDRoLYV
-         z8bcOKLB8TF19Y+EjP5ZPyZfTjA3NpWzkrnGPBI/Levk8N6RiZ3iReW4TlnShRRrELzr
-         6nJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=7TwH7k82nYPUuE9h8CuKexHnUl2ljtCKaHaz6lQR0E8=;
-        b=IfrXSR65rRuWWRPUz35dAFWBHqYXT+KPUkIrBPWRLJVca20ZnaSpYLG7FhXUHUEk6b
-         HDtVgoSZsuY/I70P0S8JoZhVaDI5U1SHbM+4Ef5LH0wPQwEdq1NgQQMpnWEWxNcMdgi+
-         euFuwKLiFwxX5LE0vkyNkWIhoWeHx3oC1crEW8UN3gdYYA8vGbcioKMh/N+4YYps46z7
-         6/UJe/2S/uqG24VyU0RTWRusDnN7klw3nTTwP5E/vR7LTuO0PsQUj5t/IwCzDmlpHmDn
-         W5LZ107+f9VSBqJyzv7+6CSuJBuhltIGCvLov4eK1g0lrk331jEufncSXNLfNcNqpbfQ
-         ktaQ==
-X-Gm-Message-State: AOAM533E0ATTIoGyN6X+vMHg2G5gM+aX+bPUBBs9xzQON9rWwMn+msJh
-        aC08ia6MblPtTJCFxRHvljZ7EhQ1UmtiFUd42M7rfrpQ
-X-Google-Smtp-Source: ABdhPJwtMOF1pAeaMrRIeUAsmJ8PdXkaV3s3OYJIrtx6sbMxLtpAERsU8O+BsyZo7RZU8oYOBqwFfT4aQTz3rNzIT3Y=
-X-Received: by 2002:a17:90a:9910:: with SMTP id b16mr2573523pjp.39.1604060382914;
- Fri, 30 Oct 2020 05:19:42 -0700 (PDT)
+        id S1726307AbgKNNiY (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sat, 14 Nov 2020 08:38:24 -0500
+Received: from mout.web.de ([212.227.17.12]:33105 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726112AbgKNNiW (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 14 Nov 2020 08:38:22 -0500
+X-Greylist: delayed 303 seconds by postgrey-1.27 at vger.kernel.org; Sat, 14 Nov 2020 08:38:22 EST
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1605361101;
+        bh=kuKhvItR/8xzzpYrbMcH90Fn+z5H2egM2I4FILw4pWA=;
+        h=X-UI-Sender-Class:To:From:Subject:Date;
+        b=KLIs4ob/1Q4zWcNBzcYB1ViRjloAKrnlz5UN+HNVO8s4XeN/W4D3J9xXbpy1wps+x
+         +Jljm9TgBjWpVgl/VaPNCG2H2TjOhS1FS8Inso62HOBtmDcWtA6r50fBw4eWZNIzFK
+         kBiEyzXy820tP7RnvEuaZHJ7aZuK9Fsp73l6fPu4=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.178.26] ([79.203.17.45]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lqleo-1k8Qbk0Tju-00eMHz for
+ <dash@vger.kernel.org>; Sat, 14 Nov 2020 14:33:18 +0100
+X-Mozilla-News-Host: news://nntp.public-inbox.org:119
+To:     dash@vger.kernel.org
+From:   =?UTF-8?Q?Ren=c3=a9_Scharfe?= <l.s.r@web.de>
+Subject: Re: [PATCH] shell: Enable fnmatch/glob by default
+Message-ID: <b8881007-eb6d-17b4-a023-31275ef28b94@web.de>
+Date:   Sat, 14 Nov 2020 14:33:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-References: <CANSNw=_7LH8NtM558HOn9Se0ZgMjxEus5=6jktkY3HrrBAH71A@mail.gmail.com>
-In-Reply-To: <CANSNw=_7LH8NtM558HOn9Se0ZgMjxEus5=6jktkY3HrrBAH71A@mail.gmail.com>
-From:   Denys Vlasenko <vda.linux@googlemail.com>
-Date:   Fri, 30 Oct 2020 13:19:32 +0100
-Message-ID: <CAK1hOcMQP9ZAeF_Vh-Ta_sPeeXPS9_6wsN8V8uS=gu-Fcx8yMQ@mail.gmail.com>
-Subject: Fwd: Busybox ash buffering-related issue in error handling
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        DASH shell mailing list <dash@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:OcaNJjuvUxGvBienbKi9dVPpBlcrbBf/Wj5God7vrciTN1t3SvI
+ nNN5qWI6/aR5DpUKBpvQDmg+zXP8Lc/sHZlaGmZvRBQSl2GGUw9x/6J0hqf5v9cwj3rUJQH
+ PlPHJWUGr3kUJJziuINpTaldqvlP1moK1FivKRduNl2I9D/7ANoP0D8c4iru1kX1HReaIkF
+ C/SB5OkDhya0jBRml4e2Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:5LAxC0VBFO4=:8NF7AFp+CFT/p/QGYVKlOE
+ plQPJ/4RGKppWwkSKuV9YX16/kkWErMeF6PXWapnF41rHcNpSDgCk/Ehf4Gmlp92Dlrn1nZTI
+ gUgq4kwhjXF4NW0D+1TyTC0mlkdMffWc9pCJ9koLdGvEjstMF9MHCX6UkQTGlX4MrqeJYlmfj
+ ChDLJlKpLj6cBJ3R14AriNwGt8kdauVvYzaJ5StkOrVmrqiwy55b9+1VkXByyTmBi5j/nwSc3
+ 20sxaPW3XtYGMeCiDgVY8fPTCMkqjbCg1EZWKAu/4cTBuVf2QL4zRdyMs3hiFJN+DQyXydOi9
+ wC7s2MvTPwJhSeuP0LZwDD5yd6cNWoGK0NIlOtkAvdy0GdwwXw33k5V1+ycKPk6Lb89lDqQn+
+ i4JjBXucEh01UrS6WWs/TdcUpcpjdMEnvuv9Nqr+PLbtvW9suaWWdywLa1TIXv2UFjid5rs/d
+ AwdmrF11rDOFL72NU4Z/YBJiqMJqAuSVQI1GOcx2v+9RGcrRdOX2zUH/jqRLdY0s5Dc/NCU2A
+ YNGADm/DDUz7K1ErS7m8+C/YjkaLDK9GuGsexp2f080D/+Y1hfHh8/XImMlQKfIvEnr/i0GY6
+ fPXnyIRJlIZbDrtDSjsZ6FAKjI12dbjP5Uv37vX3WpBy+/+qcGd1IvCupVfpKDG9WcC2sKU7H
+ +BZ82KYYKpnSSCXmYR6tL21tVP0HP8O1J1joJ8g99QBsBulD0QN00LUp6tKU0a79bDhlb0+Ka
+ 3iEZiJfMdQYM3LZfz2BQrSOqq3bXoGSaN3+71a6357os+ZCVC367Cu1ZRlxvnbhVLb4wXFCmW
+ 3d5p1ASwUMyCR0cS9sRjrllJ0DzZ6OBpCFuPFrx0SXYxbidgd/xpLcPzfE/3g9TdjV0TVDVx7
+ Df+zaHeCWszeqJU077sA==
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-This bug happens in dash too
-(I assume it's "pungets" counter not being reset on errors):
+Hello,
 
----------- Forwarded message ---------
-From: Sergey Zakharchenko <szakharchenko@digital-loggers.com>
-Date: Thu, Oct 29, 2020 at 8:00 AM
-Subject: Busybox ash buffering-related issue in error handling
-To: Denys Vlasenko <vda.linux@googlemail.com>
+on Debian testing dash eats trailing slashes of parameters that happen
+to be regular files when expanding "$@".  Example:
 
-It appears that, in the interactive shell, the
-input buffer has 1 last character remaining after some syntax errors
-are handled. The next command is interpreted with that character
-prepended, e.g.:
+   $ rm -f foo bar
+   $ touch foo
+   $ dash -c 'echo "$0" "$@"' baz foo/ bar/ ./
+   baz foo bar/ ./
 
-$ ;l
-ash: syntax error: unexpected ";"
-$ s
-[ls output]
+So slashes after non-existing files and directories are kept.
 
-Expected output for reference:
+This behavior was introduced by 7638476 (shell: Enable fnmatch/glob by
+default, 2020-05-28).  Before this commit trailing slashes were kept
+also for regular files:
 
-$ ;l
-sh: 1: Syntax error: ";" unexpected
-$ s
-sh: 1: s: not found
+   $ dash -c 'echo "$0" "$@"' baz foo/ bar/ ./
+   baz foo/ bar/ ./
 
-Similarly, an input of ;# makes the next command be treated as a
-comment and not executed.
+This feels like a bug to me: Intuitively, foo/ should not match a
+regular file foo, so such a string should be kept as-is.
 
-I'm observing this on x86-64 112453acf24520b4655f9f36da41d8ac591b1a60,
-with default options, but it's the same on earlier versions with
-different options and a different platform so it's not new.
+I noticed it today because Debian testing imported the current version
+of dash and some tests of Git's internal test suite rely on trailing
+slashes to be retained.
 
-Best regards,
-
---
-Sergey Zakharchenko
-Digital Loggers, Inc.
+Ren=C3=A9
