@@ -2,146 +2,162 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_20,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E38C5519F
-	for <linux-dash@archiver.kernel.org>; Fri, 20 Nov 2020 13:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04054C64E7A
+	for <linux-dash@archiver.kernel.org>; Fri, 27 Nov 2020 12:22:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11C57222BA
-	for <linux-dash@archiver.kernel.org>; Fri, 20 Nov 2020 13:58:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF795208D5
+	for <linux-dash@archiver.kernel.org>; Fri, 27 Nov 2020 12:22:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726420AbgKTN6U (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Fri, 20 Nov 2020 08:58:20 -0500
-Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:58427 "EHLO
-        wout4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725890AbgKTN6U (ORCPT
-        <rfc822;dash@vger.kernel.org>); Fri, 20 Nov 2020 08:58:20 -0500
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.west.internal (Postfix) with ESMTP id 6AC9AFB5
-        for <dash@vger.kernel.org>; Fri, 20 Nov 2020 08:58:19 -0500 (EST)
-Received: from imap36 ([10.202.2.86])
-  by compute3.internal (MEProxy); Fri, 20 Nov 2020 08:58:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shadura.me; h=
-        mime-version:message-id:date:from:to:subject:content-type
-        :content-transfer-encoding; s=fm2; bh=xf5cvjdL4PyaiHp6wG7xrCXAzU
-        K0TR/e9E0ZFmeqvfM=; b=plON7pmzNpjLGVigfvObjVVOAZMmu9XyA00m9NaMns
-        /ffCxUsCPa0tx2DI1k6K1plw8Ms3hxj5yzLPKJlsKSfydnCG94Tfub+YucKgFNyi
-        PPgp2k5tt7a/NiHOgHnlXIpCLuQkxrtA7l/dJDSEP/7Ga7C3ujVD+XSaK4WaJDDX
-        s0g8fHDWTc83Z0JJ6wqh0L5DOOxTI0W1wVk1z9kF5n87D3O8YwFUrFDRhAaHlvCg
-        VExHKfFTf9YI3SqkvhV0+yGtlzdnJothDNKiVgGNdgYqxKBgQ7a18W8+A3Hlt0T8
-        Caxbmrux4gzO0sFZROa4I2l/BuCDnyV43k0ERMH3fyFA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=content-transfer-encoding:content-type
-        :date:from:message-id:mime-version:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=xf5cvj
-        dL4PyaiHp6wG7xrCXAzUK0TR/e9E0ZFmeqvfM=; b=XJhHXGxAKwbivZ4XeT70Ui
-        RM/WYS9J7mG8D7LpOJh3Pc26AzXUL6grGdbuZo9L6gvk3NiqFom9//izQU7XXyMv
-        24BtvZpwY86yazRXZ96F7H5QMtum/6CFAo5XcYjQQWIFC1V5jxnQRbWfacKkdlR2
-        oBXXrWiAUc1q22Z22ALX18K/pbo4HKJd/m2ORNWZz5gPFDqAhhFzZoEVqOArmD5U
-        zjuv9HXuPEBu6u3osJUz9Ae6iTAOmCC8T8V7w/TWbDmY0tFmvcsTwbUiPqJYhQib
-        tajqJGVtx73kFfc3hgyLbcJxfg4GAI8KW/IbAIta1rLkLldc0KYgrtUIBLeJ2wrg
-        ==
-X-ME-Sender: <xms:esu3X5X3lsNmGlXzDM2EzZIsvmB5E60yYWfgVopnWuhw8Q1XvcPTHA>
-    <xme:esu3X5lkCaXgkTs-mTAkPySVAFyhtMoPzKE4yApiFnE7R8DglUmRiqjXhyqL_qEH0
-    C_PdoreGburWavt5RM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrudegtddgheeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpefofgggkfffhffvufgtgfesthhqre
-    dtreerjeenucfhrhhomhepfdetnhgurhgvjhcuufhhrgguuhhrrgdfuceorghnughrvgif
-    sehshhgrughurhgrrdhmvgeqnecuggftrfgrthhtvghrnhepudffueegleeftdegtdeuke
-    etieehfffhleeuleduveejgefgjefgvdekhfdvieeknecuffhomhgrihhnpehvihhntgdu
-    jedrnhgvthenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpegrnhgurhgvfiesshhhrgguuhhrrgdrmhgv
-X-ME-Proxy: <xmx:esu3X1ajzRedLRu4dCN6OJnGmlfeDZvRbmhYaJ-8QStUWLpgAQOyrQ>
-    <xmx:esu3X8U7eU-Vx6wrnCIYoaW9Hdtmd_T7UkfsTUCWmfmAMfBYE1ov0g>
-    <xmx:esu3Xzk1Me76GmFC3879Ovb9ASXVUi22oSkNZoX27tXe3VzfddcEzw>
-    <xmx:e8u3XyuVr_cH2eTDx7gKoeVtibSc25lhcuWJ-HpgfDFXRnDPD5ZXNg>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 8229E188007B; Fri, 20 Nov 2020 08:58:18 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.3.0-622-g4a97c0b-fm-20201115.001-g4a97c0b3
-Mime-Version: 1.0
-x-forwarded-message-id: <20201120135450.GA190228@zira.vinc17.org>
-Message-Id: <cce8a10d-b41c-45aa-8edf-39bffffea684@www.fastmail.com>
-Date:   Fri, 20 Nov 2020 14:57:58 +0100
-From:   "Andrej Shadura" <andrew@shadura.me>
+        id S1728558AbgK0MW3 (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Fri, 27 Nov 2020 07:22:29 -0500
+Received: from cas.cat ([51.68.173.168]:36846 "EHLO cas.cat"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727455AbgK0MW3 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 27 Nov 2020 07:22:29 -0500
+X-Greylist: delayed 372 seconds by postgrey-1.27 at vger.kernel.org; Fri, 27 Nov 2020 07:22:28 EST
 To:     dash@vger.kernel.org
-Subject: =?UTF-8?Q?Fwd:_Bug#975325:_dash(1)_man_page:_ulimit_documentation_is_inc?=
- =?UTF-8?Q?onsistent_and_out-of-date?=
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From:   Pedro <pedro@cas.cat>
+Subject: [bug] dash eats one line
+Message-ID: <54057fbc-b0c2-8b56-9194-e8384238f275@cas.cat>
+Date:   Fri, 27 Nov 2020 13:16:14 +0100
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="46y3LvQWAO2cwSWI9yiaMPTV4gsDjBR7h"
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--46y3LvQWAO2cwSWI9yiaMPTV4gsDjBR7h
+Content-Type: multipart/mixed; boundary="QnwVDq1AeljPyKGbAKaSqO22fr9arvl69";
+ protected-headers="v1"
+From: Pedro <pedro@cas.cat>
+To: dash@vger.kernel.org
+Message-ID: <54057fbc-b0c2-8b56-9194-e8384238f275@cas.cat>
+Subject: [bug] dash eats one line
 
+--QnwVDq1AeljPyKGbAKaSqO22fr9arvl69
+Content-Type: multipart/mixed;
+ boundary="------------E2B73D3375AAEFD175684E23"
+Content-Language: en-US
 
------ Original message -----
-From: Vincent Lefevre <vincent@vinc17.net>
-To: Debian Bug Tracking System <submit@bugs.debian.org>
-Subject: Bug#975325: dash(1) man page: ulimit documentation is inconsist=
-ent and out-of-date
-Date: Friday, 20 November 2020 14:54
+This is a multi-part message in MIME format.
+--------------E2B73D3375AAEFD175684E23
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Package: dash
-Version: 0.5.11+git20200708+dd9ef66-2
-Severity: normal
+Hi,
 
-In the ulimit documentation from the dash(1) man page:
+I am using dash on debian 10 buster (stable release) which according to=20
+`dpkg -S dash` is `Version: 0.5.10.2-5`
 
-     ulimit [-H | -S] [-a | -tfdscmlpnv [value]]
-[...]
-            -r          show or set the limit on the real-time schedulin=
-g
-                        priority of a process
+evilham encountered a bug where dash eats one line but not in freebsd's=20
+shell nor bash
 
-The -r option is not listed in the synopsis, but described anyway.
-However, it is not supported:
+attached you can find an example to reproduce it
 
-$ ulimit -r
-sh: 17: ulimit: Illegal option -r
+execution of the example in my computer (enableUFWRules is not in new lin=
+e):
 
-Moreover, the -w option is supported:
+  ./dash-bug.sh
+# Enable UFW rules only if requested (it was)enableUFWRules
 
-$ ulimit -w
-unlimited
+  $ bash dash-bug.sh
+# Enable UFW rules only if requested (it was)
+enableUFWRules
 
-but neither given in the synopsis, nor described.
+and as extra reference, here you have some workarounds to avoid the bug=20
+in your dash script [1]
 
--- System Information:
-Debian Release: bullseye/sid
-  APT prefers unstable-debug
-  APT policy: (500, 'unstable-debug'), (500, 'stable-updates'), (500, 'u=
-nstable'), (500, 'testing'), (500, 'stable'), (1, 'experimental')
-Architecture: amd64 (x86_64)
+Salut,
+Pedro
 
-Kernel: Linux 5.9.0-2-amd64 (SMP w/8 CPU threads)
-Kernel taint flags: TAINT_PROPRIETARY_MODULE, TAINT_OOT_MODULE, TAINT_UN=
-SIGNED_MODULE
-Locale: LANG=3DPOSIX, LC_CTYPE=3DC.UTF-8 (charmap=3DUTF-8), LANGUAGE not=
- set
-Shell: /bin/sh linked to /bin/dash
-Init: systemd (via /run/systemd/system)
-LSM: AppArmor: enabled
+[1]
 
-Versions of packages dash depends on:
-ii  debconf [debconf-2.0]  1.5.74
-ii  debianutils            4.11.2
-ii  dpkg                   1.20.5
-ii  libc6                  2.31-4
+failed
 
-dash recommends no packages.
+https://git.sr.ht/~evilham/cdist-evilham/commit/bf65172c8291ec4be71257605=
+0bf7a4bcf462017
 
-dash suggests no packages.
+failed
 
--- debconf information excluded
+https://git.sr.ht/~evilham/cdist-evilham/commit/1aa8b012200b0160e78a65520=
+175bb224ffc9899
 
---=20
-Vincent Lef=C3=A8vre <vincent@vinc17.net> - Web: <https://www.vinc17.net=
-/>
-100% accessible validated (X)HTML - Blog: <https://www.vinc17.net/blog/>=
+worked
 
-Work: CR INRIA - computer arithmetic / AriC project (LIP, ENS-Lyon)
+https://git.sr.ht/~evilham/cdist-evilham/commit/8996e2b66531e6b54b52207ea=
+5bdf3b71c795656
+
+--------------E2B73D3375AAEFD175684E23
+Content-Type: application/x-shellscript;
+ name="dash-bug.sh"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="dash-bug.sh"
+
+IyEvYmluL3NoCgpTRVRVUF9VRlc9J3knCgpjYXQgPDxFT0YKIyBFbmFibGUgVUZXIHJ1bGVz
+IG9ubHkgaWYgcmVxdWVzdGVkIChpdCB3YXMkKGlmIFsgLXogIiR7U0VUVVBfVUZXfSIgXTsg
+dGhlbiBwcmludGYgJyBub3QnOyBmaSkpCiQoaWYgWyAteiAiJHtTRVRVUF9VRld9IiBdOyB0
+aGVuIHByaW50ZiAnIyAnOyBmaSllbmFibGVVRldSdWxlcwpFT0YK
+--------------E2B73D3375AAEFD175684E23
+Content-Type: application/pgp-keys;
+ name="OpenPGP_0x9D64597C3A982DCA.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename="OpenPGP_0x9D64597C3A982DCA.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xsBNBFwTT0gBCACpCcJSv4ADrV8f6puGEXyGRxLdARePpMhY1LNQ4JmvDE4UGbkSHHp0A/SMw=
+FnK
+vhkc9oPrIoqTIcgfRRzr1JtYTwU3lNGQCawmrBOt5PoyHxbzE1YCpTW2Kxs/tGaBOtfnCC6ic=
+8Sj
+1MPiuyUvjnCpb8dABE2CmsEPVT+zSt0nSCmPbj2hHv6azs4wdjHhlZnnTTBbbnGU3atAoZHDZ=
+0fE
+SSxyfV92U0dTn0dYa8tWnnQuYNBDKu5UdB3hFdF61dmL+8yZqFcWwohlySvxHnuqKKW7/80Rp=
+lkb
+p5QQT/uBP4Cyad/DoCRuNLKdHTz0nsb86KqwOXQwCttLYbusVwhlABEBAAHNFXBlZHJvIDxwZ=
+WRy
+b0BjYXMuY2F0PsLAlAQTAQgAPgIbLwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgBYhBLAblhazw=
+wE6
+Jn7qc51kWXw6mC3KBQJeDcwPBQkD27BHAAoJEJ1kWXw6mC3K7HIH/j6eeoXopO+fHB1j37+gs=
+Zey
+HI6RiuCkQzGx7Rb8kAomg0awU1XuuYbU69hoOTSqzdqmnvUsCqFZKBmTHMtb+Cs7+4oebRPdV=
+pQB
+91UuhypEm4XchWi6vY1OjuvlrwenfOp0ZUrDPHeWePmEa6V0l04BQcm+mfOXQBBZCkd5pCStz=
+woD
+oBeLJXtiaOGYe2DjLnLvDxQh77mrFfdFMfI3nVCM920ByEWS8nQ/g/NtTHUVtceNwGp+17M1X=
+sNs
+xlEswWH00Vx88BWo6gSqk2h+pD6kQG0zpgEJBinHvGvsvCPsKpa85awMvt8vBpp46bbqFQigX=
++O0
+zhTA1nGHDmDuV60=3D
+=3DdhI/
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------E2B73D3375AAEFD175684E23--
+
+--QnwVDq1AeljPyKGbAKaSqO22fr9arvl69--
+
+--46y3LvQWAO2cwSWI9yiaMPTV4gsDjBR7h
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEsBuWFrPDATomfupznWRZfDqYLcoFAl/A7g4FAwAAAAAACgkQnWRZfDqYLcr+
+OQgAo3I8NdueyaM1DbNGl9p8qF2jBMSbBfrG45OUpXksqlTNKeZTyJfRvHoYrpCVIugCM5W4T36M
+xiqDJghU1vsWl5qCAz7fNiBW3MBIBz0cZdI0eisf0hxvDz6cG1NqfAbJcJL2BoOFb82Am+k4b5cd
+dAH3q/zP+aOgB72cZYkriJTXLf34rJ2T5/WvPcn0S38JjHbtEhjoGxL67tmozaKQfWIMxa14al/O
+sAEyL/9YLay9BExvFng3uNj7bua+/BZxZ/VrWHTiQ0PB+738v4EJjD3QO5qbW7kXu3XAxmKQ0hIN
+WKPV2xOjfjWtOYNJnQq1EISJFC/BtFAQLs6lOjt8UQ==
+=1ZBB
+-----END PGP SIGNATURE-----
+
+--46y3LvQWAO2cwSWI9yiaMPTV4gsDjBR7h--
