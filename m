@@ -2,162 +2,84 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_20,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04054C64E7A
-	for <linux-dash@archiver.kernel.org>; Fri, 27 Nov 2020 12:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0339C3E8C5
+	for <linux-dash@archiver.kernel.org>; Sun, 29 Nov 2020 14:38:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF795208D5
-	for <linux-dash@archiver.kernel.org>; Fri, 27 Nov 2020 12:22:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5528120719
+	for <linux-dash@archiver.kernel.org>; Sun, 29 Nov 2020 14:38:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="D0ZluWN9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728558AbgK0MW3 (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Fri, 27 Nov 2020 07:22:29 -0500
-Received: from cas.cat ([51.68.173.168]:36846 "EHLO cas.cat"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727455AbgK0MW3 (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 27 Nov 2020 07:22:29 -0500
-X-Greylist: delayed 372 seconds by postgrey-1.27 at vger.kernel.org; Fri, 27 Nov 2020 07:22:28 EST
-To:     dash@vger.kernel.org
-From:   Pedro <pedro@cas.cat>
-Subject: [bug] dash eats one line
-Message-ID: <54057fbc-b0c2-8b56-9194-e8384238f275@cas.cat>
-Date:   Fri, 27 Nov 2020 13:16:14 +0100
+        id S1725882AbgK2OiX (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sun, 29 Nov 2020 09:38:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53836 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725830AbgK2OiX (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 29 Nov 2020 09:38:23 -0500
+X-Greylist: delayed 550 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 29 Nov 2020 06:37:42 PST
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 83C7BC0613CF
+        for <dash@vger.kernel.org>; Sun, 29 Nov 2020 06:37:42 -0800 (PST)
+Received: from [192.168.1.7] (hvdijk.plus.com [81.174.157.28])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id 4DBA4733;
+        Sun, 29 Nov 2020 15:28:28 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 4DBA4733
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1606660108;
+        bh=6h+BVCZG5frm9RFYt2ykP4tdcl+XiS91Y1ZwivV7jGk=; l=857;
+        h=Subject:To:References:From:Date:In-Reply-To:From;
+        b=D0ZluWN9cihrqB7w45yFgIcKfLrmlNjUvJOYO6CLofZDWETeL1LkhI+WgXN4YEEOO
+         6P4ZBG4lznVfSRyR/l586xbFwMTccHWDXHG+hFs1olrSKTrpqzmA6HP8PDP8C0zKft
+         ahOGae2meObnZw47PAM1cASfgaKMtUIToejTC5vw=
+Subject: Re: [bug] dash eats one line
+To:     Pedro <pedro@cas.cat>, dash@vger.kernel.org
+References: <54057fbc-b0c2-8b56-9194-e8384238f275@cas.cat>
+From:   Harald van Dijk <harald@gigawatt.nl>
+Message-ID: <2b7548cb-b5bb-9b1f-3ba1-b8341f1bb7a2@gigawatt.nl>
+Date:   Sun, 29 Nov 2020 14:28:26 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="46y3LvQWAO2cwSWI9yiaMPTV4gsDjBR7h"
+In-Reply-To: <54057fbc-b0c2-8b56-9194-e8384238f275@cas.cat>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---46y3LvQWAO2cwSWI9yiaMPTV4gsDjBR7h
-Content-Type: multipart/mixed; boundary="QnwVDq1AeljPyKGbAKaSqO22fr9arvl69";
- protected-headers="v1"
-From: Pedro <pedro@cas.cat>
-To: dash@vger.kernel.org
-Message-ID: <54057fbc-b0c2-8b56-9194-e8384238f275@cas.cat>
-Subject: [bug] dash eats one line
-
---QnwVDq1AeljPyKGbAKaSqO22fr9arvl69
-Content-Type: multipart/mixed;
- boundary="------------E2B73D3375AAEFD175684E23"
-Content-Language: en-US
-
-This is a multi-part message in MIME format.
---------------E2B73D3375AAEFD175684E23
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
 Hi,
 
-I am using dash on debian 10 buster (stable release) which according to=20
-`dpkg -S dash` is `Version: 0.5.10.2-5`
+On 27/11/2020 12:16, Pedro wrote:
+> Hi,
+> 
+> I am using dash on debian 10 buster (stable release) which according to 
+> `dpkg -S dash` is `Version: 0.5.10.2-5`
+> 
+> evilham encountered a bug where dash eats one line but not in freebsd's 
+> shell nor bash
+> 
+> attached you can find an example to reproduce it
+> 
+> execution of the example in my computer (enableUFWRules is not in new 
+> line):
+> 
+>   ./dash-bug.sh
+> # Enable UFW rules only if requested (it was)enableUFWRules
+> 
+>   $ bash dash-bug.sh
+> # Enable UFW rules only if requested (it was)
+> enableUFWRules
 
-evilham encountered a bug where dash eats one line but not in freebsd's=20
-shell nor bash
+This looks like 
+<https://www.mail-archive.com/dash@vger.kernel.org/msg01883.html>, which 
+has been fixed in dash 0.5.11. I can confirm that your script produces 
+the expected output with dash 0.5.11 as well as dash built from current Git.
 
-attached you can find an example to reproduce it
-
-execution of the example in my computer (enableUFWRules is not in new lin=
-e):
-
-  ./dash-bug.sh
-# Enable UFW rules only if requested (it was)enableUFWRules
-
-  $ bash dash-bug.sh
-# Enable UFW rules only if requested (it was)
-enableUFWRules
-
-and as extra reference, here you have some workarounds to avoid the bug=20
-in your dash script [1]
-
-Salut,
-Pedro
-
-[1]
-
-failed
-
-https://git.sr.ht/~evilham/cdist-evilham/commit/bf65172c8291ec4be71257605=
-0bf7a4bcf462017
-
-failed
-
-https://git.sr.ht/~evilham/cdist-evilham/commit/1aa8b012200b0160e78a65520=
-175bb224ffc9899
-
-worked
-
-https://git.sr.ht/~evilham/cdist-evilham/commit/8996e2b66531e6b54b52207ea=
-5bdf3b71c795656
-
---------------E2B73D3375AAEFD175684E23
-Content-Type: application/x-shellscript;
- name="dash-bug.sh"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="dash-bug.sh"
-
-IyEvYmluL3NoCgpTRVRVUF9VRlc9J3knCgpjYXQgPDxFT0YKIyBFbmFibGUgVUZXIHJ1bGVz
-IG9ubHkgaWYgcmVxdWVzdGVkIChpdCB3YXMkKGlmIFsgLXogIiR7U0VUVVBfVUZXfSIgXTsg
-dGhlbiBwcmludGYgJyBub3QnOyBmaSkpCiQoaWYgWyAteiAiJHtTRVRVUF9VRld9IiBdOyB0
-aGVuIHByaW50ZiAnIyAnOyBmaSllbmFibGVVRldSdWxlcwpFT0YK
---------------E2B73D3375AAEFD175684E23
-Content-Type: application/pgp-keys;
- name="OpenPGP_0x9D64597C3A982DCA.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename="OpenPGP_0x9D64597C3A982DCA.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFwTT0gBCACpCcJSv4ADrV8f6puGEXyGRxLdARePpMhY1LNQ4JmvDE4UGbkSHHp0A/SMw=
-FnK
-vhkc9oPrIoqTIcgfRRzr1JtYTwU3lNGQCawmrBOt5PoyHxbzE1YCpTW2Kxs/tGaBOtfnCC6ic=
-8Sj
-1MPiuyUvjnCpb8dABE2CmsEPVT+zSt0nSCmPbj2hHv6azs4wdjHhlZnnTTBbbnGU3atAoZHDZ=
-0fE
-SSxyfV92U0dTn0dYa8tWnnQuYNBDKu5UdB3hFdF61dmL+8yZqFcWwohlySvxHnuqKKW7/80Rp=
-lkb
-p5QQT/uBP4Cyad/DoCRuNLKdHTz0nsb86KqwOXQwCttLYbusVwhlABEBAAHNFXBlZHJvIDxwZ=
-WRy
-b0BjYXMuY2F0PsLAlAQTAQgAPgIbLwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgBYhBLAblhazw=
-wE6
-Jn7qc51kWXw6mC3KBQJeDcwPBQkD27BHAAoJEJ1kWXw6mC3K7HIH/j6eeoXopO+fHB1j37+gs=
-Zey
-HI6RiuCkQzGx7Rb8kAomg0awU1XuuYbU69hoOTSqzdqmnvUsCqFZKBmTHMtb+Cs7+4oebRPdV=
-pQB
-91UuhypEm4XchWi6vY1OjuvlrwenfOp0ZUrDPHeWePmEa6V0l04BQcm+mfOXQBBZCkd5pCStz=
-woD
-oBeLJXtiaOGYe2DjLnLvDxQh77mrFfdFMfI3nVCM920ByEWS8nQ/g/NtTHUVtceNwGp+17M1X=
-sNs
-xlEswWH00Vx88BWo6gSqk2h+pD6kQG0zpgEJBinHvGvsvCPsKpa85awMvt8vBpp46bbqFQigX=
-+O0
-zhTA1nGHDmDuV60=3D
-=3DdhI/
------END PGP PUBLIC KEY BLOCK-----
-
---------------E2B73D3375AAEFD175684E23--
-
---QnwVDq1AeljPyKGbAKaSqO22fr9arvl69--
-
---46y3LvQWAO2cwSWI9yiaMPTV4gsDjBR7h
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEsBuWFrPDATomfupznWRZfDqYLcoFAl/A7g4FAwAAAAAACgkQnWRZfDqYLcr+
-OQgAo3I8NdueyaM1DbNGl9p8qF2jBMSbBfrG45OUpXksqlTNKeZTyJfRvHoYrpCVIugCM5W4T36M
-xiqDJghU1vsWl5qCAz7fNiBW3MBIBz0cZdI0eisf0hxvDz6cG1NqfAbJcJL2BoOFb82Am+k4b5cd
-dAH3q/zP+aOgB72cZYkriJTXLf34rJ2T5/WvPcn0S38JjHbtEhjoGxL67tmozaKQfWIMxa14al/O
-sAEyL/9YLay9BExvFng3uNj7bua+/BZxZ/VrWHTiQ0PB+738v4EJjD3QO5qbW7kXu3XAxmKQ0hIN
-WKPV2xOjfjWtOYNJnQq1EISJFC/BtFAQLs6lOjt8UQ==
-=1ZBB
------END PGP SIGNATURE-----
-
---46y3LvQWAO2cwSWI9yiaMPTV4gsDjBR7h--
+Cheers,
+Harald van Dijk
