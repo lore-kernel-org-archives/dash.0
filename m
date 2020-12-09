@@ -2,84 +2,78 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BFAC4361B
-	for <linux-dash@archiver.kernel.org>; Mon,  7 Dec 2020 03:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E417C4361B
+	for <linux-dash@archiver.kernel.org>; Wed,  9 Dec 2020 13:03:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D33E230FA
-	for <linux-dash@archiver.kernel.org>; Mon,  7 Dec 2020 03:56:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5346A23B45
+	for <linux-dash@archiver.kernel.org>; Wed,  9 Dec 2020 13:03:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728703AbgLGDzz (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sun, 6 Dec 2020 22:55:55 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:42256 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726482AbgLGDzy (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 6 Dec 2020 22:55:54 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1km7cA-0006m9-6P; Mon, 07 Dec 2020 14:55:07 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Dec 2020 14:55:06 +1100
-Date:   Mon, 7 Dec 2020 14:55:06 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Michael Biebl <biebl@debian.org>
-Cc:     Andrej Shadura <andrew.shadura@collabora.co.uk>,
-        dash@vger.kernel.org, 974705@bugs.debian.org
-Subject: Re: Changes to job handling cause hangs in wait
-Message-ID: <20201207035505.GA10592@gondor.apana.org.au>
-References: <0b1af921-f0dc-33e1-eae3-91192c2ec60a@collabora.co.uk>
- <20201201053837.GA26889@gondor.apana.org.au>
- <20201201054203.GA27074@gondor.apana.org.au>
- <20201201060618.GA27281@gondor.apana.org.au>
- <20201201065623.GA27646@gondor.apana.org.au>
- <86689c77-34c6-2dbe-32d2-95f826bfa634@debian.org>
- <20201201232606.GA32382@gondor.apana.org.au>
- <8f71b2dc-bb40-ec95-51a9-2b60e730bc84@debian.org>
+        id S1731861AbgLINCU (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 9 Dec 2020 08:02:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51166 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731844AbgLINCU (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 9 Dec 2020 08:02:20 -0500
+X-Greylist: delayed 2054 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 09 Dec 2020 05:01:40 PST
+Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08DF1C0613CF
+        for <dash@vger.kernel.org>; Wed,  9 Dec 2020 05:01:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
+        ; s=202004.hall; h=In-Reply-To:Content-Type:MIME-Version:References:
+        Message-ID:Subject:Cc:To:From:Date:Content-Transfer-Encoding:From:Reply-To:
+        Subject:Content-ID:Content-Description:X-Debbugs-Cc;
+        bh=pUaEuqWeUnevT+CMDOpkNucubJP7OQUhXuDAxCODv+Q=; b=VOPu5LfIWwF47zdvnCBpJsjWgP
+        9aZHccawjI5TntJ4MYjr1pvl9ehT9jqcz/vqpSfpcWkPbzMoTNN9UwWECqLkcTvvncq7qlsB1Db2a
+        I/zH3wuwcnYxyg7XLZmfyyXei4aHj1foNrgm6L9QkKBh5bOPagnbYZNz63M95L7J2DpQjdLK8aoEG
+        wo92FmVPniXxWdIzyzHoQdu8JX28wmdDQqxpBMTuygU3W7po5/AmjgkgKx/tiF/ojGAz/NSnatRjK
+        lyqRtrQ3VLJCad+ooq+SHOREjGDH6WJvO6AJtFVWDXhdo59SZOMEK7hdLSHOAGumhhyXbu+rxzi5d
+        THQeesDg==;
+Received: from [2a01:e35:2fdd:a4e1:fe91:fc89:bc43:b814] (helo=ohm.rr44.fr)
+        by hall.aurel32.net with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <aurelien@aurel32.net>)
+        id 1kmyYv-00019F-UH; Wed, 09 Dec 2020 13:27:17 +0100
+Received: from aurel32 by ohm.rr44.fr with local (Exim 4.94)
+        (envelope-from <aurelien@aurel32.net>)
+        id 1kmyYv-00Atuo-8S; Wed, 09 Dec 2020 13:27:17 +0100
+Date:   Wed, 9 Dec 2020 13:27:17 +0100
+From:   Aurelien Jarno <aurelien@aurel32.net>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Andrej Shadura <andrew@shadura.me>, dash@vger.kernel.org,
+        peff@peff.net, 976865@bugs.debian.org
+Subject: Re: Fwd: Bug#974900: dash removes trailing slash from script
+ arguments
+Message-ID: <20201209122717.GA2598168@aurel32.net>
+References: <f957f8b9-3430-4752-9798-9c5417d9707a@www.fastmail.com>
+ <20201117033203.GA1084@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8f71b2dc-bb40-ec95-51a9-2b60e730bc84@debian.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20201117033203.GA1084@gondor.apana.org.au>
+User-Agent: Mutt/1.14.6 (2020-07-11)
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On Thu, Dec 03, 2020 at 01:27:51PM +0100, Michael Biebl wrote:
->
-> Hm, so I applied this change and switched backed to dash, but now I get
+On 2020-11-17 14:32, Herbert Xu wrote:
+> Andrej Shadura <andrew@shadura.me> wrote:
+> > 
+> > this is another bug report I have received.
 > 
-> autopkgtest systemd --test-name=timedated -s -- lxc -s autopkgtest-sid
-> ...
-> disable NTP
-> enable NTP
-> Terminated
-> autopkgtest [13:21:42]: test timedated: -----------------------]
-> autopkgtest [13:21:42]: test timedated:  - - - - - - - - - - results - - - -
-> - - - - - -
-> timedated            FAIL non-zero exit status 143
+> This is a bug in glob(3).  Please dup and reassign to libc6.  There
+> is a patch in the queue to disable glob by default again.
 > 
-> 
-> Running with sh -x
-> ...
-> + kill 825
-> + wait 825
-> Terminated
-> 
-> 
-> Herbert, any idea what going wrong there?
-> (systemd 247.1-2 and dash 0.5.11+git20200708+dd9ef66-2)
 
-Sorry, my bad.  wait(1) with no arguments ignores the error status
-of the child and always return zero.  wait(1) specifically on a
-child obviously returns the error status of that child.  Since the
-child was killed, we need to ignore that, so this works for me:
-
-	wait $MONPID 2> /dev/null || :
+Can you please describe more precisely what is the problem with glob(3)?
 
 Thanks,
+Aurelien
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
