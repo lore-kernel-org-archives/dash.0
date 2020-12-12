@@ -6,57 +6,62 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4736C433FE
-	for <linux-dash@archiver.kernel.org>; Fri, 11 Dec 2020 02:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0543C4361B
+	for <linux-dash@archiver.kernel.org>; Sat, 12 Dec 2020 21:25:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78E7923E54
-	for <linux-dash@archiver.kernel.org>; Fri, 11 Dec 2020 02:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E9E42250E
+	for <linux-dash@archiver.kernel.org>; Sat, 12 Dec 2020 21:25:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729108AbgLKCGU (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Thu, 10 Dec 2020 21:06:20 -0500
-Received: from cloud.peff.net ([104.130.231.41]:57648 "EHLO cloud.peff.net"
+        id S2407958AbgLLVZH (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sat, 12 Dec 2020 16:25:07 -0500
+Received: from albireo.enyo.de ([37.24.231.21]:53002 "EHLO albireo.enyo.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388647AbgLKCFt (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 10 Dec 2020 21:05:49 -0500
-Received: (qmail 3587 invoked by uid 109); 11 Dec 2020 02:05:04 -0000
-Received: from Unknown (HELO peff.net) (10.0.1.2)
- by cloud.peff.net (qpsmtpd/0.94) with ESMTP; Fri, 11 Dec 2020 02:05:04 +0000
-Authentication-Results: cloud.peff.net; auth=none
-Received: (qmail 1991 invoked by uid 111); 11 Dec 2020 02:05:03 -0000
-Received: from coredump.intra.peff.net (HELO sigill.intra.peff.net) (10.0.0.2)
- by peff.net (qpsmtpd/0.94) with (TLS_AES_256_GCM_SHA384 encrypted) ESMTPS; Thu, 10 Dec 2020 21:05:03 -0500
-Authentication-Results: peff.net; auth=none
-Date:   Thu, 10 Dec 2020 21:05:02 -0500
-From:   Jeff King <peff@peff.net>
+        id S1725822AbgLLVZH (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 12 Dec 2020 16:25:07 -0500
+X-Greylist: delayed 354 seconds by postgrey-1.27 at vger.kernel.org; Sat, 12 Dec 2020 16:25:07 EST
+Received: from [172.17.203.2] (helo=deneb.enyo.de)
+        by albireo.enyo.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        id 1koCHL-00027R-1n; Sat, 12 Dec 2020 21:18:11 +0000
+Received: from fw by deneb.enyo.de with local (Exim 4.92)
+        (envelope-from <fw@deneb.enyo.de>)
+        id 1koCHK-0007fW-VR; Sat, 12 Dec 2020 22:18:10 +0100
+From:   Florian Weimer <fw@deneb.enyo.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Aurelien Jarno <aurelien@aurel32.net>, 976865@bugs.debian.org,
-        andrew@shadura.me, dash@vger.kernel.org
-Subject: Re: Bug#976865: Fwd: Bug#974900: dash removes trailing slash from
- script arguments
-Message-ID: <X9LTzo2b9iREhlEJ@coredump.intra.peff.net>
+        andrew@shadura.me, dash@vger.kernel.org, peff@peff.net
+Subject: Re: Bug#976865: Fwd: Bug#974900: dash removes trailing slash from script arguments
 References: <20201116094531.GA40024@coredump.intra.peff.net>
- <20201210025654.GA26577@gondor.apana.org.au>
- <20201210075837.GN2297@aurel32.net>
- <20201210113508.GA28224@gondor.apana.org.au>
- <X9I8vStSYdovXOIM@coredump.intra.peff.net>
- <20201211020311.GA31996@gondor.apana.org.au>
+        <20201210025654.GA26577@gondor.apana.org.au>
+        <20201210075837.GN2297@aurel32.net>
+        <20201116094531.GA40024@coredump.intra.peff.net>
+        <20201210113508.GA28224@gondor.apana.org.au>
+Date:   Sat, 12 Dec 2020 22:18:10 +0100
+In-Reply-To: <20201210113508.GA28224@gondor.apana.org.au> (Herbert Xu's
+        message of "Thu, 10 Dec 2020 22:35:08 +1100")
+Message-ID: <877dpmsoz1.fsf@mid.deneb.enyo.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201211020311.GA31996@gondor.apana.org.au>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On Fri, Dec 11, 2020 at 01:03:11PM +1100, Herbert Xu wrote:
+* Herbert Xu:
 
-> On Thu, Dec 10, 2020 at 10:20:29AM -0500, Jeff King wrote:
-> >
-> > It seems like it happens for "foo/", too. If I compile:
-> 
-> I think the key is that dash uses GLOB_NOMAGIC.
+> On Thu, Dec 10, 2020 at 08:58:37AM +0100, Aurelien Jarno wrote:
+>>
+>> That's the dash symptoms. glob(3) takes a pattern and just returns the
+>> paths matching the pattern, as they are named on the filesystem. That
+>> said, the option GLOB_MARK can return a trailing slash for all matched
+>> path that are a directory.
+>
+> Yes but it's really a bug in glob(3).  It should really return
+> a no-match for the case in question, rather than matching and then
+> returning a filename without the slash.
+>
+> IOW the pattern "foo\/" should not match a regular file foo.
 
-I wondered that, too, but adding GLOB_NOMAGIC to the call doesn't seem
-to change the results. This is all with libc6 2.31-5, by the way.
+I believe this has been reported upstream here:
 
--Peff
+  <https://sourceware.org/bugzilla/show_bug.cgi?id=25659>
+
+(But I have not reveiwed this particular bug thread here, sorry.)
