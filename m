@@ -3,32 +3,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4947CC4361B
-	for <linux-dash@archiver.kernel.org>; Sat, 19 Dec 2020 17:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2FD1C4361B
+	for <linux-dash@archiver.kernel.org>; Sat, 19 Dec 2020 22:22:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 170BF229F0
-	for <linux-dash@archiver.kernel.org>; Sat, 19 Dec 2020 17:35:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75C9623A53
+	for <linux-dash@archiver.kernel.org>; Sat, 19 Dec 2020 22:22:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727092AbgLSRfH (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sat, 19 Dec 2020 12:35:07 -0500
-Received: from sdaoden.eu ([217.144.132.164]:34472 "EHLO sdaoden.eu"
+        id S1726621AbgLSWWG (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sat, 19 Dec 2020 17:22:06 -0500
+Received: from sdaoden.eu ([217.144.132.164]:35240 "EHLO sdaoden.eu"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727031AbgLSRfH (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sat, 19 Dec 2020 12:35:07 -0500
-X-Greylist: delayed 345 seconds by postgrey-1.27 at vger.kernel.org; Sat, 19 Dec 2020 12:35:05 EST
+        id S1725944AbgLSWWF (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 19 Dec 2020 17:22:05 -0500
 Received: by sdaoden.eu (Postfix, from userid 1000)
-        id E4FA416058; Sat, 19 Dec 2020 18:28:38 +0100 (CET)
-Date:   Sat, 19 Dec 2020 18:28:38 +0100
+        id 8160216058; Sat, 19 Dec 2020 23:21:22 +0100 (CET)
+Date:   Sat, 19 Dec 2020 23:21:22 +0100
 From:   Steffen Nurpmeso <steffen@sdaoden.eu>
 To:     DASH shell mailing list <dash@vger.kernel.org>,
         Denys Vlasenko <vda.linux@googlemail.com>,
         Jilles Tjoelker <jilles@stack.nl>
-Subject: dash 0.5.11.2, busybox sh 1.32.0, FreeBSD 12.2 sh: spring
- TTOU but should not i think
-Message-ID: <20201219172838.1B-WB%steffen@sdaoden.eu>
+Subject: Re: dash 0.5.11.2, busybox sh 1.32.0, FreeBSD 12.2 sh:
+ spring TTOU but should not i think
+Message-ID: <20201219222122.p9UYT%steffen@sdaoden.eu>
+In-Reply-To: <20201219172838.1B-WB%steffen@sdaoden.eu>
+References: <20201219172838.1B-WB%steffen@sdaoden.eu>
 User-Agent: s-nail v14.9.20-84-g7268a84d
 OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
  url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
@@ -36,44 +37,108 @@ BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
  the world can make no bugs.
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
- boundary="=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-="
+ boundary="=-=MIvaqxZxjRYOPTY0zY_f_oxkpp5drCBX3zp7=-="
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
 This is a multi-part message in MIME format.
 
---=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-=
+--=-=MIvaqxZxjRYOPTY0zY_f_oxkpp5drCBX3zp7=-=
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-ID: <20201219172838.N5TuZ%steffen@sdaoden.eu>
+Content-ID: <20201219222122.KxU0u%steffen@sdaoden.eu>
 
-Hello.
+Steffen Nurpmeso wrote in
+ <20201219172838.1B-WB%steffen@sdaoden.eu>:
+ |Long story short, after falsely accusing BSD make of not working
 
-Long story short, after falsely accusing BSD make of not working
-when child shells use monitor mode someone pointed me into the
-correct direction, and whereas the major problem was on the mksh
-side (that sneaked in via $SHELL even though .. but regardless)
-and was already reported, i can report a minor issue with the
-mentioned shells nonetheless: with the reproducer (please do not
-complain, it tooks hours to get it that short), when run under
-supervision of a(ny tested) make(1), they spring a TTOU trap even
-though they should not .. i think.
+After dinner i shortened it a bit more, and attach it again, ok?
+It is terrible, but now less redundant than before.
+Sorry for being so terse, that problem crosses my head for about
+a week, and i was totally mislead and if you bang your head
+against the wall so many hours bugs or misbehaviours in a handful
+of other programs is not the expected outcome.
 
-Please run via "make -f jobo.mk SHELL=YOUR-SHELL", and you should
-see something like
+  #?0|kent:tmp$ SHELL=/bin/bash make -f jobo.mk
+  ./mx-test.sh
+  Starting job reaper (timeout of 2 seconds)
+  .. waiting for job reaper to come up
+  PRE T1 CHEK
+  PREWAIT
+  CHECK 10
+  ls: cannot access '/NONEXISTENT': No such file or directory
+  CHECK /bin/bash 50
+  allexport       off
+  braceexpand     on
+  emacs           off
+  errexit         off
+  errtrace        off
+  functrace       off
+  hashall         on
+  histexpand      off
+  history         off
+  ignoreeof       off
+  interactive-comments    on
+  keyword         off
+  monitor         on
+  noclobber       off
+  noexec          off
+  noglob          off
+  nolog           off
+  notify          off
+  nounset         off
+  onecmd          off
+  physical        off
+  pipefail        off
+  posix           off
+  privileged      off
+  verbose         off
+  vi              off
+  xtrace          off
+  CHECK 23
+  CHECK 100
+  AFTER T1 CHEK
+  Stopping job reaper
+  make: *** [jobo.mk:2: test] Error 1
 
+That is how it "should look" ;), monitor is on in there. 
+
+  #?2|kent:tmp$ SHELL=/bin/dash make -f jobo.mk
   ./mx-test.sh
   Starting job reaper (timeout of 2 seconds)
   .. waiting for job reaper to come up
   TTOU
-  ....
+  Cleaning up running jobs
+  Stopping job reaper
+  make: *** [jobo.mk:2: test] Error 2
 
-where this TTOU should not happen i would say.  It does not happen
-with bash nor mksh nor OpenBSD sh and ksh, nor NetBSD sh and eh,
-ksh, hmm.
+Somehow refuses to work when supervised by (any) make (i tried).
+Works as desired when ridden directly.
 
-I hope this helps, a nice weekend from Germany i wish,
+  #?2|kent:tmp$ SHELL=/bin/mksh make -f jobo.mk
+  ./mx-test.sh
+  Starting job reaper (timeout of 2 seconds)
+  .. waiting for job reaper to come up
+  PRE T1 CHEK
+  CHECK 10
+  PREWAIT
+  ls: cannot access '/NONEXISTENT': No such file or directory
+  PREWAIT
+  PREWAIT
+  PREWAIT
+  PREWAIT
+  PREWAIT
+  PREWAIT
+  PREWAIT
+  TIMEOUT IN PARENT
+  
+  !! Timeout: reaped job 1 [X_errexit]
+  Stopping job reaper
+
+And that condition is very strange, with or without supervision.
+
+Ciao!
 
 --steffen
 |
@@ -82,10 +147,10 @@ I hope this helps, a nice weekend from Germany i wish,
 |einen nach dem anderen runter  wa.ks himself off
 |(By Robert Gernhardt)
 
---=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-=
+--=-=MIvaqxZxjRYOPTY0zY_f_oxkpp5drCBX3zp7=-=
 Content-Type: application/x-sh; charset=us-ascii
 Content-Disposition: attachment; filename="mx-test.sh"
-Content-ID: <20201219172838.-z1Y-%steffen@sdaoden.eu>
+Content-ID: <20201219222122.K-TPL%steffen@sdaoden.eu>
 
 #!/bin/sh -
 
@@ -108,9 +173,6 @@ if [ -z "${MAILX__CC_TEST_RUNNING}" ]; then
    export CHECK RUN_TEST MAILX
 fi
 
-awk='/usr/bin/awk';export awk
-cat='/bin/cat';export cat
-grep='/usr/bin/grep';export grep
 mkdir='/bin/mkdir';export mkdir
 rm='/bin/rm';export rm
 
@@ -233,9 +295,9 @@ jspawn() {
    [ -n "${JOBMON}" ] && set -m >/dev/null 2>&1
    (  # Place the job in its own directory to ease file management
       trap '' EXIT HUP INT QUIT TERM USR1 USR2
-      ${mkdir} t.${JOBS}.d && cd t.${JOBS}.d &&
+      #${mkdir} t.${JOBS}.d && cd t.${JOBS}.d &&
          eval t_${1} ${JOBS} ${1} &&
-         ${rm} -f ../t.${JOBS}.id
+         ${rm} -f t.${JOBS}.id
    ) > t.${JOBS}.io </dev/null & # 2>&1 </dev/null &
    i=${!}
    [ -n "${JOBMON}" ] && set +m >/dev/null 2>&1
@@ -310,13 +372,6 @@ echo >&2 PREWAIT
          printf >&2 '%s!! Timeout: reaped job %s [%s]%s\n' \
             "${COLOR_ERR_ON}" ${i} "${desc}" "${COLOR_ERR_OFF}"
          TESTS_FAILED=`add ${TESTS_FAILED} 1`
-      elif [ -s t.${i}.result ]; then
-         read es tp to tf ts < t.${i}.result
-         TESTS_PERFORMED=`add ${TESTS_PERFORMED} ${tp}`
-         TESTS_OK=`add ${TESTS_OK} ${to}`
-         TESTS_FAILED=`add ${TESTS_FAILED} ${tf}`
-         TESTS_SKIPPED=`add ${TESTS_SKIPPED} ${ts}`
-         [ "${es}" != 0 ] && ESTAT=${es}
       else
          TESTS_FAILED=`add ${TESTS_FAILED} 1`
          ESTAT=1
@@ -360,18 +415,6 @@ t_epilog() {
       > ../t.${1}.result
 }
 
-t_echo() {
-   [ -n "${TEST_ANY}" ] && __i__=' ' || __i__=
-   printf "${__i__}"'%s' "${*}"
-   TEST_ANY=1
-}
-
-t_echook() {
-   [ -n "${TEST_ANY}" ] && __i__=' ' || __i__=
-   printf "${__i__}"'%s%s:ok%s' "${COLOR_OK_ON}" "${*}" "${COLOR_OK_OFF}"
-   TEST_ANY=1
-}
-
 t_echoerr() {
    ESTAT=1
    t_echo0err "${@}"
@@ -384,128 +427,39 @@ t_echo0err() {
    TEST_ANY=
 }
 
-t_echowarn() {
-   [ -n "${TEST_ANY}" ] && __i__=' ' || __i__=
-   printf "${__i__}"'%s%s%s' "${COLOR_WARN_ON}" "${*}" "${COLOR_WARN_OFF}"
-   TEST_ANY=1
-}
-
-t_echoskip() {
-   [ -n "${TEST_ANY}" ] && __i__=' ' || __i__=
-   printf "${__i__}"'%s%s[skip]%s' \
-      "${COLOR_WARN_ON}" "${*}" "${COLOR_WARN_OFF}"
-   TEST_ANY=1
-   TESTS_SKIPPED=`add ${TESTS_SKIPPED} 1`
-}
-
 check() {
    restat=${?} tid=${1} eestat=${2} f=${3} s=${4} optmode=${5}
 
-echo >&2 CHECK $TID 0
    TESTS_PERFORMED=`add ${TESTS_PERFORMED} 1`
 
-echo >&2 CHECK $TID 10
    if [ -n "${CHECK}${RUN_TEST}" ]; then
       x="t.${TEST_NAME}-${tid}"
-echo >&2 CHECK $TID 11
       if :; then
          y=test-out
-echo >&2 CHECK $TID 20
-echo >&2 CHECK $TID 21
          if [ -n "${y}" ]; then
-echo >&2 CHECK $TID 22
             if : ; then
-echo >&2 CHECK $TID 22.5
+echo >&2 CHECK $TID 10
 # NOTE: REMOVE THIS (or use true(1)) AND WORKS directly and via bmake (mksh)
 # (env -i regardless, "false" also is not it, whatever)
 env -i ls -latr /NONEXISTENT
-echo >&2 CHECK $SHELL $TID 22.8
+echo >&2 CHECK $SHELL $TID 50
 # NOTE: monitor should be "on" here
 set -o >&2
 echo >&2 CHECK $TID 23
             fi
-echo >&2 CHECK $TID 30
          fi
-echo >&2 CHECK $TID 35
       fi
    fi
 echo >&2 CHECK $TID 100
 }
 
-check_ex0() {
-   # $1=test name [$2=status]
-   __qm__=${?}
-   [ ${#} -gt 1 ] && __qm__=${2}
-
-   TESTS_PERFORMED=`add ${TESTS_PERFORMED} 1`
-
-   if [ ${__qm__} -ne 0 ]; then
-      ESTAT=1
-      t_echoerr "${1}: unexpected non-0 exit status: ${__qm__}"
-      TESTS_FAILED=`add ${TESTS_FAILED} 1`
-   else
-      t_echook "${1}"
-      TESTS_OK=`add ${TESTS_OK} 1`
-   fi
-}
-
-check_exn0() {
-   # $1=test name [$2=status]
-   __qm__=${?}
-   [ ${#} -gt 1 ] && __qm__=${2}
-   [ ${#} -gt 2 ] && __expect__=${3} || __expect__=
-
-   TESTS_PERFORMED=`add ${TESTS_PERFORMED} 1`
-
-   if [ ${__qm__} -eq 0 ]; then
-      ESTAT=1
-      t_echoerr "${1}: unexpected 0 exit status: ${__qm__}"
-      TESTS_FAILED=`add ${TESTS_FAILED} 1`
-   elif [ -n "${__expect__}" ] && [ ${__expect__} -ne ${__qm__} ]; then
-      ESTAT=1
-      t_echoerr "${1}: unexpected exit status: ${__qm__} != ${__expected__}"
-      TESTS_FAILED=`add ${TESTS_FAILED} 1`
-   else
-      t_echook "${1}"
-      TESTS_OK=`add ${TESTS_OK} 1`
-   fi
-}
-
-color_init() {
-   :
-}
-
-if ( [ "$((1 + 1))" = 2 ] ) >/dev/null 2>&1; then
    add() {
       echo "$((${1} + ${2}))"
    }
-else
-   add() {
-      ${awk} 'BEGIN{print '${1}' + '${2}'}'
-   }
-fi
-
-if ( [ "$((2 % 3))" = 2 ] ) >/dev/null 2>&1; then
-   modulo() {
-      echo "$((${1} % ${2}))"
-   }
-else
-   modulo() {
-      ${awk} 'BEGIN{print '${1}' % '${2}'}'
-   }
-fi
-
-have_feat() {
-   ( "${RAWMAILX}" ${ARGS} -X'echo $features' -Xx |
-      ${grep} +${1}, ) >/dev/null 2>&1
-}
 
 t_X_errexit() {
    t_prolog "${@}"
 
-   </dev/null ${MAILX} ${ARGS} -Snomemdebug \
-         -X'echo one' -X' echos nono ' -X'echo two' \
-      > ./t1 2>&1
 echo >&2 PRE T1 CHEK
    check 1 0 ./t1 '2700500141 51'
 echo >&2 AFTER T1 CHEK
@@ -523,12 +477,12 @@ esec=$SECONDS
 exit ${ESTAT}
 # s-sh-mode
 
---=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-=
+--=-=MIvaqxZxjRYOPTY0zY_f_oxkpp5drCBX3zp7=-=
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: attachment; filename="jobo.mk"
-Content-ID: <20201219172838.aGgxU%steffen@sdaoden.eu>
+Content-ID: <20201219222122.Lx89x%steffen@sdaoden.eu>
 
 test:
 	./mx-test.sh
 
---=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-=--
+--=-=MIvaqxZxjRYOPTY0zY_f_oxkpp5drCBX3zp7=-=--
