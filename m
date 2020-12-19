@@ -2,74 +2,533 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 115B2C4361B
-	for <linux-dash@archiver.kernel.org>; Sat, 19 Dec 2020 13:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4947CC4361B
+	for <linux-dash@archiver.kernel.org>; Sat, 19 Dec 2020 17:35:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE4C823B17
-	for <linux-dash@archiver.kernel.org>; Sat, 19 Dec 2020 13:24:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 170BF229F0
+	for <linux-dash@archiver.kernel.org>; Sat, 19 Dec 2020 17:35:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726484AbgLSNYh (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sat, 19 Dec 2020 08:24:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44306 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726482AbgLSNYg (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sat, 19 Dec 2020 08:24:36 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58C87C0617B0
-        for <dash@vger.kernel.org>; Sat, 19 Dec 2020 05:23:56 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id j1so2940779pld.3
-        for <dash@vger.kernel.org>; Sat, 19 Dec 2020 05:23:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=wIg+4l6WZMnjf1sqFhr90hcoVKNNDkWHTvGJUEZatBA=;
-        b=rnm9bsqIUbavv8qL+LulWC/yBg8LJNdulATmNB41mf5hTm8aWBKzS0XbLTvmyNYMgC
-         aZImWc1SPWUiWFwsi9ft3FWyl9JueCaGWi9iqRxEUW+vXd+ZnqoxsOhjbcHnuUJYTiiE
-         Vl1HYV7TsLvxjfmZqv6RX5dT4byvQUowU7gzqlIvNjIwu9XKv+ohVLP8x43g0GBdVZoL
-         2TLVKrW1jk3cB9rIuoMUBliF6g1av9LWzTJ9N0NDgN6SsHSox85EdAEXT3GcUqY/Fstp
-         PG83qvVFp/yo0acXBwTM1oUBGcp4GBVdluqhFsLC0wpsXgD1uFppv4KRySROIGNylN9f
-         EpYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=wIg+4l6WZMnjf1sqFhr90hcoVKNNDkWHTvGJUEZatBA=;
-        b=RH1oSZ3eYiPWjdj6Qk9XLQLY+2iCXWk/IwM8/FTuNH5O+2xeOcqAJ9rDe2LZVaB9Vj
-         C4NbFhL2ViOlYUCVYy8FTN/z0WPVAEEVtT2F27N0dKVTrvenLo3OxoR/2JVQz26kEm85
-         cc3yFy98ziBybvspfBG53xIUj5DHKVigs6lwLg0ronA1OYa8heDrbQcz4CSlNelDYWCM
-         CGqYqvvXa/OLu08UzM6rKvO3z8zkqMWP/eQVwZCDjHZ17n7XBdVjozM8ip9cOQv1wuk3
-         WjmTz4qx/sDlBkciH6RBw56aIHN1iNTYR/CciCjfintMKVn0NcVxbWO+BIhfwfZDIiI5
-         5msg==
-X-Gm-Message-State: AOAM532SKSSSFpI+kMAq8/04OJfRAxy3/lX5hMNtVWr1MOmyTyh1u2NX
-        AyTg1jkKyQ1nlrnGwjFE6lxk5E+i1JeSu/HiM7o=
-X-Google-Smtp-Source: ABdhPJwa5TCAjVUIpnREAqkwwZ5nTo9TMHeDSMmcpBtuRZobjMqoEPIKxvuyb2raAnVCrkM9d3bltTgXn0WM+sbX4eM=
-X-Received: by 2002:a17:902:b94a:b029:dc:18f2:8063 with SMTP id
- h10-20020a170902b94ab02900dc18f28063mr8900384pls.8.1608384235408; Sat, 19 Dec
- 2020 05:23:55 -0800 (PST)
+        id S1727092AbgLSRfH (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sat, 19 Dec 2020 12:35:07 -0500
+Received: from sdaoden.eu ([217.144.132.164]:34472 "EHLO sdaoden.eu"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727031AbgLSRfH (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 19 Dec 2020 12:35:07 -0500
+X-Greylist: delayed 345 seconds by postgrey-1.27 at vger.kernel.org; Sat, 19 Dec 2020 12:35:05 EST
+Received: by sdaoden.eu (Postfix, from userid 1000)
+        id E4FA416058; Sat, 19 Dec 2020 18:28:38 +0100 (CET)
+Date:   Sat, 19 Dec 2020 18:28:38 +0100
+From:   Steffen Nurpmeso <steffen@sdaoden.eu>
+To:     DASH shell mailing list <dash@vger.kernel.org>,
+        Denys Vlasenko <vda.linux@googlemail.com>,
+        Jilles Tjoelker <jilles@stack.nl>
+Subject: dash 0.5.11.2, busybox sh 1.32.0, FreeBSD 12.2 sh: spring
+ TTOU but should not i think
+Message-ID: <20201219172838.1B-WB%steffen@sdaoden.eu>
+User-Agent: s-nail v14.9.20-84-g7268a84d
+OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
+ url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
+BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
+ the world can make no bugs.
 MIME-Version: 1.0
-From:   Denys Vlasenko <vda.linux@googlemail.com>
-Date:   Sat, 19 Dec 2020 14:23:44 +0100
-Message-ID: <CAK1hOcOsHYf+aJwJCDhunWNcXvWrLwObnviPms_CkspYsL6BcQ@mail.gmail.com>
-Subject: ungetc is not cleared on error?
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        DASH shell mailing list <dash@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed;
+ boundary="=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-="
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-Current git:
+This is a multi-part message in MIME format.
 
-$ ;l
-dash: 1: Syntax error: ";" unexpected
-$ s
-COPYING    ChangeLog.O    Makefile.am  aclocal.m4  autom4te.cache
-config.h     config.log     configure       dash
-dollar_altvalue1.tests  missing  stamp-h1
-ChangeLog  Makefile    Makefile.in  autogen.sh  compile
-config.h.in  config.status  configure.ac  depcomp  install-sh
-  src      trace
+--=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-ID: <20201219172838.N5TuZ%steffen@sdaoden.eu>
+
+Hello.
+
+Long story short, after falsely accusing BSD make of not working
+when child shells use monitor mode someone pointed me into the
+correct direction, and whereas the major problem was on the mksh
+side (that sneaked in via $SHELL even though .. but regardless)
+and was already reported, i can report a minor issue with the
+mentioned shells nonetheless: with the reproducer (please do not
+complain, it tooks hours to get it that short), when run under
+supervision of a(ny tested) make(1), they spring a TTOU trap even
+though they should not .. i think.
+
+Please run via "make -f jobo.mk SHELL=YOUR-SHELL", and you should
+see something like
+
+  ./mx-test.sh
+  Starting job reaper (timeout of 2 seconds)
+  .. waiting for job reaper to come up
+  TTOU
+  ....
+
+where this TTOU should not happen i would say.  It does not happen
+with bash nor mksh nor OpenBSD sh and ksh, nor NetBSD sh and eh,
+ksh, hmm.
+
+I hope this helps, a nice weekend from Germany i wish,
+
+--steffen
+|
+|Der Kragenbaer,                The moon bear,
+|der holt sich munter           he cheerfully and one by one
+|einen nach dem anderen runter  wa.ks himself off
+|(By Robert Gernhardt)
+
+--=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-=
+Content-Type: application/x-sh; charset=us-ascii
+Content-Disposition: attachment; filename="mx-test.sh"
+Content-ID: <20201219172838.-z1Y-%steffen@sdaoden.eu>
+
+#!/bin/sh -
+
+OBJDIR='/tmp/jobo';export OBJDIR # MANAGED!!
+
+: ${SHELL:=/bin/sh};export SHELL
+
+: ${JOBNO:=1}
+: ${JOBWAIT:=2}
+: ${JOBMON:=y}
+
+export \
+   OBJDIR SHELL JOBNO JOBWAIT JOBMON
+
+LC_ALL=C LANG=C TZ=UTC
+export LC_ALL LANG TZ
+
+if [ -z "${MAILX__CC_TEST_RUNNING}" ]; then
+      CHECK=1 RUN_TEST= MAILX=
+   export CHECK RUN_TEST MAILX
+fi
+
+awk='/usr/bin/awk';export awk
+cat='/bin/cat';export cat
+grep='/usr/bin/grep';export grep
+mkdir='/bin/mkdir';export mkdir
+rm='/bin/rm';export rm
+
+if [ -z "${MAILX__CC_TEST_RUNNING}" ]; then
+   MAILX__CC_TEST_RUNNING=y
+   export MAILX__CC_TEST_RUNNING
+rm -rf $OBJDIR
+mkdir -p $OBJDIR
+   exec "${SHELL}" "${0}" "${@}"
+fi
+cd $OBJDIR || exit 100
+
+DEVELDIFF= DUMPERR=
+TESTS_PERFORMED=0 TESTS_OK=0 TESTS_FAILED=0 TESTS_SKIPPED=0
+JOBS=0 JOBLIST= JOBDESC= JOBREAPER= JOBSYNC=
+SUBSECOND_SLEEP=
+   ( sleep .1 ) >/dev/null 2>&1 && SUBSECOND_SLEEP=y
+
+   TESTS_NET_TEST=
+   [ "${OPT_NET_TEST}" = 1 ] && [ -x ./net-test ] && TESTS_NET_TEST=1
+   export TESTS_NET_TEST
+
+COLOR_ERR_ON= COLOR_ERR_OFF=  COLOR_DBGERR_ON= COLOR_DBGERR_OFF=
+COLOR_WARN_ON= COLOR_WARN_OFF=
+COLOR_OK_ON= COLOR_OK_OFF=
+ESTAT=0
+TEST_NAME=
+
+trap "
+   jobreaper_stop
+" EXIT
+trap "exit 1" HUP INT QUIT TERM
+trap 'echo TTIN' TTIN
+trap 'echo TTOU' TTOU
+trap 'echo TSTP' TSTP
+trap : CHLD
+
+jobreaper_start() {
+   printf 'Starting job reaper (timeout of %s seconds)\n' ${JOBWAIT}
+
+   i=
+   trap 'i=1' USR1 # "reaper (actually a notify timer only) is up"
+   (
+      parent=${$}
+      sleeper= int=0 hot=0
+      trap '' EXIT HUP QUIT CHLD
+      trap 'exit 0' INT
+      trap '
+         [ -n "${sleeper}" ] && kill -TERM ${sleeper} >/dev/null 2>&1
+         int=1 hot=1
+      ' USR1
+      trap '
+         [ -n "${sleeper}" ] && kill -TERM ${sleeper} >/dev/null 2>&1
+         int=1 hot=0
+      ' USR2
+      trap '
+         [ -n "${sleeper}" ] && kill -TERM ${sleeper} >/dev/null 2>&1
+         echo "Stopping job reaper"
+         exit 0
+      ' TERM
+
+      # traps are setup, notify parent that we are up and running
+      kill -USR1 ${parent} >/dev/null 2>&1
+
+      while :; do
+         int=0
+         sleep ${JOBWAIT} &
+         sleeper=${!}
+         wait ${!}
+         sleeper=
+         [ "${int}${hot}" = 01 ] && kill -USR1 ${parent} >/dev/null 2>&1
+      done
+   ) </dev/null & #>/dev/null 2>&1 &
+   JOBREAPER=${!}
+
+   j=
+   if [ ${?} -eq 0 ]; then
+      while :; do
+         if [ -n "${i}" ]; then
+            trap '' USR1
+            return
+         fi
+         printf '..%s waiting for job reaper to come up\n' "${j}"
+         j=' still'
+         sleep 1 &
+         wait ${!}
+      done
+   fi
+
+   JOBREAPER=
+   printf '%s!! Cannot start the wild job reaper!%s\n' \
+      "${COLOR_ERR_ON}" "${COLOR_ERR_OFF}"
+}
+
+jobreaper_stop() {
+   [ -n "${JOBREAPER}" ] && kill -TERM ${JOBREAPER} >/dev/null 2>&1
+   JOBREAPER=
+   if [ ${JOBS} -gt 0 ]; then
+      echo 'Cleaning up running jobs'
+      jtimeout
+      wait ${JOBLIST}
+      JOBLIST=
+   fi
+}
+
+jspawn() {
+   if [ ${JOBNO} -gt 1 ]; then
+      # We are spawning multiple jobs..
+      [ ${JOBS} -eq 0 ] && printf '...'
+      JOBS=`add ${JOBS} 1`
+      printf ' [%s=%s]' ${JOBS} "${1}"
+   else
+      JOBS=1
+      # Assume problems exist, do not let user keep hanging on terminal
+      if [ -n "${RUN_TEST}" ]; then
+         printf '... [%s]\n' "${1}"
+      fi
+   fi
+
+   [ -n "${JOBMON}" ] && set -m >/dev/null 2>&1
+   (  # Place the job in its own directory to ease file management
+      trap '' EXIT HUP INT QUIT TERM USR1 USR2
+      ${mkdir} t.${JOBS}.d && cd t.${JOBS}.d &&
+         eval t_${1} ${JOBS} ${1} &&
+         ${rm} -f ../t.${JOBS}.id
+   ) > t.${JOBS}.io </dev/null & # 2>&1 </dev/null &
+   i=${!}
+   [ -n "${JOBMON}" ] && set +m >/dev/null 2>&1
+   JOBLIST="${JOBLIST} ${i}"
+   printf '%s\n%s\n' ${i} ${1} > t.${JOBS}.id
+
+   # ..until we should sync or reach the maximum concurrent number
+   [ ${JOBS} -lt ${JOBNO} ] && return
+
+   jsync 1
+}
+
+jsync() {
+   if [ ${JOBS} -eq 0 ]; then
+      [ -n "${TEST_ANY}" ] && printf '\n'
+      TEST_ANY=
+      return
+   fi
+   [ -z "${JOBSYNC}" ] && [ ${#} -eq 0 ] && return
+
+   [ ${JOBNO} -ne 1 ] && printf ' .. waiting\n'
+
+   if [ -n "${JOBREAPER}" ]; then
+      timeout= alldone=
+
+      trap 'echo TIMEOUT IN PARENT;timeout=1' USR1
+      kill -USR1 ${JOBREAPER} >/dev/null 2>&1
+
+      loops=0
+      while [ -z "${timeout}" ]; do
+         alldone=1
+         i=0
+         while [ ${i} -lt ${JOBS} ]; do
+            i=`add ${i} 1`
+            [ -f t.${i}.id ] || continue
+            alldone=
+            break
+         done
+         [ -n "${alldone}" ] && break
+
+         if [ -z "${SUBSECOND_SLEEP}" ]; then
+            loops=`add ${loops} 1`
+            [ ${loops} -lt 111 ] && continue
+            sleep 1 &
+         else
+            sleep .5 &
+         fi
+echo >&2 PREWAIT
+         wait ${!}
+      done
+
+      kill -USR2 ${JOBREAPER} >/dev/null 2>&1
+      trap '' USR1
+
+      [ -n "${timeout}" ] && jtimeout
+   fi
+
+   # Now collect the zombies
+   wait ${JOBLIST}
+   JOBLIST=
+
+   # Update global counters
+   i=0
+   while [ ${i} -lt ${JOBS} ]; do
+      i=`add ${i} 1`
+
+      if [ -f t.${i}.id ]; then
+         { read pid; read desc; } < t.${i}.id
+         desc=${desc#${desc%%[! ]*}}
+         desc=${desc%${desc##*[! ]}}
+         [ -s t.${i}.io ] && printf >&2 '\n'
+         printf >&2 '%s!! Timeout: reaped job %s [%s]%s\n' \
+            "${COLOR_ERR_ON}" ${i} "${desc}" "${COLOR_ERR_OFF}"
+         TESTS_FAILED=`add ${TESTS_FAILED} 1`
+      elif [ -s t.${i}.result ]; then
+         read es tp to tf ts < t.${i}.result
+         TESTS_PERFORMED=`add ${TESTS_PERFORMED} ${tp}`
+         TESTS_OK=`add ${TESTS_OK} ${to}`
+         TESTS_FAILED=`add ${TESTS_FAILED} ${tf}`
+         TESTS_SKIPPED=`add ${TESTS_SKIPPED} ${ts}`
+         [ "${es}" != 0 ] && ESTAT=${es}
+      else
+         TESTS_FAILED=`add ${TESTS_FAILED} 1`
+         ESTAT=1
+      fi
+   done
+
+   JOBS=0
+}
+
+jtimeout() {
+   i=0
+   while [ ${i} -lt ${JOBS} ]; do
+      i=`add ${i} 1`
+      if [ -f t.${i}.id ] &&
+            read pid < t.${i}.id >/dev/null 2>&1 &&
+            kill -0 ${pid} >/dev/null 2>&1; then
+         j=${pid}
+         [ -n "${JOBMON}" ] && j=-${j}
+         kill -KILL ${j} >/dev/null 2>&1
+      else
+         ${rm} -f t.${i}.id
+      fi
+   done
+}
+
+t_prolog() {
+   shift
+
+   ESTAT=0 TESTS_PERFORMED=0 TESTS_OK=0 TESTS_FAILED=0 TESTS_SKIPPED=0 \
+      TEST_NAME=${1} TEST_ANY=
+
+   printf '%s[%s]%s\n' "" "${TEST_NAME}" ""
+}
+
+t_epilog() {
+   [ -n "${TEST_ANY}" ] && printf '\n'
+
+   printf '%s %s %s %s %s\n' \
+      ${ESTAT} \
+         ${TESTS_PERFORMED} ${TESTS_OK} ${TESTS_FAILED} ${TESTS_SKIPPED} \
+      > ../t.${1}.result
+}
+
+t_echo() {
+   [ -n "${TEST_ANY}" ] && __i__=' ' || __i__=
+   printf "${__i__}"'%s' "${*}"
+   TEST_ANY=1
+}
+
+t_echook() {
+   [ -n "${TEST_ANY}" ] && __i__=' ' || __i__=
+   printf "${__i__}"'%s%s:ok%s' "${COLOR_OK_ON}" "${*}" "${COLOR_OK_OFF}"
+   TEST_ANY=1
+}
+
+t_echoerr() {
+   ESTAT=1
+   t_echo0err "${@}"
+}
+
+t_echo0err() {
+   [ -n "${TEST_ANY}" ] && __i__="\n" || __i__=
+   printf "${__i__}"'%sERROR: %s%s\n' \
+      "${COLOR_ERR_ON}" "${*}" "${COLOR_ERR_OFF}"
+   TEST_ANY=
+}
+
+t_echowarn() {
+   [ -n "${TEST_ANY}" ] && __i__=' ' || __i__=
+   printf "${__i__}"'%s%s%s' "${COLOR_WARN_ON}" "${*}" "${COLOR_WARN_OFF}"
+   TEST_ANY=1
+}
+
+t_echoskip() {
+   [ -n "${TEST_ANY}" ] && __i__=' ' || __i__=
+   printf "${__i__}"'%s%s[skip]%s' \
+      "${COLOR_WARN_ON}" "${*}" "${COLOR_WARN_OFF}"
+   TEST_ANY=1
+   TESTS_SKIPPED=`add ${TESTS_SKIPPED} 1`
+}
+
+check() {
+   restat=${?} tid=${1} eestat=${2} f=${3} s=${4} optmode=${5}
+
+echo >&2 CHECK $TID 0
+   TESTS_PERFORMED=`add ${TESTS_PERFORMED} 1`
+
+echo >&2 CHECK $TID 10
+   if [ -n "${CHECK}${RUN_TEST}" ]; then
+      x="t.${TEST_NAME}-${tid}"
+echo >&2 CHECK $TID 11
+      if :; then
+         y=test-out
+echo >&2 CHECK $TID 20
+echo >&2 CHECK $TID 21
+         if [ -n "${y}" ]; then
+echo >&2 CHECK $TID 22
+            if : ; then
+echo >&2 CHECK $TID 22.5
+# NOTE: REMOVE THIS (or use true(1)) AND WORKS directly and via bmake (mksh)
+# (env -i regardless, "false" also is not it, whatever)
+env -i ls -latr /NONEXISTENT
+echo >&2 CHECK $SHELL $TID 22.8
+# NOTE: monitor should be "on" here
+set -o >&2
+echo >&2 CHECK $TID 23
+            fi
+echo >&2 CHECK $TID 30
+         fi
+echo >&2 CHECK $TID 35
+      fi
+   fi
+echo >&2 CHECK $TID 100
+}
+
+check_ex0() {
+   # $1=test name [$2=status]
+   __qm__=${?}
+   [ ${#} -gt 1 ] && __qm__=${2}
+
+   TESTS_PERFORMED=`add ${TESTS_PERFORMED} 1`
+
+   if [ ${__qm__} -ne 0 ]; then
+      ESTAT=1
+      t_echoerr "${1}: unexpected non-0 exit status: ${__qm__}"
+      TESTS_FAILED=`add ${TESTS_FAILED} 1`
+   else
+      t_echook "${1}"
+      TESTS_OK=`add ${TESTS_OK} 1`
+   fi
+}
+
+check_exn0() {
+   # $1=test name [$2=status]
+   __qm__=${?}
+   [ ${#} -gt 1 ] && __qm__=${2}
+   [ ${#} -gt 2 ] && __expect__=${3} || __expect__=
+
+   TESTS_PERFORMED=`add ${TESTS_PERFORMED} 1`
+
+   if [ ${__qm__} -eq 0 ]; then
+      ESTAT=1
+      t_echoerr "${1}: unexpected 0 exit status: ${__qm__}"
+      TESTS_FAILED=`add ${TESTS_FAILED} 1`
+   elif [ -n "${__expect__}" ] && [ ${__expect__} -ne ${__qm__} ]; then
+      ESTAT=1
+      t_echoerr "${1}: unexpected exit status: ${__qm__} != ${__expected__}"
+      TESTS_FAILED=`add ${TESTS_FAILED} 1`
+   else
+      t_echook "${1}"
+      TESTS_OK=`add ${TESTS_OK} 1`
+   fi
+}
+
+color_init() {
+   :
+}
+
+if ( [ "$((1 + 1))" = 2 ] ) >/dev/null 2>&1; then
+   add() {
+      echo "$((${1} + ${2}))"
+   }
+else
+   add() {
+      ${awk} 'BEGIN{print '${1}' + '${2}'}'
+   }
+fi
+
+if ( [ "$((2 % 3))" = 2 ] ) >/dev/null 2>&1; then
+   modulo() {
+      echo "$((${1} % ${2}))"
+   }
+else
+   modulo() {
+      ${awk} 'BEGIN{print '${1}' % '${2}'}'
+   }
+fi
+
+have_feat() {
+   ( "${RAWMAILX}" ${ARGS} -X'echo $features' -Xx |
+      ${grep} +${1}, ) >/dev/null 2>&1
+}
+
+t_X_errexit() {
+   t_prolog "${@}"
+
+   </dev/null ${MAILX} ${ARGS} -Snomemdebug \
+         -X'echo one' -X' echos nono ' -X'echo two' \
+      > ./t1 2>&1
+echo >&2 PRE T1 CHEK
+   check 1 0 ./t1 '2700500141 51'
+echo >&2 AFTER T1 CHEK
+t_epilog "$@"
+return
+}
+
+ssec=$SECONDS
+      jobreaper_start
+   jspawn X_errexit
+jsync 1
+      jobreaper_stop
+esec=$SECONDS
+
+exit ${ESTAT}
+# s-sh-mode
+
+--=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="jobo.mk"
+Content-ID: <20201219172838.aGgxU%steffen@sdaoden.eu>
+
+test:
+	./mx-test.sh
+
+--=-=pqkcrSnXSAPnp6-L9YRK0aB3zMvhK_SL_sq6=-=--
