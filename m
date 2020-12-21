@@ -6,27 +6,34 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47103C433E6
-	for <linux-dash@archiver.kernel.org>; Mon, 21 Dec 2020 19:37:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7B0C433E0
+	for <linux-dash@archiver.kernel.org>; Mon, 21 Dec 2020 19:43:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0409622D49
-	for <linux-dash@archiver.kernel.org>; Mon, 21 Dec 2020 19:37:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D19F722511
+	for <linux-dash@archiver.kernel.org>; Mon, 21 Dec 2020 19:43:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbgLUThF (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Mon, 21 Dec 2020 14:37:05 -0500
-Received: from sdaoden.eu ([217.144.132.164]:49826 "EHLO sdaoden.eu"
+        id S1726033AbgLUTnn (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Mon, 21 Dec 2020 14:43:43 -0500
+Received: from sdaoden.eu ([217.144.132.164]:49828 "EHLO sdaoden.eu"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725885AbgLUThF (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 21 Dec 2020 14:37:05 -0500
+        id S1726016AbgLUTnn (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 21 Dec 2020 14:43:43 -0500
 Received: by sdaoden.eu (Postfix, from userid 1000)
-        id 636E316057; Mon, 21 Dec 2020 20:36:22 +0100 (CET)
-Date:   Mon, 21 Dec 2020 20:36:21 +0100
+        id E223416057; Mon, 21 Dec 2020 20:43:01 +0100 (CET)
+Date:   Mon, 21 Dec 2020 20:43:00 +0100
 From:   Steffen Nurpmeso <steffen@sdaoden.eu>
-To:     DASH shell mailing list <dash@vger.kernel.org>
-Subject: Re: dash 0.5.11.2: somehow falsely waits
-Message-ID: <20201221193621.eKxnM%steffen@sdaoden.eu>
-In-Reply-To: <20201220014300.8lXtI%steffen@sdaoden.eu>
-References: <20201220014300.8lXtI%steffen@sdaoden.eu>
+To:     Jilles Tjoelker <jilles@stack.nl>
+Cc:     Harald van Dijk <harald@gigawatt.nl>,
+        DASH shell mailing list <dash@vger.kernel.org>,
+        Denys Vlasenko <vda.linux@googlemail.com>
+Subject: Re: dash 0.5.11.2, busybox sh 1.32.0, FreeBSD 12.2 sh:
+ spring TTOU but should not i think
+Message-ID: <20201221194300.i8cmF%steffen@sdaoden.eu>
+In-Reply-To: <20201221162442.GA26001@stack.nl>
+References: <20201219172838.1B-WB%steffen@sdaoden.eu>
+ <20201219222122.p9UYT%steffen@sdaoden.eu>
+ <9bb6fbb5-20e1-eae1-0144-67a4c7e20496@gigawatt.nl>
+ <20201221162442.GA26001@stack.nl>
 User-Agent: s-nail v14.9.20-84-g7268a84d
 OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
  url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
@@ -36,93 +43,56 @@ Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-Hello on a Monday.
-
-Steffen Nurpmeso wrote in
- <20201220014300.8lXtI%steffen@sdaoden.eu>:
- |There is another issue with at least dash (the others not yet
- |tested).  I cloned the git repo and it is still present at
- |6ba88b3ed28fb4b52f20b730194c4ad3d8aad037.
+Jilles Tjoelker wrote in
+ <20201221162442.GA26001@stack.nl>:
+ |On Sat, Dec 19, 2020 at 11:52:31PM +0000, Harald van Dijk wrote:
+ |> On 19/12/2020 22:21, Steffen Nurpmeso wrote:
+ |>> Steffen Nurpmeso wrote in
+ |>>   <20201219172838.1B-WB%steffen@sdaoden.eu>:
+ |>>|Long story short, after falsely accusing BSD make of not working
  |
- |With the original test script of what is in "Re: dash 0.5.11.2,
- |busybox sh 1.32.0, FreeBSD 12.2 sh: spring TTOU but should not
- |i think" the sleeper will randomly wake too early for whatever
- |reason.  The sleeper is:
+ |>> After dinner i shortened it a bit more, and attach it again, ok?
+ |>> It is terrible, but now less redundant than before.
+ |>> Sorry for being so terse, that problem crosses my head for about
+ |>> a week, and i was totally mislead and if you bang your head
+ |>> against the wall so many hours bugs or misbehaviours in a handful
+ |>> of other programs is not the expected outcome.
  |
- |  i=
- |  trap 'i=1' USR1 # "reaper (actually a notify timer only) is up"
- |  (
- |      parent=${$}
- |      sleeper= int=0 hot=0
- |      trap '' EXIT HUP QUIT CHLD
- |      trap 'exit 0' INT
- |      trap '
- |         int=1 hot=1
- |         [ -n "${sleeper}" ] && kill -TERM ${sleeper} >/dev/null 2>&1
- |      ' USR1
- |      trap '
- |         int=1 hot=0
- |         [ -n "${sleeper}" ] && kill -TERM ${sleeper} >/dev/null 2>&1
- |      ' USR2
- |      trap '
- |         [ -n "${sleeper}" ] && kill -TERM ${sleeper} >/dev/null 2>&1
- |         echo "Stopping job reaper"
- |         exit 0
- |      ' TERM
+ |> I think a minimal test case is simply
  |
- |      # traps are setup, notify parent that we are up and running
- |      kill -USR1 ${parent} >/dev/null 2>&1
+ |> all:
+ |>         $(SHELL) -c 'trap "echo TTOU" TTOU; set -m; echo all good'
  |
- |      while :; do
- |         int=0
- |         /bin/sleep ${JOBWAIT} &
- |         sleeper=${!}
- |         wait ${sleeper}
- |         sleeper=
- |         [ "${int}${hot}" = 01 ] && kill -USR1 ${parent} >/dev/null 2>&1
- |      done
- |   ) </dev/null & #>/dev/null 2>&1 &
- |   JOBREAPER=${!}
+ |> unless I accidentally oversimplified.
+ |
+ |Yes, and it can be simplified a bit more to remove make from the
+ |picture:
+ |    (SHELL -c 'trap "echo TTOU" TTOU; set -m; echo all good'; :)
 
-What seems to work absolutely reliable on Linux is
+Cool, .. but it all seems to depend on the outer shell
 
-   i=
-   trap 'i=1' USR1 # "reaper (actually a notify timer only) is up"
-   (
-      parent=${$}
-      sleeper=
-      trap '' EXIT HUP QUIT CHLD
-      trap 'exit 0' INT
-      trap '
-         (
-            trap 'exit 1' TERM
-            /bin/sleep ${JOBWAIT}
-            kill -USR1 ${parent} >/dev/null 2>&1
-         ) </dev/null &
-         sleeper=${!}
-      ' USR1
-      trap '
-         [ -n "${sleeper}" ] && kill -TERM ${sleeper} >/dev/null 2>&1
-         sleeper=
-      ' USR2
-      trap '
-         [ -n "${sleeper}" ] && kill -TERM ${sleeper} >/dev/null 2>&1
-         echo "Stopping job reaper"
-         exit 0
-      ' TERM
+  #$ bash -c  "( /bin/dash -c 'trap echo\ TTOU TTOU; set -m; echo all good' )"
+  /bin/dash: 1: set: Cannot set tty process group (Interrupted system call)
+  #$ mksh -c  "( /bin/dash -c 'trap echo\ TTOU TTOU; set -m; echo all good' )"
+  /bin/dash: 1: set: Cannot set tty process group (Interrupted system call)
+  #$ dash -c  "( /bin/dash -c 'trap echo\ TTOU TTOU; set -m; echo all good' )"
+  all good
 
-      # traps are setup, notify parent that we are up and running
-      kill -USR1 ${parent} >/dev/null 2>&1
+which results in the funny experience
 
-      while :; do
-         sleep >/dev/null 2>&1
-      done
-   ) </dev/null & #>/dev/null 2>&1 &
-   JOBREAPER=${!}
+  #?0|kent:tmp$ smake -f t.mk SHELL=/bin/bash
+  .../bin/bash -c 'trap "echo TTOU" TTOU; set -m; echo all good'
+  all good
+  #?0|kent:tmp$ smake -f t.mk SHELL=/bin/mksh
+  .../bin/mksh -c 'trap "echo TTOU" TTOU; set -m; echo all good'
+  all good
+  #?0|kent:tmp$ smake -f t.mk SHELL=/bin/dash
+  .../bin/dash -c 'trap "echo TTOU" TTOU; set -m; echo all good'
+  /bin/dash: 1: set: Cannot set tty process group (Interrupted system call)
+  smake: *** Code 2 (No such file or directory) from command line for target 'all'.
+  smake: Couldn't make 'all'.
 
-Unfortunately this causes all sorts of trouble on a lot of other
-shells on Solaris at least, with and without backgrounding the
-sleeper and waiting on it in the USR1 trap.
+Ah, it is a Monday ..
 
 --steffen
 |
