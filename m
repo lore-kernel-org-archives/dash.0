@@ -2,221 +2,117 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76851C433DB
-	for <linux-dash@archiver.kernel.org>; Wed, 23 Dec 2020 19:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C875DC433E0
+	for <linux-dash@archiver.kernel.org>; Wed, 23 Dec 2020 20:19:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 338D5223E4
-	for <linux-dash@archiver.kernel.org>; Wed, 23 Dec 2020 19:49:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F7432151B
+	for <linux-dash@archiver.kernel.org>; Wed, 23 Dec 2020 20:19:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727671AbgLWTtF (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 23 Dec 2020 14:49:05 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:43815 "EHLO
-        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726147AbgLWTtA (ORCPT
-        <rfc822;dash@vger.kernel.org>); Wed, 23 Dec 2020 14:49:00 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.nyi.internal (Postfix) with ESMTP id 55D075C0124;
-        Wed, 23 Dec 2020 14:48:09 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Wed, 23 Dec 2020 14:48:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=causal.agency;
-         h=from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=fm3; bh=wWOkjifVm5VbuTZ2GFdcO1Duoq
-        0B7XwyhcX84ZEI+N4=; b=cNqvCBnOtMBd75DEinzJX0oFk2qd1F/olzIb1vm/XF
-        EIwhUDjNuzoiHDpN8kjx7ZEMfbIdIC7o+akq3odGMdsNckdUUupyMsFXL1jElwvX
-        iuXJNDgA1CT000mO0i4WqZMCaGRgQHs7aQmU1xrJ+gDchXkcig8nsCYkuqK31okw
-        qZZn/uOr6CSv0+fyf8ONeY9Txmg6dE1tcapO4Wgpzhzd9ZK/5cJk6s8Z4F2dzAu2
-        YC2LQn5jVMTuTHvvLdVmx2CINllbYmOU9iI7M/PYZWVEURPRw5YpWy0pwNIhjGK0
-        qJ5Hwjk+ridorxrXnroHIZudyZ17eYzNK+pSLwlHvMQQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=wWOkjifVm5VbuTZ2G
-        FdcO1Duoq0B7XwyhcX84ZEI+N4=; b=SjirTVW0toOtXHPLNcigie56uTbWjQz2k
-        WvWjnoHzz2+vRN2jx2q2zFV4oIwwzwD6EoJ2F3+/LKRW6rwhmFaIUDqc8Y9DiYSh
-        h1fWDs/WW1Zcn9iS8z64hPByuPY8fcHX3v9Uw6Ko660VaFTuPKVJYLqVUPDRQex8
-        FZs90/jAUz75lhgI8aW+S8uLNGAJPZTEbhP6sfxdk2LUStq2OPWG81U0r3YzDNZ3
-        skRT70bH+2xSGGpWK/1Hka6gLSBqa7C/pj2xUEgbprOdNPOVAo4+XzErcW03macb
-        MTRzF9bo0WaTsRvJg7DX4Q3rydmZfWD9JkXHGeFKbxgt90uwGxmyg==
-X-ME-Sender: <xms:-Z7jX4biHvFuOoe0tahvsImYUp9RAxRf9XTcN4MsRXiTOmqzUbSMvA>
-    <xme:-Z7jXzbzKLmoXOImjmyBAGEk6WpdUXEk6pN7g9EoouDDynSGcZ6int39wqmdW36XS
-    gnme7RcE-divT0sZU4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvddtjedguddvlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkffoggfgsedtkeertd
-    ertddtnecuhfhrohhmpedfvedrucfotgfgnhhrohgvfdcuoehjuhhnvgestggruhhsrghl
-    rdgrghgvnhgthieqnecuggftrfgrthhtvghrnhepueehkeeitefghfdugeelffelvdevhf
-    eivdeitdehtefgffdvledukefhhfeiieehnecukfhppedutdegrdduieefrdduledtrddv
-    vdelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjh
-    hunhgvsegtrghushgrlhdrrghgvghntgih
-X-ME-Proxy: <xmx:-Z7jXy9qGqISb4kPlma54IKTzpWOLip5L1hVQ0JE-PsdzpkffFGtng>
-    <xmx:-Z7jXyrc3KrCfeCyTIl4ig0yPll7PoKA-35ra-6ZlZ2SdX1_m8704A>
-    <xmx:-Z7jXzo-08wJE3WpFmtH2-3lWXQAaurbyFi1OhfxDB37IVeROTzsag>
-    <xmx:-Z7jX9EW6G1_1Se3VbSXwo5a3deNIWoV_H1Ek6pEcWKe7IeEuZZ6cQ>
-Received: from localhost.localdomain (unknown [104.163.190.229])
-        by mail.messagingengine.com (Postfix) with ESMTPA id BEDF324005A;
-        Wed, 23 Dec 2020 14:48:08 -0500 (EST)
-From:   "C. McEnroe" <june@causal.agency>
-To:     dash@vger.kernel.org
-Cc:     "C. McEnroe" <june@causal.agency>
-Subject: [PATCH] Cache the expanded prompt for editline
-Date:   Wed, 23 Dec 2020 14:47:41 -0500
-Message-Id: <20201223194741.65087-1-june@causal.agency>
-X-Mailer: git-send-email 2.29.2
+        id S1728336AbgLWUTI (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 23 Dec 2020 15:19:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60186 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727360AbgLWUTI (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 23 Dec 2020 15:19:08 -0500
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D9EE3C061794
+        for <dash@vger.kernel.org>; Wed, 23 Dec 2020 12:18:27 -0800 (PST)
+Received: from [10.47.192.29] (92.40.195.40.threembb.co.uk [92.40.195.40])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id 7F1A34AE;
+        Wed, 23 Dec 2020 21:18:25 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 7F1A34AE
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1608754705;
+        bh=gPy9XylEa1NPt1ZudHFQyzbwC/Fxe03kNBGjKM9jDCU=; l=2509;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=gcE291wBMjU0tOojzBN4t/natzh2UdvsiXnoUZR8XE8is6dzHvgD09TZ/D/KpMDzL
+         t+Y9lSIQniX8FiBxtsaq0/f0BiXSr2Q6oYT4wQ08bH1zFn6u1dnG5I7UENRUkUp9tu
+         DC0G9hTu9+rplAC4K7eWbxwx8GQ4WrL06EOfJKk8=
+Subject: Re: dash 0.5.11.2, busybox sh 1.32.0, FreeBSD 12.2 sh: spring TTOU
+ but should not i think
+To:     Jilles Tjoelker <jilles@stack.nl>
+Cc:     Steffen Nurpmeso <steffen@sdaoden.eu>,
+        DASH shell mailing list <dash@vger.kernel.org>,
+        Denys Vlasenko <vda.linux@googlemail.com>
+References: <20201219172838.1B-WB%steffen@sdaoden.eu>
+ <20201219222122.p9UYT%steffen@sdaoden.eu>
+ <9bb6fbb5-20e1-eae1-0144-67a4c7e20496@gigawatt.nl>
+ <20201221162442.GA26001@stack.nl>
+From:   Harald van Dijk <harald@gigawatt.nl>
+Message-ID: <bf6e1634-e472-1e9f-056a-ae98be7ec9d1@gigawatt.nl>
+Date:   Wed, 23 Dec 2020 20:18:24 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201221162442.GA26001@stack.nl>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-Previously, the prompt would be expanded every time editline called the
-getprompt callback. I think the code may have been written assuming that
-editline only calls getprompt once per prompt, but it may actually call
-it many times, for instance every time you type backspace. This results
-not only in slower editing from expanding complex prompts repeatedly, it
-also consumes more and more stack memory each time getprompt is called.
-This can be seen by setting PS1 to some command substitution, typing
-many characters at the prompt, then holding backspace and observing
-memory usage. Thankfully all this stack memory is freed between prompts
-by the stackmark calls around el_gets.
+On 21/12/2020 16:24, Jilles Tjoelker wrote:
+> Also, simply entering the command
+>      trap "echo TTOU" TTOU
+> in an interactive shell makes it behave strangely. Created jobs
+> immediately stop, "fg" works once but after that the shell tends to get
+> stuck quickly.
 
-This change causes prompt expansion to always happen in the setprompt
-call, as it would when editline is disabled, and a cached copy of the
-prompt is saved for getprompt to return every time editline calls it.
-Since getprompt is no longer doing expansion, the stackmark calls
-surrounding el_gets can be removed.
----
- src/input.c  |  6 +----
- src/parser.c | 64 ++++++++++++++++++++++++++++------------------------
- 2 files changed, 35 insertions(+), 35 deletions(-)
+Good catch, there is some work to be done there too.
 
-diff --git a/src/input.c b/src/input.c
-index 17544e7..4167bd1 100644
---- a/src/input.c
-+++ b/src/input.c
-@@ -152,12 +152,8 @@ retry:
- 		static const char *rl_cp;
- 		static int el_len;
- 
--		if (rl_cp == NULL) {
--			struct stackmark smark;
--			pushstackmark(&smark, stackblocksize());
-+		if (rl_cp == NULL)
- 			rl_cp = el_gets(el, &el_len);
--			popstackmark(&smark);
--		}
- 		if (rl_cp == NULL)
- 			nr = 0;
- 		else {
-diff --git a/src/parser.c b/src/parser.c
-index a47022e..d03697b 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -107,6 +107,9 @@ struct heredoc *heredoc;
- int quoteflag;			/* set if (part of) last token was quoted */
- 
- 
-+static char *promptcache;
-+
-+
- STATIC union node *list(int);
- STATIC union node *andor(void);
- STATIC union node *pipeline(void);
-@@ -1541,27 +1544,6 @@ synerror(const char *msg)
- 	/* NOTREACHED */
- }
- 
--STATIC void
--setprompt(int which)
--{
--	struct stackmark smark;
--	int show;
--
--	needprompt = 0;
--	whichprompt = which;
--
--#ifdef SMALL
--	show = 1;
--#else
--	show = !el;
--#endif
--	if (show) {
--		pushstackmark(&smark, stackblocksize());
--		out2str(getprompt(NULL));
--		popstackmark(&smark);
--	}
--}
--
- const char *
- expandstr(const char *ps)
- {
-@@ -1611,22 +1593,23 @@ out:
- 	return result;
- }
- 
--/*
-- * called by editline -- any expansions to the prompt
-- *    should be added here.
-- */
--const char *
--getprompt(void *unused)
-+STATIC void
-+setprompt(int which)
- {
-+	struct stackmark smark;
- 	const char *prompt;
-+	int show;
-+
-+	needprompt = 0;
-+	whichprompt = which;
- 
- 	switch (whichprompt) {
- 	default:
- #ifdef DEBUG
--		return "<internal prompt error>";
-+		prompt = "<internal prompt error>";
- #endif
- 	case 0:
--		return nullstr;
-+		prompt = nullstr;
- 	case 1:
- 		prompt = ps1val();
- 		break;
-@@ -1635,7 +1618,28 @@ getprompt(void *unused)
- 		break;
- 	}
- 
--	return expandstr(prompt);
-+#ifdef SMALL
-+	show = 1;
-+#else
-+	show = !el;
-+#endif
-+	pushstackmark(&smark, stackblocksize());
-+	if (show) {
-+		out2str(expandstr(prompt));
-+	} else {
-+		free(promptcache);
-+		promptcache = savestr(expandstr(prompt));
-+	}
-+	popstackmark(&smark);
-+}
-+
-+/*
-+ * called by editline -- return the cached prompt expansion.
-+ */
-+const char *
-+getprompt(void *unused)
-+{
-+	return promptcache;
- }
- 
- const char *const *
--- 
-2.29.2
+> This seems a good approach, but certain writes to the terminal may need
+> the same treatment, for example the error message when fork fails for
+> the second and further elements of a pipeline. This also makes me wonder
+> why SIGTTOU is ignored at all by default.
 
+True. This is hard to create a reliable test case for, but there is only 
+limited code that can get executed while a job-control-enabled shell may 
+not be in the foreground process group.
+
+If fork fails halfway through a pipeline, it may also be a problem that 
+some of the commands in the pipeline may still run.
+
+> In mksh, the issue is resolved slightly differently: setting a trap on
+> TTOU pretends to work but the signal disposition remains set to ignored.
+
+zsh also rejects traps on TTOU, but does so explicitly:
+
+   zsh: can't trap SIGTTOU in interactive shells
+
+Amusingly, it prints this in any shell where job control is enabled, 
+regardless of whether the shell is interactive.
+
+> Tradition is for job control shells to be a process group leader, but I
+> don't really know why. Changing this will not fix the issue entirely
+> anyway since the shell must perform tcsetpgrp() from the background when
+> a foreground job has terminated.
+
+I've been thinking more about this, and I suspect it's a another 
+conflation between interactive mode and job control. In an interactive 
+shell that's not executing any external program, you want any Ctrl-C to 
+only send SIGINT to that shell, not to any other process. In order for 
+that to work, it needs to be its own process group.
+
+This should, in my opinion, *only* happen for interactive shells, not 
+for job-control-enabled non-interactive shells. Consider
+
+   sh -c 'sh -mc "while :; do :; done"; echo bye'
+
+The behaviour I would want is that Ctrl-C kills the parent shell, so 
+that this does not print "bye". Different shells behave differently.
+
+> What is definitely required, though, is that the shell not read input or
+> alter terminal settings if it is started in the background (possibly
+> unless the script explicitly ignored SIGTTOU). This is what the loop
+> with tcgetpgrp() does.
+
+Definitely.
+
+Cheers,
+Harald van Dijk
