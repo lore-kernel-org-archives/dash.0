@@ -2,91 +2,223 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90626C433E9
-	for <linux-dash@archiver.kernel.org>; Sat, 30 Jan 2021 16:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA83C433E0
+	for <linux-dash@archiver.kernel.org>; Sun, 31 Jan 2021 09:33:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 543E064E11
-	for <linux-dash@archiver.kernel.org>; Sat, 30 Jan 2021 16:22:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51C4D64E11
+	for <linux-dash@archiver.kernel.org>; Sun, 31 Jan 2021 09:33:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231861AbhA3QWe (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sat, 30 Jan 2021 11:22:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231886AbhA3PdA (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sat, 30 Jan 2021 10:33:00 -0500
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
-        by lindbergh.monkeyblade.net (Postfix) with UTF8SMTP id 82F54C06178A
-        for <dash@vger.kernel.org>; Sat, 30 Jan 2021 07:31:34 -0800 (PST)
-Received: from [IPv6:2a02:8010:68a1:0:3c8e:f6c9:90d1:c02a] (unknown [IPv6:2a02:8010:68a1:0:3c8e:f6c9:90d1:c02a])
-        by mail.gigawatt.nl (Postfix) with UTF8SMTPSA id 09B1CD45;
-        Sat, 30 Jan 2021 16:31:31 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 09B1CD45
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-        s=default; t=1612020692;
-        bh=19b5h2vaRjRpthTWb3luHXvrNMXvIXbmu1g+6bVZ2oc=; l=2073;
-        h=Subject:From:To:References:Date:In-Reply-To:From;
-        b=nn74vBCGCByaOrcV8lu2Pmx2wJqmUXFSf8ve03gRGpWgo2xyZHm433q8mpcqEf7Oi
-         CB03NQNsuvpdLuPA8U5q4iEFGoj86fOc+Q1nxS6voq0NZMqflK0pJdMAzKN/vFi3VP
-         uoXEXRZ2vVm8kXy0azF3rxt1bSUdGkXRob5zACKk=
-Subject: Re: getopts appears to not be shifting $@ when consuming options
-From:   Harald van Dijk <harald@gigawatt.nl>
-To:     earnestly <zibeon@gmail.com>, dash@vger.kernel.org
-References: <YBRTFXGM6pLwR5hg@teapot>
- <c5b375e0-e6b4-df94-3dbd-26c05ecbe688@gigawatt.nl>
-Message-ID: <7853ad4d-0eaf-3e91-d5bd-c7a969ed447f@gigawatt.nl>
-Date:   Sat, 30 Jan 2021 15:31:34 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101
- Thunderbird/85.0
+        id S229748AbhAaJcw (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sun, 31 Jan 2021 04:32:52 -0500
+Received: from ns.simtreas.ru ([94.25.26.30]:34906 "EHLO ns.simtreas.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229530AbhAaJa0 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 31 Jan 2021 04:30:26 -0500
+Received: from dzo.ulttk.ru (IDENT:1000@dzo-home-tun.ufk68.roskazna.local [192.168.68.4])
+        by ns.simtreas.ru (8.14.2/8.14.2) with ESMTP id 10V9TWK8001663;
+        Sun, 31 Jan 2021 13:29:33 +0400
+Subject: [PATCH]: allow recursive variable inderection in arith
+From:   "Vladimir N. Oleynik" <dzo@simtreas.ru>
+To:     dash@vger.kernel.org
+References: <08178d03-1912-76e7-0733-75e8f1d691af@simtreas.ru>
+Cc:     "Vladimir N. Oleynik" <dzo@simtreas.ru>
+Organization: Ulyanovsk Treasury
+Message-ID: <ecf90382-e5b9-9b0c-c73b-c564a660ee20@simtreas.ru>
+Date:   Sun, 31 Jan 2021 13:29:36 +0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Firefox/60.0 SeaMonkey/2.53.5.1
 MIME-Version: 1.0
-In-Reply-To: <c5b375e0-e6b4-df94-3dbd-26c05ecbe688@gigawatt.nl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <08178d03-1912-76e7-0733-75e8f1d691af@simtreas.ru>
+Content-Type: multipart/mixed;
+ boundary="------------693E1DBEBF28AB9647C1A68D"
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.0.1 (ns.simtreas.ru [94.25.26.30]); Sun, 31 Jan 2021 13:29:33 +0400 (SAMT)
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On 29/01/2021 20:15, Harald van Dijk wrote:
-> I would suggest that if this is changed to conform to POSIX, a 
-> non-standard method should remain available to allow shell functions to 
-> use getopts internally, including when the getopts loop in the function 
-> calls other functions that themselves use getopts, to ensure that any 
-> existing scripts broken by the change can be easily updated. One way to 
-> achieve that could be to special-case "local OPTIND=1" so that when the 
-> function returns, it restores not just the value of OPTIND, but uses 
-> that moment to additionally restore the extra internal state.
+This is a multi-part message in MIME format.
+--------------693E1DBEBF28AB9647C1A68D
+Content-Type: text/plain; charset=KOI8-R; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I have found that "local OPTIND=1" already works that way in bash, 
-restoring upon function return not only the value of OPTIND but also the 
-extra internal extra state. It is designed to work like that, not just a 
-happy accident: it is listed as a new feature of 4.4. Because of that, 
-if something like this is implemented, this would probably be the best 
-syntax to use.
+Hello.
 
-I have also found that this is easy to implement: currently, 
-getoptsreset() just sets the internal state (shellparam.optind and 
-shellparam.optoff) based on the text value of OPTIND. Instead, if:
-- var.h defines a new flag to indicate that special hidden data is
-   present past the end of OPTIND's text value,
-- getopts() builds its own buffer, including the extra hidden data, and
-   calls setvareq() directly with that special flag rather than relying
-   on setvarint(),
-- getoptsreset() checks it to either set the internal state as before
-   or restore the internal state, depending on whether that special flag
-   is set,
-everything just works with no special casing needed in the 
-implementation of the "local" command. The net result is even a small 
-reduction in code size.
 
-I am only posting a description of the changes rather than a patch or a 
-link to a patch because I implemented this in my shell (a fork of dash), 
-not dash itself, and the changes as I implemented them cannot be applied 
-to dash without some modifications.
+My patch for allow recursive variable inderection in arith
+and simplify allow $(( )). Originaly from my arith in busybox
 
-Cheers,
-Harald van Dijk
+Before patch:
+$ a=b b=2; echo $((a))
+dash: 1: Illegal number: b
+
+After patch:
+$ a=b b=2; echo $((a))
+2
+a=b b="a*2"; echo $((a))
+./dash: 4: arithmetic expression: expression recursion loop detected: "a"
+
+
+--w
+vodz
+
+--------------693E1DBEBF28AB9647C1A68D
+Content-Type: text/plain; charset=UTF-8;
+ name="arith_diff.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="arith_diff.txt"
+
+--- arith_yacc.c.orig   2020-12-23 11:58:12.000000000 +0400
++++ arith_yacc.c        2021-01-31 13:19:00.790119536 +0400
+@@ -34,6 +34,7 @@
+
+ #include <inttypes.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include "arith_yacc.h"
+ #include "expand.h"
+ #include "shell.h"
+@@ -134,6 +135,50 @@
+
+ static intmax_t assignment(int var, int noeval);
+
++typedef struct CHK_VAR_RECURSIVE_LOOPED {
++       const char *name;
++       struct CHK_VAR_RECURSIVE_LOOPED *next;
++} chk_var_recursive_looped_t;
++
++static chk_var_recursive_looped_t *prev_chk_var_recursive;
++
++static intmax_t arith_lookup_val(const char *name)
++{
++       const char * p = lookupvar(name);
++
++       if(p) {
++           intmax_t ret;
++
++           /* recursive try as expression */
++           chk_var_recursive_looped_t *cur;
++           chk_var_recursive_looped_t cur_save;
++           const char *arith_buf_s;
++           int lt;
++
++           for(cur = prev_chk_var_recursive; cur; cur = cur->next) {
++               if(!strcmp(cur->name, name))
++                   yyerror("expression recursion loop detected");
++           }
++           /* save current lookuped var name */
++           cur = prev_chk_var_recursive;
++           cur_save.name = name;
++           cur_save.next = cur;
++           prev_chk_var_recursive = &cur_save;
++
++           arith_buf_s = arith_buf;
++           lt = last_token;
++           ret = arith (p, 1);
++           /* restore previous after recursiving */
++           prev_chk_var_recursive = cur;
++           arith_buf = arith_buf_s;
++           last_token = lt;
++           return ret;
++       } else {
++           /* allow undefined var as 0 */
++           return 0;
++       }
++}
++
+ static intmax_t primary(int token, union yystype *val, int op, int noeval)
+ {
+	intmax_t result;
+@@ -151,7 +196,7 @@
+		return val->val;
+	case ARITH_VAR:
+		last_token = op;
+-               return noeval ? val->val : lookupvarint(val->name);
++               return noeval ? val->val : arith_lookup_val(val->name);
+	case ARITH_ADD:
+		token = op;
+		*val = yylval;
+@@ -286,16 +331,27 @@
+
+	return setvarint(val.name,
+			 op == ARITH_ASS ? result :
+-                        do_binop(op - 11, lookupvarint(val.name), result), 0);
++                        do_binop(op - 11, arith_lookup_val(val.name), result), 0);
+ }
+
+-intmax_t arith(const char *s)
++intmax_t arith(const char *s, int r)
+ {
+	intmax_t result;
++       int l0;
+
+-       arith_buf = arith_startbuf = s;
++       arith_buf = s;
++       last_token = 0;
+
+-       result = assignment(yylex(), 0);
++       if(!r) {
++               prev_chk_var_recursive = (chk_var_recursive_looped_t *)0;
++               arith_startbuf = s;
++       }
++       l0 = yylex();
++       if (l0 == 0) {
++               /* $(( )) */
++               return 0;
++       }
++       result = assignment(l0, 0);
+
+	if (last_token)
+		yyerror("expecting EOF");
+--- expand.c.orig       2020-12-23 11:58:12.000000000 +0400
++++ expand.c    2021-01-31 12:39:07.083194412 +0400
+@@ -460,7 +460,7 @@
+		rmescapes(start);
+
+	pushstackmark(&sm, endoff);
+-       result = arith(start);
++       result = arith(start, 0);
+	popstackmark(&sm);
+
+	len = cvtnum(result, flag);
+--- expand.h.orig       2020-12-23 11:58:12.000000000 +0400
++++ expand.h    2021-01-31 12:39:09.435194338 +0400
+@@ -73,7 +73,7 @@
+ void ifsfree(void);
+
+ /* From arith.y */
+-intmax_t arith(const char *);
++intmax_t arith(const char *, int r);
+ int expcmd(int , char **);
+ #ifdef USE_LEX
+ void arith_lex_reset(void);
+--- var.c.orig  2020-12-23 11:58:12.000000000 +0400
++++ var.c       2021-01-31 12:30:38.894210308 +0400
+@@ -322,12 +322,6 @@
+	return NULL;
+ }
+
+-intmax_t lookupvarint(const char *name)
+-{
+-       return atomax(lookupvar(name) ?: nullstr, 0);
+-}
+-
+-
+
+ /*
+--- var.h.orig  2020-12-23 11:58:12.000000000 +0400
++++ var.h       2021-01-31 12:30:45.150210113 +0400
+@@ -140,7 +140,6 @@
+ struct var *setvareq(char *s, int flags);
+ struct strlist;
+ char *lookupvar(const char *);
+-intmax_t lookupvarint(const char *);
+ char **listvars(int, int, char ***);
+ #define environment() listvars(VEXPORT, VUNSET, 0)
+ int showvars(const char *, int, int);
+
+--------------693E1DBEBF28AB9647C1A68D--
