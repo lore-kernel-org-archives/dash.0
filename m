@@ -2,123 +2,66 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 389FDC433F5
-	for <linux-dash@archiver.kernel.org>; Sun, 28 Nov 2021 16:47:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C53DFC433F5
+	for <linux-dash@archiver.kernel.org>; Sun, 28 Nov 2021 16:59:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234770AbhK1Qur (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sun, 28 Nov 2021 11:50:47 -0500
-Received: from smtpout01-ext2.partage.renater.fr ([194.254.240.33]:55070 "EHLO
-        smtpout01-ext2.partage.renater.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238229AbhK1Qsr (ORCPT
-        <rfc822;dash@vger.kernel.org>); Sun, 28 Nov 2021 11:48:47 -0500
-X-Greylist: delayed 510 seconds by postgrey-1.27 at vger.kernel.org; Sun, 28 Nov 2021 11:48:47 EST
-Received: from zmtaauth01.partage.renater.fr (zmtaauth01.partage.renater.fr [194.254.240.25])
-        by smtpout10.partage.renater.fr (Postfix) with ESMTP id 4CC526217D;
-        Sun, 28 Nov 2021 17:36:57 +0100 (CET)
-Received: from zmtaauth01.partage.renater.fr (localhost [127.0.0.1])
-        by zmtaauth01.partage.renater.fr (Postfix) with ESMTPS id 4077E140861;
-        Sun, 28 Nov 2021 17:36:57 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by zmtaauth01.partage.renater.fr (Postfix) with ESMTP id 2C5EA140860;
-        Sun, 28 Nov 2021 17:36:57 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmtaauth01.partage.renater.fr 2C5EA140860
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unistra.fr;
-        s=CF279DD4-6F58-4C59-BB33-73FDC6DFC1E3; t=1638117417;
-        bh=S4d8il/DaNVkUUf/jq7O3x6Pr7As6RG3Iv5fRN1mXq4=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=CCKei7RRqK+UU2HfEq20msEc0XcN1p5652q8bH+B2r8rHH0k/E4KI8edbHq6BW/mz
-         kR8rsSkawsUSTjNOsx+j/CSCvZM2MHp41x1HPyqkmbTTfB4AP6VidPMIIT77hfWIa/
-         xR7KiVfKrErVIH/7xKJxpKChFfuDEQlP/swduKZyE3Eaj9Rk9J0f8f97Q9/FgyZBIV
-         gxcI+XZRHq6jdT2l7O+PXhNqUyuyYxLqezp+7EJWNGBkxKaeLkV4IQ8fQSP4p3FzME
-         DTx796GSOHUyXHFk9J7sJQ8nA6VqqWMn3JWrcb+r4EalFeLJb5RpjpJPtmC5DIe7ZO
-         coyzBjiB2Uf7Q==
-X-Virus-Scanned: amavisd-new at zmtaauth01.partage.renater.fr
-Received: from zmtaauth01.partage.renater.fr ([127.0.0.1])
-        by localhost (zmtaauth01.partage.renater.fr [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id PBVWepetsTvG; Sun, 28 Nov 2021 17:36:57 +0100 (CET)
-Received: from 82.65.50.238 (unknown [194.254.241.250])
-        by zmtaauth01.partage.renater.fr (Postfix) with ESMTPA id DA7CE140867;
-        Sun, 28 Nov 2021 17:36:56 +0100 (CET)
-Date:   Sun, 28 Nov 2021 17:36:55 +0100
-From:   Marc Chantreux <mc@unistra.fr>
-To:     Harald van Dijk <harald@gigawatt.nl>
-Cc:     dash@vger.kernel.org
+        id S231602AbhK1RDC (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sun, 28 Nov 2021 12:03:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40830 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229606AbhK1RBB (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 28 Nov 2021 12:01:01 -0500
+X-Greylist: delayed 8939 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 28 Nov 2021 08:57:45 PST
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A0E3FC061746
+        for <dash@vger.kernel.org>; Sun, 28 Nov 2021 08:57:45 -0800 (PST)
+Received: from [IPV6:2a02:8010:68a1:0:7982:e2b0:bbb7:1729] (unknown [IPv6:2a02:8010:68a1:0:7982:e2b0:bbb7:1729])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id AA7B219C;
+        Sun, 28 Nov 2021 16:57:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl AA7B219C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1638118664;
+        bh=9s8JNc4yCemsKofMLurRTGWpzftkJqAfUTSSQuZOKQg=; l=711;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=KT9x3ygaSSygBjIL5cfw6WF0wkhCkruIUclDKj8yqZjn9gJ2lGx/PBRCsHRwkgrF2
+         GTATVpzruf0qTEySvFmE8So2XZ/Y9+rxVh0DjLaWhdi7OjwfXhj288YKOaryGL+jIT
+         vdwozooSAef9bAW6uPYtwiPMlTFWUmq8FEsr4HtY=
+Message-ID: <da2913f2-b675-7bc0-9f8b-f2bfddedb9ca@gigawatt.nl>
+Date:   Sun, 28 Nov 2021 16:57:42 +0000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101
+ Thunderbird/95.0
 Subject: Re: no match should be no string ?
-Message-ID: <YaOwJ9TVHsDrnIbM@prometheus.u-strasbg.fr>
+Content-Language: en-GB
+To:     Marc Chantreux <mc@unistra.fr>
+Cc:     dash@vger.kernel.org
 References: <YaOOIf2d6tLP8xtw@prometheus.u-strasbg.fr>
  <65da119f-ad21-ff18-11cd-3157b02cb22d@gigawatt.nl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <65da119f-ad21-ff18-11cd-3157b02cb22d@gigawatt.nl>
-X-Renater-Ptge-SpamState: clean
-X-Renater-Ptge-SpamScore: -100
-Content-Transfer-Encoding: quoted-printable
+ <YaOwJ9TVHsDrnIbM@prometheus.u-strasbg.fr>
+From:   Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <YaOwJ9TVHsDrnIbM@prometheus.u-strasbg.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-hello,
+On 28/11/2021 16:36, Marc Chantreux wrote:
+> * the ambiguity when $# is 1: there is no way to know if i have no match
+>    or if a very bad person named its file \*no_way_this_glob_matches\*.
 
-> Hi, yes, this is expected, this is standard POSIX sh behaviour and
-> implemented by all POSIX sh-compatible shells. It should even be what z=
-sh
-> does when running in POSIX mode, but I do not have it installed right n=
-ow to
-> check.
+Agreed that that is annoying.
 
-You're right!
+If your pattern includes literal characters, there is a complicated 
+workaround that you can apply directly in the pattern: use the pattern
 
-emulate sh
-set *no_way_this_glob_matches*
-echo $@
+   *[n]o_way_this_glob_matches*
 
-outputs *no_way_this_glob_matches*
+If you get back exactly '*[n]o_way_this_glob_matches*', that is because 
+the glob did not match anything. A file by that name would not be picked 
+up by the glob. If you get back anything else, it was found by the glob.
 
-> In bash, it is optional, you get the glob itself by default, but there =
-is a
-> "nullglob" shell option you can set to get what you are asking for.
+Otherwise, you would need to 'test -e' to double-check.
 
-emulate zsh
-set *no_way_this_glob_matches*
-echo $@
-ERR: zsh: no matches found: *no_way_this_glob_matches*
-
-emulate zsh
-set -- *no_way_this_glob_matches*(N)
-echo $#
-OUT: 0
-
-> In ksh, it is optional, you get the glob itself by default, but there i=
-s a
-> special thing where you can start a glob with ~(N) to change only that =
-glob
-> only to expand to nothing if there is no match.
-
-ok so (N) is a ksh inspired! thanks for the fish.
-
-> I personally suspect dash will not want to implement either extension u=
-ntil
-> POSIX decides which extension, if either/any, to standardise at some po=
-int.
-
-which is understandable but not usable because of
-
-* the ambiguity when $# is 1: there is no way to know if i have no match
-  or if a very bad person named its file \*no_way_this_glob_matches\*.
-* i can't trust a loop like
-    for it in \*no_way_this_glob_matches\*; do gzip "$it"; done
-
-fortunately, this POSIX problem will not affect my daily life as
-
-* i use zsh when i want a QND script or need an interactive shell
-* for anything else, i use find . -name \*no_way_this_glob_matches\* -max=
-depth 1 -print0
-
-thank you so much for your help.
-
---=20
-Marc Chantreux
-Direction du num=E9rique de l'Universit=E9 de Strasbourg
-P=F4le de Calcul et Services Avanc=E9s =E0 la Recherche (CESAR)
-http://annuaire.unistra.fr/p/20200
+Cheers,
+Harald van Dijk
