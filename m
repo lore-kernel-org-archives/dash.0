@@ -2,88 +2,69 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F209C433EF
-	for <linux-dash@archiver.kernel.org>; Sun, 28 Nov 2021 14:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A69C433F5
+	for <linux-dash@archiver.kernel.org>; Sun, 28 Nov 2021 14:35:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357902AbhK1OXP (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sun, 28 Nov 2021 09:23:15 -0500
-Received: from smtpout02-ext4.partage.renater.fr ([194.254.241.31]:41442 "EHLO
-        smtpout02-ext4.partage.renater.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237729AbhK1OVO (ORCPT
-        <rfc822;dash@vger.kernel.org>); Sun, 28 Nov 2021 09:21:14 -0500
-X-Greylist: delayed 368 seconds by postgrey-1.27 at vger.kernel.org; Sun, 28 Nov 2021 09:21:13 EST
-Received: from zmtaauth02.partage.renater.fr (zmtaauth02.partage.renater.fr [194.254.241.25])
-        by smtpout20.partage.renater.fr (Postfix) with ESMTP id 1F316BFB0F
-        for <dash@vger.kernel.org>; Sun, 28 Nov 2021 15:11:47 +0100 (CET)
-Received: from zmtaauth02.partage.renater.fr (localhost [127.0.0.1])
-        by zmtaauth02.partage.renater.fr (Postfix) with ESMTPS id 0EF1DA081D
-        for <dash@vger.kernel.org>; Sun, 28 Nov 2021 15:11:47 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by zmtaauth02.partage.renater.fr (Postfix) with ESMTP id F3C70A082C
-        for <dash@vger.kernel.org>; Sun, 28 Nov 2021 15:11:46 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmtaauth02.partage.renater.fr F3C70A082C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unistra.fr;
-        s=CF279DD4-6F58-4C59-BB33-73FDC6DFC1E3; t=1638108706;
-        bh=Cv7+Uvl0uIzFg1tzeS8mVsCNEvG+a6BX5B64h4p/L0E=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=m27Ck/2GQWkRZadk5WHDIz9xLpRmRO0ijKfnek7FjGpHWoTSSLMyjs3F5fMrYqkoM
-         +ACoZcQsbJ8QhZmQK5UimeILjyKwtkWnnbW9Inx7bmTvIx5IRVZD/j178R9H28SzKZ
-         2pQrwZt0V2fjh2aDQ9iCGO59MimAQOVOQsFyoUk8aihwmWWtBvDl2qs8e45t8hwVnP
-         7hsme9U+ee6Hifh29/5vvNUzYzokHcEgNkFfiQkQLP6gieINGuHRmzS3Dt1z77ebFt
-         X5xtU4xX764f+xOfcZqUSPd2RBz7YJ5Vouoitd6yE05aKNxvrIl8gwFB3iy0d1W/y9
-         N3zhd27RY7iHQ==
-X-Virus-Scanned: amavisd-new at zmtaauth02.partage.renater.fr
-Received: from zmtaauth02.partage.renater.fr ([127.0.0.1])
-        by localhost (zmtaauth02.partage.renater.fr [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id XtTitNzLMQXG for <dash@vger.kernel.org>;
-        Sun, 28 Nov 2021 15:11:46 +0100 (CET)
-Received: from 82.65.50.238 (unknown [194.254.241.249])
-        by zmtaauth02.partage.renater.fr (Postfix) with ESMTPA id B6340A081D
-        for <dash@vger.kernel.org>; Sun, 28 Nov 2021 15:11:46 +0100 (CET)
-Date:   Sun, 28 Nov 2021 15:11:45 +0100
-From:   Marc Chantreux <mc@unistra.fr>
-To:     dash@vger.kernel.org
-Subject: no match should be no string ?
-Message-ID: <YaOOIf2d6tLP8xtw@prometheus.u-strasbg.fr>
+        id S1358022AbhK1OjI (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sun, 28 Nov 2021 09:39:08 -0500
+Received: from mail.gigawatt.nl ([51.68.198.76]:47934 "EHLO mail.gigawatt.nl"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1357929AbhK1OhI (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 28 Nov 2021 09:37:08 -0500
+X-Greylist: delayed 304 seconds by postgrey-1.27 at vger.kernel.org; Sun, 28 Nov 2021 09:37:08 EST
+Received: from [IPV6:2a02:8010:68a1:0:7982:e2b0:bbb7:1729] (unknown [IPv6:2a02:8010:68a1:0:7982:e2b0:bbb7:1729])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id 6EF264AC;
+        Sun, 28 Nov 2021 14:28:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 6EF264AC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1638109724;
+        bh=WPi8NkMNWWMFvBzk5G6AycCrc1WM36Ps2IcnuZIJ24M=; l=1124;
+        h=Date:Subject:To:References:From:In-Reply-To:From;
+        b=CfE/91+zlVM9lablP5ENfbpnJT1eDDKhhA2WDhruxFtO6utU1K57lVMsH3X0dWq19
+         0ZASdncYfmqTpweSPbHdBL6BrNc6I0iwKnhn3R+CrMzq8NntaWdqUiEkCQMUabvjrn
+         6MEZ+C90MiiZJSfVOo6TBdKjVoUhZ1kzDOXv91/I=
+Message-ID: <65da119f-ad21-ff18-11cd-3157b02cb22d@gigawatt.nl>
+Date:   Sun, 28 Nov 2021 14:28:43 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-X-Renater-Ptge-SpamState: clean
-X-Renater-Ptge-SpamScore: 0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101
+ Thunderbird/95.0
+Subject: Re: no match should be no string ?
+Content-Language: en-GB
+To:     Marc Chantreux <mc@unistra.fr>, dash@vger.kernel.org
+References: <YaOOIf2d6tLP8xtw@prometheus.u-strasbg.fr>
+From:   Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <YaOOIf2d6tLP8xtw@prometheus.u-strasbg.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-hello people,
+On 28/11/2021 14:11, Marc Chantreux wrote:
+> hello people,
+> 
+> I'm porting scripts from zsh to dash using version
+> 0.5.11+git20200708+dd9ef66-5 from debian and
+> surprised to realize that the result of a glob failure is the glob
+> itself (when i expected an empty string).
 
-I'm porting scripts from zsh to dash using version
-0.5.11+git20200708+dd9ef66-5 from debian and
-surprised to realize that the result of a glob failure is the glob
-itself (when i expected an empty string).
+Hi, yes, this is expected, this is standard POSIX sh behaviour and 
+implemented by all POSIX sh-compatible shells. It should even be what 
+zsh does when running in POSIX mode, but I do not have it installed 
+right now to check.
 
-    for it in *.txt; do gzip $it; done
-    ERR: gzip: *.g: No such file or directory
+In bash, it is optional, you get the glob itself by default, but there 
+is a "nullglob" shell option you can set to get what you are asking for.
 
-    note () >&2 echo "$@"
-    rm -rf *.g
-    set *.g
-    case $#
-        in (0) echo ok
-        ;; (*) echo nope
-    esac
-    ERR: nope
+In ksh, it is optional, you get the glob itself by default, but there is 
+a special thing where you can start a glob with ~(N) to change only that 
+glob only to expand to nothing if there is no match.
 
-not only unexpected but it also make it harder to deal
-with.  i found nothing about that in the manual
-so before i dig into the code and provide a patch,
-i would like to know if this is an expected behavior
-with a rationale in it (like a bug to bug clone or
-POSIX compliance).
+Both of those are valid extensions that don't affect POSIX conformance.
 
-regards,
---=20
-Marc Chantreux
-Direction du num=E9rique de l'Universit=E9 de Strasbourg
-P=F4le de Calcul et Services Avanc=E9s =E0 la Recherche (CESAR)
-http://annuaire.unistra.fr/p/20200
+I personally suspect dash will not want to implement either extension 
+until POSIX decides which extension, if either/any, to standardise at 
+some point.
+
+Cheers,
+Harald van Dijk
