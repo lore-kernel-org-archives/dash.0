@@ -2,98 +2,115 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65051C433F5
-	for <linux-dash@archiver.kernel.org>; Mon, 17 Jan 2022 03:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F36C433F5
+	for <linux-dash@archiver.kernel.org>; Tue, 18 Jan 2022 06:13:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236931AbiAQDX6 (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sun, 16 Jan 2022 22:23:58 -0500
-Received: from beige.elm.relay.mailchannels.net ([23.83.212.16]:58475 "EHLO
-        beige.elm.relay.mailchannels.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230324AbiAQDX4 (ORCPT
-        <rfc822;dash@vger.kernel.org>); Sun, 16 Jan 2022 22:23:56 -0500
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-        by relay.mailchannels.net (Postfix) with ESMTP id 2359B621320
-        for <dash@vger.kernel.org>; Mon, 17 Jan 2022 03:23:55 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (unknown [127.0.0.6])
-        (Authenticated sender: instrampxe0y3a)
-        by relay.mailchannels.net (Postfix) with ESMTPA id 526546214B1
-        for <dash@vger.kernel.org>; Mon, 17 Jan 2022 03:23:54 +0000 (UTC)
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384)
-        by 100.106.113.21 (trex/6.4.3);
-        Mon, 17 Jan 2022 03:23:54 +0000
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Language-Glossy: 438d361810e68ca1_1642389834819_653861786
-X-MC-Loop-Signature: 1642389834818:464965786
-X-MC-Ingress-Time: 1642389834818
-Received: from ppp-88-217-46-204.dynamic.mnet-online.de ([88.217.46.204]:45824 helo=heisenberg.fritz.box)
-        by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <calestyo@scientia.org>)
-        id 1n9IcV-0007m9-T1
-        for dash@vger.kernel.org; Mon, 17 Jan 2022 03:23:52 +0000
-Message-ID: <3709ca54c9001bffd3e690695c3b44d47d50c7c8.camel@scientia.org>
-Subject: possible wrong behaviour with patterns double [ with no closing ]
-From:   Christoph Anton Mitterer <calestyo@scientia.org>
-To:     dash@vger.kernel.org
-Date:   Mon, 17 Jan 2022 04:23:46 +0100
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.3-1 
+        id S229851AbiARGNZ (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Tue, 18 Jan 2022 01:13:25 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:59638 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229574AbiARGNZ (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 18 Jan 2022 01:13:25 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1n9hjx-00076O-Im; Tue, 18 Jan 2022 17:13:10 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 18 Jan 2022 17:13:09 +1100
+Date:   Tue, 18 Jan 2022 17:13:09 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Harald van Dijk <harald@gigawatt.nl>
+Cc:     calestyo@scientia.org, dash@vger.kernel.org
+Subject: [PATCH] expand: Always quote caret when using fnmatch
+Message-ID: <YeZadfOkUDdN7JqS@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-OutGoing-Spam-Status: No, score=-1.0
-X-AuthUser: calestyo@scientia.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e341e41f-8c32-b6e4-8be3-8f94fae2677c@gigawatt.nl>
+X-Newsgroups: apana.lists.os.linux.dash
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-Hey.
+Harald van Dijk <harald@gigawatt.nl> wrote:
+> 
+> On 12/01/2022 16:25, Christoph Anton Mitterer wrote:
+>> The results for the run-circumflex seem pretty odd.
+>> Apparently, the ^ is taken literally, but the other two are negated.
+> 
+> The ^ is not taken literally. The ^ in the pattern is wrongly taken as 
+> the negation operator, and the ^ in the argument is then reported as a 
+> match because it is neither . nor a.
+> 
+> This bug (you're right that it's a bug) is specific to builds that use 
+> fnmatch(). In dash itself, ^ is always assumed as a literal. In builds 
+> with --disable-fnmatch you get correct results. In builds with 
+> --enable-fnmatch, because dash assumes ^ is assumed as a literal, dash 
+> fails to escape it before passing it on to fnmatch(), and the system 
+> fnmatch() may choose differently from dash on how to deal with unquoted 
+> ^s. What dash should do to get whatever behaviour the system fnmatch() 
+> chooses is leave unquoted ^s unquoted, and leave quoted ^s quoted. This 
+> can be achieved by
+> 
+> --- a/src/mksyntax.c
+> +++ b/src/mksyntax.c
+> @@ -178,14 +178,14 @@ main(int argc, char **argv)
+>         add("$", "CVAR");
+>         add("}", "CENDVAR");
+>         /* ':/' for tilde expansion, '-' for [a\-x] pattern ranges */
+> -       add("!*?[=~:/-]", "CCTL");
+> +       add("!*?[^=~:/-]", "CCTL");
+>         print("dqsyntax");
+>         init();
+>         fputs("\n/* syntax table used when in single quotes */\n", cfile);
+>         add("\n", "CNL");
+>         add("'", "CENDQUOTE");
+>         /* ':/' for tilde expansion, '-' for [a\-x] pattern ranges */
+> -       add("!*?[=~:/-]\\", "CCTL");
+> +       add("!*?[^=~:/-]\\", "CCTL");
+>         print("sqsyntax");
+>         init();
+>         fputs("\n/* syntax table used when in arithmetic */\n", cfile);
+> 
+> However, whether this is the correct approach is a matter of opinion: 
+> dash could alternatively choose to always take ^ as a literal and always 
+> escape it before passing it on to fnmatch(), overriding whatever 
+> decision the libc people had taken.
 
+Yes, this would produce the most consistent result.
 
-Assuming a pattern of:
-[.*^\]
-my understanding was that this would actually mean:
-- the literal string [. followed by
-- the pattern notation special character * (i.e. any string) followed by
-- the literal string ^]
+This patch forces ^ to be a literal when we use fnmatch.
 
-Because ] is escaped, it's to be taken literally and in a pattern a [
-without corresponding ] is to be taken literally as well.
+Fixes: 7638476c18f2 ("shell: Enable fnmatch/glob by default")
+Reported-by: Christoph Anton Mitterer <calestyo@scientia.org>
+Suggested-by: Harald van Dijk <harald@gigawatt.nl>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-That seems to work in dash:
-$ case '[.^]' in ([.*^\]) echo match;; (*) echo no match;; esac
-match
-$ case '[.x^]' in ([.*^\]) echo match;; (*) echo no match;; esac
-match
-$ case '[.xx^]' in ([.*^\]) echo match;; (*) echo no match;; esac
-match
-
-
-However, adding another [ to the pattern:
-[.*^[\]
-which should be:
-- the literal string [. followed by
-- the pattern notation special character * (i.e. any string) followed by
-- the literal string ^[]
-
-No longer matches:
-$ case '[.^[]' in ([.*^[\]) echo match;; (*) echo no match;; esac
-no match
-$ case '[.x^[]' in ([.*^[\]) echo match;; (*) echo no match;; esac
-no match
-$ case '[.xx^[]' in ([.*^[\]) echo match;; (*) echo no match;; esac
-no match
-
-
-Whereas, AFAIU POSIX, it should.
-
-This works, btw. in bash, but neither in busybox sh, nor klibc sh.
-
-
-Cheers,
-Chris.
+diff --git a/src/expand.c b/src/expand.c
+index aea5cc4..04bf8fb 100644
+--- a/src/expand.c
++++ b/src/expand.c
+@@ -47,6 +47,9 @@
+ #include <string.h>
+ #ifdef HAVE_FNMATCH
+ #include <fnmatch.h>
++#define FNMATCH_IS_ENABLED 1
++#else
++#define FNMATCH_IS_ENABLED 0
+ #endif
+ #ifdef HAVE_GLOB
+ #include <glob.h>
+@@ -1693,8 +1696,11 @@ _rmescapes(char *str, int flag)
+ 			notescaped = 0;
+ 			goto copy;
+ 		}
++		if (FNMATCH_IS_ENABLED && *p == '^')
++			goto add_escape;
+ 		if (*p == (char)CTLESC) {
+ 			p++;
++add_escape:
+ 			if (notescaped)
+ 				*q++ = '\\';
+ 		}
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
