@@ -2,181 +2,97 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05506C433F5
-	for <linux-dash@archiver.kernel.org>; Sun, 20 Feb 2022 16:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1B4C4332F
+	for <linux-dash@archiver.kernel.org>; Mon, 21 Feb 2022 16:41:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240612AbiBTQCi (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sun, 20 Feb 2022 11:02:38 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38760 "EHLO
+        id S232011AbiBUQlh (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Mon, 21 Feb 2022 11:41:37 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236651AbiBTQCh (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 20 Feb 2022 11:02:37 -0500
-X-Greylist: delayed 31584 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 20 Feb 2022 08:02:14 PST
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B80421E12
-        for <dash@vger.kernel.org>; Sun, 20 Feb 2022 08:02:13 -0800 (PST)
-Received: (Authenticated sender: stephane@chazelas.org)
-        by mail.gandi.net (Postfix) with ESMTPSA id 010361BF205;
-        Sun, 20 Feb 2022 16:02:11 +0000 (UTC)
-Date:   Sun, 20 Feb 2022 16:02:11 +0000
-From:   Stephane Chazelas <stephane@chazelas.org>
-To:     Christoph Anton Mitterer <calestyo@scientia.org>
-Cc:     dash@vger.kernel.org
-Subject: Re: how is locale/unset intended to work with dash?
-Message-ID: <20220220160211.wmq6vpo7taxczd3r@chazelas.org>
-References: <2a150a397fcdda7dd357dd5b125ec585acce3a70.camel@scientia.org>
+        with ESMTP id S1380934AbiBUQkF (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 21 Feb 2022 11:40:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 60DA227CF2
+        for <dash@vger.kernel.org>; Mon, 21 Feb 2022 08:39:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645461558;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kcwXIbLZUDU5EjQvdM+2qFGtz2L2sbkXgfEKGQXEaDw=;
+        b=TgpkLDnpdgTr1W2gvNblnZTy/bw5FZjEabvtW4LoLcTs3ufwEDzMijok5+VsCqFR4rBInb
+        AxlEi5ZTDLKa58mMf9qLyAr5BYTvOSDSf3gBbOMkNI0F5OOI6vRCQezG6pcE4AmJTY+w8N
+        ZF7wnf88n7ySzhaPjTLKuhHGzACYcME=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-608-N3V_nQC2NAGgaftUftydqQ-1; Mon, 21 Feb 2022 11:39:14 -0500
+X-MC-Unique: N3V_nQC2NAGgaftUftydqQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A11C31091DA0;
+        Mon, 21 Feb 2022 16:39:12 +0000 (UTC)
+Received: from redhat.com (unknown [10.2.16.240])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BE611753DB;
+        Mon, 21 Feb 2022 16:39:10 +0000 (UTC)
+Date:   Mon, 21 Feb 2022 10:39:08 -0600
+From:   Eric Blake <eblake@redhat.com>
+To:     Stephane Chazelas <stephane@chazelas.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Harald van Dijk <harald@gigawatt.nl>, calestyo@scientia.org,
+        dash@vger.kernel.org
+Subject: Re: [v2 PATCH] expand: Always quote caret when using fnmatch
+Message-ID: <20220221163908.hykzez677nlmve6x@redhat.com>
+References: <YeZadfOkUDdN7JqS@gondor.apana.org.au>
+ <c31fb498-0f82-dcdc-b1c6-212b8c919c07@gigawatt.nl>
+ <YeejsuVQaGCkQ97t@gondor.apana.org.au>
+ <20220220071544.7odyx5urgcwjsobd@chazelas.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2a150a397fcdda7dd357dd5b125ec585acce3a70.camel@scientia.org>
+In-Reply-To: <20220220071544.7odyx5urgcwjsobd@chazelas.org>
+User-Agent: NeoMutt/20211029-332-f3b9af
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-2022-02-20 05:15:23 +0100, Christoph Anton Mitterer:
-[...]
-> I'm trying to understand how local/unset works with dash... and it
-> seems to be a bit dangerous.
-[...]
-
-AFAIK, it's the Almquist shell that first introduced the "local"
-builtin. It was later added to bash¹, zsh, ksh, pdksh, yash, bosh
-etc but with semantics slightly different between all shells.
-
-See
-https://unix.stackexchange.com/questions/493729/list-of-shells-that-support-local-keyword-for-defining-local-variables/493743#493743
-for details.
-
-In the Almquist shell, "local" just makes the variable local to
-the function, it doesn't change its value nor attributes. Upon
-returning from the function, its original value and attributes
-from before invoking "local" are restored.
-
-That's one of the most consistent APIs among shells that have a
-local builtin/keyword. IIRC, that's also the API bosh chose.
-
-It can be surprising and dangerous if you're used to the
-ksh/bash semantic whereby a new variable is instanciated (though
-possibly with some attributes inherited from the original
-variable) initially unset, upon the first invocation of "local"
-in a given scope.
-
-But in ash-based shells such as dash, you can do:
-
-   local var
-   unset -v var
-
-If you want the local variable to be initially unset.
-
-That approach doesn't work in some other shells such as mksh
-where unset -v would not unset the variable but peel one level
-of local'ness (reveal the variable from the parent scope if
-any).
-
-That was discussed extensively on the POSIX (austin-group-l)
-mailing list a few years back. The maintainer of NetBSD sh (also
-based on ash, and IIRC on which dash is based on), had suggested
-adding some -I (inherit, default) and -N (null / unset) options
-to "local" so you can decide which behaviour you want in the
-hope that other shells would follow so POSIX can eventually
-specify a "local" keyword for sh that satisfies existing
-implementations.
-
-I'm not aware that any other shell followed that. bash came up
-with an alternative mechanism instead: the localvar_inherit
-options which affects all "local" invocations.
-
-So:
-
-  bash -O localvar_inherit -O localvar_unset
-
-(localvar_unset fixing a misfeature of bash whereby unset could
-also fail to unset in some conditions like in mksh).
-
-should behave similarly to ash-based shells such as dash.
-
-With that clarified, commenting on your post:
-
-> In bash, e.g., it seems to work like that:
-> always the var from the next outer scope is used, when
-> setting/expanding/unsetting
+On Sun, Feb 20, 2022 at 07:15:44AM +0000, Stephane Chazelas wrote:
+> 2022-01-19 16:37:54 +1100, Herbert Xu:
+> [...]
+> > This patch forces ^ to be a literal when we use fnmatch.
+> [...]
+> The "fix" also seems incomplete and causes at least this
+> regression:
 > 
-> This implies, that bash "shadows" variables, e.g.
+> $ ltrace -e fnmatch ./bin/dash -c 'case "\\" in ($1) echo match; esac' sh '[\^]'
+> dash->fnmatch("[\\\\^]", "\\", 0)                              = 0
+> match
 > 
-> $ x=Vtop
-> $ f1() { local x=V1 ; f2; echo f1 $x ; }
-> $ f2() { echo f2 $x ; unset -v x ; echo f2 $x ; }
-> $ echo top $x
-> $ f1
-> $ echo top $x
+> See how that added \ caused it to be included in the set. Compare with:
 > 
-> would give this in bash:
-> top Vtop
-> f2 V1
-> f2 Vtop
-> f1 Vtop
-> top Vtop
-> 
-> In other words, as soon as x is unset in f2, the f1()'s local x ceases
-> to exist and the global x is used.
+> +++ exited (status 0) +++
+> $ ltrace -e fnmatch ./bin/dash -c 'case "\\" in ($1) echo match; esac' sh '[\!]'
+> dash->fnmatch("[\\!]", "\\", 0)                                = 1
+> +++ exited (status 0) +++
+> $ ltrace -e fnmatch ./bin/dash -c 'case "\\" in ($1) echo match; esac' sh '[\x]'
+> dash->fnmatch("[\\x]", "\\", 0)                                = 1
+> +++ exited (status 0) +++
 
-That's the misfeature I was talking about: when unset is called
-from a function where the variable has not been defined, it
-doesn't unset the variable but reveals the variable from the
-parent scope like mksh does.
-
-You can do shopt -s localvar_unset for unset to always unset
-(without undoing unshadowing the variable) like in ksh/zsh.
-
-[...]
-> However,... things can get far more strange:
-> $ x=Vtop
-> $ f1() { local x=V1 ; f2 ; echo f1 $x; }
-> $ f2() { echo f2 $x; unset -v x; echo f2 $x; f3 ; echo f2 $x; }
-> $ f3() { echo f3 $x; unset -v x; echo f3 $x; }
-> $ echo top $x
-> vf1
-
-???
-
-> $ echo top $x
-
-???
- 
-> which gives in dash:
-> 
-> top Vtop
-> f2 V1
-> f2
-> f3
-> f3
-> f2
-> f1
-> top Vtop   <- shouldn't that have been unset by the f3’s unset?
->               f1’s x was already gone by then
-
-No, x was made local by f1. No amount of unsetting from within
-that invocation, even if it's in subfunctions will undo that, it
-still unsets (removes a value from) the local variable of f1.
-.
-The variable is local, that's the whole point, you don't want
-whatever f1 does to affect the "x" variable of the parent scope
-(which is why I call bash/mksh's behaviour a misfeature).
-
-When f1 returns, the value and attributes of x are restored from
-when before "local x" was invoked 
-
-[...]
-> => when the unset is in the *same* scope level as the `local` ... it
-> doesn't "unshadow".
-
-Yes, which is why it's not as bad as in mksh IMO.
-
----------------
-¹ very shortly after in the case of bash, suggesting local was
-possibly added to ash and bash independently from each other.
-local in bash was an alias for typeset copied from ksh
+If you want to escape ^ to always be treated as a literal when calling
+fnmatch(), you have to spell it something like [[=^=]...], not [\^...]
+(that is, since \^ inside [] does NOT treat the \ as an escape
+character, but as yet another literal character as part of the brakcet
+group, you instead have to resort to calling out the literal character
+^ via alternative spellings such as by a collation equivalent).
+Another alternative is to rewrite the [] bracket exprsesion so that ^
+is no longer first (but be careful if the character after ^ is -, ],
+or !, as the rewrite is not always a trivial swap with the next
+character).
 
 -- 
-Stephane
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
