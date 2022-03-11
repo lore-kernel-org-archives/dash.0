@@ -2,112 +2,80 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ABEDC433EF
-	for <linux-dash@archiver.kernel.org>; Fri, 11 Mar 2022 04:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0205CC433F5
+	for <linux-dash@archiver.kernel.org>; Fri, 11 Mar 2022 10:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232123AbiCKE0p convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-dash@archiver.kernel.org>);
-        Thu, 10 Mar 2022 23:26:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45656 "EHLO
+        id S1347370AbiCKKNm (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Fri, 11 Mar 2022 05:13:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232117AbiCKE0o (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 10 Mar 2022 23:26:44 -0500
-Received: from bee.birch.relay.mailchannels.net (bee.birch.relay.mailchannels.net [23.83.209.14])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15F6519F46D
-        for <dash@vger.kernel.org>; Thu, 10 Mar 2022 20:25:41 -0800 (PST)
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-        by relay.mailchannels.net (Postfix) with ESMTP id 51B91120E62
-        for <dash@vger.kernel.org>; Fri, 11 Mar 2022 04:25:41 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (unknown [127.0.0.6])
-        (Authenticated sender: instrampxe0y3a)
-        by relay.mailchannels.net (Postfix) with ESMTPA id 72618120D50
-        for <dash@vger.kernel.org>; Fri, 11 Mar 2022 04:25:40 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1646972740; a=rsa-sha256;
-        cv=none;
-        b=Zo3OWGFwohBgjaGY4sBGF52x6179Z5e4tUJ8uOR1mkevKJLs3NkkYQCKvf9Flgo4JvDDkF
-        EQmxXheHZcAyJgcR79HEeFMgykhHnv2SR4zsoSmLqcZghRcN1SlZ+6qBtM+2+Ji7hVPs+f
-        EVaFGs/9OX+35oFu6Tax043lEVtRKmMNmNcScs6Bd6cUdc+Gy+3W6rI2wsIZT7FUw+qbuo
-        77ZCERgKMTsWee1csRDZtprocVKncejeVa9qmHR8aZMYRo6iVbWxa8PBan/SSrMgQRT/qH
-        kqkCS0VncPhbhMcxfBoD8l01FA91scOg1qM3x+QozXjXeniLXwTS7FPXtOsmIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-        s=arc-2022; t=1646972740;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=AtcmuRlf/csav7NY5XC4YEvwRBBM8YSF22azzCe50O0=;
-        b=MksYKcpC2HKD779ad1UWvctxtNfH1RMN7pMSmDzLetBZL1mFApicITh1LkiRgu0H3fDRpV
-        4ZYY1RY0u14XLCj/NKkdoF1S1L4ysz2ZH+8a5o/goF1Z5czIywzwmiMKxDG4vrE9Vh6Jwh
-        1N9s6XjsucX3DQgYvHxLLXaqarP63S8QNadwlKlEbWiYBq6rC67Agn6a8bvB8SFH7xFnzr
-        O0ueV2J2dPLHEK2rrn/2zowzvd4S7yKKYY3zwv5MzE4ISCBccQ6LcspfP6OyyiuXemY9vH
-        /q/8ojX6+uJQslTzH6WHKJU/mf5cdwCJkYjuYyMnseWr3kGKJV3Dg15qllWQGQ==
-ARC-Authentication-Results: i=1;
-        rspamd-56df6fd94d-fxzfl;
-        auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384)
-        by 100.121.210.153 (trex/6.5.3);
-        Fri, 11 Mar 2022 04:25:41 +0000
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Scare-Hook: 5c75af2b240fd23e_1646972740945_2778218775
-X-MC-Loop-Signature: 1646972740945:2545382006
-X-MC-Ingress-Time: 1646972740945
-Received: from ppp-46-244-246-77.dynamic.mnet-online.de ([46.244.246.77]:56248 helo=heisenberg.fritz.box)
-        by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <calestyo@scientia.org>)
-        id 1nSWqO-000374-AT
-        for dash@vger.kernel.org; Fri, 11 Mar 2022 04:25:38 +0000
-Message-ID: <3574fa7e81a2c56fdb720ea0df259ae3df92c3b2.camel@scientia.org>
-Subject: possible wrong behaviour when -s and -c are both used
-From:   Christoph Anton Mitterer <calestyo@scientia.org>
-To:     dash@vger.kernel.org
-Date:   Fri, 11 Mar 2022 05:25:33 +0100
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-User-Agent: Evolution 3.43.3-1 
+        with ESMTP id S240197AbiCKKNl (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 11 Mar 2022 05:13:41 -0500
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 48F09B2D69
+        for <dash@vger.kernel.org>; Fri, 11 Mar 2022 02:12:38 -0800 (PST)
+Received: from [IPV6:2a02:8010:68a1:0:d0d4:d13c:6697:df13] (unknown [IPv6:2a02:8010:68a1:0:d0d4:d13c:6697:df13])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id F1C85C1;
+        Fri, 11 Mar 2022 10:12:35 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl F1C85C1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1646993556;
+        bh=XK1GaI+ENZ9LQueOTDGUV1SDcHamYjV21FdG0wjNdcA=; l=1070;
+        h=Date:Subject:To:References:From:In-Reply-To:From;
+        b=Q3ZwOK7NVx8p2lCKpP4AweW3f6wm/jaa9xndsFVtXS/dxfw/By8U/A8tsytUu8IpZ
+         GkwzNq2/PzqmBLjTmC11AuGhw7xIiGgY51s+4S4E/KSuKKTLzzpljk6bKEsaEJ3Mr3
+         tq6oEfXWBOozMLJlyH5yJZfMxn5DZsiTaauf7vy4=
+Message-ID: <fdfed8d3-d654-74de-67f5-85d21ae4c630@gigawatt.nl>
+Date:   Fri, 11 Mar 2022 10:12:35 +0000
 MIME-Version: 1.0
-X-OutGoing-Spam-Status: No, score=-1.0
-X-AuthUser: calestyo@scientia.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:98.0) Gecko/20100101
+ Thunderbird/98.0
+Subject: Re: possible wrong behaviour when -s and -c are both used
+Content-Language: en-US
+To:     Christoph Anton Mitterer <calestyo@scientia.org>,
+        dash@vger.kernel.org
+References: <3574fa7e81a2c56fdb720ea0df259ae3df92c3b2.camel@scientia.org>
+From:   Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <3574fa7e81a2c56fdb720ea0df259ae3df92c3b2.camel@scientia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-Hey.
+On 11/03/2022 04:25, Christoph Anton Mitterer wrote:
+> Hey.
+> 
+> I've noted that dash gives different behaviour when both -s and -c are
+> used, depending on their order:
 
-I've noted that dash gives different behaviour when both -s and -c are
-used, depending on their order:
+The order is irrelevant.
 
-calestyo@heisenberg:~$ cat script
-date
-calestyo@heisenberg:~$
+> calestyo@heisenberg:~$ cat script
+> date
+> calestyo@heisenberg:~$
+> 
+> calestyo@heisenberg:~$ dash -s -c 'echo foo' script
+> foo
+> $     <--- this is dash's prompt, and it reads input from stdin
 
-calestyo@heisenberg:~$ dash -s -c 'echo foo' script
-foo
-$     <--- this is dash's prompt, and it reads input from stdin
-calestyo@heisenberg:~$ dash -c 'echo foo' -s script
-foo
-calestyo@heisenberg:~$ 
+This has -s and -c options. Contrary to your analysis below, as has been 
+answered on your Austin Group bug report, this has unspecified 
+behaviour. dash can do whatever it wants here.
 
+> calestyo@heisenberg:~$ dash -c 'echo foo' -s script
+> foo
 
-POSIX specifies[0]:
-> -c
->    Read commands from the command_string operand.
->    ...
->    No commands shall be read from the standard input.
+This only has a -c option. -s appears after 'echo foo', which is a 
+non-option, and is therefore also a non-option. This is required to set 
+$0 to -s, $1 to script, and then try to print 'foo', which dash 
+correctly implements.
 
+The syntax to have both -s and -c options, but have -s appear after -c, is
 
-So I'd say -c is ought to override -s ... but in any case I'd guess
-it's unintended that the order of the two changes the behaviour?!
+   dash -c -s 'echo foo' script
 
+which behaves the same as the -s -c case.
 
-Thanks,
-Chris.
-
-
-[0] https://pubs.opengroup.org/onlinepubs/9699919799/utilities/sh.html
+Cheers,
+Harald van Dijk
