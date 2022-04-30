@@ -2,186 +2,132 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FEA7C433FE
-	for <linux-dash@archiver.kernel.org>; Fri, 22 Apr 2022 22:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DBCC433F5
+	for <linux-dash@archiver.kernel.org>; Sat, 30 Apr 2022 19:30:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232788AbiDVWWK (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Fri, 22 Apr 2022 18:22:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57732 "EHLO
+        id S244265AbiD3TeS (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sat, 30 Apr 2022 15:34:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232708AbiDVWWC (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 22 Apr 2022 18:22:02 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70CD338253
-        for <dash@vger.kernel.org>; Fri, 22 Apr 2022 14:12:50 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id v12so5915664wrv.10
-        for <dash@vger.kernel.org>; Fri, 22 Apr 2022 14:12:50 -0700 (PDT)
+        with ESMTP id S244229AbiD3TeR (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 30 Apr 2022 15:34:17 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D466DDF77
+        for <dash@vger.kernel.org>; Sat, 30 Apr 2022 12:30:52 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id j6so8341313qkp.9
+        for <dash@vger.kernel.org>; Sat, 30 Apr 2022 12:30:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chrisn.me.uk; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to
          :content-transfer-encoding;
-        bh=2ademG7SZXF2h4AnJg075pDYfcVwh2CxMKwCLJMs4jg=;
-        b=B/svTO8V+Lkp2OTFfnZtWrJLVCJEpd1+pDXdfkR8N/vmWmweyvTirgoOwO4gBEgrJ6
-         9c1M18gNlYva80wK/wfgJf4oXOv7YzHYDVP5ttURiVFShOC2CAUS3+kV5bNYGTsmZtoQ
-         9tacD9ukaIUg+KAntSc4QK1+iiMNgTZef4ejA=
+        bh=Y0QqUu8HbYJ8hXQILHUeyaxG/au/YiT17poRMgtDgzM=;
+        b=FMRG9OeBr1LEyx6vWtbsIWSm1YL0Esoe4cZkwZ6zp3R+pQwtY0c7QjXzEBUbLbb8i/
+         aGMtoom1Jkd7NlrfG6AUl1+crUrOgolN/npSMk2/empel7nFrV/xbDlGbZ5qTQS6XeCZ
+         s6DB5PBWnTA+8zlBZOiXGxHL2gdQoEe+4s2dEwAvyc4FVjWPQ6oWW2J7byxxA3B02GiH
+         vebP3QqD3RbslO+n1vlJPEJzRmysDIHqbbOnTM4703jA8ywQyOu3hYlCbtv7Iz8E2xtJ
+         K76xVB+rQOLD/aix8bXExo7ih5Yxt1xh2SVVgKMOYCeS/0+i9dOIf7SAVC2eNeaSgZWc
+         2Dxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
          :content-transfer-encoding;
-        bh=2ademG7SZXF2h4AnJg075pDYfcVwh2CxMKwCLJMs4jg=;
-        b=tXQhV5+N2B5+N64HvI8UO5H4X6weT0QLN+reabemOoeZhfG5JOmsVyzNvfvcA37vl0
-         rUDAry6jIFGbgLo4v+933cM7c5zpbdkMBQzNHmher7JZS5KOUK+Kj4HjGhi4oxHuFmWy
-         50/EoB4GVOD67oyv9qSWMIzVeZN9Gm1VvKUV5WFHdog66VJDGkudxwrbbq5XIYIYv9X1
-         aKRcOXYcoKbmBTIbNiyXC7dVymiG2boDPT4RjzmJZz8m1SBWULTpbFTDdnrJUbVJyygv
-         pg+9o/17LNe882pAxupXifQk8rXErtPQF2eRjS4hU0Ii+gH1eLLgkXn3aVeaSoCyfjrA
-         mj8A==
-X-Gm-Message-State: AOAM533ocyEdiITBUMGopsvqzAPXXetVXlKtpkDvSYX9rgUxPQkmfxfK
-        fy/eft+k6JERd1NDoj9/ZEMdk0uY40sx7g==
-X-Google-Smtp-Source: ABdhPJw7fuJgXNiuYgkm7uHxwxVeBTue6MeZ5YVhE5HQvVFvZL51FZcMpsXcl0JCXBwXZlIOSMk3ZA==
-X-Received: by 2002:adf:d4ce:0:b0:20a:b38e:ff7f with SMTP id w14-20020adfd4ce000000b0020ab38eff7fmr5053483wrk.276.1650661969348;
-        Fri, 22 Apr 2022 14:12:49 -0700 (PDT)
-Received: from localhost.localdomain (cpc83467-wolv18-2-0-cust127.16-1.cable.virginm.net. [82.32.92.128])
-        by smtp.gmail.com with ESMTPSA id z14-20020a7bc14e000000b00392a3e62b66sm2346985wmi.33.2022.04.22.14.12.48
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Apr 2022 14:12:48 -0700 (PDT)
-From:   Chris Novakovic <chris@chrisn.me.uk>
-To:     dash@vger.kernel.org
-Cc:     Chris Novakovic <chris@chrisn.me.uk>
-Subject: [PATCH] jobs: Implement pipefail option
-Date:   Fri, 22 Apr 2022 22:10:13 +0100
-Message-Id: <20220422211013.18195-1-chris@chrisn.me.uk>
-X-Mailer: git-send-email 2.30.0
+        bh=Y0QqUu8HbYJ8hXQILHUeyaxG/au/YiT17poRMgtDgzM=;
+        b=Ndm/cswVM2OZz37lLLokJI+0rwYL7H9C3+EpZ3/P6AQWv3L8YjHbP9LC1lOUjKq9qk
+         ZCzLEkkiWfTk5qA2uXAkbeZ57/C+w7GrTV5TefUq1SkgDshZ3SjwUGvXlrypK/GDBov1
+         7NY7IY5EPXztw9jtb05iN3NIVluPi2sSiFMWKOSdgBKMbEpQd31p2JsxnYjQu0Jw9jFP
+         JuvxhsxEiYvLfpbynDlkG4MHwZRB/2/mp2FhoMq6nZA7ycyP1wbJz/xREbT7Vjxa10Ho
+         0orl2e6SbmrZ08ikcOqSztKMx+wjLM0nUQX87AeGE/Cgl6bpBbkFXX6/nLRYR0ciV2Q1
+         rKSg==
+X-Gm-Message-State: AOAM532CBrdjYHU4GEd/Z9JsCgUPhA1nqe3iMmmP0tz3fzcoD87pMdRW
+        7YEgn2wnu7bde2dg+VTTUuqlNMtglLRw+KxNY4KHIIYv
+X-Google-Smtp-Source: ABdhPJyuwtGB4EoWvFR+sVogEFEFSaDJiLgvae/a2LNLtwJND6T7uqKJcAdBI8YH/vF8GLqBIoegVmLrxsgrgNaR1h8=
+X-Received: by 2002:a05:620a:430b:b0:67e:85d1:f53f with SMTP id
+ u11-20020a05620a430b00b0067e85d1f53fmr3747893qko.43.1651347051834; Sat, 30
+ Apr 2022 12:30:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Al g <algore3698@gmail.com>
+Date:   Sat, 30 Apr 2022 15:30:40 -0400
+Message-ID: <CAOKKkHeAkWxtgm6=0eq6D6pPt+QV3SuEhrq=YNO-Jj7vospf-w@mail.gmail.com>
+Subject: [PATCH] expand: Add ifsfree to expand to fix a logic error that leaks
+ the heap
+To:     dash@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-With the pipefail option set, a pipeline's exit status is the exit
-status of the rightmost command that failed, or zero if all commands
-succeeded.
+Description of problem:
+First bug:
+Due to a logic error in the ifsbreakup function in expand.c if a
+heredoc and normal command is run one after the other by means of a
+semi-colon, when the second command drops into ifsbreakup the command
+will be evaluated with the ifslastp/ifsfirst struct that was set when
+the here doc was evaluated. This results in a buffer over-read that
+can leak the program's heap, stack, and arena addresses which can be
+used to beat ASLR.
+Second bug:
+If the heap is sprayed with a certain amount of bash variables and
+part of the first bug is sent, a predictable heap value can be free'd
+and put into the tcache. After the heap value is free'd, if the heap
+was sprayed correctly, an attacker can overwrite the free=E2=80=99d tcache
+address to obtain numerous write-what-where and the ability to
+arbitrarily overwrite any writable memory address. This could lead to
+a DoS or arbitrary code execution.
 
-This is planned for inclusion in the next revision of POSIX [1],
-although the details are yet to be finalised. The semantics of this
-implementation are the same as those proposed in [2], which have also
-been adopted by the BSD shells.
+Steps to Reproduce:
+First bug:
+cmd args: ~/exampleDir/example> dash
+$ M=3D'AAAAAAAAAAAAAAAAA'    <note: 17 A's>
+$ q00(){
+$ <<000;echo
+$ ${D?$M$M$M$M$M$M}        <note: 6 $M's>
+$ 000
+$ }
+$ q00                      <note: After the q00 is typed in, the leak
+should be echo'd out; this works with ash, busybox ash, and dash and
+with all option args.>
 
-[1] https://www.austingroupbugs.net/view.php?id=789
-[2] https://www.austingroupbugs.net/view.php?id=789#c4115
----
- src/dash.1    | 31 ++++++++++++++++++++++++-------
- src/jobs.c    |  9 ++++++++-
- src/options.c |  2 ++
- src/options.h |  5 +++--
- 4 files changed, 37 insertions(+), 10 deletions(-)
+Second bug:
+cmd args: ~/exampleDir/example> dash
+<Everything in the `` is not meant to show what exactly is typed in
+but more or less an action if that makes sense.>
+$ AAAAAAAAAAAAAA    <note: These 14 A's are necessary to get initial
+heap groom correct>
+$ `spray 400 bash variables with size of 0x30 bytes`
+$ `send bash variable with size of 0x20 bytes`
+$ `send bash variable with size of 0x60 bytes`
+$ `spray 12 bash variables with size of 0x20 bytes`
+$ `Send part of first vulnerability`
+   $ <<000000;V
+   $ <Z*16+$Y*19>${x?0p$^?A<$B*442>$0b<B*10>dbasdfg$0<S*10>}
+<note: The <> in this line are not meant to be entered in as is, but
+instead shows amount of letter inside <> that would be entered in.>
+   $ 000000      <note: After the 000000 is entered in the
+vulnerability should trigger and attempt to free a predictable heap
+address; while it can differ on each host, typically around variable
+C20 - C5 is where the predictable free'd address will be.>
 
-diff --git a/src/dash.1 b/src/dash.1
-index ff02237..7a7b162 100644
---- a/src/dash.1
-+++ b/src/dash.1
-@@ -553,13 +553,17 @@ by redirection operators that are part of the command.
- If the pipeline is not in the background (discussed later), the shell
- waits for all commands to complete.
- .Pp
--If the reserved word ! does not precede the pipeline, the exit status is
--the exit status of the last command specified in the pipeline.
--Otherwise, the exit status is the logical NOT of the exit status of the
--last command.
--That is, if the last command returns zero, the exit status
--is 1; if the last command returns greater than zero, the exit status is
--zero.
-+If the
-+.Em pipefail
-+option was enabled when the shell began execution of the pipeline, the
-+pipeline's exit status is the exit status of the last command specified in
-+the pipeline that exited with non-zero status, or zero if all commands in
-+the pipeline exited with a status of zero. If the
-+.Em pipefail
-+option was not enabled, the pipeline's exit status is the exit status of
-+the last command specified in the pipeline; the exit statuses of any other
-+commands are not used. If the reserved word ! precedes the pipeline, its
-+exit status is the logical NOT of the exit status described above.
- .Pp
- Because pipeline assignment of standard input or standard output or both
- takes place before redirection, it can be modified by redirection.
-@@ -1791,6 +1795,19 @@ if the option is +o,
- the settings are printed in a format suitable for
- reinput to the shell to affect the same option settings.
- .Pp
-+In addition to the option names listed in the
-+.Sx Argument List Processing
-+section, the following options may be specified as arguments
-+to -o or +o:
-+.Bl -tag -width pipefail
-+.It Em pipefail
-+Derive the exit status of a pipeline from the exit statuses of all
-+of the commands in the pipeline, not just the last command, as
-+described in the
-+.Sx Pipelines
-+section.
-+.El
-+.Pp
- The third use of the set command is to set the values of the shell's
- positional parameters to the specified args.
- To change the positional
-diff --git a/src/jobs.c b/src/jobs.c
-index f3b9ffc..78c7bc6 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -1526,8 +1526,15 @@ STATIC int
- getstatus(struct job *job) {
- 	int status;
- 	int retval;
-+	struct procstat *ps;
-+
-+	ps = job->ps + job->nprocs - 1;
-+	status = ps->status;
-+	if (pipefail) {
-+		while (status == 0 && --ps >= job->ps)
-+			status = ps->status;
-+	}
- 
--	status = job->ps[job->nprocs - 1].status;
- 	retval = WEXITSTATUS(status);
- 	if (!WIFEXITED(status)) {
- #if JOBS
-diff --git a/src/options.c b/src/options.c
-index a46c23b..cc0f70d 100644
---- a/src/options.c
-+++ b/src/options.c
-@@ -80,6 +80,7 @@ static const char *const optnames[NOPTS] = {
- 	"notify",
- 	"nounset",
- 	"nolog",
-+	"pipefail",
- 	"debug",
- };
- 
-@@ -101,6 +102,7 @@ const char optletters[NOPTS] = {
- 	'u',
- 	0,
- 	0,
-+	0,
- };
- 
- char optlist[NOPTS];
-diff --git a/src/options.h b/src/options.h
-index 975fe33..f421316 100644
---- a/src/options.h
-+++ b/src/options.h
-@@ -60,9 +60,10 @@ struct shparam {
- #define	bflag optlist[13]
- #define	uflag optlist[14]
- #define	nolog optlist[15]
--#define	debug optlist[16]
-+#define	pipefail optlist[16]
-+#define	debug optlist[17]
- 
--#define NOPTS	17
-+#define NOPTS	18
- 
- extern const char optletters[NOPTS];
- extern char optlist[NOPTS];
--- 
-2.30.0
+Patch:
+Adding the following to expand.c will fix both bugs in one go.
+(Thank you to Harald van Dijk and Michael Greenberg for doing the
+heavy lifting for this patch!)
+--
+--- a/src/expand.c
++++ b/src/expand.c
+@@ -859,6 +859,7 @@
+                               if (discard)
+                                          return -1;
 
++                             ifsfree();
+                               sh_error("Bad substitution");
+                    }
+
+@@ -1739,6 +1740,7 @@
+                                 } else
+                                              msg =3D umsg;
+                   }
++                 ifsfree();
+                   sh_error("%.*s: %s%s", end - var - 1, var, msg, tail);
+ }
+--
