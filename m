@@ -2,221 +2,178 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A8EC433F5
-	for <linux-dash@archiver.kernel.org>; Mon, 30 May 2022 17:02:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3E4C433F5
+	for <linux-dash@archiver.kernel.org>; Tue, 31 May 2022 20:39:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238922AbiE3RCq (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Mon, 30 May 2022 13:02:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51430 "EHLO
+        id S1347814AbiEaUjz (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Tue, 31 May 2022 16:39:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235187AbiE3RCp (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 30 May 2022 13:02:45 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D5B4D267
-        for <dash@vger.kernel.org>; Mon, 30 May 2022 10:02:43 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id v19so7006333edd.4
-        for <dash@vger.kernel.org>; Mon, 30 May 2022 10:02:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=OK9ifbHp0S6vdDJr5AsulBVQ6cxtgwUPD6XiVE256oU=;
-        b=Y2MtadCA22bOHMxa09uLos0E+zSBYHRqNyTstkT5tteyjJkNvyn5Ud3oU/YXXf5Z3v
-         GzduqaCrcAJC2s0FWU2cCtMYF1xbbEbDPWW3CT0T5GLLAKAENgwoS2ayN1DHUoVe8IE4
-         Oixumz5XFvHzZUDo+fraK5HlTfLGy2aHkh/kgehmPbZZenhTPYoIUUvKal2XLv94bGKL
-         sBUrsgiyyMkWjOQ2vLCv7tbNhCCWa022zkjnc1SS5GHaUCMBi0vOVpC3M4T9AW2VOHgO
-         nT7M1OXPf8ZVEU+oQJYJhOshiyaOjhheIV59jmY7yqTtSuPWqomawRi8T0uc8j4mij41
-         IrMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=OK9ifbHp0S6vdDJr5AsulBVQ6cxtgwUPD6XiVE256oU=;
-        b=WheOjaKYofi7/jYLxHMCBADzWwd0rlGlwWaksbafK/q0N3w/hJMxh1K3zBYRS6U6+2
-         GXX5XpNQgJ5s4EpwS4HmAE8x0JIwyiqUzhExd3Tn8XeGpbYFG6NblK5+3R5cO+pFH0t8
-         5mj09g1hswq9UZRB3zA7si+xmSpKE01IR1/OTtYk4k2CsYPsLZNQNjPyJbBrpRQ4/nMc
-         a+XEJsJ/XLTT+DFTSGvNs6tSSA7CCKxkY1rzcMGmR3jnFY/6LvtHdoeKRRNJRWGojlNA
-         W7XLrj2klEJMh/92v501YSE3qs9llZ5Vhxln3gmHARBcWkWLjXQvtHdz83BPl37tT2sk
-         PwYg==
-X-Gm-Message-State: AOAM533WNCjdT3rTWXrodjN1Q8+03q1pbIQvHBx0gJj2zRJYBA4ajjgG
-        K2qeeaxPQzg2FiGEbbT62irSHloF3TUbQKD4dqJ7Ngucwqw=
-X-Google-Smtp-Source: ABdhPJxsATHlWHsOBRwaFeLg8WRfB5EaFodeGtuMRfIy8+YEJrMit7Qm61EiQnxHfYUYSP4DXGU+zIvEQO2Exwe8SYY=
-X-Received: by 2002:a05:6402:e85:b0:41d:121b:f436 with SMTP id
- h5-20020a0564020e8500b0041d121bf436mr60299579eda.121.1653930162266; Mon, 30
- May 2022 10:02:42 -0700 (PDT)
-MIME-Version: 1.0
-From:   Nicola Lamacchia <nicola.lamacchia@gmail.com>
-Date:   Mon, 30 May 2022 19:02:30 +0200
-Message-ID: <CA+z1gfX9ZexoQC8tm9V0hV_Vo3kMxxDw5GJdeNTy_DFGu_CMKg@mail.gmail.com>
-Subject: [PATCH] exec.c: Fix exit status for command -v on non-executable files
+        with ESMTP id S1347813AbiEaUjx (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 31 May 2022 16:39:53 -0400
+Received: from tdc-dmzmx102.arconic.com (tdc-dmzmx102.arconic.com [142.79.57.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7D105FB0
+        for <dash@vger.kernel.org>; Tue, 31 May 2022 13:39:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=arconic.com; i=@arconic.com; q=dns/txt; s=arnc;
+  t=1654029588; x=1685565588;
+  h=from:to:subject:mime-version:message-id:date;
+  bh=HYJfP+s9mbf+PTgUB62hiySlij9Th8HnZoD3JI2n0yU=;
+  b=da8iJq25pdBK8lxJLTuAubgplTk8hmCKEq/qlKKIbROTuem6gUD2xCHO
+   5P79f6FQPi01xnhqVnqqdL+5YYv556VloRrkLR3xDmvpGwgN8AApT0QjK
+   qRvaMHaWR61CgUt9rBtmbUM9DYJ0urc5BmQBcUnoiHkE1qSHaBHFAXSna
+   mY0z6usdwR1CYh8DQczsj+2mC3EHgXYu9h+Ka4YElCEOycOc9zlwDg6K+
+   t4x63esELKR3oDrHNM6h7OOa/6vTmhtP0jI9DgH60sFEpCETE5kkGn+mh
+   4WZR0UjDnsJtNseRJRkQfZL1i+hT0MNS7YxmgnHJ1jHwooPJFoyNHualY
+   A==;
+IronPort-SDR: EcxSF4bZRcmTw8T+R24pztDPmv3nAr+nEi6mQ0lNbSZTtP1flw5SrUBIbpKALHU8bD4uIPl5ao
+ tFtyL6Bjkxaw==
+IronPort-Data: =?us-ascii?q?A9a23=3AP80/qqvKUgNEPviiQjAqoFFIIOfnVGRcMUV32?=
+ =?us-ascii?q?f8akzHdYApBsoF/qtZmKTyEbKuNZGLxfdF/a4W2o05TsJKDn9NrHFdvpCgwH?=
+ =?us-ascii?q?3lBpJueD7x1DKtQ0wB+jyH7ofUOA/w2MrEsF+hpCC6FzvuRGuK59yMkiPjWH?=
+ =?us-ascii?q?uOU5NPsYUideyc1EU/Ntjozw4bVsqYw6TSIK1vlVeHa+qUzC3f5s9JACV/43?=
+ =?us-ascii?q?orYwP9ZUFQejxtD1rA2TagjUFYzDBD5BrpHTU26ByOQroW5godW7gsepYxV8?=
+ =?us-ascii?q?F81/z91Yj+kupDcW3Emafv7BTChtkUHAu6rmBNFoC05lK08MZLwa28O03PQw?=
+ =?us-ascii?q?5YolYQL78XYpQQBZ8UgnMwWUxBCFyxle6NH47/KO1C2q8eUyUzNNXDrxp2CC?=
+ =?us-ascii?q?WlrbN1Gob8vUAmi8tRdcljhdCuri+utwJqlReR2wMcuNs/mOMUYoH4I8N1zJ?=
+ =?us-ascii?q?Z7KWrjFRKzW6dQd1S8oidxRTK+YecMddDdmYBjLZFtEPVJ/NX73p8/w7lGXT?=
+ =?us-ascii?q?tGSgAv9SXIL3lXu?=
+IronPort-HdrOrdr: =?us-ascii?q?A9a23=3AGRQxrKGG1ZJyCk8DpLqE9MeALOsnbusQ8z?=
+ =?us-ascii?q?AXPiFKJyC9Hfbo9fxG8M5w6faWslkssRMb+exoUZPoKRjhHPZOgLX5Vo3PYO?=
+ =?us-ascii?q?CJggaVxMoL1/qA/wHd?=
+X-IronPort-AV: E=Sophos;i="5.91,230,1647316800"; 
+   d="scan'208";a="59863109"
+Received: from noatdc-appgtw91.valueaddco.com (HELO NOATDC-APPGTW91.arconic.com) ([10.14.159.21])
+  by tdc-dmzmx102.arconic.com with ESMTP; 31 May 2022 16:39:47 -0400
+Received: from limsdev.amppcs.noa.alcoa.com ([10.58.23.20]) by NOATDC-APPGTW91.arconic.com with Microsoft SMTPSVC(8.5.9600.16384);
+         Tue, 31 May 2022 16:39:47 -0400
+From:   charles.fisher@arconic.com
 To:     dash@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: EXIT trap does not fire
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Message-ID: <NOATDC-APPGTW91Teip00015ab2@NOATDC-APPGTW91.arconic.com>
+X-OriginalArrivalTime: 31 May 2022 20:39:47.0635 (UTC) FILETIME=[916F1030:01D8752E]
+Date:   31 May 2022 16:39:47 -0400
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-Hello,
+I think that I have found a bug in dash that impacts EXIT trap handling. The behavior is different (and appears correct) in bash, ksh93 and mksh. I am using the EPEL dash package, version 0.5.10.2 for CentOS 7 (full package info included).
 
-the following patches `command -v` to make it abide by POSIX
-specifications[1] as previously described by orbea in this mailing
-list[2]. Behavior comparison at the bottom[5].
+I didn't see this already reported on the mailing list; hopefully I am not reporting a duplicate bug, sorry if so.
 
-Please note that POSIX does not specify the exit status in this
-case[1]: "Otherwise, no output shall be written and the exit status
-shall reflect that the name was not found." Although it requires the
-exit status to be 127 in case of command not found[3].
+The ssh-agent used in the context immediately below seems to prevent an EXIT trap from firing upon abnormal termination:
 
-Also note that in order for a command to be considered "found" when
-using the PATH variable, it has to be an executable file[4]: "The list
-shall be searched from beginning to end, applying the filename to each
-prefix, until an executable file with the specified name and
-appropriate execution permissions is found."
+  # cat dashbug_trivial
+  #!/bin/dash
 
-Therefore an exit status of 127 seems to be suitable in this case.
-Which would leave the exit status 126 to be used when the user tries
-to execute a file while not having the right permissions to do so.
+  eval $(ssh-agent)
 
----
-diff --git a/src/exec.c b/src/exec.c
-index 87354d4..facaf6b 100644
---- a/src/exec.c
-+++ b/src/exec.c
-@@ -445,8 +445,8 @@ loop:
-                                e = errno;
-                        goto loop;
-                }
--               e = EACCES;     /* if we fail, this will be the error */
--               if (!S_ISREG(statb.st_mode))
-+               e = ENOENT;     /* if we fail, this will be the error */
-+               if (!S_ISREG(statb.st_mode) || access(fullname, F_OK|X_OK) != 0)
-                        continue;
-                if (lpathopt) {         /* this is a %func directory */
-                        stalloc(len);
-@@ -832,6 +832,9 @@ describe_command(out, command, path, verbose)
-                        } while (--j >= 0);
-                        p = stackblock();
-                }
-+               if (access(p, X_OK) != 0) {
-+                       goto not_found;
-+               }
-                if (verbose) {
-                        outfmt(
-                                out, " is%s %s",
-@@ -864,15 +867,18 @@ describe_command(out, command, path, verbose)
-                break;
+  trap 'eval $(ssh-agent -k)' EXIT
 
-        default:
--               if (verbose) {
--                       outstr(": not found\n", out);
--               }
--               return 127;
-+               goto not_found;
-        }
+  if ssh-add
+  then echo testing
+       read junk
+  fi
 
- out:
-        outc('\n', out);
-        return 0;
-+
-+not_found:
-+       if (verbose) {
-+               outstr(": not found\n", out);
-+       }
-+       return 127;
- }
+The EXIT does not fire if the user aborts (it fires properly if the user does not abort):
 
- int
----
+  # ./dashbug_trivial 
+  Agent pid 59714
+  Enter passphrase for /root/.ssh/id_ed25519: 
+  Identity added: /root/.ssh/id_ed25519 (root@bastion.mycompany.com)
+  testing
+  ^C
+  # ps ax | grep agent | grep -v grep
+  59714 ?        Ss     0:00 ssh-agent
 
-Cheers
 
--- Nicola
+I am actually iterating over a set of hosts inside the conditional:
 
-[1]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/command.html
-[2]: https://www.mail-archive.com/dash@vger.kernel.org/msg01968.html
-[3]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_08_02
-[4]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_03
-[5]:
-Old behavior:
+  # cat dashbug
+  #!/bin/dash
 
-$ cd /tmp
-$ mkdir -p test1 test2 test3
-$ umask 0000
-$ touch test1/foo test2/foo test3/foo
-$ chmod +x test2/foo
-$ PATH=./test1
-$ command -v foo
-./test1/foo
-$ echo $?
-0
-$ foo
-dash: 9: foo: Permission denied
-$ echo $?
-126
-$ test1/foo
-dash: 11: test1/foo: Permission denied
-$ echo $?
-126
-$ PATH=./test2
-$ command -v foo
-./test2/foo
-$ echo $?
-0
-$ foo
-$ echo $?
-0
-$ PATH=./test1:./test2:./test3
-$ command -v foo # returns the non-executable file
-./test1/foo
-$ echo $?
-0
-$ /bin/chmod +x test1/foo test3/foo
-$ command -v foo # returns the cached command
-./test1/foo
-$ echo $?
-0
-$ foo # uses the executable file (./test2/foo)
-$ echo $?
-0
-$ /bin/rm test1/foo test2/foo test3/foo
-$ /bin/rmdir test1 test2 test3 --ignore-fail-on-non-empty
+  eval $(ssh-agent)
 
-Patched behavior:
+  trap 'eval $(ssh-agent -k)' EXIT
 
-$ cd /tmp
-$ mkdir -p test1 test2 test3
-$ umask 0000
-$ touch test1/foo test2/foo test3/foo
-$ chmod +x test2/foo
-$ PATH=./test1
-$ command -v foo
-$ echo $?
-127
-$ foo
-dash: 9: foo: not found
-$ echo $?
-127
-$ test1/foo
-dash: 11: test1/foo: Permission denied
-$ echo $?
-126
-$ PATH=./test2
-$ command -v foo
-./test2/foo
-$ echo $?
-0
-$ foo
-$ echo $?
-0
-$ PATH=./test1:./test2:./test3
-$ command -v foo
-./test2/foo
-$ echo $?
-0
-$ /bin/chmod +x test1/foo test3/foo
-$ command -v foo # returns the cached command
-./test2/foo
-$ echo $?
-0
-$ foo
-$ echo $?
-0
-$ /bin/rm test1/foo test2/foo test3/foo
-$ /bin/rmdir test1 test2 test3 --ignore-fail-on-non-empty
+  if ssh-add
+  then while read -r host port user &lt;&9
+       do printf '=%s=%d=%s=\n' "$host" "$port" "$user"
+          ssh -p "$port" "$user@$host" "$@" 2>&1
+       done 9&lt;&lt;-''EndOfHosts
+	limsprd.amppcs.noa.alcoa.com 22 root
+	darkstar.dpw.alcoa.com 24 root
+  EndOfHosts
+  fi
+
+The iterative script executes perfectly in dash; the problem is abnormal termination:
+
+  # ./dashbug uptime
+  Agent pid 10809
+  Enter passphrase for /root/.ssh/id_ed25519: 
+  Identity added: /root/.ssh/id_ed25519 (root@bastion.mycompany.com)
+  =host1.mycompany.com=22=root=
+  13:12:52 up 233 days,  1:58,  0 users,  load average: 0.66, 0.63, 0.54
+  =host2.mycompany.com=24=root=
+  13:12:52 up 2 days,  1:59,  0 users,  load average: 0.00, 0.00, 0.00
+  Agent pid 10809 killed
+
+Oddly, when I left off the trailing "fi" the trap killed the agent:
+
+  # ./dashbug uptime
+  Agent pid 9953
+  ./dashbug: 15: ./dashbug: Syntax error: end of file unexpected (expecting "fi")
+  Agent pid 9953 killed
+
+When I break the password prompt with a control-c, dash does not terminate the agent:
+
+  # ./dashbug uptime
+  Agent pid 10072
+  Enter passphrase for /root/.ssh/id_ed25519: ^C
+
+  #
+
+I confirmed this with a check of the process list:
+
+  # ps ax | grep agent | grep -v grep
+  10072 ?        Ss     0:00 ssh-agent
+
+If I switch this to mksh (or other previously mentioned shells), a control-c does what I expect:
+
+  # head -1 dashbug
+  #!/bin/mksh
+
+  # ./dashbug uptime
+  Agent pid 10193
+  Enter passphrase for /root/.ssh/id_ed25519: ^C
+  Agent pid 10193 killed
+  #
+
+Is this a problem with dash, or a lack in my understanding?
+
+
+These are the full details on the CentOS 7 EPEL package for dash:
+
+  # rpm -qi dash
+  Name        : dash
+  Version     : 0.5.10.2
+  Release     : 1.el7
+  Architecture: x86_64
+  Install Date: Wed 11 Aug 2021 01:45:26 PM CDT
+  Group       : System Environment/Shells
+  Size        : 159742
+  License     : BSD and GPLv2+ and Public Domain and Copyright only
+  Signature   : RSA/SHA256, Mon 05 Nov 2018 06:00:50 AM CST, Key ID 72f97b74ec551f03
+  Source RPM  : dash-0.5.10.2-1.el7.src.rpm
+  Build Date  : Mon 05 Nov 2018 06:00:48 AM CST
+  Build Host  : x86-ol7-builder-01.us.oracle.com
+  Relocations : (not relocatable)
+  Vendor      : Oracle America
+  URL         : http://gondor.apana.org.au/~herbert/dash/
+  Summary     : Small and fast POSIX-compliant shell
+  Description :
+  DASH is a POSIX-compliant implementation of /bin/sh that aims to be as small as
+  possible. It does this without sacrificing speed where possible. In fact, it is
+  significantly faster than bash (the GNU Bourne-Again SHell) for most tasks.
