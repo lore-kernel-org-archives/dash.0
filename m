@@ -2,46 +2,45 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA87CC25B06
-	for <linux-dash@archiver.kernel.org>; Sun, 14 Aug 2022 14:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B24C3F6B0
+	for <linux-dash@archiver.kernel.org>; Sun, 14 Aug 2022 14:19:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231433AbiHNOTJ (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sun, 14 Aug 2022 10:19:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39502 "EHLO
+        id S231866AbiHNOTK (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sun, 14 Aug 2022 10:19:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231268AbiHNOTI (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 14 Aug 2022 10:19:08 -0400
+        with ESMTP id S231268AbiHNOTJ (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 14 Aug 2022 10:19:09 -0400
 Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AC141DED2
-        for <dash@vger.kernel.org>; Sun, 14 Aug 2022 07:19:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E3588DED2
+        for <dash@vger.kernel.org>; Sun, 14 Aug 2022 07:19:08 -0700 (PDT)
 Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 90A371232;
-        Sun, 14 Aug 2022 16:19:03 +0200 (CEST)
+        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 22F361334;
+        Sun, 14 Aug 2022 16:19:08 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202205; t=1660486743;
-        bh=Zbt28bNoI5pN5Xg7J9S2Tlj/ctTHzXIQZrSNc9gOnrw=;
+        s=202205; t=1660486748;
+        bh=aIo9lbtxL8JOAgFX2rC44I4tFexK3ClRBEXR2xsBNDc=;
         h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=nXD2aUG0AhnvPxXTS+pWfB88xLhwVQpDEb5j3VXLwh7tHuV3PvI2RK0etCVvIzrmS
-         BjHUBVdX1xhXXjmvwGJVJ83bvByw5wERUCWF7QXafi18UPTNpGTmfyRaf5CKkRq+zQ
-         4S+48EbmPMc2VW3Jvdq2PVHbBNSaBwEQY9OpRPLmH2B0t9hzsW2vHpZP/nGbehG0ev
-         5CWI2beKAuxiM4S1LkI3PFlF5Z0EThd5dHoRzEq80KhJBaodIZtDgcP0TCnXvpndsa
-         OXwb4x8zN+arYE8wjlv750k8TjWwDbwAxIRUY2jUTbTZLyY686pnsFrrKXjBJhgCSt
-         P0NDsn5ez7VqWYBp3mkQIw8/RnKTH57AwSpnlLMTFrKbAjhlPXD6Cg1GbISw4/KS6x
-         j2S3D6IlkGP1qfvSTG3TVhYnmw8w21YbPlyQyD9nZpygqHXojEDooPFDv5xg+obsRH
-         ToHYS8kactphY4Zfl6n66i81mt1S+lG5HGVVziUaL1HfmHZOg4hChJEdyVdIHgKPet
-         eusoG5GoeUqubHa+yiqsaBfmr9PLtWi3abEHrEhYFxCasq0Vei6GJG+4ZqBBydc9bc
-         +qUmrLwAA3JrRK18bLdWlk/FwwkCyAn2zsKjMfj0HMr1Usp1/ucUM8VcqHRFzusXKp
-         eb2v8MCM75a0aD2hJ4damoEQ=
-Date:   Sun, 14 Aug 2022 16:19:02 +0200
+        b=uctEt+t52DU/MTBMlSMTOVf8DgzVwD9NrYPGAT/lcXhs8FzVm5X2sJy/YfRfUfJvC
+         XnQ67WWwnSsyXdfrQ2wlqVoFM7jOVkM9L1VeFibd9E0D+JQsijKmhbJB4Zle9ABNkC
+         BLOMgg2v1eFovZlClatsyCsDBsyzKjl5XZDMbm7WbsRLnFP4Z0F3tIP7ElBxPz9PdL
+         JhGH558SMrKubqEUAg/R6psxPnUY81xLZ+P9Y7hSRs+yFljHML/faNbek+PArxNrrW
+         PkM8+nyXp9R6CVhn4AGxRZOZRQ2Ad/RGstVLJ7yM9P16WHrPnOaH1ZnElSqo0wqdHr
+         L3YCG8W4bdLyimJp6FcV/da+ai7xe5HeJvptZ9S+uuCP8lG7BJjRMU5nhsD0QPwbxM
+         YHwunzDRUFMEhHj6lO6meo17c55KJJwcGetE5LZqnwVIMJOwu83qn9MsIJsDBgTmfZ
+         NpGaZJ2tGjEg0gIk4Ilt6GaccYoqP+3KfnDwGDPF9ZtfMxvS8h/Xf8sG8iLc3U1lFG
+         R08WpkYUTe6lwLxOrgHSz6sl3vQ5ujscgBXaNLw8cxNEp7r5kwr8FESx7S/wOwo1w5
+         +XQYBxhYaCeWLFME+LBt8WhrUYFYaHt9lUPaqZKFVDXcoEsvauWShjHCbnaOQydpmR
+         uHW4oUzSOGa49ZkWegHvXx3o=
+Date:   Sun, 14 Aug 2022 16:19:07 +0200
 From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
 To:     dash@vger.kernel.org, Harald van Dijk <harald@gigawatt.nl>
-Subject: [PATCH v2 1/2] man: printf: reword to avoid confusion v/v Ar
- argument[s]/arguments
-Message-ID: <0d82c5a6b3a84ec3c6f5eb3513e4800f2f1f601a.1660486650.git.nabijaczleweli@nabijaczleweli.xyz>
+Subject: [PATCH v2 2/2] man: printf: in 'X, X is a byte under dash
+Message-ID: <c7b48630f0f5e9c19bedb8298d591a01c12581af.1660486650.git.nabijaczleweli@nabijaczleweli.xyz>
 References: <af8be241-f3cc-4ca9-ee49-e856e658c683@gigawatt.nl>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="hldaxgosbgjyl6fy"
+        protocol="application/pgp-signature"; boundary="zjihjifloub2pqef"
 Content-Disposition: inline
 In-Reply-To: <af8be241-f3cc-4ca9-ee49-e856e658c683@gigawatt.nl>
 User-Agent: NeoMutt/20220429
@@ -50,110 +49,70 @@ List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
 
---hldaxgosbgjyl6fy
+--zjihjifloub2pqef
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-The current wording says that given
-  printf a b c d
-a is the format, c and d are processed as noted,
-but b is unspecified
+Multiple issues:
+  * the encoding is not always ASCII
+  * what ASCII code is assigned to =D1=8F
+  * dash isn't internationalised
+    (this is nonconformant but out of scope),
+    and uses the next /byte/; in a UTF-8 locale:
+      $ printf %d\\n \'=C4=85
+      196
+      $ printf %d\\n \'=D1=8F
+      196
+    this is in contrast to POSIX (and bash), which says:
+      > If the leading character is a single-quote or double-quote,
+      > the value shall be the numeric value in the underlying codeset
+      > of the character following the single-quote or double-quote.
+    (i.e. mbrtowc(&val, argv[n], ...))
 
 Signed-off-by: Ahelenia Ziemia=C5=84ska <nabijaczleweli@nabijaczleweli.xyz>
 ---
-That's a fair cop, considering the manual already abuses Ar arguments as
-Ar argument and arguments.
-
-Please consider the following updated patch, which calls the arguments
-consumed by conversions "value"s.
-
- src/dash.1 | 29 +++++++++++++----------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+ src/dash.1 | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/src/dash.1 b/src/dash.1
-index ff02237..310f34e 100644
+index 310f34e..38cf020 100644
 --- a/src/dash.1
 +++ b/src/dash.1
-@@ -1528,30 +1528,26 @@ With the
- option specified the output will be formatted suitably for non-interactive=
- use.
- .\".Pp
- .It Xo printf Ar format
--.Op Ar arguments  ...
-+.Oo Ar value Oc Ns ...
- .Xc
- .Ic printf
--formats and prints its arguments, after the first, under control
--of the
--.Ar format  .
--The
--.Ar format
--is a character string which contains three types of objects: plain charact=
-ers,
-+formats and prints its arguments according to
-+.Ar format ,
-+a character string which contains three types of objects: plain characters,
- which are simply copied to standard output, character escape sequences whi=
-ch
- are converted and copied to the standard output, and format specifications,
- each of which causes printing of the next successive
--.Ar argument  .
-+.Ar value .
- .Pp
--The
--.Ar arguments
--after the first are treated as strings if the corresponding format is
-+Each
-+.Ar value
-+is treated as a string if the corresponding format specification is
- either
- .Cm b ,
--.Cm c
-+.Cm c ,
- or
- .Cm s ;
--otherwise it is evaluated as a C constant, with the following extensions:
--.Pp
-+otherwise it is evaluated as a C constant, with the following additions:
- .Bl -bullet -offset indent -compact
+@@ -1552,9 +1552,7 @@ otherwise it is evaluated as a C constant, with the f=
+ollowing additions:
  .It
  A leading plus or minus sign is allowed.
-@@ -1561,8 +1557,9 @@ If the leading character is a single or double quote,=
- the value is the
- code of the next character.
+ .It
+-If the leading character is a single or double quote, the value is the
+-.Tn ASCII
+-code of the next character.
++If the leading character is a single or double quote, the value of the nex=
+t byte.
  .El
  .Pp
--The format string is reused as often as necessary to satisfy the
--.Ar arguments  .
-+The format string is reused as often as necessary until all
-+.Ar value Ns s
-+are consumed.
- Any extra format specifications are evaluated with zero or the null
- string.
- .Pp
+ The format string is reused as often as necessary until all
 --=20
 2.30.2
 
-
---hldaxgosbgjyl6fy
+--zjihjifloub2pqef
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmL5BFYACgkQvP0LAY0m
-WPFAMw/+I4GsEcarBQ38IJ3QU9LlyDoESRdxve6+AzhtL4ph/8kDiX6TGbpsY4AW
-5JUa0dWuJnO1nnuzPWngo2AgFPKvpwKFz+blfzlvgOJPm9oAsKs8VfjZv7nhfhKF
-7PNryZ9WBHnvSCoQgWxc1dI+sXO9jJxRljgpBzCIVsc+vq2WhyGd8fiW3zvsOiEb
-o8n1wl5oaRkqILanClhBOQ973rPTm64wTxhs3leF3k+ksg9X43Ce6xPB1P3bBAEL
-a9qwY9XPKQrhvpPTvt8eBRU4Lo6E/7he/H5F2WgvwAUFOJ4tG2jWl7Ro2zn1tyeh
-pATmqOmCD+MtgAcY9sukIM5MRAx6zYEjAxAsSwvspHJDg/FtEYMvnoFpxB5gBOvp
-RWX1O/E5sVvnnmUcb8vvB8Z5ZH/pkWg0+6osCCPId3rP6tdCYrHB3yfCVBLGcE6v
-/9s0FKMORvf9bYDAX4vmc2tkWgzRTZCG9qX30UNpUneTqOskMEKNK6AuRgavb2eA
-xtJf/HSg3WSiQ/b5vokOTRp2HNRgW+6FPy0nsFpnryaZPL/SYfMorjbJn7TNMtl1
-sLyEyk/HTsYGTaCLC3w2G1SuNqYPZEJMVverHlp5YfD7ihegpo/SVJty4yr+2BHt
-acsr0UQrFnl/59O1WuOzwsBKsXvBXH4NRy1Ig+zX+xp/2YQbVtE=
-=U0VU
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmL5BFoACgkQvP0LAY0m
+WPEn6g/+OfdqBHWC4560/EI63P4CBRut/EghLEJ9aMZ7EIw2fAoXYfXMHzXO0Bci
+u/M0jreUNwkqF3R1jG4RUZX0jwO5TWz8f4/3Se1ZrbVKAn3Z8sbO69aRFmtwEZea
+g/ijmPq4iLTO3BwpNxwY+CLDgIFxKOAlfCxs1HhVkAOi9ax0a+Cxu5bxyEjr6aVf
+tD1rfE0XO9K14PiIkbjQITIbLsdPFVaEpCVmj2EdR8BqOV8Dxhm2yev/SrrlXHB9
+43TYseOuZrGL/+4GY0wXVegLaCJ8qO3vZQSfPOXs26UgLxuks4G2f3Nr5YdlyAfx
+sJ6jBOvQR0meY3AzLszoNJp0dT+gLVcGHRk49LKYNuWoflVZzaEMkGphi6DTECgH
+HXYGNULNNoxXVEkyP0E+G9A0SYenfPNNGdcd+aMZTc+YVDLvcFF8KWsJICRkUbn6
+4S9R6yTaoZTWRyoEmOs8wdxE7uyP9IpKtQjzjPhTHTXD+pYodP388YDnNH4S46SG
+09WHq5cXu859s8D/AbBMcQ46YRUAj53pSoX1/pLPH9hgvstavias4t6yAbCoIwpB
+iBZ+3elK0uzKru7ft5myu8/mlGTC+3M6XFNZMblp0UVG6SQQBOOJ1iWGnTXBrZuY
+t37vlU/BF6jphaQ/iEeo2G0zfqze1pN4XqPNUWzxoUhKBkeOnFI=
+=wblj
 -----END PGP SIGNATURE-----
 
---hldaxgosbgjyl6fy--
+--zjihjifloub2pqef--
