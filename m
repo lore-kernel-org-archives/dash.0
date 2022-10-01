@@ -2,38 +2,38 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 902A0C433FE
-	for <linux-dash@archiver.kernel.org>; Fri, 30 Sep 2022 22:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9963EC433F5
+	for <linux-dash@archiver.kernel.org>; Sat,  1 Oct 2022 18:46:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232009AbiI3Wqa (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Fri, 30 Sep 2022 18:46:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47372 "EHLO
+        id S229457AbiJASqC (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sat, 1 Oct 2022 14:46:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232528AbiI3Wq2 (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 30 Sep 2022 18:46:28 -0400
-X-Greylist: delayed 578 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 30 Sep 2022 15:46:20 PDT
+        with ESMTP id S229495AbiJASqC (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 1 Oct 2022 14:46:02 -0400
 Received: from lucifer.abilit.eu (lucifer.abilit.eu [85.93.218.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CEB1163B4B
-        for <dash@vger.kernel.org>; Fri, 30 Sep 2022 15:46:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B23D1C43B
+        for <dash@vger.kernel.org>; Sat,  1 Oct 2022 11:45:53 -0700 (PDT)
 Received: from mailout.lll.lu (unknown [10.10.13.1])
-        by lucifer.abilit.eu (Postfix) with ESMTPS id 2112FE92C4
-        for <dash@vger.kernel.org>; Sat,  1 Oct 2022 00:36:40 +0200 (CEST)
+        by lucifer.abilit.eu (Postfix) with ESMTPS id D4148E92EE
+        for <dash@vger.kernel.org>; Sat,  1 Oct 2022 20:45:51 +0200 (CEST)
 Received: from [192.168.178.21] (vodsl-10400.vo.lu [85.93.207.160])
         (authenticated bits=0)
-        by lll.lu (8.15.2/8.15.2/Debian-22) with ESMTPSA id 28UMadJ3838426
+        by lll.lu (8.15.2/8.15.2/Debian-22) with ESMTPSA id 291Ijosj902153
         (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO)
-        for <dash@vger.kernel.org>; Sat, 1 Oct 2022 00:36:39 +0200
-From:   Alain Knaff <alain@knaff.lu>
+        for <dash@vger.kernel.org>; Sat, 1 Oct 2022 20:45:51 +0200
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
  PC
+From:   Alain Knaff <alain@knaff.lu>
 To:     dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
-Message-ID: <6ea7da38-204f-54bf-7156-085a1589c40b@knaff.lu>
-Date:   Sat, 1 Oct 2022 00:36:38 +0200
+ <6ea7da38-204f-54bf-7156-085a1589c40b@knaff.lu>
+Message-ID: <6cacf608-326e-211a-7d37-164041710980@knaff.lu>
+Date:   Sat, 1 Oct 2022 20:45:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
+In-Reply-To: <6ea7da38-204f-54bf-7156-085a1589c40b@knaff.lu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -43,16 +43,8 @@ X-Mailing-List: dash@vger.kernel.org
 
 Hi,
 
-Here is an updated version of my patch. There were a couple of needed 
-adaptations that I "missed", as my compilation environment had a couple 
-of adjustments which are not normally present on AT&T UnixPC.
-
-Changes since previous version:
- - configure test for presence of include files : stdlib.h inttypes.h 
-dirent.h .
- - configure test (and fallback implementations) for library functions: 
-memmove readdir
- - let SIGCHLD handling not interfere with getcwd() initialization.
+Sorry, yet another update to the patch. Apparently when I did the diff, 
+the src/system.c file of my "reference" tree was not clean.
 
 Regards,
 
@@ -2419,16 +2411,39 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/shell.h dash/src/shell.h
  #define va_copy __va_copy
  #endif
 diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
---- ref/dash-0.5.11.5/src/system.c	2022-06-05 11:23:38.603392873 +0200
+--- ref/dash-0.5.11.5/src/system.c	2018-11-15 13:36:14.000000000 +0100
 +++ dash/src/system.c	2022-09-29 23:55:40.743658122 +0200
-@@ -26,8 +26,15 @@
-  * SUCH DAMAGE.
+@@ -27,35 +27,14 @@
   */
  
-+#ifndef HAVE_ISALPHA
-+#include <ctype.h>
-+#endif
-+
+ #ifndef HAVE_ISALPHA
+-#define isalnum _isalnum
+-#define iscntrl _iscntrl
+-#define islower _islower
+-#define isspace _isspace
+-#define isalpha _isalpha
+-#define isdigit _isdigit
+-#define isprint _isprint
+-#define isupper _isupper
+-#define isblank _isblank
+-#define isgraph _isgraph
+-#define ispunct _ispunct
+-#define isxdigit _isxdigit
+ #include <ctype.h>
+-#undef isalnum
+-#undef iscntrl
+-#undef islower
+-#undef isspace
+-#undef isalpha
+-#undef isdigit
+-#undef isprint
+-#undef isupper
+-#undef isblank
+-#undef isgraph
+-#undef ispunct
+-#undef isxdigit
+ #endif
+ 
  #include <signal.h>
  #include <string.h>
 +#ifdef HAVE_FCNTL_H
@@ -2437,7 +2452,7 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
  
  #include "error.h"
  #include "output.h"
-@@ -64,6 +71,10 @@
+@@ -92,6 +71,10 @@
  {
  	static char buf[19];
  
@@ -2448,20 +2463,29 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
  	if ((unsigned)sig < NSIG && sys_siglist[sig])
  		return (char *)sys_siglist[sig];
  	fmtstr(buf, sizeof(buf), "Signal %d", sig); 
-@@ -100,3 +111,227 @@
- 	sh_error("no sysconf for: %d", name);
+@@ -129,71 +112,226 @@
  }
  #endif
-+
-+
+ 
+-#ifndef HAVE_ISALPHA
+-int isalnum(int c) {
+-	return _isalnum(c);
+-}
+-
+ 
+-int iscntrl(int c) {
+-	return _iscntrl(c);
 +#ifndef HAVE_DUP2
 +int dup2(int a, int b)
 +{
 +	close(b);
 +	return fcntl(a, F_DUPFD, b);
-+}
+ }
 +#endif
-+
+ 
+-
+-int islower(int c) {
+-	return _islower(c);
 +#ifndef HAVE_STRSTR
 +char * strstr (const char* haystack, const char *needle)
 +{
@@ -2476,32 +2500,40 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
 +			return (char *)start;
 +	}
 +	return NULL;
-+}
+ }
 +#endif
-+
+ 
 +#ifndef HAVE_STRNDUP
 +char *strdup(const char *str)
 +{
 +    char *nstr;
-+
+ 
+-int isspace(int c) {
+-	return _isspace(c);
+-}
 +    if (str == (char*)0)
 +        return 0;
-+
+ 
 +    nstr = (char*)malloc((strlen(str) + 1));
-+
+ 
+-int isalpha(int c) {
+-	return _isalpha(c);
+-}
 +    if (nstr == (char*)0)
 +    {
 +        (void)fprintf(stderr, "strdup(): not enough memory to duplicate `%s'\n",
 +		      str);
 +	exit(1);
 +    }
-+
+ 
 +    (void)strcpy(nstr, str);
-+
+ 
+-int isdigit(int c) {
+-	return _isdigit(c);
 +    return nstr;
-+}
+ }
 +#endif
-+
+ 
 +#ifndef HAVE_STRCASECMP
 +int strcasecmp(const char *s1, const char *s2)
 +{
@@ -2520,16 +2552,20 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
 +	break;
 +    }
 +  while (c1 == c2);
-+
+ 
+-int isprint(int c) {
+-	return _isprint(c);
 +  return c1 - c2;
-+}
+ }
 +#endif
-+
+ 
 +#if 0
 +static int getdigit(char a, int max)
 +{
 +	int dig;
-+
+ 
+-int isupper(int c) {
+-	return _isupper(c);
 +	if(a < '0')
 +		return -1;
 +	if(a <= '9') {
@@ -2544,8 +2580,8 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
 +		return -1;
 +	else
 +		return dig;
-+}
-+
+ }
+ 
 +extern int errno;
 +unsigned long strtoull(const char *string, char **eptr, int base)
 +{
@@ -2581,37 +2617,45 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
 +		*eptr = (char *) string;
 +	return accu;
 +}
-+
+ 
+-#if HAVE_DECL_ISBLANK
+-int isblank(int c) {
+-	return _isblank(c);
 +long strtoll(const char *string, char **eptr, int base)
 +{
 +	if(*string == '-') {
 +		return - (long) strtoull(string+1, eptr, base);
 +	} else
 +		return (long) strtoull(string, eptr, base);
-+}
-+#endif
-+
+ }
+ #endif
+ 
+-
+-int isgraph(int c) {
+-	return _isgraph(c);
 +#ifndef HAVE_STRTOUL
 +unsigned long strtoul(const char *string, char **eptr, int base)
 +{
 +	return (unsigned long) strtol(string, eptr, base);
-+}
+ }
 +#endif
-+
+ 
 +#ifndef HAVE_RAISE
 +int raise(int sig)
 +{
 +	return kill(getpid(),sig);
 +}
 +#endif
-+
+ 
+-int ispunct(int c) {
+-	return _ispunct(c);
 +#ifndef HAVE_STRERROR
 +char *strerror(int x) {
 +	extern char *sys_errlist[];
 +	return sys_errlist[x];
-+}
+ }
 +#endif
-+
+ 
 +#ifndef HAVE_STPNCPY
 +char *stpncpy(char *dst, const char *src, int len)
 +{
@@ -2631,7 +2675,9 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
 +	return ret;
 +}
 +#endif
-+
+ 
+-int isxdigit(int c) {
+-	return _isxdigit(c);
 +#ifndef HAVE_VSNPRINTF
 +int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 +{
@@ -2645,9 +2691,12 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
 +	strncpy(str, buffer, n);
 +	str[n]='\0';
 +	return ret;
-+}
-+#endif
-+
+ }
+ #endif
+ 
+-#if !HAVE_DECL_ISBLANK
+-int isblank(int c) {
+-	return c == ' ' || c == '\t';
 +#ifndef HAVE_MEMMOVE
 +/* memmove.c -- copy memory.
 +   This snippet is in the public domain.  */
@@ -2674,211 +2723,8 @@ diff -urN -x .svn ref/dash-0.5.11.5/src/system.c dash/src/system.c
 +        *dest++ = *source++;
 +    }
 +  return dest0;
-+}
-+#endif
-diff -urN -x .svn ref/dash-0.5.11.5/src/system.c.orig dash/src/system.c.orig
---- ref/dash-0.5.11.5/src/system.c.orig	1970-01-01 01:00:00.000000000 +0100
-+++ dash/src/system.c.orig	2018-11-15 13:36:14.000000000 +0100
-@@ -0,0 +1,199 @@
-+/*
-+ * Copyright (c) 2004
-+ *	Herbert Xu <herbert@gondor.apana.org.au>.  All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ * 3. The name of the author may not be used to endorse or promote products
-+ *    derived from this software without specific prior written permission.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
-+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
-+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ */
-+
-+#ifndef HAVE_ISALPHA
-+#define isalnum _isalnum
-+#define iscntrl _iscntrl
-+#define islower _islower
-+#define isspace _isspace
-+#define isalpha _isalpha
-+#define isdigit _isdigit
-+#define isprint _isprint
-+#define isupper _isupper
-+#define isblank _isblank
-+#define isgraph _isgraph
-+#define ispunct _ispunct
-+#define isxdigit _isxdigit
-+#include <ctype.h>
-+#undef isalnum
-+#undef iscntrl
-+#undef islower
-+#undef isspace
-+#undef isalpha
-+#undef isdigit
-+#undef isprint
-+#undef isupper
-+#undef isblank
-+#undef isgraph
-+#undef ispunct
-+#undef isxdigit
-+#endif
-+
-+#include <signal.h>
-+#include <string.h>
-+
-+#include "error.h"
-+#include "output.h"
-+#include "system.h"
-+
-+#ifndef HAVE_MEMPCPY
-+void *mempcpy(void *dest, const void *src, size_t n)
-+{
-+	return memcpy(dest, src, n) + n;
-+}
-+#endif
-+
-+#ifndef HAVE_STPCPY
-+char *stpcpy(char *dest, const char *src)
-+{
-+	size_t len = strlen(src);
-+	dest[len] = 0;
-+	return mempcpy(dest, src, len);
-+}
-+#endif
-+
-+#ifndef HAVE_STRCHRNUL
-+char *strchrnul(const char *s, int c)
-+{
-+	char *p = strchr(s, c);
-+	if (!p)
-+		p = (char *)s + strlen(s);
-+	return p;
-+}
-+#endif
-+
-+#ifndef HAVE_STRSIGNAL
-+char *strsignal(int sig)
-+{
-+	static char buf[19];
-+
-+	if ((unsigned)sig < NSIG && sys_siglist[sig])
-+		return (char *)sys_siglist[sig];
-+	fmtstr(buf, sizeof(buf), "Signal %d", sig); 
-+	return buf;
-+}
-+#endif
-+
-+#ifndef HAVE_BSEARCH
-+void *bsearch(const void *key, const void *base, size_t nmemb,
-+	      size_t size, int (*cmp)(const void *, const void *))
-+{
-+	while (nmemb) {
-+		size_t mididx = nmemb / 2;
-+		const void *midobj = base + mididx * size;
-+		int diff = cmp(key, midobj);
-+
-+		if (diff == 0)
-+			return (void *)midobj;
-+
-+		if (diff > 0) {
-+			base = midobj + size;
-+			nmemb -= mididx + 1;
-+		} else
-+			nmemb = mididx;
-+	}
-+
-+	return 0;
-+}
-+#endif
-+
-+#ifndef HAVE_SYSCONF
-+long sysconf(int name)
-+{
-+	sh_error("no sysconf for: %d", name);
-+}
-+#endif
-+
-+#ifndef HAVE_ISALPHA
-+int isalnum(int c) {
-+	return _isalnum(c);
-+}
-+
-+
-+int iscntrl(int c) {
-+	return _iscntrl(c);
-+}
-+
-+
-+int islower(int c) {
-+	return _islower(c);
-+}
-+
-+
-+int isspace(int c) {
-+	return _isspace(c);
-+}
-+
-+
-+int isalpha(int c) {
-+	return _isalpha(c);
-+}
-+
-+
-+int isdigit(int c) {
-+	return _isdigit(c);
-+}
-+
-+
-+int isprint(int c) {
-+	return _isprint(c);
-+}
-+
-+
-+int isupper(int c) {
-+	return _isupper(c);
-+}
-+
-+
-+#if HAVE_DECL_ISBLANK
-+int isblank(int c) {
-+	return _isblank(c);
-+}
-+#endif
-+
-+
-+int isgraph(int c) {
-+	return _isgraph(c);
-+}
-+
-+
-+int ispunct(int c) {
-+	return _ispunct(c);
-+}
-+
-+
-+int isxdigit(int c) {
-+	return _isxdigit(c);
-+}
-+#endif
-+
-+#if !HAVE_DECL_ISBLANK
-+int isblank(int c) {
-+	return c == ' ' || c == '\t';
-+}
-+#endif
+ }
+ #endif
 diff -urN -x .svn ref/dash-0.5.11.5/src/system.h dash/src/system.h
 --- ref/dash-0.5.11.5/src/system.h	2018-12-14 06:48:03.000000000 +0100
 +++ dash/src/system.h	2022-09-24 15:44:37.093154232 +0200
