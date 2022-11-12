@@ -2,93 +2,80 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CF6C4332F
-	for <linux-dash@archiver.kernel.org>; Sat, 12 Nov 2022 11:03:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37856C433FE
+	for <linux-dash@archiver.kernel.org>; Sat, 12 Nov 2022 12:09:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231480AbiKLLDB (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sat, 12 Nov 2022 06:03:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58820 "EHLO
+        id S230365AbiKLMJn (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sat, 12 Nov 2022 07:09:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231463AbiKLLDA (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sat, 12 Nov 2022 06:03:00 -0500
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE69D959D
-        for <dash@vger.kernel.org>; Sat, 12 Nov 2022 03:02:59 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id bs21so9497014wrb.4
-        for <dash@vger.kernel.org>; Sat, 12 Nov 2022 03:02:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=sCNgCSFUqSH34vRZriPDo21L0XXR5uOOwVA/O5ZpSBE=;
-        b=SV8M/5UBuCPOa5/fEVD1atO8Ny3PBMG+XDbAj+CpXNmsnNxckwSCqbSqSsQuY0w1KE
-         HQ6K+zcxtFvl+xxcTQ9y2YkPRughGw3HKzqDKkd9iKu83vyTGfOMqROHTDiJUXnrkqZW
-         /0bZOkIu9sCuIf8Mj2N+cXIg3IYjrDcnabl3knYQx4fa0ALfA4VMrwG22zczix0DOsA2
-         N7NeUR+CD8f/DPGBvC3tVT/VTjq6LUjcVmae6uFIEVHbRZwmSB6duKmS/G5DIj6dmy5y
-         G7vSXCHOAQLqK/1Yl5QP4eZ49sXnpCLIYREau9/zkhLPntxvlvSyGwNPr7I/XnmJnER3
-         bxBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sCNgCSFUqSH34vRZriPDo21L0XXR5uOOwVA/O5ZpSBE=;
-        b=gZbTwCvFSbBbcgEcZ6zM3A+h0FWiM98R1a6blYCGr/zW/nkUKBGio3W0nLVptFA0Hn
-         mvUGcUM+BEqb5s8871UpNfdOwLZ0gDEBCfWhS+IWt4P/ueJno1NcEa4pBSzg6ZDKuYix
-         YYtgmA5AB9V2VwJqMtN6q+KHB4Lp6CJiVAt9Ou9hXXoCYq1JNRpR78kZXPlsOYpK+QjH
-         S4JkybcspdGMaRMa9Kzhnfe8E9F2wTyWHOLNztyYpHtVegavTtIH041YQHE4tB7v8aiP
-         zhK+JCCRs1IjLW9kLZJ0j+Wuv8bHblv0Yje5khjZ9wFZKxCkUMZHAAvoxTIVqn5bdvcz
-         Tr+w==
-X-Gm-Message-State: ANoB5plBE+VNBZa4r4l3BqN/aGUChcf9Srbuh9LzffQMy46fHFXmGJ6t
-        s7as+TllSkU5CdZl6RZl9/V/aNtbrpBfsVaQ7lW5xoVJ9JbOYg==
-X-Google-Smtp-Source: AA0mqf70J5KYzXjL82BvWvRawG2eRzsyNjQxH1wrgQFciRZnz8cYX1fPB/odKmV8ySYo5Byjy23BsNifk1VwSEB5Ncw=
-X-Received: by 2002:a5d:6e89:0:b0:228:dd1d:8a42 with SMTP id
- k9-20020a5d6e89000000b00228dd1d8a42mr3328869wrz.375.1668250978081; Sat, 12
- Nov 2022 03:02:58 -0800 (PST)
+        with ESMTP id S230257AbiKLMJm (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 12 Nov 2022 07:09:42 -0500
+X-Greylist: delayed 449 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 12 Nov 2022 04:09:40 PST
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E559B2250A
+        for <dash@vger.kernel.org>; Sat, 12 Nov 2022 04:09:40 -0800 (PST)
+Received: from [192.168.178.32] (uk.gigawatt.nl [51.148.134.205])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id AB04F1E54;
+        Sat, 12 Nov 2022 12:02:09 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl AB04F1E54
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1668254529;
+        bh=NGwQiEdX1v11euACvWICyPNV3mlq26PCBq2eJZv4EAw=; l=1306;
+        h=Date:Subject:To:References:From:In-Reply-To:From;
+        b=YvqCapr8cWwapQil56iykcDLWYloDchq+pq3HUDWTLHrj80ywVEOxGXNZ8GrG42CC
+         CkivH645KZje1ztJxMn18jO9xhgTgMOv57X0jimUIHlyMLubxZregttLCGHHttonID
+         MtceSPteyOairpyUl/uIvTg9zKx9fHMsBTcb+Q9w=
+Message-ID: <2d4016af-dc0d-141c-91e4-e808bda33e4d@gigawatt.nl>
+Date:   Sat, 12 Nov 2022 12:02:08 +0000
 MIME-Version: 1.0
-From:   Akbarkhon Variskhanov <akbarkhon.variskhanov@gmail.com>
-Date:   Sat, 12 Nov 2022 16:02:47 +0500
-Message-ID: <CANeoM1GQ6XsittRZAE-hZLQYngjF_B5Rm7f786cB3vLQY6dLmw@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
 Subject: Re: EXIT trap does not fire
-To:     dash@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     Akbarkhon Variskhanov <akbarkhon.variskhanov@gmail.com>,
+        dash@vger.kernel.org
+References: <CANeoM1GQ6XsittRZAE-hZLQYngjF_B5Rm7f786cB3vLQY6dLmw@mail.gmail.com>
+From:   Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <CANeoM1GQ6XsittRZAE-hZLQYngjF_B5Rm7f786cB3vLQY6dLmw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-I can confirm this behavior in dash
-0.5.11+git20210903+057cd650a4ed-3build1 (on Ubuntu).
+Hi,
 
-Signal terminations are not caught by EXIT. It only catches normal
-exits. Unfortunately, the EXIT condition is not well-defined by POSIX,
-so it's left to interpretation. In the EXAMPLES section of `trap`,
-it's hinted that EXIT should be able to handle all terminations (thus,
-acting like a shortcut):
+On 12/11/2022 11:02, Akbarkhon Variskhanov wrote:
+> In bash, however, it seems to work fine. The action is executed and
+> the exit status is preserved.
 
-> Set a trap so the logout utility in the directory referred to by the HOME environment variable executes when the shell terminates:
->   trap '"$HOME"/logout' EXIT
+This is not actually the case. bash will run EXIT actions on any signal 
+that it installs a handler for, but it does not install a handler for 
+all signals.
 
-In dash:
+   $ bash -c 'trap "echo exit" EXIT; kill -PWR $$; echo still here'
+   Power failure
+   $ bash -c 'trap "echo exit" EXIT; trap "exit" PWR; kill -PWR $$; echo 
+still here'
+   exit
 
-#!/bin/dash
-> /tmp/file
-trap 'rm -f /tmp/file' EXIT
-read -r input
+> I'm not sure what The Open Group is planning to do and whether or not
+> we're getting any clarification regarding this.
 
-the action is never executed if the script is sent any terminating
-signal (HUP, ABRT, INT, TERM, you name it).
+POSIX is making it unspecified what happens here:
 
-In bash, however, it seems to work fine. The action is executed and
-the exit status is preserved.
+   https://austingroupbugs.net/view.php?id=621
 
-I'm not sure what The Open Group is planning to do and whether or not
-we're getting any clarification regarding this. Until then, I think
-it's reasonable to interpret or even expect that the EXIT condition
-concerns all kinds of terminations, not just explicit program exits.
+     The EXIT condition shall occur when the shell terminates normally
+     (exits), and may occur when the shell terminates abnormally as a
+     result of delivery of a signal (other than SIGKILL) whose trap
+     action is the default.
 
-To conclude, I just wanna say that
+The original proposed resolution listed a number of signals that would 
+be required to be caught and to have EXIT handlers run. There were 
+objections to that proposed resolution, it seemed unreasonable to 
+require shells to install signal handlers for signals that scripts do 
+not explicitly request signal handlers for.
 
-     trap 'cleanup' EXIT
-
-is shorter/cleaner/better/saner than
-
-     trap 'cleanup' HUP ABRT INT QUIT TERM KILL PIPE ...
+Cheers,
+Harald van Dijk
