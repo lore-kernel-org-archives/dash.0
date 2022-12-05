@@ -2,166 +2,90 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10910C47089
-	for <linux-dash@archiver.kernel.org>; Mon,  5 Dec 2022 15:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50EE4C4321E
+	for <linux-dash@archiver.kernel.org>; Mon,  5 Dec 2022 15:27:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232010AbiLEPCJ (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Mon, 5 Dec 2022 10:02:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34494 "EHLO
+        id S231151AbiLEP1X (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Mon, 5 Dec 2022 10:27:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232208AbiLEPCH (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 5 Dec 2022 10:02:07 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D9F41D0FE
-        for <dash@vger.kernel.org>; Mon,  5 Dec 2022 07:02:05 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1p2Cyn-0046SX-Vs; Mon, 05 Dec 2022 23:02:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 05 Dec 2022 23:02:01 +0800
-Date:   Mon, 5 Dec 2022 23:02:01 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Alex Gorinson <algore3698@gmail.com>
-Cc:     dash@vger.kernel.org, Harald van Dijk <harald@gigawatt.nl>
-Subject: [v2 PATCH] expand: Add ifsfree to expand to fix a logic error that
- causes a buffer over-read
-Message-ID: <Y44H6WLH/b/6+Dey@gondor.apana.org.au>
-References: <CAOKKkHc=bt4p1d4hMzFbQeE14mZJJ7d1REpJ-D_BQD02re1Pdw@mail.gmail.com>
+        with ESMTP id S232621AbiLEP02 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 5 Dec 2022 10:26:28 -0500
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 38282DE80
+        for <dash@vger.kernel.org>; Mon,  5 Dec 2022 07:25:02 -0800 (PST)
+Received: from [192.168.178.37] (uk.gigawatt.nl [51.148.134.205])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id 80A09177;
+        Mon,  5 Dec 2022 15:25:00 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 80A09177
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1670253900;
+        bh=gQbe9gro0LncqumNQs1cnXznllyDKJHs3wRHik0a+U0=; l=1833;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=F2Jq0jYP0KzPpm7nrr0+Wnmvp5Ekvbt5MFJ/sMJ+Hf/3tWDiSOAWoliPH1eg2JrnM
+         GxvVimfZe0JevFwP8xxPsnIv/7I0CJZdRPcrqc9l4HRa67t6MGY77YYgvHdknYKRrn
+         K0mlagmBzK48F7whmmmVsqRxeyrY6+Yp91eknK1c=
+Message-ID: <2f8aff20-ed7f-ee61-9f3d-b7e649cbe56d@gigawatt.nl>
+Date:   Mon, 5 Dec 2022 15:24:22 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOKKkHc=bt4p1d4hMzFbQeE14mZJJ7d1REpJ-D_BQD02re1Pdw@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101
+ Thunderbird/108.0
+Subject: Re: [v2 PATCH] expand: Add ifsfree to expand to fix a logic error
+ that causes a buffer over-read
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Alex Gorinson <algore3698@gmail.com>
+Cc:     dash@vger.kernel.org
+References: <CAOKKkHc=bt4p1d4hMzFbQeE14mZJJ7d1REpJ-D_BQD02re1Pdw@mail.gmail.com>
+ <Y44H6WLH/b/6+Dey@gondor.apana.org.au>
+Content-Language: en-US
+From:   Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <Y44H6WLH/b/6+Dey@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 02:27:10PM -0400, Alex Gorinson wrote:
-> Due to a logic error in the ifsbreakup function in expand.c if a
-> heredoc and normal command is run one after the other by means of a
-> semi-colon, when the second command drops into ifsbreakup the command
-> will be evaluated with the ifslastp/ifsfirst struct that was set when
-> the here doc was evaluated. This results in a buffer over-read that
-> can leak the program's heap, stack, and arena addresses which can be
-> used to beat ASLR.
+On 05/12/2022 15:02, Herbert Xu wrote:
+> On Mon, Jun 20, 2022 at 02:27:10PM -0400, Alex Gorinson wrote:
+>> Due to a logic error in the ifsbreakup function in expand.c if a
+>> heredoc and normal command is run one after the other by means of a
+>> semi-colon, when the second command drops into ifsbreakup the command
+>> will be evaluated with the ifslastp/ifsfirst struct that was set when
+>> the here doc was evaluated. This results in a buffer over-read that
+>> can leak the program's heap, stack, and arena addresses which can be
+>> used to beat ASLR.
+>>
+>> Steps to Reproduce:
+>> First bug:
+>> cmd args: ~/exampleDir/example> dash
+>> $ M='AAAAAAAAAAAAAAAAA'    <note: 17 A's>
+>> $ q00(){
+>> $ <<000;echo
+>> $ ${D?$M$M$M$M$M$M}        <note: 6 $M's>
+>> $ 000
+>> $ }
+>> $ q00                      <note: After the q00 is typed in, the leak
+>> should be echo'd out; this works with ash, busybox ash, and dash and
+>> with all option args.>
+>>[...]
 > 
-> Steps to Reproduce:
-> First bug:
-> cmd args: ~/exampleDir/example> dash
-> $ M='AAAAAAAAAAAAAAAAA'    <note: 17 A's>
-> $ q00(){
-> $ <<000;echo
-> $ ${D?$M$M$M$M$M$M}        <note: 6 $M's>
-> $ 000
-> $ }
-> $ q00                      <note: After the q00 is typed in, the leak
-> should be echo'd out; this works with ash, busybox ash, and dash and
-> with all option args.>
+> Thanks for the report!
 > 
-> Patch:
-> Adding the following to expand.c will fix both bugs in one go.
-> (Thank you to Harald van Dijk and Michael Greenberg for doing the
-> heavy lifting for this patch!)
-> ==========================
-> --- a/src/expand.c
-> +++ b/src/expand.c
-> @@ -859,6 +859,7 @@
-> if (discard)
-> return -1;
-> 
-> +ifsfree();
-> sh_error("Bad substitution");
-> }
-> 
-> @@ -1739,6 +1740,7 @@
-> } else
-> msg = umsg;
-> }
-> +ifsfree();
-> sh_error("%.*s: %s%s", end - var - 1, var, msg, tail);
->  }
-> ==========================
+> I think it's better to add the ifsfree() call to the exception
+> handling path as other sh_error calls may trigger this too.
 
-Thanks for the report!
+FWIW, the possibility of other sh_error calls being overlooked is why I 
+ended up doing it differently myself: I ended up with exverror() calling 
+ifsfree(). It is a smaller change than this; it works because there is 
+currently no case where preserving IFS regions after an error is wanted 
+anyway, and I cannot imagine a future change that would change that. But 
+it is possible that my imagination is lacking there.
 
-I think it's better to add the ifsfree() call to the exception
-handling path as other sh_error calls may trigger this too.
+Q: If exception != EXERROR, longjmp() is called without first calling 
+ifsfree(), leaving IFS regions in place for a higher level to deal with. 
+If execution ultimately ends up at exitreset(), which calls ifsfree() 
+anyway, that is fine. Is that guaranteed to always be the case?
 
-Reported-by: Alex Gorinson <algore3698@gmail.com> 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/src/expand.c b/src/expand.c
-index aea5cc4..a40d8be 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -1763,6 +1763,16 @@ varunset(const char *end, const char *var, const char *umsg, int varflags)
- 	sh_error("%.*s: %s%s", end - var - 1, var, msg, tail);
- }
- 
-+void restore_handler_expandarg(struct jmploc *savehandler, int err)
-+{
-+	handler = savehandler;
-+	if (err) {
-+		if (exception != EXERROR)
-+			longjmp(handler->loc, 1);
-+		ifsfree();
-+	}
-+}
-+
- #ifdef mkinit
- 
- INCLUDE "expand.h"
-diff --git a/src/expand.h b/src/expand.h
-index c44b848..49a18f9 100644
---- a/src/expand.h
-+++ b/src/expand.h
-@@ -62,7 +62,9 @@ struct arglist {
- #define EXP_DISCARD	0x400	/* discard result of expansion */
- 
- 
-+struct jmploc;
- union node;
-+
- void expandarg(union node *, struct arglist *, int);
- #define rmescapes(p) _rmescapes((p), 0)
- char *_rmescapes(char *, int);
-@@ -71,6 +73,7 @@ void recordregion(int, int, int);
- void removerecordregions(int); 
- void ifsbreakup(char *, int, struct arglist *);
- void ifsfree(void);
-+void restore_handler_expandarg(struct jmploc *savehandler, int err);
- 
- /* From arith.y */
- intmax_t arith(const char *);
-diff --git a/src/parser.c b/src/parser.c
-index 13c2df5..bf94697 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -1589,9 +1589,7 @@ expandstr(const char *ps)
- 	result = stackblock();
- 
- out:
--	handler = savehandler;
--	if (err && exception != EXERROR)
--		longjmp(handler->loc, 1);
-+	restore_handler_expandarg(savehandler, err);
- 
- 	doprompt = saveprompt;
- 	unwindfiles(file_stop);
-diff --git a/src/redir.c b/src/redir.c
-index 93abba3..5a5835c 100644
---- a/src/redir.c
-+++ b/src/redir.c
-@@ -473,9 +473,7 @@ redirectsafe(union node *redir, int flags)
- 		handler = &jmploc;
- 		redirect(redir, flags);
- 	}
--	handler = savehandler;
--	if (err && exception != EXERROR)
--		longjmp(handler->loc, 1);
-+	restore_handler_expandarg(savehandler, err);
- 	RESTOREINT(saveint);
- 	return err;
- }
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Cheers,
+Harald van Dijk
