@@ -2,148 +2,147 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C79C4332F
-	for <linux-dash@archiver.kernel.org>; Wed, 14 Dec 2022 23:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8105FC4332F
+	for <linux-dash@archiver.kernel.org>; Wed, 14 Dec 2022 23:39:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229441AbiLNXHv (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 14 Dec 2022 18:07:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44150 "EHLO
+        id S229454AbiLNXjk (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 14 Dec 2022 18:39:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiLNXHt (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 14 Dec 2022 18:07:49 -0500
+        with ESMTP id S229560AbiLNXj0 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 14 Dec 2022 18:39:26 -0500
 Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 04B5029832
-        for <dash@vger.kernel.org>; Wed, 14 Dec 2022 15:07:42 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2352945ECE
+        for <dash@vger.kernel.org>; Wed, 14 Dec 2022 15:39:24 -0800 (PST)
 Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 11A4BFBC;
-        Thu, 15 Dec 2022 00:07:40 +0100 (CET)
+        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 53E7D11CE
+        for <dash@vger.kernel.org>; Thu, 15 Dec 2022 00:39:22 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202211; t=1671059260;
-        bh=ShkNhiY9i7XF4FfkaWpeRYOKGoig5UUH292whqtn2gE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=doOefPJookxxSCcP5nk5KuYga1/aaS8dLBTnxbMKL+kE9getXzsQxg2yHEwz+MYlA
-         S9q5wKK8H7zvIm8UcU65zmJBS1Z9XHZbTKDF+Iu2Flns9yoRq4QMltAZtBdpZJEE1W
-         5eKIUvDIrjm83JXO9RvY1do/JnD8rhBEWJimkHpaGubL8IjRrzK83e6PD9yGjs6jvr
-         j55bZ3HaHpfJrl1zryZEqrwheDflKsOZe34f4geTYN7FgPki5Dk8UCwsUTzjP6VEkK
-         hCGyClBPq79zW/8l1e78Qaj1GHjAjwyaF3yrdSVNqWaz2WtNSr6tQnuvNPxQeXH0GW
-         KYeqo6VEoPx3Q==
-Date:   Thu, 15 Dec 2022 00:07:38 +0100
+        s=202211; t=1671061162;
+        bh=V0fmCYd5hkH1lJ/FQEM82C+izDClEDfEej2OgVWDYyY=;
+        h=Date:From:To:Subject:From;
+        b=MZgdrDSYMTnVCgYdFu+CenJ8JN2cdhkYr27ph1Nyx0yb+FytjMycJBWhSMdgGl8h9
+         4CIM5LOT/T2doVSTxf3YJTwbqxzFSAXBNLNPZAkEiKhWjY/4f/JAgMjW55OaTX2on7
+         UvlWgi+UnSDB66yxjhZTCRUUZ+r4vY9LLQB8D7HzzYJGn/yDJ+uKOboYQAie5ieEXq
+         gbDGhtsUE2btspcyFQV9V7X99FQLX7OJk+4c86jV4J57JdE2uH6jx9YQ2NoPa1KAew
+         8wZdOMX+LsJeIpGXTtDVXtn1pPuc9LqeBxlJyX+82LdFTL1AOpdWuWQYONXy+vYqDE
+         VJPBSp4YcldDA==
+Date:   Thu, 15 Dec 2022 00:39:21 +0100
 From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
-To:     Michael Greenberg <michael@greenberg.science>
-Cc:     Steffen Nurpmeso <steffen@sdaoden.eu>, dash@vger.kernel.org
-Subject: Re: [PATCH] options: don't error when unsetting OPTIND
-Message-ID: <20221214230738.kedln32yfzcgdovd@tarta.nabijaczleweli.xyz>
-References: <20221214023130.u7pn4ca6ma4kuxot@tarta.nabijaczleweli.xyz>
- <m2edt2nk5q.fsf@greenberg.science>
- <20221214174946.yISP5%steffen@sdaoden.eu>
- <m2bko5obo9.fsf@greenberg.science>
+To:     dash@vger.kernel.org
+Subject: [PATCH] parser: don't keep alloca()ing in a loop for substitutions
+Message-ID: <20221214233921.m6hpt5a6kb3wgyjl@tarta.nabijaczleweli.xyz>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="q6c2eshbq64qpgmn"
+        protocol="application/pgp-signature"; boundary="pkcwtjcn3mxuqizz"
 Content-Disposition: inline
-In-Reply-To: <m2bko5obo9.fsf@greenberg.science>
 User-Agent: NeoMutt/20220429
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
 
---q6c2eshbq64qpgmn
-Content-Type: text/plain; charset=utf-8
+--pkcwtjcn3mxuqizz
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi!
+When encountering
+  printf %010000d | tr 0 \` | sh -n
+  printf %09999d  | tr 0 \` | sh -n
+you want no output and "Syntax error: EOF in backquote substitution",
+respectively; instead, current dash segfaults.
 
-On Wed, Dec 14, 2022 at 05:36:22PM -0500, Michael Greenberg wrote:
-> On 2022-12-14 at 06:49:46 PM, Steffen Nurpmeso wrote:
->=20
-> > Michael Greenberg wrote in
-> >  <m2edt2nk5q.fsf@greenberg.science>:
-> >  ...
-> >  |Bafflingly, the POSIX spec gives the example `readonly HOME PWD`, but
-> >  |with no explanation about why one might want to do that. (I get making
-> >  |`HOME` readonly, but `PWD`? Is that supposed to stop `cd` from workin=
-g?)
-> >
-> > PWD is a beast with lots of "behaviors of the cd and pwd utilities
-> > are unspecified" in case of user edits, see "2.5.3 Shell Variables".
->=20
-> Is running `readonly PWD` the same as setting `PWD`?
->=20
-> The language in the documentation for `cd` and in 2.5.3 only talks about =
-setting or
-> unsetting `PWD`, but not the export/readonly bits.
+This is because the alloca for the save buffer is run, naturally,
+in the same function, so first it allocates one byte, then two,
+then ..., then appx. 4000 (for me, depends on the binary),
+then it segfaults on the memcpy (it's even worse, since due to
+alignment, it usually allocates much more for the early stuff).
 
-Isssue 8 Draft 2.1, XBD, 8.1 Environment Variable Definition para. 11
-(p. 156, ll. 5381-5390) says:
-  Additionally, a subset of the above variables are manipulated by shell bu=
-ilt-in utilities outside of
-  shell assignments. If an attempt is made to mark any of the following var=
-iables as readonly, then
-  either the readonly utility shall reject the attempt, or readonly shall s=
-ucceed but the shell can still
-  modify the variables outside of assignment context, or readonly shall suc=
-ceed but use of a shell
-  built-in that would otherwise modify such a variable shall fail.
-    LINENO
-    OLDPWD
-    OPTARG
-    OPTIND
-    PWD
+Nevertheless, the stack frame grows unboundedly, until we completely
+destroy the stack. Instead, alloca a 1KiB buffer on first use and
+fall back to ckmalloc for bigger save buffers. In practice this means
+that we'll alloca nothing in a good amount of cases, then just about
+always use the alloca buffer except for truly pathological input.
 
-I.e., readonly PWD; cd /; PWD=3Ddupa must:
-  * fail in readonly, or
-  * fail in the cd, or
-  * fail in the assignment
-at implementer's choice. Which is just a long-winded way of saying "just
-do whatever but only accept readonly if it does anything".
+Fixes: https://bugs.debian.org/966156
+---
+ src/parser.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-Dash appears to do option 2:
-  $ ./dash -c 'readonly PWD; cd /'
-  ./dash: 1: cd: PWD: is read only
-  $ ./dash -c 'readonly OPTIND; getopts a a -a'
-  ./dash: 1: getopts: OPTIND: is read only
-which is fine.
-OLDPWD behaves like PWD and OPTARG like OPTIND.
-LINENO behaves like option 3 for obvious reasons.
+diff --git a/src/parser.c b/src/parser.c
+index a552c47..3f7e50a 100644
+--- a/src/parser.c
++++ b/src/parser.c
+@@ -898,6 +898,7 @@ readtoken1(int firstc, char const *syntax, char *eofmar=
+k, int striptabs)
+ 	struct nodelist *bqlist;
+ 	int quotef;
+ 	int oldstyle;
++	char *parsebackq_save;
+ 	/* syntax stack */
+ 	struct synstack synbase =3D { .syntax =3D syntax };
+ 	struct synstack *synstack =3D &synbase;
+@@ -906,6 +907,7 @@ readtoken1(int firstc, char const *syntax, char *eofmar=
+k, int striptabs)
+ 		synstack->dblquote =3D 1;
+ 	quotef =3D 0;
+ 	bqlist =3D NULL;
++	parsebackq_save =3D NULL;
+=20
+ 	STARTSTACKSTR(out);
+ 	loop: {	/* for each line, until end of word */
+@@ -1355,15 +1357,18 @@ badsub:
+ parsebackq: {
+ 	struct nodelist **nlpp;
+ 	union node *n;
+-	char *str;
++	char *str, *mstr;
+ 	size_t savelen;
+ 	struct heredoc *saveheredoclist;
+ 	int uninitialized_var(saveprompt);
+=20
+-	str =3D NULL;
++	str =3D mstr =3D NULL;
+ 	savelen =3D out - (char *)stackblock();
+ 	if (savelen > 0) {
+-		str =3D alloca(savelen);
++		if (savelen > 1024)
++			str =3D mstr =3D ckmalloc(savelen);
++		else
++			str =3D parsebackq_save ?: (parsebackq_save =3D alloca(1024));
+ 		memcpy(str, stackblock(), savelen);
+ 	}
+         if (oldstyle) {
+@@ -1449,6 +1454,7 @@ done:
+ 	if (str) {
+ 		memcpy(out, str, savelen);
+ 		STADJUST(savelen, out);
++		free(mstr);
+ 	}
+ 	USTPUTC(CTLBACKQ, out);
+ 	if (oldstyle)
+--=20
+2.30.2
 
-(For completeness: in ibid., para. 12 (ll. 5391-5392)
- there's a provision for special treatment for any non-standard
- variable we want for our built-ins:
-   Implementations may provide an implementation-defined set of additional =
-variables which are
-   manipulated by implementation-specific built-in utilities not defined in=
- this standard. The
-   readonly utility shall not reject marking these additional variables as =
-readonly, but when marked
-   readonly, those extension utilities shall either continue to modify the =
-variables, or shall fail
-   because the variable is readonly. None of the variables defined by this =
-standard shall be in this
-   implementation-defined set.)
-
-Best,
-=D0=BD=D0=B0=D0=B1
-
---q6c2eshbq64qpgmn
+--pkcwtjcn3mxuqizz
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmOaVzUACgkQvP0LAY0m
-WPEC7Q//Wt+9PQ4QTpj+L9wSKPb1Qvgz81G6gjqeb44pIr2LgZY9zsk7Z7ufHfL/
-Yh92cCwN1Y0chRZuKs21w2kN+1eefgA8toxe2R+h+0rffj0EqQEEfPkYvuDjdSWU
-r1Ssfv9aPKl9Fo5SJmWy3VyBYY0nCl5y0igNEQq1azs2S/epXtCRhbLFUePXTMrl
-r8RI8FWuPZ3NE0y3ljj7RYCzYqxuilv+St/dyU+IAZJfoYMclL18Lc7vUIqOGM4M
-xyTcTFlvxIAqCgifkE2oSlRgmsCe8GK2OzRd/GY85sL7vSUZnJQSmZbyUcHx1uyh
-9ljDLTnXLIwhcvztT0lTtXNL78AJgY6chCGSCZZaOYQsniFcE5RGyrmWit6dYoSe
-PYL6bL3tYP1mLZ35gyO0vgHX7LkazshLkG0ko0Mz+YD1CNwOeXc4TZWOzkuQ1y6q
-EU4d9pGfyQiow+dOf78uNOpl3VHFDQXLQdpXTW/An3j9KP3Lf5kNvYL9f0XGpf6+
-nVwQM5854C/urBip3xHxpwi1VdFndlEWx58d3e1FJmxEwUKzA3aaOBtbUyUSIdvo
-A6CEVxWZ6OoQN2St08ENWWxHq4Snx1mITKG/CvfqzxGRebxhpvWH3nZCAaNMQ5uj
-wsw5JDi6tKVeUISm6eKAUPbbWL13swD3amNsIwzBz+jg1NH/+Ts=
-=rnjo
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmOaXqgACgkQvP0LAY0m
+WPExuxAAtx6TkTYyoXFq/NZ0j/vDuJkxhYkjrZJ2jOwMfYyItsbmah/vI+abcSm0
+oHpbdfiNlhOSFe16zBxsb8M/0EKbQyhAr5zeOiGKAi0I7aXTXkeBhGq8a2S0GcLp
+Z4jamUjMmOOQExzOQbjBvtNcYZmUtomBIXjoWmVnqWdwxui/gfsiV1JhJqlydUdF
+x4Di6X5AIzYXNHQWEGACWMfNTK/ml7LvpdhaVWNcI0V56BQNLVY5mIgophNp7LZ/
+XqfrXhrN1uGtdIqbruDgoS8z3JxtvQN6ppCUi1+G1Cpm6tm6b1T77/hOfsGnKx+f
+n6excFEjeV5+Uyatz0tlNriGsA+qf7qKebWHMTJS1kbMiYmdeNQ+z/0YV5gRUMj9
+XGffnPbHFoOMhtUPcOplNh+pW7OVSs8qZ3p4co3NvR9nSy4SLbZD5y6/a6KqP/7/
+VzfJdLhiSOLCax07aFDM3AJkyyufSXylqjsilK2rzJCNq4ecl8CMerYO5/FYevbm
+UdMB/r5fjfdoBCj8FLCMSL5C/cIp9tv+1fLGH1IkHo2AMR2H765O/HYIqa4T8tM1
+ujqTX/4BCLj7sr0M3FjrpyCuQZeyzvw5DNKVBGJ5iSwphee7LZ2TqbVXg4xWLWDW
+ZG2BcF1QU/52ih0N6FsAkeQB9mGwZkfpj40cG2ztn32wuVgL/r0=
+=DON3
 -----END PGP SIGNATURE-----
 
---q6c2eshbq64qpgmn--
+--pkcwtjcn3mxuqizz--
