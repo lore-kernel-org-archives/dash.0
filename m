@@ -2,115 +2,93 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D52AC4332F
-	for <linux-dash@archiver.kernel.org>; Thu, 15 Dec 2022 18:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED3CBC10F1E
+	for <linux-dash@archiver.kernel.org>; Thu, 15 Dec 2022 20:51:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbiLOSjk (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Thu, 15 Dec 2022 13:39:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37266 "EHLO
+        id S229677AbiLOUv0 (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Thu, 15 Dec 2022 15:51:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229873AbiLOSjh (ORCPT <rfc822;dash@vger.kernel.org>);
-        Thu, 15 Dec 2022 13:39:37 -0500
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ABD655AF
-        for <dash@vger.kernel.org>; Thu, 15 Dec 2022 10:39:33 -0800 (PST)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.nyi.internal (Postfix) with ESMTP id E01E85C0085;
-        Thu, 15 Dec 2022 13:39:30 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Thu, 15 Dec 2022 13:39:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        greenberg.science; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm3; t=1671129570; x=1671215970; bh=PfrTA4zFLq
-        4u9TnjR4p5y2Q46TZDspKkwUYVEBhx3pQ=; b=HxBdti9bqCQQ1fvirLHxdr+5fx
-        eNWlqW2tNdaeW0NdHHVCBan3D7f00kU+aLraWS1MVqx8rUImHi7zK/EUwqVhpgN1
-        VNGkhUp/z2W0Jdwdp2oc2KJSvawtJOAjkftX2tHLXAoG7YpHtCij2nhh3JIenys5
-        PBO6YM6oTUxViQGHYk3Wub7x/YPcLfCD4xBzOz7G9rdopwB2u6xEg5DYcMmA7SnT
-        1BI47trUOK144PxOQaseaDsnlUuYh1PO11F6WBuM1OsAdcbHl5i3sgQfeFY+k49/
-        RQUm2gm7ReX8XnPOcl/3JlP4tCjtkhMtNrcqhxeDOoS1XCDIruAgCAQ34/OQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1671129570; x=
-        1671215970; bh=PfrTA4zFLq4u9TnjR4p5y2Q46TZDspKkwUYVEBhx3pQ=; b=R
-        1w0hS9kPDzl5rDFTEFhesxLBWDPNMfa4AP55jN9EB9udyxZFgOCqZ4HApa83IfIm
-        XYBKufSS0PV+Tq6pzvqxHSC2JvCSAKivj3beROrxse0ooRJv36K9AGtGdTeBQMUX
-        vNK4IPZxYLvv9fRDatxa6UGgjeFLZbxTnKFURaQZN/SZc03xnh90eH+2CLts+9bU
-        hwfedAl4LN85TiJjoHS6uxm/PBKhKgOWvD30f8bEQjPV3R1iRfTwY45tJwBm+8Qg
-        9VUyYt+9XGPoxseV/rTZH4lujEYyl81smXOzEbQmM80Z0NL1Nm/awO7KlbjdVJjM
-        IEauRnJvoFi31U2FbNBgA==
-X-ME-Sender: <xms:4mmbYzK7-QcPh6HCnhymzp5cT9N7M_jVaxaVVL45V0ZkRxZh-NMavw>
-    <xme:4mmbY3K8kfntQWCQkJPw2TcUQk97S3vpufOEhxYRmQAxMjv1jlrTTTnX1SZ3gMnWc
-    LwnGZ5YZrEJ7gGv3Hw>
-X-ME-Received: <xmr:4mmbY7sA1L7otXbWZkMHi3DRNIl9KxfcL4Zg-67YkMcnQ9a_cMMo43Wqfw0b>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeehgdduudefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefujghffffkgggtgfesthhqredttddtjeenucfhrhhomhepofhitghh
-    rggvlhcuifhrvggvnhgsvghrghcuoehmihgthhgrvghlsehgrhgvvghnsggvrhhgrdhstg
-    hivghntggvqeenucggtffrrghtthgvrhhnpeeiteeguedukeeiueduteevfeduveeigfdv
-    hfdtleffueffudfftdfgteeuueejjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehmihgthhgrvghlsehgrhgvvghnsggvrhhgrdhstghivghn
-    tggv
-X-ME-Proxy: <xmx:4mmbY8a9M9TgMXAm__5Q4TsP2ktlJ_la1GOh6CXkErc3XvUOPCKcUQ>
-    <xmx:4mmbY6Z1U7mzbziuYT7_HA8QuSaucgRXTrftfoBx-GiNMWczKrD6rA>
-    <xmx:4mmbYwDYKs5f3u-HoNr4AXHe2HC3Acqyhvo-bdmLZxFLReZtQcnMYg>
-    <xmx:4mmbY9x7fgD4ZPE9IsJV5fSwoiP_bltubwBf125rQqW7KKiZgvvjCg>
-Feedback-ID: ib2794684:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 15 Dec 2022 13:39:30 -0500 (EST)
-From:   Michael Greenberg <michael@greenberg.science>
-To:     =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
-Cc:     Steffen Nurpmeso <steffen@sdaoden.eu>, dash@vger.kernel.org
-Subject: Re: [PATCH] options: don't error when unsetting OPTIND
-In-Reply-To: <20221214230738.kedln32yfzcgdovd@tarta.nabijaczleweli.xyz>
-References: <20221214023130.u7pn4ca6ma4kuxot@tarta.nabijaczleweli.xyz>
- <m2edt2nk5q.fsf@greenberg.science>
- <20221214174946.yISP5%steffen@sdaoden.eu>
- <m2bko5obo9.fsf@greenberg.science>
- <20221214230738.kedln32yfzcgdovd@tarta.nabijaczleweli.xyz>
-Date:   Thu, 15 Dec 2022 13:39:29 -0500
-Message-ID: <m25yeco6ji.fsf@greenberg.science>
+        with ESMTP id S229595AbiLOUvY (ORCPT <rfc822;dash@vger.kernel.org>);
+        Thu, 15 Dec 2022 15:51:24 -0500
+Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2687C1EEC5
+        for <dash@vger.kernel.org>; Thu, 15 Dec 2022 12:51:22 -0800 (PST)
+Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
+        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 3AEBDF7A
+        for <dash@vger.kernel.org>; Thu, 15 Dec 2022 21:51:20 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
+        s=202211; t=1671137480;
+        bh=CFsEq4PWcbWdBwLyPgEIw97elek4I4TckN3r4S6iOuo=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=B4tGQn7EJaOvwdgFJfmXgTUaeAGJD+U7AR4aXPHXCXVNHaU/67BUVZcWD+g25GFj/
+         nCMdKI05QsEA5nMUFSCFTPhnzkiUpwB5pZwH2roYHFnOfIUe9DYwN42xAP+zGIHdaI
+         y0u6B8DMzdlnrx9FECoDEb4ljcmz0BbvpQrhO5ra7KTzS89OXfFxoyfgDI0zs8R2Ak
+         /1iwx5XoLMfGsB7scFGTwLa5IhBHOHB6PxFpJzecPUHqzvcN5coN3pAT6Ay0coE9E/
+         ODeXDvCbRH+BV0hYkm/Ojuox6kgu6XP0GU+upryLmz2on05H3fNmj90NTol/gZjw2b
+         140sdtJFCxdEQ==
+Date:   Thu, 15 Dec 2022 21:51:19 +0100
+From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
+To:     dash@vger.kernel.org
+Subject: [PATCH v2 4/3] man: document false built-in
+Message-ID: <20221215205119.sihav7onr3l77el4@tarta.nabijaczleweli.xyz>
+References: <ce831de5c91ebd75b6da5fbdd7de79159a765e6f.1671063677.git.nabijaczleweli@nabijaczleweli.xyz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="i5whyngkrjyht2h2"
+Content-Disposition: inline
+In-Reply-To: <ce831de5c91ebd75b6da5fbdd7de79159a765e6f.1671063677.git.nabijaczleweli@nabijaczleweli.xyz>
+User-Agent: NeoMutt/20220429
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On 2022-12-15 at 12:07:38 AM, =D0=BD=D0=B0=D0=B1 wrote:
 
-> Hi!
->
-> On Wed, Dec 14, 2022 at 05:36:22PM -0500, Michael Greenberg wrote:
->> On 2022-12-14 at 06:49:46 PM, Steffen Nurpmeso wrote:
->>=20
->> > Michael Greenberg wrote in
->> >  <m2edt2nk5q.fsf@greenberg.science>:
->> >  ...
->> >  |Bafflingly, the POSIX spec gives the example `readonly HOME PWD`, but
->> >  |with no explanation about why one might want to do that. (I get maki=
-ng
->> >  |`HOME` readonly, but `PWD`? Is that supposed to stop `cd` from worki=
-ng?)
->> >
->> > PWD is a beast with lots of "behaviors of the cd and pwd utilities
->> > are unspecified" in case of user edits, see "2.5.3 Shell Variables".
->>=20
->> Is running `readonly PWD` the same as setting `PWD`?
->>=20
->> The language in the documentation for `cd` and in 2.5.3 only talks about=
- setting or
->> unsetting `PWD`, but not the export/readonly bits.
->
-> Isssue 8 Draft 2.1, XBD, 8.1 Environment Variable Definition para. 11
-> (p. 156, ll. 5381-5390) says:
+--i5whyngkrjyht2h2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for finding this! I didn't think to check the current draft.
+Only true was documented, add false just below it
+(out of order, but so is true, and the grouping makes much more sense).
+---
+ src/dash.1 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Cheers,
-Michael
+diff --git a/src/dash.1 b/src/dash.1
+index 514fcfe..f06efb6 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -1095,6 +1095,8 @@ etc).
+ .It :
+ .It true
+ A null command that returns a 0 (true) exit value.
++.It false
++A null command that returns a 1 (false) exit value.
+ .It \&. file
+ The commands in the specified file are read and executed by the shell.
+ .It alias Op Ar name Ns Op Ar "=3Dstring ..."
+--=20
+2.30.2
+
+--i5whyngkrjyht2h2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmObiMYACgkQvP0LAY0m
+WPGXng/8C7maE9ArPeYgf+HDrCau2/b9Ok+/j9OQBJCCSwxfIgPftwLGJ+Sn4HF7
+OQY7hbV1yhtlCCYeUXcS4sx7rB92tzhDViBlFaS6X8mn0Cqw7Eo4esXSYkr0OpeN
+UTOt3fmYrSp1u1KcO66NcKSvmPWrd4Equ5x9TrruuIupBVHFzREkqcFgnxqge8bp
+D+k3BaA9Dihp7uajD1K9F/XFkeeGxFS9hE1eHg+CkyriiQpR0G2kL/9WVKV9/T7O
+dh/rPHwh6pvDHHCp1mxIupKO4S9S+YP3wMApYC+bl87uBazdRTMSk5d8r4VR2i1/
+XJWLqxKkpTgL4NIzZNvjI51/2IlKwJtBvNC2IVsoJdy4XZzN4cES0hE5fiUqp3+4
+ZCwcPxFp5h8QipqeaRBRC+GIJP2Kid88P3Mt6V+6dFR7RnBOr3myhjViV5Af6SC/
+0A4Hh1+KP2bsr69nkhzMUdqgiQiSi7nSobpYnnxYxVU5BHcPSRZJqU4of9LYisam
+rfA97ZlSHFBw9NBC0Maz/BSBoPUHyd1BIhcnmrFxNRgHkShQpVIooJY5pkDHnxtt
+m8TAZQ6MimVuCoh/J5U0/cm1SZJK5/8OJ6QEgvhq2MdheMy/4IE2bb6QW1kzlYAk
+xyGstIFIvo8T0G9im8H857Z+U5A6hlNFrRyn87kR+nlRb00U2e0=
+=/vAY
+-----END PGP SIGNATURE-----
+
+--i5whyngkrjyht2h2--
