@@ -2,40 +2,40 @@ Return-Path: <dash-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8280C4332F
-	for <linux-dash@archiver.kernel.org>; Thu, 15 Dec 2022 00:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C0DC4332F
+	for <linux-dash@archiver.kernel.org>; Thu, 15 Dec 2022 00:23:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbiLOAXC (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 14 Dec 2022 19:23:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43684 "EHLO
+        id S229649AbiLOAXG (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 14 Dec 2022 19:23:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229760AbiLOAW5 (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 14 Dec 2022 19:22:57 -0500
+        with ESMTP id S229575AbiLOAXE (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 14 Dec 2022 19:23:04 -0500
 Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8C9BC33D
-        for <dash@vger.kernel.org>; Wed, 14 Dec 2022 16:22:56 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 933EF33D
+        for <dash@vger.kernel.org>; Wed, 14 Dec 2022 16:23:03 -0800 (PST)
 Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id DF6C610AE
-        for <dash@vger.kernel.org>; Thu, 15 Dec 2022 01:22:55 +0100 (CET)
+        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id E7B4D10B0
+        for <dash@vger.kernel.org>; Thu, 15 Dec 2022 01:23:02 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202211; t=1671063775;
-        bh=pHTzXZY/7vJtwyPcBiMopJ8j7dWNhZckzeNXV871fm8=;
+        s=202211; t=1671063782;
+        bh=5o6tJ0cSUTQyKxBYqsWZuD7huartTkVdL44QI2weMfY=;
         h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=PW1hE/g2Xu+rJFJhrGYJilbLjBKIwqEyQAplU2dM4Ti0zX3ANXRPjuM5qcjAzYAw3
-         njK1PU67OCjWnVfz6Amq9eXDravk07p5T7lIefrxmSMjUdUqDSSt/JXPdQxDAG6WF+
-         6SENPaBJEKW/rkT86HYK20/Ci7r9gMXeYfSf1mD6SDY9LRKfbi3f4M+sGZzPPkgqgp
-         9nEGIe/VskLzf+DCH9ysc/WNLu40CO9wbYJ45VS+KcugonDhfcDUBTY9wKpcKsVGiu
-         CWmTUAfPKTSuqXJJgOhs1SqJg4hGMt7SgfVABlEuXMWTKBZWlxxSGWlhe1YOe8wX1M
-         YMnyCNLQUzm3g==
-Date:   Thu, 15 Dec 2022 01:22:54 +0100
+        b=FrY0jhlQyxhsXKtUP39sRSGOUrmnMHXpIUJfRMjlNsJfvap17Nu2Y9npaWtPQb5Ha
+         Y+gcJdtG9qRX1ioeZtfBaTmzIya4VZuFjgYmHiDHxH49XDh5bcAUcHErlcJbTZmxqS
+         +TsrassWBVgpFuPZJGGAjJvKNZOjyOevS43+sU7w07lEiN77/S+PpBe5llm40ibjNf
+         4dgBeDpszZ6eCDLqw/DkdW01jV+ybcGxR7OhakcC/b8xzMk0hcwmmr2B9QgUuT/h9+
+         e2XF1GG5HXwGlx3xQHsK+rcI4p4gq3flbTL1KRBy13InNS3Wevkv2ALixddQ9VMn9N
+         U5DLjj3vWujhQ==
+Date:   Thu, 15 Dec 2022 01:23:01 +0100
 From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
 To:     dash@vger.kernel.org
-Subject: [PATCH v2 2/3] man: note chdir being the same builtin as cd
-Message-ID: <73d0a6fb6647fc83b592070ec4c4882f1de124b6.1671063677.git.nabijaczleweli@nabijaczleweli.xyz>
+Subject: [PATCH v2 3/3] man: document kill builtin
+Message-ID: <90e2b94e6e75aab4d591affa3eb0c63446eb404d.1671063677.git.nabijaczleweli@nabijaczleweli.xyz>
 References: <ce831de5c91ebd75b6da5fbdd7de79159a765e6f.1671063677.git.nabijaczleweli@nabijaczleweli.xyz>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="3fxmqxks5xiabgpx"
+        protocol="application/pgp-signature"; boundary="gg4kgjf2fq3f2v26"
 Content-Disposition: inline
 In-Reply-To: <ce831de5c91ebd75b6da5fbdd7de79159a765e6f.1671063677.git.nabijaczleweli@nabijaczleweli.xyz>
 User-Agent: NeoMutt/20220429
@@ -44,52 +44,76 @@ List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
 
---3fxmqxks5xiabgpx
+--gg4kgjf2fq3f2v26
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
+The manual now contains all built-ins
 ---
- src/dash.1 | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/dash.1 | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/src/dash.1 b/src/dash.1
-index 969a883..dd2bd47 100644
+index dd2bd47..514fcfe 100644
 --- a/src/dash.1
 +++ b/src/dash.1
-@@ -1143,8 +1143,8 @@ Do not execute the command but
- search for the command and print the absolute pathname
- of utilities, the name for builtins or the expansion of aliases.
+@@ -1478,6 +1478,33 @@ of other members of the job.
+ .It Fl p
+ Display only leader PIDs, one per line.
  .El
--.It cd Ar -
--.It Xo cd Op Fl LP
-+.It cd|chdir Ar -
-+.It Xo cd|chdir Op Fl LP
- .Op Ar directory
- .Xc
- Switch to the specified directory (default
++.It kill Oo Fl s Ar sigspec | Fl Ns Ar signum | Fl Ns Ar sigspec Oc Op Ar =
+pid | job ...
++Equivalent to
++.Xr kill 1 ,
++but a
++.Ar job
++spec may also be specified.
++Signals can be either case-insensitive names without
++.Dv SIG
++prefixes or decimal numbers; the default is
++.Dv TERM .
++.It kill Fl l Op Ar signum | exitstatus
++List available signal names without the
++.Dv SIG
++prefix
++.Pq Ar sigspec Ns s .
++If
++.Ar signum
++specified, display just the
++.Ar sigspec
++for that signal.
++If
++.Ar exitstatus
++specified
++.Pq > Sy 128 ,
++display just the
++.Ar sigspec
++that caused it.
+ .It pwd Op Fl LP
+ builtin command remembers what the current directory
+ is rather than recomputing it each time.
 --=20
 2.30.2
 
-
---3fxmqxks5xiabgpx
+--gg4kgjf2fq3f2v26
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmOaaN4ACgkQvP0LAY0m
-WPGGmBAAsk53nOvG8WjhLFXbVUL+Gk8nge/DY2B1q/7bmTdEMfSj26Ey+UFVOP24
-8cFxIgsjeBfb8N+QyDZSnVTlkROPmOBwCh5N9nYcZbUIoNUpFCSalk3wocwBu+j4
-4XifY/51VUnQaCXNhv/IfiWWNjeJRZ8kPO/ioMpY0uGN8DHqtLPCdAO+WEz7Rlk0
-T88yselWvy1PQGJdWaSbPUujnePB42pIEvML+xOtNiP/JfgNSBCXxGLCtuOCMIWA
-0cgCgUQpL6uugSPPiYIFThkNePguPbJEeWFl2uSYJ+YsrGQThMY9uJPq2A6Px+zf
-KBwRreFSXpA6Iefw5bqJL5PUBePiquWecDsA4fTj9uIslwVdGm5dKXGBNE5PtJIC
-Xldr9hKc00Ko0WT66/E0S1Qm6OopF5/K7qT1ewurE7k0pjxH3Fp8cn0CJJrDIriE
-Th8E/aPkSpfR+genYpKSGejGIWGAU4yodzVwiF1nHRg1KjoRZSPc9ho7kljKOXSq
-7DDDl3xQvC2lMCHJV8xiwG6A19UkaBey1Wd/YdGhbNAU6q3pp+dI8KS2MIFbUIrW
-LBYNIgCFpYcmbA2E/W5m/2eNjN0WqGzAljKGOqK5MrjCVQbYnPG7gSw154ZtYq6c
-FANTSneV4G6j3/vAf2HfvI0MOOQE/y9GeInJNxyY6oCifffKj6A=
-=IU/n
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmOaaOUACgkQvP0LAY0m
+WPFEzA/6A4MeWfA34sJlcSojPkspLRgY0reAAY7SEjdbimbwLmkBkBmzk/DsWeZe
+Byf8pTrSf48yhVLlmNXaFjTdjjQXxG3jTuH24N7jWqlkYykZj26LHbO2Q1717aC3
+YtNBmrkN+ng/Pgv7Xa1b8SOsqmJrUnAIDuXaS8Mk82gv5+SJNJ+GX9xwc6VPhAdp
+UGyp0f4JM75nfx1asixPmlst0gdlXqac7gduJ+1ZDQgBwRtvZTFx5EV9iCatmd1C
+be2c+b/A9jiZuoDc9nEXYsho6asuVA1mODwo0rOL+3ln8u1m3wF3Ixh6Ilh/Y4NR
+zYXmX4t0iq/LpMuDnJKfeGMNntb8+WQRrnZrS9TGkbmbMAluwOxlki6112mRVszU
+u+UkVjbxvzLXFo1pxrj0bw8zEPKJVgtDWs10n9d5bvs+Q3xsw7UPHfJJnHYivsy9
+S+/VkJpBfa1/evMlFoejmKH6rgmeeNA2G+8J4/SDjN+kXsTMRZm6hatJoPHjcLfN
+KjcWEX9UTKVKr51EaoWoMYg72npwdPOM3hjdxT3Di3xTlQLOPU38JatDhIN21MSk
+70wz8EgiOKlmX1PoxowtsYmZB3+sPM2eMYSV7rOb39Ojk2zYj9OxsJyoL1orkvWp
+rhME5NzR1mYaXQNeLDvvKeqZyVrLaMplKeU+t1aVJJ5kwDjv6Gs=
+=YXsa
 -----END PGP SIGNATURE-----
 
---3fxmqxks5xiabgpx--
+--gg4kgjf2fq3f2v26--
