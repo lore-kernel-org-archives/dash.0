@@ -2,84 +2,65 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE6CBC3DA7A
-	for <linux-dash@archiver.kernel.org>; Mon,  2 Jan 2023 12:46:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 748CDC3DA7A
+	for <linux-dash@archiver.kernel.org>; Mon,  2 Jan 2023 13:37:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232371AbjABMqf (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Mon, 2 Jan 2023 07:46:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52254 "EHLO
+        id S230314AbjABNhA (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Mon, 2 Jan 2023 08:37:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231445AbjABMqe (ORCPT <rfc822;dash@vger.kernel.org>);
-        Mon, 2 Jan 2023 07:46:34 -0500
-Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 535393B3
-        for <dash@vger.kernel.org>; Mon,  2 Jan 2023 04:46:32 -0800 (PST)
-Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 36CBC4A8;
-        Mon,  2 Jan 2023 13:46:29 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202211; t=1672663589;
-        bh=4+F7qxkZx5aSKDPMBe7urZgT1z5d62vBSne0EOenUeU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=glV5DHyYq5h8z8VKZfSnqHa7cUi3T9J7wxslVJY1nnTHTWTPuJV3Wktwah5bcw9Y5
-         PYn5PaKm+0c+15dtgq1w9bCLZJTbjxk8oixTlf8Pa17/Rln7uKBYu7Ob/OBjF/cgu8
-         K30go9gEDEMoESLGJ4uRKDOwpSJ5KX12Fa1hc+PANvVrulpB7BrNVt2nVKFGvH0j5s
-         6BA1zb5we3AKJ7bFKHLPEiJBcMyUw6LJ/G0oSmhSPvNRlWMIsbFkokPXXXWvKPTlkI
-         KH6glW0z/1L6LCGtrBmgnqPlIP3+tXjDOBTq4/BAz5xql1Aoc327YHWc09ey6ZXKSZ
-         LrPkqireo1qEQ==
-Date:   Mon, 2 Jan 2023 13:46:28 +0100
-From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dash@vger.kernel.org
+        with ESMTP id S232615AbjABNgv (ORCPT <rfc822;dash@vger.kernel.org>);
+        Mon, 2 Jan 2023 08:36:51 -0500
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 215BBF2
+        for <dash@vger.kernel.org>; Mon,  2 Jan 2023 05:36:49 -0800 (PST)
+Received: from [192.168.178.37] (uk.gigawatt.nl [51.148.134.205])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id 2D3A2744;
+        Mon,  2 Jan 2023 13:36:48 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 2D3A2744
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1672666608;
+        bh=b/+EnZYvMs6y7RKP21Wd9RhRI9o29wjXmZZkTo499EI=; l=750;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=lWwy0FOf1ACZmC1zg+a+izyfUzidXpXSYbPTR05rG5hqgV8w6eo/gwHGCI8EcoFB3
+         V7rJjCoRW/bYVdlA3QIWHDZahsQ+ft22jPxshhuSZKNZPzGikmcUqlfGTwhtTLevOh
+         y0QBAJlg6mk17J6tKlvxrRL0teE5H8qq8J44cJRg=
+Message-ID: <8f9890b8-225c-a091-ef2c-27f3bb508940@gigawatt.nl>
+Date:   Mon, 2 Jan 2023 13:34:34 +0000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101
+ Thunderbird/109.0
 Subject: Re: [PATCH 1/2] exec: type: ignore first --, per POSIX
-Message-ID: <20230102124628.w6mtevhvnuthco4j@tarta.nabijaczleweli.xyz>
+To:     =?UTF-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dash@vger.kernel.org
 References: <b9085f1a9812a436d37bc6f8d96d17bdba4433c5.1670966008.git.nabijaczleweli@nabijaczleweli.xyz>
  <Y7KhlatS/XnFn3VP@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="zwqy7f5oglnzf3sf"
-Content-Disposition: inline
-In-Reply-To: <Y7KhlatS/XnFn3VP@gondor.apana.org.au>
-User-Agent: NeoMutt/20220429
+ <20230102124628.w6mtevhvnuthco4j@tarta.nabijaczleweli.xyz>
+Content-Language: en-US
+From:   Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <20230102124628.w6mtevhvnuthco4j@tarta.nabijaczleweli.xyz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
+On 02/01/2023 12:46, наб wrote:
+> On Mon, Jan 02, 2023 at 05:19:17PM +0800, Herbert Xu wrote:
+>> наб <nabijaczleweli@nabijaczleweli.xyz> wrote:
+>>> Issue 7, XCU, type, OPTIONS reads "None.",
+>> type is marked XSI.  dash does claim conformance with respect
+>> to XSI.
+> Which means it ought to abide by "None." in the OPTIONS sexion,
+> as out-lined in the subsequent lines, i.e. discard an initial --, yes.
+> 
+> Good to see we agree, I guess?
 
---zwqy7f5oglnzf3sf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm pretty sure that was a pretty bad typo and meant to say "dash does 
+*not* claim conformance with respect to XSI." See e.g. 
+<https://lore.kernel.org/dash/20130904032000.GA19583@gondor.apana.org.au/>, 
+"In any case, dash does not claim XSI conformance, [...]"
 
-On Mon, Jan 02, 2023 at 05:19:17PM +0800, Herbert Xu wrote:
-> =D0=BD=D0=B0=D0=B1 <nabijaczleweli@nabijaczleweli.xyz> wrote:
-> > Issue 7, XCU, type, OPTIONS reads "None.",
-> type is marked XSI.  dash does claim conformance with respect
-> to XSI.
-Which means it ought to abide by "None." in the OPTIONS sexion,
-as out-lined in the subsequent lines, i.e. discard an initial --, yes.
-
-Good to see we agree, I guess?
-=D0=BD=D0=B0=D0=B1
-
---zwqy7f5oglnzf3sf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmOy0h8ACgkQvP0LAY0m
-WPFvdxAAiG0hJUpoYq8JvrsO3lHoMx+zWpJE9VMW/lj7klM+wqr2KZ+0Vjrv9oHv
-vKMeHy4vMj28XyvUhEU2MXhOscc1SJQveliaDop/ABvZd/v5IQ3sHeMb568/23/G
-yKu3QSDHEdlIJLhW51l8u62CFmAduItN0hrTCzZzYRScpOPQzSMB8D4VS+avgy7a
-FYCgwlQW+82oP5BvJv2DIu/3lIuX4bw4JP3g5jgewistotTTWAj2mA1aPJlzjQso
-SnmBX8OlTn6jjiBkXh2Wy8jrZFvPQASoxoh6J1rRrlh1Ag719+wpSwreS+HE6cwX
-zUdW0mj/iRI+SLcYFS6kUBbi2UQkO6qav0NRxPkxVBZcUbpg/khz9P6389y3tzZx
-JPLf8JCJDYeSmnP5IGg9XZ17ZzWDi3vp31fkSAUZ4tEdGm/YTy5br4MoqKS1cEbd
-pRXoazFdtzfghgIM9uVh0MvTBlKOWezskOklKZSCLWZV5SSF5gnUQ1Uqjs8i/jev
-a+NB6jyCyMSIZb0UNqT8/LJoAgZ3Sp8d2NBmM6TeFzLI5DjoUhP3vDYhVds1fQ9d
-RjE779oRCM7Qas3gUevC2I2kOHAyXguB+btXxzYOzsMQZXnRJzEjlhvXuRVB9zO9
-Vx5qZ/GFwwD2Skb2k2ZuK+I9aNcHu+ZgRogfiUghAes6nbzuYFA=
-=HpuN
------END PGP SIGNATURE-----
-
---zwqy7f5oglnzf3sf--
+Cheers,
+Harald van Dijk
