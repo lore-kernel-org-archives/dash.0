@@ -2,200 +2,249 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E373C3DA7D
-	for <linux-dash@archiver.kernel.org>; Tue,  3 Jan 2023 06:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 393B8C3DA7D
+	for <linux-dash@archiver.kernel.org>; Tue,  3 Jan 2023 09:08:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230124AbjACGQD (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Tue, 3 Jan 2023 01:16:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57572 "EHLO
+        id S232970AbjACJIo (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Tue, 3 Jan 2023 04:08:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230107AbjACGQD (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 3 Jan 2023 01:16:03 -0500
+        with ESMTP id S230478AbjACJIn (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 3 Jan 2023 04:08:43 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24FD0C42
-        for <dash@vger.kernel.org>; Mon,  2 Jan 2023 22:16:01 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23006DFC8
+        for <dash@vger.kernel.org>; Tue,  3 Jan 2023 01:08:40 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pCaac-00DMOt-CY; Tue, 03 Jan 2023 14:15:59 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Jan 2023 14:15:58 +0800
-Date:   Tue, 3 Jan 2023 14:15:58 +0800
+        id 1pCdHh-00DOQo-Um; Tue, 03 Jan 2023 17:08:39 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Jan 2023 17:08:37 +0800
+Date:   Tue, 3 Jan 2023 17:08:37 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
-Cc:     dash@vger.kernel.org, harald@gigawatt.nl
-Subject: [v3 PATCH] input: Read standard input byte-wise
-Message-ID: <Y7PIHqN4ic4UBOBb@gondor.apana.org.au>
+To:     dash@vger.kernel.org
+Subject: [PATCH] input: Disable lleft in SMALL mode
+Message-ID: <Y7PwlSeCwzgXztfc@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <42d2b629549d8be07d14acb6cdd7d0f853ed1a6e.1670979949.git.nabijaczleweli@nabijaczleweli.xyz>
-X-Newsgroups: apana.lists.os.linux.dash
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-наб <nabijaczleweli@nabijaczleweli.xyz> wrote:
-> 
-> POSIX Issue 7, XCU, sh, STDIN says:
+Counting lleft is only necessary if history support is enabled.
+Therefore it can be safely disabled if SMALL is defined.
 
-Your patch breaks history support since that relies on there
-being a whole line in the input buffer.
-
-This works for me:
-
----8<---
-POSIX Issue 7, XCU, sh, STDIN says:
- When the shell is using standard input and it invokes a command that
- also uses standard input, the shell shall ensure that the standard
- input file pointer points directly after the command it has read when
- the command begins execution. It shall not read ahead in such a manner
- that any characters intended to be read by the invoked command are
- consumed by the shell (whether interpreted by the shell or not) or
- that characters that are not read by the invoked command are not seen
- by the shell.
-
-I.e.
- sh <<EOF
- id
- cat
- good!
- EOF
-must execute id, then execute cat, then the cat must copy "good!"
-to the standard output stream, and similarly
- sh <<"EOF"
- id
- read Q
- good!
- echo Q$Q
- EOF
-must execute id, then read "good!" into Q, then echo "Qgood!".
-
-Heretofor the output was as such:
- uid=1000(nabijaczleweli) gid=100(users) groups=100(users)
- ./dash: 3: good!: not found
-and as such (with -x):
- + id
- uid=1000(nabijaczleweli) gid=100(users) groups=100(users)
- + read Q
- + good!
- sh: 3: good!: not found
- + echo Q
- Q
-and a strace confirms:
- read(0, "id\ncat\ngood!\n", 8192)       = 13
- read(0, "id\nread Q\ngood!\necho Q$Q\n", 8192) = 25
-
-Reading the standard input byte-by-byte is the obvious solution to this
-issue, Just Works, and is how all of shells do it on non-seekable input
-(we could, theoretically, read regular files block-wise,
-then seek within them after parsing, but the complexity out-weighs
-the rarity of running sh < program; we could also do whole-line reads
-on teletypes in icanon mode, but, again, the gain here is miniscule
-for an interactive session, and the mode can change at any time, so...).
-Naturally, we keep reading block-wise from not-standard-input.
-
-With this patch, we observe the correct
- uid=1000(nabijaczleweli) gid=100(users) groups=100(users)
- good!
-and
- + id
- uid=1000(nabijaczleweli) gid=100(users) groups=100(users)
- + read Q
- + echo Qgood!
- Qgood!
-
-Link: https://bugs.debian.org/862907
-Reported-by: наб <nabijaczleweli@nabijaczleweli.xyz>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/src/input.c b/src/input.c
-index ec075f5..43c9161 100644
+index 8691617..7b37ae2 100644
 --- a/src/input.c
 +++ b/src/input.c
-@@ -159,6 +159,17 @@ int pgetc(void)
- 	return __pgetc();
- }
+@@ -54,9 +54,7 @@
+ #include "alias.h"
+ #include "parser.h"
+ #include "main.h"
+-#ifndef SMALL
+ #include "myhistedit.h"
+-#endif
  
-+static int stdin_clear_nonblock(void)
-+{
-+	int flags = fcntl(0, F_GETFL, 0);
-+
-+	if (flags >= 0) {
-+		flags &=~ O_NONBLOCK;
-+		flags = fcntl(0, F_SETFL, flags);
-+	}
-+
-+	return flags;
-+}
+ #define IBUFSIZ (BUFSIZ + 1)
  
- static int
- preadfd(void)
-@@ -195,22 +206,38 @@ retry:
+@@ -256,12 +254,10 @@ retry:
  
- 	} else
- #endif
-+	if (parsefile->fd)
- 		nr = read(parsefile->fd, buf, IBUFSIZ - 1);
-+	else {
-+		unsigned len = IBUFSIZ - 1;
-+
-+		nr = 0;
-+
-+		do {
-+			int err;
+ static int preadbuffer(void)
+ {
+-	char *q;
+-	int more;
+-#ifndef SMALL
+ 	int something;
+-#endif
+ 	char savec;
++	int more;
++	char *q;
  
-+			err = read(0, buf, 1);
-+			if (err <= 0) {
-+				if (nr)
-+					break;
-+
-+				nr = err;
-+				if (errno != EWOULDBLOCK)
-+					break;
-+				if (stdin_clear_nonblock() < 0)
-+					break;
-+
-+				out2str("sh: turning off NDELAY mode\n");
-+				goto retry;
-+			}
-+
-+			nr++;
-+		} while (!IS_DEFINED_SMALL && *buf++ != '\n' && --len);
-+	}
+ 	if (unlikely(parsefile->strpush)) {
+ 		popstring();
+@@ -271,11 +267,11 @@ static int preadbuffer(void)
+ 		return PEOF;
+ 	flushall();
  
- 	if (nr < 0) {
- 		if (errno == EINTR)
- 			goto retry;
--		if (parsefile->fd == 0 && errno == EWOULDBLOCK) {
--			int flags = fcntl(0, F_GETFL, 0);
--			if (flags >= 0 && flags & O_NONBLOCK) {
--				flags &=~ O_NONBLOCK;
--				if (fcntl(0, F_SETFL, flags) >= 0) {
--					out2str("sh: turning off NDELAY mode\n");
--					goto retry;
--				}
--			}
--		}
+-	more = parsefile->lleft;
++	more = input_get_lleft(parsefile);
+ 	if (more <= 0) {
+ again:
+ 		if ((more = preadfd()) <= 0) {
+-			parsefile->lleft = parsefile->nleft = 0;
++			input_set_lleft(parsefile, parsefile->nleft = 0);
+ 			return PEOF;
+ 		}
  	}
- 	return nr;
+@@ -283,37 +279,38 @@ again:
+ 	q = parsefile->nextc;
+ 
+ 	/* delete nul characters */
+-#ifndef SMALL
+ 	something = 0;
+-#endif
+ 	for (;;) {
+ 		int c;
+ 
+ 		more--;
+ 		c = *q;
+ 
+-		if (!c)
++		if (!c) {
+ 			memmove(q, q + 1, more);
+-		else {
+-			q++;
++			goto check;
++		}
+ 
+-			if (c == '\n') {
+-				parsefile->nleft = q - parsefile->nextc - 1;
+-				break;
+-			}
++		q++;
+ 
+-#ifndef SMALL
+-			switch (c) {
+-			default:
+-				something = 1;
+-				/* fall through */
+-			case '\t':
+-			case ' ':
+-				break;
+-			}
+-#endif
++		if (IS_DEFINED_SMALL)
++			goto check;
++
++		switch (c) {
++		case '\n':
++			parsefile->nleft = q - parsefile->nextc - 1;
++			goto check;
++
++		default:
++			something = 1;
++			/* fall through */
++
++		case '\t':
++		case ' ':
++			break;
+ 		}
+ 
++check:
+ 		if (more <= 0) {
+ 			parsefile->nleft = q - parsefile->nextc - 1;
+ 			if (parsefile->nleft < 0)
+@@ -321,12 +318,12 @@ again:
+ 			break;
+ 		}
+ 	}
+-	parsefile->lleft = more;
++	input_set_lleft(parsefile, more);
+ 
+-	savec = *q;
++	if (!IS_DEFINED_SMALL)
++		savec = *q;
+ 	*q = '\0';
+ 
+-#ifndef SMALL
+ 	if (parsefile->fd == 0 && hist && something) {
+ 		HistEvent he;
+ 		INTOFF;
+@@ -334,7 +331,6 @@ again:
+ 			parsefile->nextc);
+ 		INTON;
+ 	}
+-#endif
+ 
+ 	if (vflag) {
+ 		out2str(parsefile->nextc);
+@@ -343,7 +339,8 @@ again:
+ #endif
+ 	}
+ 
+-	*q = savec;
++	if (!IS_DEFINED_SMALL)
++		*q = savec;
+ 
+ 	return (signed char)*parsefile->nextc++;
  }
+@@ -458,7 +455,7 @@ setinputfd(int fd, int push)
+ 	parsefile->fd = fd;
+ 	if (parsefile->buf == NULL)
+ 		parsefile->buf = ckmalloc(IBUFSIZ);
+-	parsefile->lleft = parsefile->nleft = 0;
++	input_set_lleft(parsefile, parsefile->nleft = 0);
+ 	plinno = 1;
+ }
+ 
 diff --git a/src/input.h b/src/input.h
-index 8c39f33..8830b66 100644
+index 8830b66..1ff5773 100644
 --- a/src/input.h
 +++ b/src/input.h
-@@ -34,6 +34,12 @@
-  *	@(#)input.h	8.2 (Berkeley) 5/4/95
+@@ -76,7 +76,9 @@ struct parsefile {
+ 	int linno;		/* current line */
+ 	int fd;			/* file descriptor (or -1 if string) */
+ 	int nleft;		/* number of chars left in this line */
++#ifndef SMALL
+ 	int lleft;		/* number of chars left in this buffer */
++#endif
+ 	char *nextc;		/* next char in buffer */
+ 	char *buf;		/* input buffer */
+ 	struct strpush *strpush; /* for pushing strings at this level */
+@@ -110,3 +112,19 @@ void setinputstring(char *);
+ void popfile(void);
+ void unwindfiles(struct parsefile *);
+ void popallfiles(void);
++
++static inline int input_get_lleft(struct parsefile *pf)
++{
++#ifdef SMALL
++	return 0;
++#else
++	return pf->lleft;
++#endif
++}
++
++static inline void input_set_lleft(struct parsefile *pf, int len)
++{
++#ifndef SMALL
++	pf->lleft = len;
++#endif
++}
+diff --git a/src/myhistedit.h b/src/myhistedit.h
+index 22e5c43..1736f62 100644
+--- a/src/myhistedit.h
++++ b/src/myhistedit.h
+@@ -31,9 +31,27 @@
+  *	@(#)myhistedit.h	8.2 (Berkeley) 5/4/95
   */
  
 +#ifdef SMALL
-+#define IS_DEFINED_SMALL 1
++typedef void History;
++typedef void EditLine;
++typedef int HistEvent;
++
++enum {
++	H_APPEND,
++	H_ENTER,
++};
++
++#define hist NULL
++
++static inline void history(History *h, HistEvent *he, int action, char *p)
++{
++}
 +#else
-+#define IS_DEFINED_SMALL 0
+ #include <histedit.h>
+ 
+ extern History *hist;
 +#endif
 +
- /* PEOF (the end of file marker) is defined in syntax.h */
+ extern EditLine *el;
+ extern int displayhist;
  
- enum {
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
