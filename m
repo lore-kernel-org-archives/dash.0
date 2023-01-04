@@ -2,105 +2,106 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1EDC46467
-	for <linux-dash@archiver.kernel.org>; Wed,  4 Jan 2023 11:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3825C4332F
+	for <linux-dash@archiver.kernel.org>; Wed,  4 Jan 2023 11:33:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233446AbjADLZr (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 4 Jan 2023 06:25:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49302 "EHLO
+        id S234001AbjADLdv (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 4 Jan 2023 06:33:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230423AbjADLZq (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 4 Jan 2023 06:25:46 -0500
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 645FD1ADBB
-        for <dash@vger.kernel.org>; Wed,  4 Jan 2023 03:25:45 -0800 (PST)
-Received: from [IPV6:2a02:8010:68a1:0:f140:f5fb:7038:8e8a] (unknown [IPv6:2a02:8010:68a1:0:f140:f5fb:7038:8e8a])
-        by mail.gigawatt.nl (Postfix) with ESMTPSA id E303E477;
-        Wed,  4 Jan 2023 11:25:43 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl E303E477
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-        s=default; t=1672831544;
-        bh=tubGJbYnRpmg7dfw2PXjewETma8y5cZHkXihMX3Rf2g=; l=2255;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=SSUGX2t4ebaA7dcM2uOINAuMdjDuai/iiA+fm/mnrD6jejwcFj4UKYkCfA2KTROFl
-         /vOicJsg41Mz2oJVJNBwrAnfQlylMOnVdBnHSnEJTr1ZLPYnvWXhk+54Hg5DWjU6aY
-         QtVFGwjjv9iWKII0rkOtME3cv6hLxvpGdvucZfg4=
-Message-ID: <8ddcc8a3-9588-435a-9d5f-1edbcd121012@gigawatt.nl>
-Date:   Wed, 4 Jan 2023 11:25:09 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101
- Thunderbird/109.0
-Subject: Re: [PATCH v2 2/3] parser: synerror: explicitly consume the entire
- invalid line
-Content-Language: en-US
+        with ESMTP id S234268AbjADLdu (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 4 Jan 2023 06:33:50 -0500
+Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 720CFF0D
+        for <dash@vger.kernel.org>; Wed,  4 Jan 2023 03:33:49 -0800 (PST)
+Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
+        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 7790C650;
+        Wed,  4 Jan 2023 12:33:46 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
+        s=202211; t=1672832026;
+        bh=+9ZYAQnw0dnvfNmHkoJ6pachmekwMilPvZFeSybxkLQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=M1o26AOW1V48+i8/jgVvwJ1Y8Nxy1DVjyDbRZxiayh5gNh1u5Z8JLJ9N+ILJRLrY2
+         BhdQLNhJRsdclpKeqtmmZjZmB1AnnBZS6hVMK7Ian/9sYGOhz5vOqRFSmNg2MXRCRN
+         n54wzQrQAMJSuBM9hUQK0jP1/TtHpJfhekoQIK0hYLsbuox8lsHw5zjLiyA8wy5JiE
+         5DZq8uAKZyhRrZtpmDezy0h8Xk8QkCD4tmiFZ2zFjkAjv++CBx2WtpEbCDPwkVzIrQ
+         Ow2lTnHlcaLjqadAEPk0ZHfpjkIgeQa6yVBlxgEC/wN5rkJB90w3V/Wih7lPV0C2qb
+         M9XcG4li1Gvnw==
+Date:   Wed, 4 Jan 2023 12:33:45 +0100
+From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     =?UTF-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>,
-        dash@vger.kernel.org
-References: <Y7OKk/jM53zRE4xg@gondor.apana.org.au>
- <bb422d70-0ba5-e29b-3ec8-8fc1c4630233@gigawatt.nl>
- <Y7VMJGPXXziUrBio@gondor.apana.org.au>
-From:   Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <Y7VMJGPXXziUrBio@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Cc:     dash@vger.kernel.org
+Subject: [PATCH v2 1/2] options: getopts: ignore first --, per POSIX
+Message-ID: <728796762ed62a1e9a38cf62762e57509e5027a2.1672831998.git.nabijaczleweli@nabijaczleweli.xyz>
+References: <Y7TgIM0PFC5HaZk6@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="4dio53pphmti4peh"
+Content-Disposition: inline
+In-Reply-To: <Y7TgIM0PFC5HaZk6@gondor.apana.org.au>
+User-Agent: NeoMutt/20220429
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On 04/01/2023 09:51, Herbert Xu wrote:
-> On Tue, Jan 03, 2023 at 11:47:05AM +0000, Harald van Dijk wrote:
->>
->> In order for this to be a problem, we need something where the newline
->> itself triggers a syntax error. For synexpect(TDO), is that possible? In all
->> cases where synexpect(TDO) is called, a newline is permitted, and it is the
->> token after the newline that the error will be reported on, no? In that
->> situation, reading the rest of the line is correct.
-> 
-> You're right, it isn't possible with TDO.
-> 
->> I'm not going to rule out that there is a potential for problems, but if
->> there is, it's not the situation you say.
-> 
-> However, the synexpect in parsefname would seem to qualify:
-> 
-> cat <<- <newline>
 
-You're right, that does show the problem, thanks.
+--4dio53pphmti4peh
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Since the only case where special care is needed is when the problematic 
-token was newline, it can be handled as simply as
+Issue 7, XCU, getopts, OPTIONS reads "None.",
+and getopts isn't a special built-in listed in sexion 2.14 =E2=80=92
+this means that XCU, 1. Introduction, 1.4 Utility Description Defaults,
+OPTIONS, Default Behavior applies:
+  Default Behavior: When this section is listed as "None.", it means
+  that the implementation need not support any options. Standard
+  utilities that do not accept options, but that do accept operands,
+  shall recognize "--" as a first argument to be discarded.
 
-   if (lasttoken != TNL)
-     skipline();
+Test with: getopts -- d: a
+Correct output is no output, exit 1
+Wrong output errors out with d: being an invalid argument name
+---
+ src/options.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-I will do some testing to see if I am overlooking something, and follow 
-up if I am.
+diff --git a/src/options.c b/src/options.c
+index a46c23b..337a8ee 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -409,6 +409,9 @@ getoptscmd(int argc, char **argv)
+ {
+ 	char **optbase;
+=20
++	nextopt(nullstr);
++	argc -=3D argptr - argv - 1;
++	argv =3D argptr - 1;
+ 	if (argc < 3)
+ 		sh_error("Usage: getopts optstring var [arg]");
+ 	else if (argc =3D=3D 3) {
+--=20
+2.30.2
 
->> Handling it in the input layer after the error has already been reported
->> means we get inconsistent error handling when running with dash -isv. The
->> error may, depending on whether the rest of the line was in the buffer
->> already, be reported either in the middle of the input line, or on the next
->> line.
->>
->> Just try changing sh -i to sh -iv in the reproducer and seeing what what
->> happens with your patch.
-> 
-> I don't think this is such a big deal.  You get the same effect
-> if you simply do input line buffering but only up to a certain
-> length.  I tried one million instead of ten thousand with the
-> reproducer and ksh93 prints out the error after only 65536
-> characters.
-> 
-> In any case, we could actually fix this by buffering stderr and
-> then making sh -v bypass the buffer and write directly to 2.
-> 
-> I tried it and it actually seems to work.  But all the extra flush
-> calls bloat up the code a bit so it needs a bit more work before
-> I'm happy to run with it.
 
-Interesting approach. Error messages are known to always fit in the 
-buffer, so you can probably be sure it won't be forced to be emitted 
-early. It could work.
+--4dio53pphmti4peh
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Cheers,
-Harald van Dijk
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmO1ZBgACgkQvP0LAY0m
+WPEzlA/+LNOxJhriZ9xEaaZhKCo8pSIlf04BUsmagzoXbMbjGIqODEuY5sBO1Tht
+/8CHMemh5Zz8p7ooU4gXeDswrJDAGO7IarrE0k5bFhfYd5aibVmr2zMQAKosZeET
+909T4vxcx1973rJDtc02wKTKBeJklUusBHoUSgXe2h0XFumNIWuzEYjctgixib7I
+iYMjKRiZ5DF6EvK1udbbCngiph1zEg7fTX4Ks97qifG/gc8i9h3hNcIkR+3JAAJg
+XdY6+XgvjQA0tCLwlfF9cidpIV/KXbxW9pliWq3DHMkxLUT2ywGZTEIGnFBvAjrE
+r3VtX9dzvtEUbORMyj6VYk3sEKEN5/KLFGeL7ntueNgcXo3JsG0BZgmmExoex9CU
+uezrjA9zMwxKkIU10BG1+ZBSPMTF+hNWOq9TGu+E9knjb1pidk9rYK6YrRCgw9py
+ew3d6zb/DAx/Jqyjt+RzJOkMu+l34mxoPJzBlY6V27kupw2Z+b1FIqzDJz4xUTm9
+EeU4HONfS5il27jJjCRx/2C5m2E1ww3ufQzr2XvR9fh7mZ8t9jLoG9O5Ww0g+QsS
+6xvtOC9HBHftigG+MUCAyY3aVkYcZPdyyDwEt15sWbpO8N0fA7TvztTlyYuicNIA
+MjWZSdJ/9F6WgFxoAosIXYV2TifvO9xNoa0UnoNqAqFbr5M/2pY=
+=iDMg
+-----END PGP SIGNATURE-----
+
+--4dio53pphmti4peh--
