@@ -2,50 +2,50 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28285C54EBD
-	for <linux-dash@archiver.kernel.org>; Mon,  9 Jan 2023 00:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B33C7C54EBC
+	for <linux-dash@archiver.kernel.org>; Mon,  9 Jan 2023 00:15:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234115AbjAIAMi (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sun, 8 Jan 2023 19:12:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55356 "EHLO
+        id S230441AbjAIAPr (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sun, 8 Jan 2023 19:15:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234052AbjAIAMd (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sun, 8 Jan 2023 19:12:33 -0500
+        with ESMTP id S230315AbjAIAPq (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sun, 8 Jan 2023 19:15:46 -0500
 Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5EE7B1144A
-        for <dash@vger.kernel.org>; Sun,  8 Jan 2023 16:12:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 94C2AEE
+        for <dash@vger.kernel.org>; Sun,  8 Jan 2023 16:15:45 -0800 (PST)
 Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id D88981126;
-        Mon,  9 Jan 2023 01:12:20 +0100 (CET)
+        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id DFDDF1048;
+        Mon,  9 Jan 2023 01:15:44 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202211; t=1673223140;
-        bh=dEvsxRGwxtTaf1tRKPXRt2rH+AYzQH2luGS+/ohQTcU=;
+        s=202211; t=1673223344;
+        bh=WFHUqTpNWxTbB2UEuJwbBuUVa7wOWmEAT+Qln0r+DT8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=AnwIeZNw9t6AWWKi7N2MupvRfJry/wqVr0lAg/kYxeB14km8u6RkZTpphoPnFxHKU
-         ike9KvbUjY1RsWqNq8JsZa9ngxB/FKcJyPYn89JACbikWD8pOPQOmrRlj9U3EQqMD4
-         yNjtgALtOkbyPcIguO+8M+wFmlkZc5qczunTdRpNqFTBTLgjptVjhsihdcP7JLu5bG
-         VPeAym6XN5EeCJFQ+gVQ+27pvrijyflEYTeMhKP/ACr8RMffMoYgUJHSktZDlOFSSm
-         SG5In/QeaMUEKP9l4qmK3heRJTigulYi4PeHY/9QEolvbKbgNwiWS/HOolb1mrfaFL
-         3O+GGsZYyuMGA==
-Date:   Mon, 9 Jan 2023 01:12:19 +0100
+        b=teeuVMG8/o+SOvqPs98bpvYsXJ/suDQSyx/fkO9zdTFQDiE+zqreXFsCpE5LTdInp
+         ybj7qwacwVd0IEv1kUCF81F3llDD7Lw/wH0S66uaeKk2LxiFez26kIjYWmhfGWiOWH
+         AVy8DwrcCrAkEq78Z6/03nYbQolWG8Y7giJjjO68NJpOjYLvnj9NXfp5/n+fn8iZt2
+         KR6FPsAwpoxHAWNcdFPlZlKC2f3uNwIpMRJXwLwEUepj5Qkm4mlk8lgSDKGicM/4p5
+         PjVzT1zvxu0S+JUoCl95XbE9l3ypHDsQAbXhgOZMd48HOCqy86FGWXcvsIMUwrg0vU
+         pu+5P+Hr/3A/w==
+Date:   Mon, 9 Jan 2023 01:15:43 +0100
 From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
 To:     Harald van Dijk <harald@gigawatt.nl>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
-Subject: [PATCH] alias: fix name quoting in printalias
-Message-ID: <20230109001219.2ylktzb7uckoeti5@tarta.nabijaczleweli.xyz>
-References: <ae838562-3d6d-aad8-f3ae-8d7d23e25c4d@gigawatt.nl>
+Subject: [PATCH v2] alias: fix name quoting in printalias
+Message-ID: <20230109001543.vpk6khjtqkjtrjox@tarta.nabijaczleweli.xyz>
+References: <20230109001219.2ylktzb7uckoeti5@tarta.nabijaczleweli.xyz>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="xeci533rptxhhaud"
+        protocol="application/pgp-signature"; boundary="7hb2riuxrznjm2he"
 Content-Disposition: inline
-In-Reply-To: <ae838562-3d6d-aad8-f3ae-8d7d23e25c4d@gigawatt.nl>
+In-Reply-To: <20230109001219.2ylktzb7uckoeti5@tarta.nabijaczleweli.xyz>
 User-Agent: NeoMutt/20220429
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
 
---xeci533rptxhhaud
+--7hb2riuxrznjm2he
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -56,26 +56,13 @@ separately first.
 Fixes: commit 4ec545e8dc98a3f461cf56bed03adafa81c64aec ("alias: Quote
  name in printalias")
 ---
-I coulda swore I tested it and that's where I got my commit message from;
-I try to always use my history verbatim for the messages,
-for this exact reason.
-That said, I can reproduce the bug on trunk and my clean original branch,
-so dunno how that got there. my b.
-
-On trunk:
-  $ src/dash -c 'alias foo=3Dbar "a|b|c"=3Dd; alias'
-  'bar'=3D'bar'
-  'd'=3D'd'
-With patch:
-  $ src/dash -c 'alias foo=3Dbar "a|b|c"=3Dd; alias'
-  'foo'=3D'bar'
-  'a|b|c'=3D'd'
+really not my year sorry
 
  src/alias.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/alias.c b/src/alias.c
-index 1375cdd..3cd589c 100644
+index 1375cdd..fcad43b 100644
 --- a/src/alias.c
 +++ b/src/alias.c
 @@ -197,7 +197,8 @@ freealias(struct alias *ap) {
@@ -84,31 +71,31 @@ index 1375cdd..3cd589c 100644
  printalias(const struct alias *ap) {
 -	out1fmt("%s=3D%s\n", single_quote(ap->name), single_quote(ap->val));
 +	out1str(single_quote(ap->name));
-+	out1fmt("=3D%s\n", single_quote(ap->name), single_quote(ap->val));
++	out1fmt("=3D%s\n", single_quote(ap->val));
  }
 =20
  STATIC struct alias **
 --=20
 2.30.2
 
---xeci533rptxhhaud
+--7hb2riuxrznjm2he
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmO7W+MACgkQvP0LAY0m
-WPGsfA//bQQIq560Fnd0VDZmxmOZoMZN57Q6HmgKCCBu0SZEV47dr39HwN1p3fQy
-8SUoxKB+fnUQygkSRtuwGmeHiwovI9iFdO8PuTBphCbX6yMJC7vtOb71o1maW1Si
-2pVd4Mj6YW/lct8mqjqJ/wK/KzXzcLhzROooQ6nokbxw6AVbGgodQ9cFG+L/J47s
-+tTHcT7REmLBBprSY6EoV2Jp0mZW8J+LfxIKTtKUQZpTBe+1e/B+oOzPVk1B8NUB
-FQUDa/PIUUddFFooHQXmaLDhS3ezJlIBCZ9vPl3zTuF4XuGCeQ1kF2Wf3rxiRkyZ
-3NsIJzJAnFcPT+VwwyyyOXxOZp5huB+q/Gs2eBh3EXuppUp/+4pd51tdm3nIbYLj
-OTnVtSvQPDAx5LSM10NSWbsptkBbDb3ZkubX4e4MdKl3eGmxI7JAs9vAIWBMyw7U
-yUo4If3gj5byMb0qoM9MKXjq17YcNeRsbsiXSGR7Nqm49vUTDBQo0CT6xCySS07D
-+Vw8rFPPnp4KBHTBH9SYRKtvbWmOkmSQakQepj9ZztYiVfjbEbHZAYJ2/wCDTl79
-7OaGX9ZQAka2if7iyjSaHR6FAi5rRk1t0e/QvtTZGiiyxnyy/0ij0XnVAYQwb6qK
-kONuREyjHkKmgQ8ZlOm958yUdMri/JfFXiKIw1Zoh8K0w5wdeTA=
-=h4LD
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmO7XK8ACgkQvP0LAY0m
+WPGsfBAAlKeskumYUTiXHUr6CgAMVRuFNKGPipTkhX41/c3a/7mBgXcgUSm0ukE9
+JEXgshiv5PPDQyvlmb6KJ0WwqMpfCvhpk2zQR1TEO5BSF2O/+sNk2/JYNTKx+DR5
+BTaKD72TPFKY7W6kEhqGdPeLxLsMUGxhVC4p5xpG4lu8O94dIn7xo5Bks8q0OLGg
+aEBpVzBFJ4kMzjfe3a9sceXlZUxzyNxk9UHJhJcq21g+IamB/T+NBstm89VTpBYH
+f67aTGGWuNRXA2dXeuzSQ4VFoNi4JJok8F5Sx5Zf3JZY4O+hDdzURhLTjloN+Lh+
+5E3tP2emdjjL+Vd8Ws8zzSszbUM38fDVF+hhuig4zsfYUCHoEtr0yE/5B6AjWYT/
+jD2QVkQJqQizEq6quSekogkhozksa9fm7QkS7kAgVTmzO5UUluq5rejug9jNQbUc
+NNBqkwG/LcffXwJ9YAvD0DggWos3heSSwLbUzqj+EVx79zjQKDlqhnYGooqy7oce
+8MS/RB8el3IQI3DjhO9RDiPVP8FG+Je6x/vB7AMumAE48rof4/iLV1W6+vSEC8MO
+rQcK29agozy9b3t8kyXXB1VE1SGCMl6GT+s0kSpGZj+JROxV4v22nDAgPEpV9YLG
+Xsbyw+36z345Zn3y8dDxP9UlnYmn48rRciLiBH5zh3Mh2hbIdQY=
+=Hxzv
 -----END PGP SIGNATURE-----
 
---xeci533rptxhhaud--
+--7hb2riuxrznjm2he--
