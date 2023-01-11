@@ -2,111 +2,90 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C92C54EBE
-	for <linux-dash@archiver.kernel.org>; Tue, 10 Jan 2023 21:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D51CAC46467
+	for <linux-dash@archiver.kernel.org>; Wed, 11 Jan 2023 00:06:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231735AbjAJV2z (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Tue, 10 Jan 2023 16:28:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39728 "EHLO
+        id S231939AbjAKAGM (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Tue, 10 Jan 2023 19:06:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234434AbjAJV2u (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 10 Jan 2023 16:28:50 -0500
-Received: from mail02.stack.nl (scw01.stack.nl [51.15.111.152])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D689B5585F
-        for <dash@vger.kernel.org>; Tue, 10 Jan 2023 13:28:47 -0800 (PST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by mail02.stack.nl (Postfix) with ESMTP id DB2801E00B9;
-        Tue, 10 Jan 2023 21:28:45 +0000 (UTC)
-Received: from mail02.stack.nl ([127.0.0.1])
-        by localhost (mail02.stack.nl [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id Jm2gaA8umOfy; Tue, 10 Jan 2023 21:28:42 +0000 (UTC)
-Received: from blade.stack.nl (blade.stack.nl [192.168.121.130])
-        by mail02.stack.nl (Postfix) with ESMTP id 290E81E0096;
-        Tue, 10 Jan 2023 21:28:42 +0000 (UTC)
-Received: by blade.stack.nl (Postfix, from userid 1677)
-        id 124AB238B7F; Tue, 10 Jan 2023 22:28:42 +0100 (CET)
-Date:   Tue, 10 Jan 2023 22:28:42 +0100
-From:   Jilles Tjoelker <jilles@stack.nl>
-To:     Ganael Laplanche <ganael.laplanche@martymac.org>
-Cc:     dash@vger.kernel.org
-Subject: Re: Monitor mode handling (bug ?)
-Message-ID: <20230110212842.GA2103@stack.nl>
-References: <7091680.J8PY2HnTC3@home.martymac.org>
+        with ESMTP id S233501AbjAKAGL (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 10 Jan 2023 19:06:11 -0500
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C8F84CE22
+        for <dash@vger.kernel.org>; Tue, 10 Jan 2023 16:06:05 -0800 (PST)
+Received: from [IPV6:2a02:8010:68a1:0:f140:f5fb:7038:8e8a] (unknown [IPv6:2a02:8010:68a1:0:f140:f5fb:7038:8e8a])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id 15A37105F;
+        Wed, 11 Jan 2023 00:06:04 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 15A37105F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1673395564;
+        bh=tWuQQJoBWxRhfjY7cOPz8uBS+rZg9nljc4donNMbYno=; l=1312;
+        h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+        b=D9daKCxTwNrqM5yNba4jcBCDXJURLhLQq0xRiMTLrUV4gZJZ1e1v3DuhtpqJH786X
+         gSvJsw41N656MbJ5MIRAv3frNqd6N/IMils7PmWerf77S18B981OC7iA42ffi7hga3
+         Siwas0hQSrE9cJpcVDFFs1IUx9L1RwfFcfEzgpsQ=
+Message-ID: <2251366a-a75e-7901-a47d-b9fa94e53fc5@gigawatt.nl>
+Date:   Wed, 11 Jan 2023 00:06:04 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7091680.J8PY2HnTC3@home.martymac.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101
+ Thunderbird/109.0
+Subject: Re: [PATCH v2] alias: fix name quoting in printalias
+From:   Harald van Dijk <harald@gigawatt.nl>
+To:     dash@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        =?UTF-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
+References: <20230109001219.2ylktzb7uckoeti5@tarta.nabijaczleweli.xyz>
+ <20230109001543.vpk6khjtqkjtrjox@tarta.nabijaczleweli.xyz>
+ <7f1920ef-dc74-3a34-6453-507bbb349b8b@gigawatt.nl>
+Content-Language: en-GB
+In-Reply-To: <7f1920ef-dc74-3a34-6453-507bbb349b8b@gigawatt.nl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On Mon, Jan 09, 2023 at 04:18:02PM +0100, Ganael Laplanche wrote:
-> Digging into a problem with a project of mine [1], I found dash (0.5.12) 
-> behaves differently from other POSIX-compliant shells when dealing with 
-> monitor mode when running in the background.
+On 09/01/2023 00:30, Harald van Dijk wrote:
+> On 09/01/2023 00:15, наб wrote:
+>> single_quote() over-writes the stack string, so just output the name
+>> separately first.
+>>
+>> Fixes: commit 4ec545e8dc98a3f461cf56bed03adafa81c64aec ("alias: Quote
+>>   name in printalias")
+>> ---
+>> really not my year sorry
+> 
+> This one works, thanks.
+> 
+> I'm wondering if we can save on code size by storing aliases differently 
+> instead, allowing for a simpler fix here. If we store aliases in memory 
+> in name=value form in a single block of memory, we only need a single 
+> savestr() when creating the alias, we only need a single single_quote() 
+> call here, we only need a single free() when we're done with the alias, 
+> and may be able to share some code with src/var.c for checking the alias 
+> name and stopping at the '='.
+> 
+> That'd be a larger change though, and even if it is possible, I am not 
+> sure it's worth it.
 
-> In the following example, dash immediately sends a SIGTTIN signal that stops 
-> the process group:
+Having implemented this, I am also seeing that this does achieve the 
+result of reducing code size. The only visible change is that given e.g.
 
-> $ cat test.sh
-> set -m
-> $ dash test.sh &
-> [1]  + suspended (tty input)  dash test.sh
+   alias foo=bar
+   alias foo
 
-> while other shells do not:
+we get
 
-> $ bash test.sh &
-> [1]  + done       bash test.sh
-> $ sh test.sh & # (/bin/sh from FreeBSD 13.1-RELEASE)
-> [1]  + done       sh test.sh
-> $ ksh93 test.sh &
-> [1]  + done       ksh93 test.sh
+   'foo=bar'
 
-> Is that an intended behaviour ?
+rather than
 
-The loop with SIGTTIN is the right thing for an interactive job control
-shell. It ensures that two job control shells do not interfere. The idea
-is that the user can later 'fg' from the outer job control shell.
+   'foo'='bar'
 
-The loop also helps with suspending a job control shell, for example via
-the funcs/suspend function from the ash source (containing 'local -',
-'set +m' and 'kill -TSTP 0'): when trying to resume the inner shell via
-'bg' in the outer shell, it is this loop that makes the inner shell stop
-itself.
+which should be equally acceptable.
 
-However, for a non-interactive shell, monitor mode is most useful for
-its effect of placing jobs in their own process groups. This does not
-necessarily imply any tty manipulation.
+If there is interest in having this in dash, can adapt and submit it.
 
-To make this possible, feature was added to FreeBSD sh in
-https://cgit.freebsd.org/src/commit/?id=cd60e2c67d52e1f957841af19128c7227880743a
-
-This commit allows using job control without a tty in non-interactive
-mode. Where an interactive shell disables job control with the message
-  can't access tty; job control turned off
-or stops itself because it is not in the foreground, a non-interactive
-shell instead leaves a limited form of job control enabled that only
-sets process group IDs on new processes and does not alter the
-terminal's foreground process group ID.
-
-> Also, the following test leads to dash looping indefinitely and eating 100% 
-> CPU:
-
-> $ cat test2.sh
-> trap '' 21
-> set -m
-> $ dash test2.sh &
-
-> It remains stuck within the following loop:
-
-> https://git.kernel.org/pub/scm/utils/dash/dash.git/tree/src/jobs.c?
-> h=v0.5.12#n208
-
-> Weird... Is that a dash bug or am I missing something?
-
-Manipulating the disposition of TTIN/TTOU/TSTP with job control enabled
-might be a question of "if it hurts, don't do that".
-
--- 
-Jilles Tjoelker
+> Cheers,
+> Harald van Dijk
