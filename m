@@ -2,29 +2,30 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D5DC46467
-	for <linux-dash@archiver.kernel.org>; Wed, 11 Jan 2023 16:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5BEC5479D
+	for <linux-dash@archiver.kernel.org>; Wed, 11 Jan 2023 16:38:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233380AbjAKQ2H (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 11 Jan 2023 11:28:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35966 "EHLO
+        id S235948AbjAKQin (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 11 Jan 2023 11:38:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234813AbjAKQ1n (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 11 Jan 2023 11:27:43 -0500
-Received: from relay10.mail.gandi.net (relay10.mail.gandi.net [IPv6:2001:4b98:dc4:8::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC8A51DDE7
-        for <dash@vger.kernel.org>; Wed, 11 Jan 2023 08:25:16 -0800 (PST)
+        with ESMTP id S239714AbjAKQiB (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 11 Jan 2023 11:38:01 -0500
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFF3395D6
+        for <dash@vger.kernel.org>; Wed, 11 Jan 2023 08:37:23 -0800 (PST)
 Received: (Authenticated sender: ganael.laplanche@martymac.org)
-        by mail.gandi.net (Postfix) with ESMTPSA id 591EA240013;
-        Wed, 11 Jan 2023 16:25:14 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id A2434C000C;
+        Wed, 11 Jan 2023 16:37:21 +0000 (UTC)
 From:   Ganael Laplanche <ganael.laplanche@martymac.org>
 To:     Jilles Tjoelker <jilles@stack.nl>
 Cc:     dash@vger.kernel.org
 Subject: Re: Monitor mode handling (bug ?)
-Date:   Wed, 11 Jan 2023 17:25:10 +0100
-Message-ID: <7895519.bYQgcRI8ro@home.martymac.org>
-In-Reply-To: <20230110212842.GA2103@stack.nl>
+Date:   Wed, 11 Jan 2023 17:37:17 +0100
+Message-ID: <3939408.BRNeRiNLvY@home.martymac.org>
+In-Reply-To: <7895519.bYQgcRI8ro@home.martymac.org>
 References: <7091680.J8PY2HnTC3@home.martymac.org> <20230110212842.GA2103@stack.nl>
+ <7895519.bYQgcRI8ro@home.martymac.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
@@ -32,41 +33,14 @@ Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On Tuesday, January 10, 2023 10:28:42 PM CET Jilles Tjoelker wrote:
+On Wednesday, January 11, 2023 5:25:10 PM CET Ganael Laplanche wrote:
 
-Hello Jilles,
+> This is exactly what I use fpsync for (to get a new process group). Do I
+> understand that this feature is not available in Dash ?
 
-> The loop with SIGTTIN is the right thing for an interactive job control
-> shell. It ensures that two job control shells do not interfere. The idea
-> is that the user can later 'fg' from the outer job control shell.
-> 
-> The loop also helps with suspending a job control shell, for example via
-> the funcs/suspend function from the ash source (containing 'local -',
-> 'set +m' and 'kill -TSTP 0'): when trying to resume the inner shell via
-> 'bg' in the outer shell, it is this loop that makes the inner shell stop
-> itself.
-
-Thanks for those explanations.
-
-> However, for a non-interactive shell, monitor mode is most useful for
-> its effect of placing jobs in their own process groups. This does not
-> necessarily imply any tty manipulation.
-> 
-> To make this possible, feature was added to FreeBSD sh in
-> https://cgit.freebsd.org/src/commit/?id=cd60e2c67d52e1f957841af19128c7227880
-> 743a
-> 
-> This commit allows using job control without a tty in non-interactive
-> mode.
-> [...]
-
-This is exactly what I use fpsync for (to get a new process group). Do I 
-understand that this feature is not available in Dash ?
-
-> Manipulating the disposition of TTIN/TTOU/TSTP with job control enabled
-> might be a question of "if it hurts, don't do that".
-
-Thanks!
+I'll rephrase : this is exactly what I use *for* fpsync (to get a new process 
+group for each sub-job). Do I understand that this feature is not available in 
+Dash ?
 
 -- 
 Ganael LAPLANCHE <ganael.laplanche@martymac.org>
