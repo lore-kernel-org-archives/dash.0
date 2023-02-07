@@ -2,40 +2,40 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C335BC636D3
-	for <linux-dash@archiver.kernel.org>; Tue,  7 Feb 2023 19:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07799C636CC
+	for <linux-dash@archiver.kernel.org>; Tue,  7 Feb 2023 19:33:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232088AbjBGTdz (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        id S231964AbjBGTdz (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
         Tue, 7 Feb 2023 14:33:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40780 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231772AbjBGTdr (ORCPT <rfc822;dash@vger.kernel.org>);
+        with ESMTP id S231890AbjBGTdr (ORCPT <rfc822;dash@vger.kernel.org>);
         Tue, 7 Feb 2023 14:33:47 -0500
 Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 41DA03CE0C
-        for <dash@vger.kernel.org>; Tue,  7 Feb 2023 11:33:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2E5DB3CE2A
+        for <dash@vger.kernel.org>; Tue,  7 Feb 2023 11:33:32 -0800 (PST)
 Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id C232411C4;
-        Tue,  7 Feb 2023 20:33:26 +0100 (CET)
+        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 5E7E2168C;
+        Tue,  7 Feb 2023 20:33:31 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202211; t=1675798406;
-        bh=+zPNgPih9bH/NvfdpusETLSd0TrgWTt+UCzMQH6RvzA=;
+        s=202211; t=1675798411;
+        bh=oG85JYBGvLuuf1f9mnO1Hi0KC6QwnxIWND62LdFm5YM=;
         h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=QPXoyeHbl3ZT0pyC52AB/BOPXYxgIk3iJmuffQms2HSiN0u3Z6jHkX5ia2eaSil9J
-         b7NmqKL9fopTlek/o7FOyv1aUVhKISaXOKLRf/2HQP177D4wQ7UeHstVWmsE5Z0dMY
-         yI8tvc/B59MkAP/GtIVEBqVEi19aw64NxgvDYC4gpcv+7xNqBbDJJ8QMdOqsd4VRqI
-         s7SAN/8Dn6wwzXt94pDNVVPmxApTdEOcEsokqaNUjHBbEFcMxDe4uq85KrroI8RM4F
-         GsCJxGIr10elRAWGbfbaRuM+OTDzHhlu6ZPJpHjwEANINJExO8Fx7UP+PJCVhcQ6Mj
-         rzUVDw3tZZHJA==
-Date:   Tue, 7 Feb 2023 20:33:25 +0100
+        b=MTsGBSNvbWymwlR9Ok6vZ9koUNk122Gt6GjTSDh0baTUoAlmuS7hEyGmZqXb6Dmqs
+         OpqEpmWHFNL7lqO1DAclYNnpWgYiuy4uUR46WqE803jfsP+10AQujqd8sop4zH41qN
+         JUb5qDceZbB1rgbAjQ8E5MxO5zcRu/sZKezvrhMvYnS12ipsh/tCkKbq3YXm97Thqj
+         RKjVEnjsJVjEsL4g+FBM2+eBec755xoU4cZyHJJIZg5gsI/MxCfq0S9EWMDQQMEz87
+         /UYcbt5XUK56bw/QzejfJ0/ZdNnRoGjkNl1jATwWTgicAZtxj4yscC+s0KNEzfcwg1
+         H3td1uF5yjKaQ==
+Date:   Tue, 7 Feb 2023 20:33:30 +0100
 From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
 To:     Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
-Subject: [PATCH 1/6] fc -s: refuse multiple events instead of ignoring
-Message-ID: <96c003b30fc95cdf5aed3162901abaa9b89430e2.1675798292.git.nabijaczleweli@nabijaczleweli.xyz>
+Subject: [PATCH 2/6] fc -s: don't loop forever when executing the latest entry
+Message-ID: <7166822efa32d227a28d86bd1fb505f09bb7cf0c.1675798292.git.nabijaczleweli@nabijaczleweli.xyz>
 References: <ab3fbcc2-1a9a-136b-0b02-a5ea31fe02c5@gigawatt.nl>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="xeykwizvkycnqul5"
+        protocol="application/pgp-signature"; boundary="7n7zq2eejlb3d54c"
 Content-Disposition: inline
 In-Reply-To: <ab3fbcc2-1a9a-136b-0b02-a5ea31fe02c5@gigawatt.nl>
 User-Agent: NeoMutt/20220429
@@ -44,103 +44,139 @@ List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
 
---xeykwizvkycnqul5
+--7n7zq2eejlb3d54c
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-The POSIX SYNOPSIS (and our manual which steals it verbatim) says:
-  fc -s [old=3Dnew] [first]
-and, indeed, we only use the first non-=3D argument
-instead of enforcing the usage, which is confusing.
+Quoting CVS comment:
+  Ensure [...] that we break out of the loop after executing it.
+  With the previous code, because the re-executed command was added to
+  the history, it would think that it still had to execute it,
+  leading to an infinite loop.
 
-bash:
-	2025     ls
-	2026     id
-	$ fc -s ls=3Dwho 2025 2026
-	who
-	nabijaczleweli pts/2 2023-02-07 17:36 (192.168.1.109)
-	nabijaczleweli pts/3 2023-02-07 17:38 (192.168.1.109)
-	nabijaczleweli pts/4 2023-02-07 16:58 (192.168.1.109)
-	nabijaczleweli pts/5 2023-02-07 17:45 (192.168.1.109)
-ksh93:
-	240     id
-	241     ls
-	$ fc -s ls=3Dwho 241 240
-	ksh: hist: -e - requires single argument
-yash:
-	2       ls
-	3       id
-	$ fc -s ls=3Dwho 2 3
-	fc: too many operands are specified
-zsh:
-	    2  id
-	    3  ls
-	tarta% fc -s ls=3Dwho 3 2
-	fc: bad option: -s
-dash (before):
-	    1 ls
-	    2 id
-	$ fc -s ls=3Dwho 1 2
-	who
-	nabijaczleweli pts/2 2023-02-07 17:36 (192.168.1.109)
-	nabijaczleweli pts/3 2023-02-07 17:38 (192.168.1.109)
-	nabijaczleweli pts/4 2023-02-07 16:58 (192.168.1.109)
-	nabijaczleweli pts/5 2023-02-07 17:45 (192.168.1.109)
-dash (after):
-	    1 ls
-	    2 id
-	$ fc -s ls=3Dwho 1 2
-	src/dash: 3: fc: -s takes one history argument
+  The last thing which differs from ksh is that we get the "fc -s"
+  command into the history, but this is actually rather a feature
+  in my humble opinion.
+
+POSIX disagrees:
+  [W]hen the -l option is not specified, the resulting lines shall be
+  entered at the end of the history list and then re-executed by sh.
+  The fc command that caused the editing shall not be entered into the
+  history list.
+
+But this is a separate issue, since even without -s dash puts fc into
+the history (i.e. id; ls; fc 1 2; fc -l; yields 1=3Did, 2=3Dls, 3=3Dfc -l).
+
+Test cases:
+  $ id
+  uid=3D1000(nabijaczleweli) gid=3D100(users) groups=3D100(users)
+  $ fc -s 1
+  id
+  uid=3D1000(nabijaczleweli) gid=3D100(users) groups=3D100(users)
+  $ fc -l
+      1 id
+      2 fc -s 1
+      3 id
+-- >8 --
+  $ ls
+  autogen.sh  ChangeLog  ...
+  $ id
+  uid=3D1000(nabijaczleweli) gid=3D100(users) groups=3D100(users)
+  $ fc -s -1
+  id
+  uid=3D1000(nabijaczleweli) gid=3D100(users) groups=3D100(users)
+-- >8 --
+  $ ls
+  autogen.sh  ChangeLog  ...
+  $ id
+  uid=3D1000(nabijaczleweli) gid=3D100(users) groups=3D100(users)
+  $ fc -s -2
+  ls
+  autogen.sh  ChangeLog  ...
+-- >8 --
+  $ ls
+  autogen.sh  ChangeLog  ...
+  $ id
+  uid=3D1000(nabijaczleweli) gid=3D100(users) groups=3D100(users)
+  $ fc -s -2
+  ls
+  autogen.sh  ChangeLog  ...
+  $ id 1
+  uid=3D1(daemon) gid=3D1(daemon) groups=3D1(daemon)
+  $ id 2
+  uid=3D2(bin) gid=3D2(bin) groups=3D2(bin)
+  $ fc -s 3
+  fc -s -2
+  id 1
+  uid=3D1(daemon) gid=3D1(daemon) groups=3D1(daemon)
+  $ fc -l
+      1 ls
+      2 id
+      3 fc -s -2
+      4 ls
+      5 id 1
+      6 id 2
+      7 fc -s 3
+      8 id 1
+-- >8 --
+  $ id 1
+  uid=3D1(daemon) gid=3D1(daemon) groups=3D1(daemon)
+  $ fc -s 2
+  fc -s 2
+  fc -s 2
+  fc -s 2
+  fc -s 2
+  src/dash: 1: fc: called recursively too many times
+and I'm happy to call this "behaving exactly as I expected when I was
+typing it in", so removing the XXX.
 
 Adapted-from: NetBSD src bin/sh/histedit.c rev 1.38 by aymeric@
 ---
-Here's a quick few that fix my report and a couple of the ones you list
-at the end of that thread.
-
- src/histedit.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ src/histedit.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/src/histedit.c b/src/histedit.c
-index f5c90ab..fc87283 100644
+index fc87283..28956ec 100644
 --- a/src/histedit.c
 +++ b/src/histedit.c
-@@ -296,6 +296,13 @@ histcmd(int argc, char **argv)
- 		*repl++ =3D '\0';
- 		argc--, argv++;
- 	}
+@@ -382,12 +382,10 @@ histcmd(int argc, char **argv)
+=20
+ 				evalstring(s, 0);
+ 				if (displayhist && hist) {
+-					/*
+-					 *  XXX what about recursive and
+-					 *  relative histnums.
+-					 */
+ 					history(hist, &he, H_ENTER, s);
+ 				}
 +
-+	/*
-+	 * If -s is specified, accept only one operand
-+	 */
-+	if (sflg && argc >=3D 2)
-+		sh_error("too many args");
-+
- 	/*
- 	 * determine [first] and [last]
- 	 */
++				break;
+ 			} else
+ 				fputs(s, efp);
+ 		}
 --=20
 2.30.2
 
 
---xeykwizvkycnqul5
+--7n7zq2eejlb3d54c
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmPip4UACgkQvP0LAY0m
-WPFf9A/9H+AenI8q+dFJ+0LdjafJrP84qQMOJSJWir7oeZtmOc0J5xM9BLaGRBlN
-pvjYHQyfhqCbjqIKqrIkcuQDmcD9zDCY4Nh5YCLc2MCa2kQ9max7uHLXe8D8D0y0
-IgI9sa41PQY4oNfW919HYaQ6E5ZFRyUfx1/m7tXS9vOY+qeGkMQ0vE+hnXPUuLEJ
-0/2FR8q6t45jnTGUcLjzVJUuU4CevT8GTzjq6OEJL/bY/eoCYDWjKG1+sAVOZh0b
-DF5Lbo6MxnnN5KHl3SPgw7Nl+uWVobTz2NWwKKCMOqTRWMBMk0Ilc3JCtuSCCpii
-y0ZzuPHX9I2hSN3OH3Fq4gnBrlXSs5q2iK6SS5sTi1EomzndFVsIBfITn5+sXUoN
-DkaJuusKU4HSAANJB6yX8db3E+Im3H5iCJRffdKhhT9pMI6v5qqyLt0BpFCpqGUx
-I8J8rlP21r5SnJOLP38VsdfrRGhLDYWCaog7KZe6pPyrTBt/UuGrED95NClqaLfJ
-U9rhtYT54YUwwYap1SdJb2jCZse9/lhsuMAZtr4mcX/IAFP6zJlSlqlBlyNm4Jdv
-YGqz6bVWal7pYasayPCxrDUPAWXOFNEo3eZc80igQY1Hk6qr9z4q4OHy9NtDKX4Z
-nux+U32sYtXoYCRgDvc8TPEXthxKU20wHALdkyHj1wuVe+YLz6w=
-=zo/q
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmPip4kACgkQvP0LAY0m
+WPGg6g/+JjlnoDgOV9gBjmWiqDNJpAWNoTNdu13G3bOQlEXz9HnTAHvxq/o20ONn
+lyl+/zvBeMepCZPjYJdKfuLu2QdZJTjaTaeZo6APACywrZtI7wPnZjfQYY2PJaU0
+WQAk/sUDf/ZX7PV4ymui3kJJJca4Ifb2dJqGGJVhejOf4uM6LQW36beX9akNZTs4
+s2Pl4IfRyartdFe81ikHHRNhRGI1c4njF5li/6VhoMI8Dy8vkVB5WRoGmI2dJ+Ba
+TVBywrUvhdnasNCTOO/XWe48FYYE3tulkiv9V00vzV3qX85CrI2CccttvAehqCzo
+KGM17zRXnXt1RAarselyi52SXWjEgKhJ2FDeKko9xzWQq7KUkjgTWCS2H4K0zoRH
+ENtOtNEpAx+1+lYmUp9CB++HWKrjZKrDDOJuAFL51DjrVV4kvxZ4EweYo8az98kR
+fHMiW9pci1p+Rnf1a3MJl/E6WUi6R7BIlWOGMXbyexBoHe3dKZQ2ExOy0g4O+DAd
++LU4teUGZbV/tkY97fRueO6mhlXFHbGDetS9IT24RrNh3MaDq8BTEzxJ8giwn3DZ
+3Yyv9ubczrqshYLVj081NP2oYqCfnG2oTzvPdlfy669XrPAQmpy3ca+658xR1Ap4
+66dKfZwhA5uB8sMh9cm7DiTfPWAY+1IB+7gt+M9sDfAevvMlodU=
+=YNuh
 -----END PGP SIGNATURE-----
 
---xeykwizvkycnqul5--
+--7n7zq2eejlb3d54c--
