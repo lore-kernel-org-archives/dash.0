@@ -2,40 +2,40 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD9AFC636CC
-	for <linux-dash@archiver.kernel.org>; Tue,  7 Feb 2023 19:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1513C636D3
+	for <linux-dash@archiver.kernel.org>; Tue,  7 Feb 2023 19:34:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232035AbjBGTd7 (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Tue, 7 Feb 2023 14:33:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41032 "EHLO
+        id S231866AbjBGTeC (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Tue, 7 Feb 2023 14:34:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232039AbjBGTdy (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 7 Feb 2023 14:33:54 -0500
+        with ESMTP id S231772AbjBGTdz (ORCPT <rfc822;dash@vger.kernel.org>);
+        Tue, 7 Feb 2023 14:33:55 -0500
 Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2CA43EFE4
-        for <dash@vger.kernel.org>; Tue,  7 Feb 2023 11:33:44 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5BDBF3EFF7
+        for <dash@vger.kernel.org>; Tue,  7 Feb 2023 11:33:49 -0800 (PST)
 Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id EE40710CA;
-        Tue,  7 Feb 2023 20:33:43 +0100 (CET)
+        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 3882F1700;
+        Tue,  7 Feb 2023 20:33:48 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202211; t=1675798424;
-        bh=B6q9ZevxjZFqj+JgoXImeHSf4CBX9uAxhRtszJMSlJw=;
+        s=202211; t=1675798428;
+        bh=XSavRGu0cDLQdSb1Y1rEcZmnlDRJe1qhHq/2iQgR5ZY=;
         h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=O5llsGvhg+GupuxjuvGGhjFwjHaanF16l2WBG9ksfXzUbgAU8bY9XeUHCrt69SVtn
-         zYu14Gik6Tg4CJ2qX+JqRUDjgSGzu2wzYj5TazYq+JOY9jJu7HxE+JHpa/dLXA3W0X
-         FWmDSK+fXevLiVagcmi++W6w4KMnXzW9pmmxyirNqVI/jmEEO63O6EEkBeLnR/speI
-         dEOFurJPZu9uGDW1g6vacgb5DHQqxIqMkaAZkdlmTffsXp5gknPLYp7OOtRDBe56M5
-         gyhypFH10NlXHzBgMjYQD1g5iQn+Blt6xtE/AjW2B8NwmO5j8TlQZkrmTRpw2lxAko
-         zDFuo6/eYxcqg==
-Date:   Tue, 7 Feb 2023 20:33:42 +0100
+        b=SCzLVzd/ZsLZE6IZx68gnCZQBnhslJHOZ8CokRd/2c01IupnnFGQLKz1qNJJToopP
+         d9pql9dzYVxk11xbk6Q8PQhrnd/swQFBW4NVej4CB9wbMfzD0kBMm5lMawSrWUJmxl
+         /97qGPlgdxzLDSjOZ0OHKBFozVlz9qeZJrrrzDpwCAzb+B4y+EPc0y7JP1Yf+7TDlU
+         PnOVw3L7zEGTMkMkiI8/mKChQv+7dbdbGTezy2DE9DNVKNrRBr7M6p1P/GN5UWpIDq
+         9hVGyWTD4Q44WZyac1g5NqC1NFiePx4iKEGEHhPMGRO50yOYWjpOTBwffBK/YK7RWX
+         v2VqYN5mT8k+A==
+Date:   Tue, 7 Feb 2023 20:33:47 +0100
 From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
 To:     Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
-Subject: [PATCH 5/6] fc: fix "fc -3" extension on glibc
-Message-ID: <0ea78f2dddbb59ce2c984c83ab45cd811191b499.1675798292.git.nabijaczleweli@nabijaczleweli.xyz>
+Subject: [PATCH 6/6] fc: don't include the current fc in out-of-range last
+Message-ID: <d2d5de626bafa4e1b76eb136c1d63cb8f4ce7fa1.1675798292.git.nabijaczleweli@nabijaczleweli.xyz>
 References: <ab3fbcc2-1a9a-136b-0b02-a5ea31fe02c5@gigawatt.nl>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="zdvw2swwaytqbmec"
+        protocol="application/pgp-signature"; boundary="z7yk2caa3tfvv2j6"
 Content-Disposition: inline
 In-Reply-To: <ab3fbcc2-1a9a-136b-0b02-a5ea31fe02c5@gigawatt.nl>
 User-Agent: NeoMutt/20220429
@@ -44,83 +44,101 @@ List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
 
---zdvw2swwaytqbmec
+--z7yk2caa3tfvv2j6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
+POSIX states:
+  When a range of commands is used, it shall not be an error to specify
+  first or last values that are not in the history list; fc shall
+  substitute the value representing the oldest or newest command in the
+  list, as appropriate. For example, if there are only ten commands in
+  the history list, numbered 1 to 10:
+    fc -l
+    fc 1 99
+  shall list and edit, respectively, all ten commands.
+
+Which would seem to imply that the current fc shouldn't be included
+(well, in the POSIX model, no non--l fc enters the history,
+ so that reinforces that).
+
+zsh, bash, mksh, yash all agree with this; oddly, ksh includes it.
+
 Before:
-	$ echo a
-	a
-	$ echo b
-	b
-	$ fc -2 -1
-	src/dash: 3: fc: unknown option: -2
-	$ fc -- -2 -1
-	16
-	,p
-	echo b
-	fc -2 -1
+  $ 1
+  src/dash: 1: 1: not found
+  $ 2
+  src/dash: 2: 2: not found
+  $ 3
+  src/dash: 3: 3: not found
+  $ 4
+  src/dash: 4: 4: not found
+  $ 5
+  src/dash: 5: 5: not found
+  $ 6
+  src/dash: 6: 6: not found
+  $ fc 1 999
+  21
+  ,p
+  1
+  2
+  3
+  4
+  5
+  6
+  fc 1 999
 After:
-	$ echo a
-	a
-	$ echo b
-	b
-	$ fc -2 -1
-	6
-	,p
-	echo a
-	echo b
+  $ fc 1 9999
+  12
+  ,p
+  1
+  2
+  3
+  4
+  5
+  6
 
 Reported-by: Harald van Dijk <harald@gigawatt.nl>
 Reported-in: https://marc.info/?l=3Ddash&m=3D154707728009743&w=3D2
 ---
- src/histedit.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/histedit.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/src/histedit.c b/src/histedit.c
-index f10e5ab..502ad40 100644
+index 502ad40..7692776 100644
 --- a/src/histedit.c
 +++ b/src/histedit.c
-@@ -217,7 +217,7 @@ histcmd(int argc, char **argv)
- #else
- 	optreset =3D 1; optind =3D 1; /* initialize getopt */
- #endif
--	while (not_fcnumber(argv[optind]) &&
-+	while (not_fcnumber(argv[optind ?: 1]) &&
- 	      (ch =3D getopt(argc, argv, ":e:lnrs")) !=3D -1)
- 		switch ((char)ch) {
- 		case 'e':
-@@ -243,6 +243,7 @@ histcmd(int argc, char **argv)
- 			sh_error("unknown option: -%c", optopt);
- 			/* NOTREACHED */
+@@ -476,6 +476,8 @@ str_to_event(const char *str, int last)
+ 				 */
+ 				retval =3D history(hist, &he,
+ 						last ? H_FIRST : H_LAST);
++				if (retval !=3D -1 && last)
++					retval =3D history(hist, &he, H_NEXT);
+ 			}
  		}
-+	optind =3D optind ?: 1;
- 	argc -=3D optind, argv +=3D optind;
-=20
- 	/*
+ 		if (retval =3D=3D -1)
 --=20
 2.30.2
 
-
---zdvw2swwaytqbmec
+--z7yk2caa3tfvv2j6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmPip5YACgkQvP0LAY0m
-WPE0zw/8C94sQ2ILF9fcaAA/PNI1F8sjakqOl4sOHKgbCXL6ia+/FNmKiYRZknWy
-w7k60N0HxUWYVCRbP2JvNPoqMf0wc5Zvd6X2OMR16W/cCo/GLVnT2rE+Fdn1JIPs
-J5QPDz//kRIR0O1Ye1iSRAHnQ8m0UmshG3yKAOrX+9RjRIp1lNfEVeOe6PdCGqkH
-ngTmg5McQhjkd9nRqOlGAY4wNGbRYLE4ASjIYgI3EF+ZrZOVcXH8zzLUy39E+3f3
-F/dWsY4uempcL1Q25uthM+vB/jLCuyZmPmsXGaxjQ44yIYwfuXR93URRNeBnS3eo
-pcpzJ6tHZgYnqlHXUUarpJsV0K7F5lbIERSS5lGRv6mlxFk+XgVG9S/vUH2/ESsN
-2BX2bgZdWPxI5JCQkw73hNXXh6n+mOE/wFsv8KFOtagLEEQU0Qbcmh5hUedP8Vtt
-LiQL11CYQf5rLIMCkBSW0PhpUAaQMi5e1//bHmnJIfzbxhKIQI6FLHiTbHTfO68H
-dXxSDhMArduxSbCHZOohcBiDm/0/YAOKQKLyP15liiArOiTrukgppUIiV/jaVbJb
-FAmMTqnZZ1To1n78QXGJvArwCE2Law6XYTmLkjOWGR1XRRUO0f2rFqfCs3UK+ou9
-TA5OA8LVSx8E7pAZUMxGNIpwisTroiro6RqPx2IaVrHlxEVjL/g=
-=+NKY
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmPip5oACgkQvP0LAY0m
+WPFKjw/+L9Q3YO8ToZUPmabhxq+UFNRU4DJPSPzpaJ265/xMvd08X0v8nSs52nKg
+ZaW5vqsj1Z+VkV8pS0pbN+Vn+kXJhGGs8WK2C8rVXEN2XSI0s9dxL3ARpaCtv/a8
+kDuDgG7oc3cwZ971Mf0H0aEbkT/m39jYIt0FoGh9fCZktOhYhuNy8JbGzmWODzZs
+57aU4W28SLXlla45SjiYnXT8Zk0shGw+M8whi4PUFR7zvKA8+6lqrGtD5vzKuRyp
+tABIEFHWfrrNf8ZvCSrnTo+SDAqDkCKpcAdrJOaSUtitx1BGeutFAfPKr3i8UwmF
+5IWRpyHmqaXVZLaDzDEX8w9WVhcOR8obVV/IOU/KprFFpP3HWKqIUTqdljN6MQYm
+YuBEWC0F0DQKdTLv8W4T4lKuAsmCK0ckdVUHKPg+g6bxu2BxQOQAj3Z/1MsJE5I0
+BQcUp52gHbkPgLadMj5puXTVLj2pNqLA7RLdyrdAcXiGriKb/BEIjn/tImSATKhR
+PzoUcudkOMIc2GkrbJfT3Kd606ayOTa4HKOqIujmkzS9yMVbI+U8rZjq+AUtqju2
+Nu2Y26L09LyTdQlCc4OEhVJVGRNnMA0c6mxK2MzbPA70aXQj4PFlz6bH4asNCpup
+axMf2adAmLrF+wLUk3riSXSkY9NUgG5pr0Qps3/LD3/JrWFF0H0=
+=N8Vt
 -----END PGP SIGNATURE-----
 
---zdvw2swwaytqbmec--
+--z7yk2caa3tfvv2j6--
