@@ -2,191 +2,78 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B73C636CC
-	for <linux-dash@archiver.kernel.org>; Wed,  8 Feb 2023 05:15:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C1F9C05027
+	for <linux-dash@archiver.kernel.org>; Wed,  8 Feb 2023 08:43:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229490AbjBHFPy (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 8 Feb 2023 00:15:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50460 "EHLO
+        id S229679AbjBHInO (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 8 Feb 2023 03:43:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjBHFPx (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 8 Feb 2023 00:15:53 -0500
-X-Greylist: delayed 91 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 07 Feb 2023 21:15:51 PST
-Received: from omta002.cacentral1.a.cloudfilter.net (omta002.cacentral1.a.cloudfilter.net [3.97.99.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C7F40C1
-        for <dash@vger.kernel.org>; Tue,  7 Feb 2023 21:15:51 -0800 (PST)
-Received: from shw-obgw-4004a.ext.cloudfilter.net ([10.228.9.227])
-        by cmsmtp with ESMTP
-        id PTWmpwmoxl2xSPcmipZQBP; Wed, 08 Feb 2023 05:14:20 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=shaw.ca; s=s20180605;
-        t=1675833260; bh=cB0Oooy6fgqwW3sXt/74MnpC103+CmBPc0h+6fDdqV0=;
-        h=Date:From:Subject:Reply-To:To:Cc;
-        b=Y9h/Z6VZUAlXnqlVD6afusYtneDjVszY8Sz7x5/MEw+3lBQ2UpSpalyhE21JqDUge
-         dI2VUTxESrC8FGXUhhvI8IF4exjP0rMb0uI4LxvJyU9L6+wfhP5Jl7sneZoNqApugT
-         5YAwLPZCce8GSzmSCIHC/3USBRRKqCRQ6l94sKEnPw55GQ0+I6qBbz5hCz2/KMbbd2
-         zGE/s1OpsRy2egefwOVfe9ozaJnleHRkkkT0KCp0dyAKXBiScuK0B0h66VZYHCedjx
-         8hvTTdvpLynS8wGE/pS3hbiUFd8y6GZbJueIi/ywSup+lM9ZuknVuWzbSFgEIX8NFw
-         na59jWAV5NbAA==
-Received: from [10.0.0.5] ([184.64.102.149])
-        by cmsmtp with ESMTP
-        id PcmhpsJrG3fOSPcmhpJv2H; Wed, 08 Feb 2023 05:14:20 +0000
-X-Authority-Analysis: v=2.4 cv=J8G5USrS c=1 sm=1 tr=0 ts=63e32fac
- a=DxHlV3/gbUaP7LOF0QAmaA==:117 a=DxHlV3/gbUaP7LOF0QAmaA==:17
- a=r77TgQKjGQsHNAKrUKIA:9 a=yPf7pi8k6090NVXkwu8A:9 a=QEXdDO2ut3YA:10
- a=FZ9wS0a9E1mmaF1ckGwA:9 a=E-yladNfQNEA:10 a=ICWkgZSdWe_YlBB88T4A:9
- a=ITdVHhY7-e0A:10 a=RIdMWvM8z9WmbC61yKYA:9
-Content-Type: multipart/mixed; boundary="------------gJoBKljSJKkfZLqAc7YIR3wW"
-Message-ID: <12629edc-ec41-ca2a-968b-3be7de2743ae@Shaw.ca>
-Date:   Tue, 7 Feb 2023 22:14:18 -0700
+        with ESMTP id S229478AbjBHInN (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 8 Feb 2023 03:43:13 -0500
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BE5661117D
+        for <dash@vger.kernel.org>; Wed,  8 Feb 2023 00:43:11 -0800 (PST)
+Received: from [IPV6:2a02:8010:68a1:0:f140:f5fb:7038:8e8a] (unknown [IPv6:2a02:8010:68a1:0:f140:f5fb:7038:8e8a])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id 8D84D104C;
+        Wed,  8 Feb 2023 08:43:09 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 8D84D104C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1675845789;
+        bh=8AnYS6x0+oYqF/WqRtjhZqjOlIlYv20833BRX57F09A=; l=1474;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=RTwhGoBxoP41gjjyiRsDyMDd6Sa5Bmnew/NtQcELQj+z6Txsdq/o4BqvYSLew0Cv5
+         wiGz2kbSRiW/PBc0eoQXXJQSwt8OWwkSCTpI37aURuSSKwIToqVUGgMZbGVUqAjh69
+         E5pggeKtQNdxgd4Uei1Db0ywu4uzJWC0umolG87o=
+Message-ID: <7a89fc42-e7bc-748d-5ea6-31cb523f74c6@gigawatt.nl>
+Date:   Wed, 8 Feb 2023 08:43:06 +0000
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-From:   Brian Inglis <Brian.Inglis@Shaw.ca>
-Subject: dash 0.5.12 parameter expansion using classes not working
-Reply-To: Brian.Inglis@Shaw.ca
-To:     Herbert Xu <dash@vger.kernel.org>
-Cc:     Brian Inglis <Brian.Inglis@SystematicSW.ab.ca>
-Content-Language: en-CA
-Organization: Inglis
-X-CMAE-Envelope: MS4xfKOi8m28ERQ71pLpikMQx/XsKsJhLDd9/A813Cr2umztcuQb/f5gZJopztJllTJ3KYzwk+sU1+a5GocMLJpxdsIbo2/rXhr7nzqysp+fU3FPi90GUwGF
- bkSm2wDs1IIv6LBUiB7QN3kOLgExrUVgxn+cBOkEMlinaA/3IvPwM0IKaw6hxluwI8jw291CeBICgSjp52Bq8gL6N2T3AkPv9VS5iYctxojTx3QdQJ3IFekx
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:110.0) Gecko/20100101
+ Thunderbird/110.0
+Subject: Re: dash 0.5.12 parameter expansion using classes not working
+To:     Brian.Inglis@Shaw.ca
+Cc:     DASH shell mailing list <dash@vger.kernel.org>
+References: <12629edc-ec41-ca2a-968b-3be7de2743ae@Shaw.ca>
+Content-Language: en-US
+From:   Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <12629edc-ec41-ca2a-968b-3be7de2743ae@Shaw.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------gJoBKljSJKkfZLqAc7YIR3wW
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+On 08/02/2023 05:14, Brian Inglis wrote:
+> Hi folks,
+> 
+> Under dash 0.5.12 parameter expansion using regexp classes [[:space:]] 
+> to trim no longer works, but releases up to 0.5.11.5 still work 
+> correctly with the same environment and default config options.
+> 
+> In the attached dash script and logs, one of our users has an abstruse 
+> string they use to clean up build command lines, but I trimmed that down 
+> to the locale-dependent [[:space:]] regexp, then to the ASCII whitespace 
+> characters generated by echo, and only the last still works with 0.5.12, 
+> all work under 0.5.11.5.
+> 
+> Nothing obvious jumps out from the commitdiffs between then and now, so 
+> I am hoping some possible cause occurs to you.
+> 
+> Build environment was Cygwin+newlib autoreconf with autoconf 2.71, 
+> autogen 5.18.16, automake 1.16.5, gcc 11.3, binutils 2.29, coreutils 
+> 9.0, dash 0.5.11.5 as sh.
 
-Hi folks,
+Hi,
 
-Under dash 0.5.12 parameter expansion using regexp classes [[:space:]] to trim 
-no longer works, but releases up to 0.5.11.5 still work correctly with the same 
-environment and default config options.
+dash 0.5.12 includes commit 7638476c 
+<https://git.kernel.org/pub/scm/utils/dash/dash.git/commit/?id=7638476c18f2a8451b05d49f4e767ee1f98cfc17> 
+which enables the use of libc's fnmatch() by default. Looking at newlib 
+sources, 
+<https://github.com/eblot/newlib/blob/master/newlib/libc/posix/fnmatch.c>, 
+it appears that newlib's fnmatch() does not support character classes 
+and should not be used for dash. Would you be able to check that 
+explicitly passing --disable-fnmatch to the configure options gets it 
+working properly again?
 
-In the attached dash script and logs, one of our users has an abstruse string 
-they use to clean up build command lines, but I trimmed that down to the 
-locale-dependent [[:space:]] regexp, then to the ASCII whitespace characters 
-generated by echo, and only the last still works with 0.5.12, all work under 
-0.5.11.5.
-
-Nothing obvious jumps out from the commitdiffs between then and now, so I am 
-hoping some possible cause occurs to you.
-
-Build environment was Cygwin+newlib autoreconf with autoconf 2.71, autogen 
-5.18.16, automake 1.16.5, gcc 11.3, binutils 2.29, coreutils 9.0, dash 0.5.11.5 
-as sh.
-
--- 
-Take care. Thanks, Brian Inglis			Calgary, Alberta, Canada
-
-La perfection est atteinte			Perfection is achieved
-non pas lorsqu'il n'y a plus rien à ajouter	not when there is no more to add
-mais lorsqu'il n'y a plus rien à retirer	but when there is no more to cut
-			-- Antoine de Saint-Exupéry
---------------gJoBKljSJKkfZLqAc7YIR3wW
-Content-Type: text/plain; charset=UTF-8; name="par-ext-t.sh"
-Content-Disposition: attachment; filename="par-ext-t.sh"
-Content-Transfer-Encoding: base64
-
-IyEvYmluL2Rhc2ggLXZ4Cgp0cmltKCkgewogICMgcmVtb3ZlIGxlYWRpbmcgd2hpdGVzcGFj
-ZSBjaGFyYWN0ZXJzCiAgX190cmltPSIkeyojJHsqJSVbIVs6c3BhY2U6XV0qfX0iCiAgIyBy
-ZW1vdmUgdHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7
-X190cmltJSR7X190cmltIyMqWyFbOnNwYWNlOl1dfX0iCn0KCnRyaW0gIiBhbHBoYSIgfCBv
-ZCAtdCB4MWEKdHJpbSAiYmV0YSAiIHwgb2QgLXQgeDFhCnRyaW0gIg1nYW1tYQkiIHwgb2Qg
-LXQgeDFhCgp0cmltMigpIHsKICAjIHJlbW92ZSBsZWFkaW5nIHdoaXRlc3BhY2UgY2hhcmFj
-dGVycwogIF9fdHJpbT0iJHsqIyNbWzpzcGFjZTpdXX0iCiAgIyByZW1vdmUgdHJhaWxpbmcg
-d2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7X190cmltJSVbWzpzcGFj
-ZTpdXX0iCn0KCnRyaW0yICIgYWxwaGEiIHwgb2QgLXQgeDFhCnRyaW0yICJiZXRhICIgfCBv
-ZCAtdCB4MWEKdHJpbTIgIg1nYW1tYQkiIHwgb2QgLXQgeDFhCgp0cmltMygpIHsKICBfc3Bh
-Y2U9IiQoZWNobyAtbiAnW1xiXHRcblx2XGZcciBdJykiCiAgIyByZW1vdmUgbGVhZGluZyB3
-aGl0ZXNwYWNlIGNoYXJhY3RlcnMKICBfX3RyaW09IiR7KiMjJF9zcGFjZX0iCiAgIyByZW1v
-dmUgdHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7X190
-cmltJSUkX3NwYWNlfSIKfQoKdHJpbTMgIiBhbHBoYSIgfCBvZCAtdCB4MWEKdHJpbTMgImJl
-dGEgIiB8IG9kIC10IHgxYQp0cmltMyAiDWdhbW1hCSIgfCBvZCAtdCB4MWEKCg==
---------------gJoBKljSJKkfZLqAc7YIR3wW
-Content-Type: text/plain; charset=UTF-8; name="test11.log"
-Content-Disposition: attachment; filename="test11.log"
-Content-Transfer-Encoding: base64
-
-IyEvYmluL2Rhc2ggLXZ4Cgp0cmltKCkgewogICMgcmVtb3ZlIGxlYWRpbmcgd2hpdGVzcGFj
-ZSBjaGFyYWN0ZXJzCiAgX190cmltPSIkeyojJHsqJSVbIVs6c3BhY2U6XV0qfX0iCiAgIyBy
-ZW1vdmUgdHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7
-X190cmltJSR7X190cmltIyMqWyFbOnNwYWNlOl1dfX0iCn0KCnRyaW0gIiBhbHBoYSIgfCBv
-ZCAtdCB4MWEKKyB0cmltICBhbHBoYQorIF9fdHJpbT1hbHBoYQorIHByaW50ZiAlcyBhbHBo
-YQorIG9kIC10IHgxYQowMDAwMDAwICA2MSAgNmMgIDcwICA2OCAgNjEKICAgICAgICAgIGEg
-ICBsICAgcCAgIGggICBhCjAwMDAwMDUKdHJpbSAiYmV0YSAiIHwgb2QgLXQgeDFhCisgdHJp
-bSBiZXRhIAorIF9fdHJpbT1iZXRhIAorIHByaW50ZiAlcyBiZXRhCisgb2QgLXQgeDFhCjAw
-MDAwMDAgIDYyICA2NSAgNzQgIDYxCiAgICAgICAgICBiICAgZSAgIHQgICBhCjAwMDAwMDQK
-dHJpbSAiDWdhbW1hCSIgfCBvZCAtdCB4MWEKKyB0cmltIA1nYW1tYQkKKyBfX3RyaW09Z2Ft
-bWEJCisgcHJpbnRmICVzIGdhbW1hCisgb2QgLXQgeDFhCjAwMDAwMDAgIDY3ICA2MSAgNmQg
-IDZkICA2MQogICAgICAgICAgZyAgIGEgICBtICAgbSAgIGEKMDAwMDAwNQoKdHJpbTIoKSB7
-CiAgIyByZW1vdmUgbGVhZGluZyB3aGl0ZXNwYWNlIGNoYXJhY3RlcnMKICBfX3RyaW09IiR7
-KiMjW1s6c3BhY2U6XV19IgogICMgcmVtb3ZlIHRyYWlsaW5nIHdoaXRlc3BhY2UgY2hhcmFj
-dGVycwogIHByaW50ZiAiJXMiICIke19fdHJpbSUlW1s6c3BhY2U6XV19Igp9Cgp0cmltMiAi
-IGFscGhhIiB8IG9kIC10IHgxYQorIHRyaW0yICBhbHBoYQorIF9fdHJpbT1hbHBoYQorIHBy
-aW50ZiAlcyBhbHBoYQorIG9kIC10IHgxYQowMDAwMDAwICA2MSAgNmMgIDcwICA2OCAgNjEK
-ICAgICAgICAgIGEgICBsICAgcCAgIGggICBhCjAwMDAwMDUKdHJpbTIgImJldGEgIiB8IG9k
-IC10IHgxYQorIHRyaW0yIGJldGEgCisgX190cmltPWJldGEgCisgcHJpbnRmICVzIGJldGEK
-KyBvZCAtdCB4MWEKMDAwMDAwMCAgNjIgIDY1ICA3NCAgNjEKICAgICAgICAgIGIgICBlICAg
-dCAgIGEKMDAwMDAwNAp0cmltMiAiDWdhbW1hCSIgfCBvZCAtdCB4MWEKKyB0cmltMiANZ2Ft
-bWEJCisgX190cmltPWdhbW1hCQorIHByaW50ZiAlcyBnYW1tYQorIG9kIC10IHgxYQowMDAw
-MDAwICA2NyAgNjEgIDZkICA2ZCAgNjEKICAgICAgICAgIGcgICBhICAgbSAgIG0gICBhCjAw
-MDAwMDUKCnRyaW0zKCkgewogIF9zcGFjZT0iJChlY2hvIC1uICdbXGJcdFxuXHZcZlxyIF0n
-KSIKICAjIHJlbW92ZSBsZWFkaW5nIHdoaXRlc3BhY2UgY2hhcmFjdGVycwogIF9fdHJpbT0i
-JHsqIyMkX3NwYWNlfSIKICAjIHJlbW92ZSB0cmFpbGluZyB3aGl0ZXNwYWNlIGNoYXJhY3Rl
-cnMKICBwcmludGYgIiVzIiAiJHtfX3RyaW0lJSRfc3BhY2V9Igp9Cgp0cmltMyAiIGFscGhh
-IiB8IG9kIC10IHgxYQorIHRyaW0zICBhbHBoYQorIG9kIC10IHgxYQorIGVjaG8gLW4gW1xi
-XHRcblx2XGZcciBdCisgX3NwYWNlPVsICQoLDA0gXQorIF9fdHJpbT1hbHBoYQorIHByaW50
-ZiAlcyBhbHBoYQowMDAwMDAwICA2MSAgNmMgIDcwICA2OCAgNjEKICAgICAgICAgIGEgICBs
-ICAgcCAgIGggICBhCjAwMDAwMDUKdHJpbTMgImJldGEgIiB8IG9kIC10IHgxYQorIHRyaW0z
-IGJldGEgCisgb2QgLXQgeDFhCisgZWNobyAtbiBbXGJcdFxuXHZcZlxyIF0KKyBfc3BhY2U9
-WwgJCgsMDSBdCisgX190cmltPWJldGEgCisgcHJpbnRmICVzIGJldGEKMDAwMDAwMCAgNjIg
-IDY1ICA3NCAgNjEKICAgICAgICAgIGIgICBlICAgdCAgIGEKMDAwMDAwNAp0cmltMyAiDWdh
-bW1hCSIgfCBvZCAtdCB4MWEKKyB0cmltMyANZ2FtbWEJCisgKyBvZCAtdCB4MWEKZWNobyAt
-biBbXGJcdFxuXHZcZlxyIF0KKyBfc3BhY2U9WwgJCgsMDSBdCisgX190cmltPWdhbW1hCQor
-IHByaW50ZiAlcyBnYW1tYQowMDAwMDAwICA2NyAgNjEgIDZkICA2ZCAgNjEKICAgICAgICAg
-IGcgICBhICAgbSAgIG0gICBhCjAwMDAwMDUKCg==
---------------gJoBKljSJKkfZLqAc7YIR3wW
-Content-Type: text/plain; charset=UTF-8; name="test12.log"
-Content-Disposition: attachment; filename="test12.log"
-Content-Transfer-Encoding: base64
-
-IyEvYmluL2Rhc2ggLXZ4Cgp0cmltKCkgewogICMgcmVtb3ZlIGxlYWRpbmcgd2hpdGVzcGFj
-ZSBjaGFyYWN0ZXJzCiAgX190cmltPSIkeyojJHsqJSVbIVs6c3BhY2U6XV0qfX0iCiAgIyBy
-ZW1vdmUgdHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7
-X190cmltJSR7X190cmltIyMqWyFbOnNwYWNlOl1dfX0iCn0KCnRyaW0gIiBhbHBoYSIgfCBv
-ZCAtdCB4MWEKKyB0cmltICBhbHBoYQorIF9fdHJpbT0KKyBwcmludGYgJXMgCisgb2QgLXQg
-eDFhCjAwMDAwMDAKdHJpbSAiYmV0YSAiIHwgb2QgLXQgeDFhCisgdHJpbSBiZXRhIAorIF9f
-dHJpbT0KKyBwcmludGYgJXMgCisgb2QgLXQgeDFhCjAwMDAwMDAKdHJpbSAiDWdhbW1hCSIg
-fCBvZCAtdCB4MWEKKyB0cmltIA1nYW1tYQkKKyBfX3RyaW09CisgcHJpbnRmICVzIAorIG9k
-IC10IHgxYQowMDAwMDAwCgp0cmltMigpIHsKICAjIHJlbW92ZSBsZWFkaW5nIHdoaXRlc3Bh
-Y2UgY2hhcmFjdGVycwogIF9fdHJpbT0iJHsqIyNbWzpzcGFjZTpdXX0iCiAgIyByZW1vdmUg
-dHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7X190cmlt
-JSVbWzpzcGFjZTpdXX0iCn0KCnRyaW0yICIgYWxwaGEiIHwgb2QgLXQgeDFhCisgdHJpbTIg
-IGFscGhhCisgX190cmltPSBhbHBoYQorIHByaW50ZiAlcyAgYWxwaGEKKyBvZCAtdCB4MWEK
-MDAwMDAwMCAgMjAgIDYxICA2YyAgNzAgIDY4ICA2MQogICAgICAgICBzcCAgIGEgICBsICAg
-cCAgIGggICBhCjAwMDAwMDYKdHJpbTIgImJldGEgIiB8IG9kIC10IHgxYQorIHRyaW0yIGJl
-dGEgCisgX190cmltPWJldGEgCisgcHJpbnRmICVzIGJldGEgCisgb2QgLXQgeDFhCjAwMDAw
-MDAgIDYyICA2NSAgNzQgIDYxICAyMAogICAgICAgICAgYiAgIGUgICB0ICAgYSAgc3AKMDAw
-MDAwNQp0cmltMiAiDWdhbW1hCSIgfCBvZCAtdCB4MWEKKyB0cmltMiANZ2FtbWEJCisgX190
-cmltPQ1nYW1tYQkKKyBwcmludGYgJXMgDWdhbW1hCQorIG9kIC10IHgxYQowMDAwMDAwICAw
-ZCAgNjcgIDYxICA2ZCAgNmQgIDYxICAwOQogICAgICAgICBjciAgIGcgICBhICAgbSAgIG0g
-ICBhICBodAowMDAwMDA3Cgp0cmltMygpIHsKICBfc3BhY2U9IiQoZWNobyAtbiAnW1xiXHRc
-blx2XGZcciBdJykiCiAgIyByZW1vdmUgbGVhZGluZyB3aGl0ZXNwYWNlIGNoYXJhY3RlcnMK
-ICBfX3RyaW09IiR7KiMjJF9zcGFjZX0iCiAgIyByZW1vdmUgdHJhaWxpbmcgd2hpdGVzcGFj
-ZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7X190cmltJSUkX3NwYWNlfSIKfQoKdHJp
-bTMgIiBhbHBoYSIgfCBvZCAtdCB4MWEKKyB0cmltMyAgYWxwaGEKKyBvZCAtdCB4MWEKKyBl
-Y2hvIC1uIFtcYlx0XG5cdlxmXHIgXQorIF9zcGFjZT1bCAkKCwwNIF0KKyBfX3RyaW09YWxw
-aGEKKyBwcmludGYgJXMgYWxwaGEKMDAwMDAwMCAgNjEgIDZjICA3MCAgNjggIDYxCiAgICAg
-ICAgICBhICAgbCAgIHAgICBoICAgYQowMDAwMDA1CnRyaW0zICJiZXRhICIgfCBvZCAtdCB4
-MWEKKyB0cmltMyBiZXRhIAorIG9kIC10IHgxYQorIGVjaG8gLW4gW1xiXHRcblx2XGZcciBd
-CisgX3NwYWNlPVsICQoLDA0gXQorIF9fdHJpbT1iZXRhIAorIHByaW50ZiAlcyBiZXRhCjAw
-MDAwMDAgIDYyICA2NSAgNzQgIDYxCiAgICAgICAgICBiICAgZSAgIHQgICBhCjAwMDAwMDQK
-dHJpbTMgIg1nYW1tYQkiIHwgb2QgLXQgeDFhCisgdHJpbTMgDWdhbW1hCQorIG9kIC10IHgx
-YQorIGVjaG8gLW4gW1xiXHRcblx2XGZcciBdCisgX3NwYWNlPVsICQoLDA0gXQorIF9fdHJp
-bT1nYW1tYQkKKyBwcmludGYgJXMgZ2FtbWEKMDAwMDAwMCAgNjcgIDYxICA2ZCAgNmQgIDYx
-CiAgICAgICAgICBnICAgYSAgIG0gICBtICAgYQowMDAwMDA1Cgo=
-
---------------gJoBKljSJKkfZLqAc7YIR3wW--
+Cheers,
+Harald van Dijk
