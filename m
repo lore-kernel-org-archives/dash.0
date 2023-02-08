@@ -2,129 +2,191 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 137D3C636D4
-	for <linux-dash@archiver.kernel.org>; Tue,  7 Feb 2023 19:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B73C636CC
+	for <linux-dash@archiver.kernel.org>; Wed,  8 Feb 2023 05:15:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231772AbjBGTeD (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Tue, 7 Feb 2023 14:34:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41026 "EHLO
+        id S229490AbjBHFPy (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 8 Feb 2023 00:15:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232047AbjBGTdy (ORCPT <rfc822;dash@vger.kernel.org>);
-        Tue, 7 Feb 2023 14:33:54 -0500
-Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7E00E3B670
-        for <dash@vger.kernel.org>; Tue,  7 Feb 2023 11:33:40 -0800 (PST)
-Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id B426A942;
-        Tue,  7 Feb 2023 20:33:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202211; t=1675798419;
-        bh=LFLA99HyYUBNUwoTrehEu2zy8RwDT7JJG6bmJkWYQmk=;
-        h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=Vdq6uwNpj095FXg/1ZQNyvbD9fwBRapdeX5/MVfR+QSHO0V/M6XMuwZkgIRnXYdtf
-         17P1iUl7GG08tNdq8IicgYNdX94eojI3lgMH3+sx97B0zoeFbpmPf8K85lmeEerW0W
-         KgIiPICPtiXjpskAbQUuABumcmWecJqXFKzwlyWWjBpUIG/00Jpm17cL+wnjxFw05G
-         CtdgEy6m++lV/PECgi1r6h+Pr3DBa8g/Iu889w58saC4Z0K0JyD4AvnYRi4Bzdo3m6
-         aJ6R7Cd6mHcyiAPzbyKbm+LPV2N6wD6KSMD1ELEepn6LXqsJZmmSBu2x4bv2aHlt8b
-         zCAHSjFxEInsQ==
-Date:   Tue, 7 Feb 2023 20:33:38 +0100
-From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
-To:     Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
-Subject: [PATCH 4/6] fc: don't require an argument
-Message-ID: <ba7012f7f2cf644c79160b6f1361486d46d9cf9d.1675798292.git.nabijaczleweli@nabijaczleweli.xyz>
-References: <ab3fbcc2-1a9a-136b-0b02-a5ea31fe02c5@gigawatt.nl>
+        with ESMTP id S229457AbjBHFPx (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 8 Feb 2023 00:15:53 -0500
+X-Greylist: delayed 91 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 07 Feb 2023 21:15:51 PST
+Received: from omta002.cacentral1.a.cloudfilter.net (omta002.cacentral1.a.cloudfilter.net [3.97.99.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C7F40C1
+        for <dash@vger.kernel.org>; Tue,  7 Feb 2023 21:15:51 -0800 (PST)
+Received: from shw-obgw-4004a.ext.cloudfilter.net ([10.228.9.227])
+        by cmsmtp with ESMTP
+        id PTWmpwmoxl2xSPcmipZQBP; Wed, 08 Feb 2023 05:14:20 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=shaw.ca; s=s20180605;
+        t=1675833260; bh=cB0Oooy6fgqwW3sXt/74MnpC103+CmBPc0h+6fDdqV0=;
+        h=Date:From:Subject:Reply-To:To:Cc;
+        b=Y9h/Z6VZUAlXnqlVD6afusYtneDjVszY8Sz7x5/MEw+3lBQ2UpSpalyhE21JqDUge
+         dI2VUTxESrC8FGXUhhvI8IF4exjP0rMb0uI4LxvJyU9L6+wfhP5Jl7sneZoNqApugT
+         5YAwLPZCce8GSzmSCIHC/3USBRRKqCRQ6l94sKEnPw55GQ0+I6qBbz5hCz2/KMbbd2
+         zGE/s1OpsRy2egefwOVfe9ozaJnleHRkkkT0KCp0dyAKXBiScuK0B0h66VZYHCedjx
+         8hvTTdvpLynS8wGE/pS3hbiUFd8y6GZbJueIi/ywSup+lM9ZuknVuWzbSFgEIX8NFw
+         na59jWAV5NbAA==
+Received: from [10.0.0.5] ([184.64.102.149])
+        by cmsmtp with ESMTP
+        id PcmhpsJrG3fOSPcmhpJv2H; Wed, 08 Feb 2023 05:14:20 +0000
+X-Authority-Analysis: v=2.4 cv=J8G5USrS c=1 sm=1 tr=0 ts=63e32fac
+ a=DxHlV3/gbUaP7LOF0QAmaA==:117 a=DxHlV3/gbUaP7LOF0QAmaA==:17
+ a=r77TgQKjGQsHNAKrUKIA:9 a=yPf7pi8k6090NVXkwu8A:9 a=QEXdDO2ut3YA:10
+ a=FZ9wS0a9E1mmaF1ckGwA:9 a=E-yladNfQNEA:10 a=ICWkgZSdWe_YlBB88T4A:9
+ a=ITdVHhY7-e0A:10 a=RIdMWvM8z9WmbC61yKYA:9
+Content-Type: multipart/mixed; boundary="------------gJoBKljSJKkfZLqAc7YIR3wW"
+Message-ID: <12629edc-ec41-ca2a-968b-3be7de2743ae@Shaw.ca>
+Date:   Tue, 7 Feb 2023 22:14:18 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="w7boaumakpr4mvwu"
-Content-Disposition: inline
-In-Reply-To: <ab3fbcc2-1a9a-136b-0b02-a5ea31fe02c5@gigawatt.nl>
-User-Agent: NeoMutt/20220429
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+From:   Brian Inglis <Brian.Inglis@Shaw.ca>
+Subject: dash 0.5.12 parameter expansion using classes not working
+Reply-To: Brian.Inglis@Shaw.ca
+To:     Herbert Xu <dash@vger.kernel.org>
+Cc:     Brian Inglis <Brian.Inglis@SystematicSW.ab.ca>
+Content-Language: en-CA
+Organization: Inglis
+X-CMAE-Envelope: MS4xfKOi8m28ERQ71pLpikMQx/XsKsJhLDd9/A813Cr2umztcuQb/f5gZJopztJllTJ3KYzwk+sU1+a5GocMLJpxdsIbo2/rXhr7nzqysp+fU3FPi90GUwGF
+ bkSm2wDs1IIv6LBUiB7QN3kOLgExrUVgxn+cBOkEMlinaA/3IvPwM0IKaw6hxluwI8jw291CeBICgSjp52Bq8gL6N2T3AkPv9VS5iYctxojTx3QdQJ3IFekx
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
+This is a multi-part message in MIME format.
+--------------gJoBKljSJKkfZLqAc7YIR3wW
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---w7boaumakpr4mvwu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi folks,
 
-This is already handled correctly (per POSIX) below:
-  When the synopsis form with -s is used:
-    If first is omitted, the previous command shall be used.
-  For the synopsis forms without -s:
-    If first and last are both omitted, the previous 16 commands
-    shall be listed or the previous single command shall be edited
-    (based on the -l option).
+Under dash 0.5.12 parameter expansion using regexp classes [[:space:]] to trim 
+no longer works, but releases up to 0.5.11.5 still work correctly with the same 
+environment and default config options.
 
-Test log:
-  $ ls
-  autogen.sh  ChangeLog  ...
-  $ id
-  uid=3D1000(nabijaczleweli) gid=3D100(users) groups=3D100(users)
-  $ who
-  nabijaczleweli pts/2 2023-02-07 18:36 (192.168.1.109)
-  $ fc
-  4
-  ,
-  who
-  q
-  nabijaczleweli pts/2 2023-02-07 18:36 (192.168.1.109)
-  $ fc -l
-      1 ls
-      2 id
-      3 who
-      4 fc
-  $ fc -s
-  fc -l
-      1 ls
-      2 id
-      3 who
-      4 fc
-      5 fc -l
+In the attached dash script and logs, one of our users has an abstruse string 
+they use to clean up build command lines, but I trimmed that down to the 
+locale-dependent [[:space:]] regexp, then to the ASCII whitespace characters 
+generated by echo, and only the last still works with 0.5.12, all work under 
+0.5.11.5.
 
-Reported-by: Harald van Dijk <harald@gigawatt.nl>
-Reported-in: https://marc.info/?l=3Ddash&m=3D154707728009743&w=3D2
----
- src/histedit.c | 3 ---
- 1 file changed, 3 deletions(-)
+Nothing obvious jumps out from the commitdiffs between then and now, so I am 
+hoping some possible cause occurs to you.
 
-diff --git a/src/histedit.c b/src/histedit.c
-index 24631ca..f10e5ab 100644
---- a/src/histedit.c
-+++ b/src/histedit.c
-@@ -212,9 +212,6 @@ histcmd(int argc, char **argv)
- 	if (hist =3D=3D NULL)
- 		sh_error("history not active");
-=20
--	if (argc =3D=3D 1)
--		sh_error("missing history argument");
--
- #ifdef __GLIBC__
- 	optind =3D 0;
- #else
---=20
-2.30.2
+Build environment was Cygwin+newlib autoreconf with autoconf 2.71, autogen 
+5.18.16, automake 1.16.5, gcc 11.3, binutils 2.29, coreutils 9.0, dash 0.5.11.5 
+as sh.
 
+-- 
+Take care. Thanks, Brian Inglis			Calgary, Alberta, Canada
 
---w7boaumakpr4mvwu
-Content-Type: application/pgp-signature; name="signature.asc"
+La perfection est atteinte			Perfection is achieved
+non pas lorsqu'il n'y a plus rien à ajouter	not when there is no more to add
+mais lorsqu'il n'y a plus rien à retirer	but when there is no more to cut
+			-- Antoine de Saint-Exupéry
+--------------gJoBKljSJKkfZLqAc7YIR3wW
+Content-Type: text/plain; charset=UTF-8; name="par-ext-t.sh"
+Content-Disposition: attachment; filename="par-ext-t.sh"
+Content-Transfer-Encoding: base64
 
------BEGIN PGP SIGNATURE-----
+IyEvYmluL2Rhc2ggLXZ4Cgp0cmltKCkgewogICMgcmVtb3ZlIGxlYWRpbmcgd2hpdGVzcGFj
+ZSBjaGFyYWN0ZXJzCiAgX190cmltPSIkeyojJHsqJSVbIVs6c3BhY2U6XV0qfX0iCiAgIyBy
+ZW1vdmUgdHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7
+X190cmltJSR7X190cmltIyMqWyFbOnNwYWNlOl1dfX0iCn0KCnRyaW0gIiBhbHBoYSIgfCBv
+ZCAtdCB4MWEKdHJpbSAiYmV0YSAiIHwgb2QgLXQgeDFhCnRyaW0gIg1nYW1tYQkiIHwgb2Qg
+LXQgeDFhCgp0cmltMigpIHsKICAjIHJlbW92ZSBsZWFkaW5nIHdoaXRlc3BhY2UgY2hhcmFj
+dGVycwogIF9fdHJpbT0iJHsqIyNbWzpzcGFjZTpdXX0iCiAgIyByZW1vdmUgdHJhaWxpbmcg
+d2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7X190cmltJSVbWzpzcGFj
+ZTpdXX0iCn0KCnRyaW0yICIgYWxwaGEiIHwgb2QgLXQgeDFhCnRyaW0yICJiZXRhICIgfCBv
+ZCAtdCB4MWEKdHJpbTIgIg1nYW1tYQkiIHwgb2QgLXQgeDFhCgp0cmltMygpIHsKICBfc3Bh
+Y2U9IiQoZWNobyAtbiAnW1xiXHRcblx2XGZcciBdJykiCiAgIyByZW1vdmUgbGVhZGluZyB3
+aGl0ZXNwYWNlIGNoYXJhY3RlcnMKICBfX3RyaW09IiR7KiMjJF9zcGFjZX0iCiAgIyByZW1v
+dmUgdHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7X190
+cmltJSUkX3NwYWNlfSIKfQoKdHJpbTMgIiBhbHBoYSIgfCBvZCAtdCB4MWEKdHJpbTMgImJl
+dGEgIiB8IG9kIC10IHgxYQp0cmltMyAiDWdhbW1hCSIgfCBvZCAtdCB4MWEKCg==
+--------------gJoBKljSJKkfZLqAc7YIR3wW
+Content-Type: text/plain; charset=UTF-8; name="test11.log"
+Content-Disposition: attachment; filename="test11.log"
+Content-Transfer-Encoding: base64
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmPip5IACgkQvP0LAY0m
-WPG8gQ//RQaF4ka55nnId9otiJ/qv0wzYRhxHsD2sDhw8K2AGB5SxMjLGwA+NQwO
-G7FE7GiEVeRkge1u5zOBE/m9E0tDIG3s7O+IUe+OmyiL6TbkGgQj9yhHjL0YfH9P
-RpFzY6VI6oyUx1x/DMGVR4vqR73Wd+rNKOgBOn+nOvbAKNH1RzD/oT0sbnBHM5ol
-x1SL4F17pFZl93qPsQkFXkKZLgB9b+v2emiG8JF9tmP2uHlve3Onjh6yoqlLVD/V
-KWCvUZHZ1gS2Gik9As9a/z6E+5hz4lHN37MnrBxp57jvnlVRKSDc78XAU/Jw1eS6
-gT7JnxBaa8l9WwF84W4cSyhoGoVq7NHDMbFu22xiEyxYTAn533XgdaN39QRJriD+
-zUZE5BBD468JgB3uDFVYZNphJJAZQmluqL/+ehmZfTnE/F68eGilEByAr2JfklVu
-dAuCu4DX/Bb3gK6aubh5TxBGNAaRl5sJVmIr1I3pzZNeNnS8PvWc4LNShn1R3wPd
-rgBXXHiV2xX1sEpZ3cIpS5Jxt6Ly39ha4gBq2jb7sztpnEkchUB/MysdTS/lZ0b/
-innjrRLc723YCn1YFxF0punJUxmwsfyyz9Yvpy7tmOT2YChth43a3vD0bF6X+T0f
-6kRsYngyUmkQH0AwGz0aGnYkM6e3K252KOL50C0vp1SrNnbnbp4=
-=9h1g
------END PGP SIGNATURE-----
+IyEvYmluL2Rhc2ggLXZ4Cgp0cmltKCkgewogICMgcmVtb3ZlIGxlYWRpbmcgd2hpdGVzcGFj
+ZSBjaGFyYWN0ZXJzCiAgX190cmltPSIkeyojJHsqJSVbIVs6c3BhY2U6XV0qfX0iCiAgIyBy
+ZW1vdmUgdHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7
+X190cmltJSR7X190cmltIyMqWyFbOnNwYWNlOl1dfX0iCn0KCnRyaW0gIiBhbHBoYSIgfCBv
+ZCAtdCB4MWEKKyB0cmltICBhbHBoYQorIF9fdHJpbT1hbHBoYQorIHByaW50ZiAlcyBhbHBo
+YQorIG9kIC10IHgxYQowMDAwMDAwICA2MSAgNmMgIDcwICA2OCAgNjEKICAgICAgICAgIGEg
+ICBsICAgcCAgIGggICBhCjAwMDAwMDUKdHJpbSAiYmV0YSAiIHwgb2QgLXQgeDFhCisgdHJp
+bSBiZXRhIAorIF9fdHJpbT1iZXRhIAorIHByaW50ZiAlcyBiZXRhCisgb2QgLXQgeDFhCjAw
+MDAwMDAgIDYyICA2NSAgNzQgIDYxCiAgICAgICAgICBiICAgZSAgIHQgICBhCjAwMDAwMDQK
+dHJpbSAiDWdhbW1hCSIgfCBvZCAtdCB4MWEKKyB0cmltIA1nYW1tYQkKKyBfX3RyaW09Z2Ft
+bWEJCisgcHJpbnRmICVzIGdhbW1hCisgb2QgLXQgeDFhCjAwMDAwMDAgIDY3ICA2MSAgNmQg
+IDZkICA2MQogICAgICAgICAgZyAgIGEgICBtICAgbSAgIGEKMDAwMDAwNQoKdHJpbTIoKSB7
+CiAgIyByZW1vdmUgbGVhZGluZyB3aGl0ZXNwYWNlIGNoYXJhY3RlcnMKICBfX3RyaW09IiR7
+KiMjW1s6c3BhY2U6XV19IgogICMgcmVtb3ZlIHRyYWlsaW5nIHdoaXRlc3BhY2UgY2hhcmFj
+dGVycwogIHByaW50ZiAiJXMiICIke19fdHJpbSUlW1s6c3BhY2U6XV19Igp9Cgp0cmltMiAi
+IGFscGhhIiB8IG9kIC10IHgxYQorIHRyaW0yICBhbHBoYQorIF9fdHJpbT1hbHBoYQorIHBy
+aW50ZiAlcyBhbHBoYQorIG9kIC10IHgxYQowMDAwMDAwICA2MSAgNmMgIDcwICA2OCAgNjEK
+ICAgICAgICAgIGEgICBsICAgcCAgIGggICBhCjAwMDAwMDUKdHJpbTIgImJldGEgIiB8IG9k
+IC10IHgxYQorIHRyaW0yIGJldGEgCisgX190cmltPWJldGEgCisgcHJpbnRmICVzIGJldGEK
+KyBvZCAtdCB4MWEKMDAwMDAwMCAgNjIgIDY1ICA3NCAgNjEKICAgICAgICAgIGIgICBlICAg
+dCAgIGEKMDAwMDAwNAp0cmltMiAiDWdhbW1hCSIgfCBvZCAtdCB4MWEKKyB0cmltMiANZ2Ft
+bWEJCisgX190cmltPWdhbW1hCQorIHByaW50ZiAlcyBnYW1tYQorIG9kIC10IHgxYQowMDAw
+MDAwICA2NyAgNjEgIDZkICA2ZCAgNjEKICAgICAgICAgIGcgICBhICAgbSAgIG0gICBhCjAw
+MDAwMDUKCnRyaW0zKCkgewogIF9zcGFjZT0iJChlY2hvIC1uICdbXGJcdFxuXHZcZlxyIF0n
+KSIKICAjIHJlbW92ZSBsZWFkaW5nIHdoaXRlc3BhY2UgY2hhcmFjdGVycwogIF9fdHJpbT0i
+JHsqIyMkX3NwYWNlfSIKICAjIHJlbW92ZSB0cmFpbGluZyB3aGl0ZXNwYWNlIGNoYXJhY3Rl
+cnMKICBwcmludGYgIiVzIiAiJHtfX3RyaW0lJSRfc3BhY2V9Igp9Cgp0cmltMyAiIGFscGhh
+IiB8IG9kIC10IHgxYQorIHRyaW0zICBhbHBoYQorIG9kIC10IHgxYQorIGVjaG8gLW4gW1xi
+XHRcblx2XGZcciBdCisgX3NwYWNlPVsICQoLDA0gXQorIF9fdHJpbT1hbHBoYQorIHByaW50
+ZiAlcyBhbHBoYQowMDAwMDAwICA2MSAgNmMgIDcwICA2OCAgNjEKICAgICAgICAgIGEgICBs
+ICAgcCAgIGggICBhCjAwMDAwMDUKdHJpbTMgImJldGEgIiB8IG9kIC10IHgxYQorIHRyaW0z
+IGJldGEgCisgb2QgLXQgeDFhCisgZWNobyAtbiBbXGJcdFxuXHZcZlxyIF0KKyBfc3BhY2U9
+WwgJCgsMDSBdCisgX190cmltPWJldGEgCisgcHJpbnRmICVzIGJldGEKMDAwMDAwMCAgNjIg
+IDY1ICA3NCAgNjEKICAgICAgICAgIGIgICBlICAgdCAgIGEKMDAwMDAwNAp0cmltMyAiDWdh
+bW1hCSIgfCBvZCAtdCB4MWEKKyB0cmltMyANZ2FtbWEJCisgKyBvZCAtdCB4MWEKZWNobyAt
+biBbXGJcdFxuXHZcZlxyIF0KKyBfc3BhY2U9WwgJCgsMDSBdCisgX190cmltPWdhbW1hCQor
+IHByaW50ZiAlcyBnYW1tYQowMDAwMDAwICA2NyAgNjEgIDZkICA2ZCAgNjEKICAgICAgICAg
+IGcgICBhICAgbSAgIG0gICBhCjAwMDAwMDUKCg==
+--------------gJoBKljSJKkfZLqAc7YIR3wW
+Content-Type: text/plain; charset=UTF-8; name="test12.log"
+Content-Disposition: attachment; filename="test12.log"
+Content-Transfer-Encoding: base64
 
---w7boaumakpr4mvwu--
+IyEvYmluL2Rhc2ggLXZ4Cgp0cmltKCkgewogICMgcmVtb3ZlIGxlYWRpbmcgd2hpdGVzcGFj
+ZSBjaGFyYWN0ZXJzCiAgX190cmltPSIkeyojJHsqJSVbIVs6c3BhY2U6XV0qfX0iCiAgIyBy
+ZW1vdmUgdHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7
+X190cmltJSR7X190cmltIyMqWyFbOnNwYWNlOl1dfX0iCn0KCnRyaW0gIiBhbHBoYSIgfCBv
+ZCAtdCB4MWEKKyB0cmltICBhbHBoYQorIF9fdHJpbT0KKyBwcmludGYgJXMgCisgb2QgLXQg
+eDFhCjAwMDAwMDAKdHJpbSAiYmV0YSAiIHwgb2QgLXQgeDFhCisgdHJpbSBiZXRhIAorIF9f
+dHJpbT0KKyBwcmludGYgJXMgCisgb2QgLXQgeDFhCjAwMDAwMDAKdHJpbSAiDWdhbW1hCSIg
+fCBvZCAtdCB4MWEKKyB0cmltIA1nYW1tYQkKKyBfX3RyaW09CisgcHJpbnRmICVzIAorIG9k
+IC10IHgxYQowMDAwMDAwCgp0cmltMigpIHsKICAjIHJlbW92ZSBsZWFkaW5nIHdoaXRlc3Bh
+Y2UgY2hhcmFjdGVycwogIF9fdHJpbT0iJHsqIyNbWzpzcGFjZTpdXX0iCiAgIyByZW1vdmUg
+dHJhaWxpbmcgd2hpdGVzcGFjZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7X190cmlt
+JSVbWzpzcGFjZTpdXX0iCn0KCnRyaW0yICIgYWxwaGEiIHwgb2QgLXQgeDFhCisgdHJpbTIg
+IGFscGhhCisgX190cmltPSBhbHBoYQorIHByaW50ZiAlcyAgYWxwaGEKKyBvZCAtdCB4MWEK
+MDAwMDAwMCAgMjAgIDYxICA2YyAgNzAgIDY4ICA2MQogICAgICAgICBzcCAgIGEgICBsICAg
+cCAgIGggICBhCjAwMDAwMDYKdHJpbTIgImJldGEgIiB8IG9kIC10IHgxYQorIHRyaW0yIGJl
+dGEgCisgX190cmltPWJldGEgCisgcHJpbnRmICVzIGJldGEgCisgb2QgLXQgeDFhCjAwMDAw
+MDAgIDYyICA2NSAgNzQgIDYxICAyMAogICAgICAgICAgYiAgIGUgICB0ICAgYSAgc3AKMDAw
+MDAwNQp0cmltMiAiDWdhbW1hCSIgfCBvZCAtdCB4MWEKKyB0cmltMiANZ2FtbWEJCisgX190
+cmltPQ1nYW1tYQkKKyBwcmludGYgJXMgDWdhbW1hCQorIG9kIC10IHgxYQowMDAwMDAwICAw
+ZCAgNjcgIDYxICA2ZCAgNmQgIDYxICAwOQogICAgICAgICBjciAgIGcgICBhICAgbSAgIG0g
+ICBhICBodAowMDAwMDA3Cgp0cmltMygpIHsKICBfc3BhY2U9IiQoZWNobyAtbiAnW1xiXHRc
+blx2XGZcciBdJykiCiAgIyByZW1vdmUgbGVhZGluZyB3aGl0ZXNwYWNlIGNoYXJhY3RlcnMK
+ICBfX3RyaW09IiR7KiMjJF9zcGFjZX0iCiAgIyByZW1vdmUgdHJhaWxpbmcgd2hpdGVzcGFj
+ZSBjaGFyYWN0ZXJzCiAgcHJpbnRmICIlcyIgIiR7X190cmltJSUkX3NwYWNlfSIKfQoKdHJp
+bTMgIiBhbHBoYSIgfCBvZCAtdCB4MWEKKyB0cmltMyAgYWxwaGEKKyBvZCAtdCB4MWEKKyBl
+Y2hvIC1uIFtcYlx0XG5cdlxmXHIgXQorIF9zcGFjZT1bCAkKCwwNIF0KKyBfX3RyaW09YWxw
+aGEKKyBwcmludGYgJXMgYWxwaGEKMDAwMDAwMCAgNjEgIDZjICA3MCAgNjggIDYxCiAgICAg
+ICAgICBhICAgbCAgIHAgICBoICAgYQowMDAwMDA1CnRyaW0zICJiZXRhICIgfCBvZCAtdCB4
+MWEKKyB0cmltMyBiZXRhIAorIG9kIC10IHgxYQorIGVjaG8gLW4gW1xiXHRcblx2XGZcciBd
+CisgX3NwYWNlPVsICQoLDA0gXQorIF9fdHJpbT1iZXRhIAorIHByaW50ZiAlcyBiZXRhCjAw
+MDAwMDAgIDYyICA2NSAgNzQgIDYxCiAgICAgICAgICBiICAgZSAgIHQgICBhCjAwMDAwMDQK
+dHJpbTMgIg1nYW1tYQkiIHwgb2QgLXQgeDFhCisgdHJpbTMgDWdhbW1hCQorIG9kIC10IHgx
+YQorIGVjaG8gLW4gW1xiXHRcblx2XGZcciBdCisgX3NwYWNlPVsICQoLDA0gXQorIF9fdHJp
+bT1nYW1tYQkKKyBwcmludGYgJXMgZ2FtbWEKMDAwMDAwMCAgNjcgIDYxICA2ZCAgNmQgIDYx
+CiAgICAgICAgICBnICAgYSAgIG0gICBtICAgYQowMDAwMDA1Cgo=
+
+--------------gJoBKljSJKkfZLqAc7YIR3wW--
