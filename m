@@ -2,78 +2,125 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C1F9C05027
-	for <linux-dash@archiver.kernel.org>; Wed,  8 Feb 2023 08:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5255FC05027
+	for <linux-dash@archiver.kernel.org>; Wed,  8 Feb 2023 13:56:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbjBHInO (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 8 Feb 2023 03:43:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42112 "EHLO
+        id S231200AbjBHN4P (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 8 Feb 2023 08:56:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjBHInN (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 8 Feb 2023 03:43:13 -0500
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [IPv6:2001:41d0:801:2000::19e9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BE5661117D
-        for <dash@vger.kernel.org>; Wed,  8 Feb 2023 00:43:11 -0800 (PST)
-Received: from [IPV6:2a02:8010:68a1:0:f140:f5fb:7038:8e8a] (unknown [IPv6:2a02:8010:68a1:0:f140:f5fb:7038:8e8a])
-        by mail.gigawatt.nl (Postfix) with ESMTPSA id 8D84D104C;
-        Wed,  8 Feb 2023 08:43:09 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 8D84D104C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-        s=default; t=1675845789;
-        bh=8AnYS6x0+oYqF/WqRtjhZqjOlIlYv20833BRX57F09A=; l=1474;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=RTwhGoBxoP41gjjyiRsDyMDd6Sa5Bmnew/NtQcELQj+z6Txsdq/o4BqvYSLew0Cv5
-         wiGz2kbSRiW/PBc0eoQXXJQSwt8OWwkSCTpI37aURuSSKwIToqVUGgMZbGVUqAjh69
-         E5pggeKtQNdxgd4Uei1Db0ywu4uzJWC0umolG87o=
-Message-ID: <7a89fc42-e7bc-748d-5ea6-31cb523f74c6@gigawatt.nl>
-Date:   Wed, 8 Feb 2023 08:43:06 +0000
+        with ESMTP id S230421AbjBHN4P (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 8 Feb 2023 08:56:15 -0500
+Received: from omta002.cacentral1.a.cloudfilter.net (omta002.cacentral1.a.cloudfilter.net [3.97.99.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB70C55BD
+        for <dash@vger.kernel.org>; Wed,  8 Feb 2023 05:56:12 -0800 (PST)
+Received: from shw-obgw-4004a.ext.cloudfilter.net ([10.228.9.227])
+        by cmsmtp with ESMTP
+        id PTWmpwmoul2xSPkvkpZscm; Wed, 08 Feb 2023 13:56:12 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=shaw.ca; s=s20180605;
+        t=1675864572; bh=aEjAOVVq8VEe+K5Jy8EwkkBhvoefjs+9rfDJt4oHmJc=;
+        h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To;
+        b=CBjZDeXojHuAzI9TovE2RPme94uif9uIOJtyLZqukKfZieV2ZVpJxOZEUPgQsDWBz
+         2kTt0Ppm78Wfyuy2rcABiNUSN+QqnaysirvKfbO0sARnHtP0muoJ20liAJWjjvzX/b
+         +cskkOFAyZ1XPCeSNDRqOJMAoAJs2y6bMwfOivsy1/5ud7c9u5vtRNCiP/tnkgrufq
+         ivX3XZfPsZ8fV1SUYyvB5b80FbOKMXHb4zn5ufa8bWu2K8VibZ5gbXBQsZwu4jVM+Q
+         8YI60QheaEaYxR3sBqMqEKZVTkDC+aE625G2vsKuPOjCTPTu9m80sOZGiDFby8mPFb
+         SP76q16lfBYWQ==
+Received: from [10.0.0.5] ([184.64.102.149])
+        by cmsmtp with ESMTP
+        id PkvjpttgS3fOSPkvjpKL24; Wed, 08 Feb 2023 13:56:12 +0000
+X-Authority-Analysis: v=2.4 cv=J8G5USrS c=1 sm=1 tr=0 ts=63e3a9fc
+ a=DxHlV3/gbUaP7LOF0QAmaA==:117 a=DxHlV3/gbUaP7LOF0QAmaA==:17
+ a=IkcTkHD0fZMA:10 a=VwQbUJbxAAAA:8 a=NEAV23lmAAAA:8 a=CCpqsmhAAAAA:8
+ a=w_pzkKWiAAAA:8 a=XnELFe-qDqbaONAMqS0A:9 a=QEXdDO2ut3YA:10
+ a=AjGcO6oz07-iQ99wixmX:22 a=ul9cdbp4aOFLsgKbc677:22 a=sRI3_1zDfAgwuvI8zelB:22
+Message-ID: <ceea0f98-1166-01bb-e116-74df39c77a16@Shaw.ca>
+Date:   Wed, 8 Feb 2023 06:56:10 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:110.0) Gecko/20100101
- Thunderbird/110.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Reply-To: Brian.Inglis@Shaw.ca
 Subject: Re: dash 0.5.12 parameter expansion using classes not working
-To:     Brian.Inglis@Shaw.ca
+Content-Language: en-CA
+To:     Harald van Dijk <harald@gigawatt.nl>
 Cc:     DASH shell mailing list <dash@vger.kernel.org>
 References: <12629edc-ec41-ca2a-968b-3be7de2743ae@Shaw.ca>
-Content-Language: en-US
-From:   Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <12629edc-ec41-ca2a-968b-3be7de2743ae@Shaw.ca>
+ <7a89fc42-e7bc-748d-5ea6-31cb523f74c6@gigawatt.nl>
+From:   Brian Inglis <Brian.Inglis@Shaw.ca>
+Organization: Inglis
+In-Reply-To: <7a89fc42-e7bc-748d-5ea6-31cb523f74c6@gigawatt.nl>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfBqXZFtmaetAWZfSRidQOUYgpMNVKejj6zcpk/DTO/gtORgEaaJPxaebbKp9JHEphLS0rYSyOqmjI8Rton3uj7uU2cTUMH0oZWqHS+L8XYxvnz6ta8Jp
+ Kb+4N5S/VJO4HAl3bnjxTnbYutsYVvmh97TCbAoTYNPuO65DbYD220X+gOQ0SUc/NNQ349f0acRGvtgWSJ6FuFDPUGRCKpXZjKzezHvXzbnkTD7C1qZCuFvo
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On 08/02/2023 05:14, Brian Inglis wrote:
-> Hi folks,
-> 
-> Under dash 0.5.12 parameter expansion using regexp classes [[:space:]] 
-> to trim no longer works, but releases up to 0.5.11.5 still work 
-> correctly with the same environment and default config options.
-> 
-> In the attached dash script and logs, one of our users has an abstruse 
-> string they use to clean up build command lines, but I trimmed that down 
-> to the locale-dependent [[:space:]] regexp, then to the ASCII whitespace 
-> characters generated by echo, and only the last still works with 0.5.12, 
-> all work under 0.5.11.5.
-> 
-> Nothing obvious jumps out from the commitdiffs between then and now, so 
-> I am hoping some possible cause occurs to you.
-> 
-> Build environment was Cygwin+newlib autoreconf with autoconf 2.71, 
-> autogen 5.18.16, automake 1.16.5, gcc 11.3, binutils 2.29, coreutils 
-> 9.0, dash 0.5.11.5 as sh.
+On 2023-02-08 01:43, Harald van Dijk wrote:
+> On 08/02/2023 05:14, Brian Inglis wrote:
+>> Under dash 0.5.12 parameter expansion using regexp classes [[:space:]] to trim 
+>> no longer works, but releases up to 0.5.11.5 still work correctly with the 
+>> same environment and default config options.
+>>
+>> In the attached dash script and logs, one of our users has an abstruse string 
+>> they use to clean up build command lines, but I trimmed that down to the 
+>> locale-dependent [[:space:]] regexp, then to the ASCII whitespace characters 
+>> generated by echo, and only the last still works with 0.5.12, all work under 
+>> 0.5.11.5.
+>>
+>> Nothing obvious jumps out from the commitdiffs between then and now, so I am 
+>> hoping some possible cause occurs to you.
+>>
+>> Build environment was Cygwin+newlib autoreconf with autoconf 2.71, autogen 
+>> 5.18.16, automake 1.16.5, gcc 11.3, binutils 2.29, coreutils 9.0, dash 
+>> 0.5.11.5 as sh.
 
-Hi,
+> dash 0.5.12 includes commit 7638476c 
+> <https://git.kernel.org/pub/scm/utils/dash/dash.git/commit/?id=7638476c18f2a8451b05d49f4e767ee1f98cfc17>
+> which enables the use of libc's fnmatch() by default. Looking at newlib 
+> sources,
+> <https://github.com/eblot/newlib/blob/master/newlib/libc/posix/fnmatch.c>,
+> it appears that newlib's fnmatch() does not support character classes and
+> should not be used for dash. Would you be able to check that explicitly
+> passing --disable-fnmatch to the configure options gets it working properly
+> again?
+Thanks very much Harald,
 
-dash 0.5.12 includes commit 7638476c 
-<https://git.kernel.org/pub/scm/utils/dash/dash.git/commit/?id=7638476c18f2a8451b05d49f4e767ee1f98cfc17> 
-which enables the use of libc's fnmatch() by default. Looking at newlib 
-sources, 
-<https://github.com/eblot/newlib/blob/master/newlib/libc/posix/fnmatch.c>, 
-it appears that newlib's fnmatch() does not support character classes 
-and should not be used for dash. Would you be able to check that 
-explicitly passing --disable-fnmatch to the configure options gets it 
-working properly again?
+That indeed was the cause and solution - test release on its way to mirrors.
 
-Cheers,
-Harald van Dijk
+Cygwin/newlib is tricky in that it may extend newlib with hosted features, some 
+implemented with C++, so there is sometimes another source to check for on the 
+same servers hosting automake, binutils, gdb, glibc, valgrind, etc.:
+
+https://sourceware.org/git/?p=newlib-cygwin.git;a=blob;f=winsup/cygwin/libc/fnmatch.c
+https://sourceware.org/git/?p=newlib-cygwin.git;a=blob;f=newlib/libc/posix/fnmatch.c
+https://sourceware.org/git/?p=newlib-cygwin.git;a=blob;f=winsup/cygwin/glob.cc
+https://sourceware.org/git/?p=newlib-cygwin.git;a=blob;f=newlib/libc/posix/glob.c
+
+Also tricky is that newlib is mainly BSD or similarly licensed for use by and in 
+commercial embedded tool chains and RTOSes whereas Cygwin is mainly LGPL and 
+packages GPL licensed.
+
+[I noticed that dash src/compile sets up Cygwin to use cygpath -m to produce 
+Windows file names, and patched that out in our build.
+If anyone reports anything under Cygwin being non-POSIX conforming, or behaving 
+differently to any most Unix platforms, please have them report that to the 
+cygwin@cygwin.com public mailing list (no subscription required) or possibly 
+discuss on the Libera.Chat IRC channel #cygwin, where it may be addressed.
+This does not apply to Cygwin hosted Mingw64 or Msys2 cross-build toolchains.
+
+Few Cygwin packages now have any support for using Windows features or file names.
+That handling is hidden way down in the emulation shared library where possible.
+All sources and tests should build and run identically to Linux,  *BSDs, Solaris.
+Features like Windows text files and file path names now mostly cause grief, 
+unless they happen to end up being passed down verbatim to the correct part of 
+the emulation library where they are taken care of.]
+
+-- 
+Take care. Thanks, Brian Inglis			Calgary, Alberta, Canada
+
+La perfection est atteinte			Perfection is achieved
+non pas lorsqu'il n'y a plus rien à ajouter	not when there is no more to add
+mais lorsqu'il n'y a plus rien à retirer	but when there is no more to cut
+			-- Antoine de Saint-Exupéry
