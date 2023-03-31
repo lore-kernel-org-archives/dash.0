@@ -2,137 +2,68 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C642C6FD18
-	for <linux-dash@archiver.kernel.org>; Fri, 31 Mar 2023 12:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5CDC761A6
+	for <linux-dash@archiver.kernel.org>; Fri, 31 Mar 2023 14:47:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232598AbjCaMx3 (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Fri, 31 Mar 2023 08:53:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55682 "EHLO
+        id S231247AbjCaOr3 (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Fri, 31 Mar 2023 10:47:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230356AbjCaMxV (ORCPT <rfc822;dash@vger.kernel.org>);
-        Fri, 31 Mar 2023 08:53:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACE2D20C3E
-        for <dash@vger.kernel.org>; Fri, 31 Mar 2023 05:52:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680267125;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=O66AWK8WDuk1k36Sf3keBx9bPZxLnzhdkrmYFq49tZI=;
-        b=agknD8tc0XZ1oSCNBez/X52FLuUAO8ro4KEVhMXLTyOXon/IcR7X3arI4mm7qtwJoc37m9
-        Gg2W/1PbdN4d52zx5Bbu3LieKpcLw7TeoWuwIlNgK3SkX61w1Mi4eSgrWV6EvSZWpXj2gd
-        MITKf1mOmN4KQrzBzJ5UB4dttxkAkhM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-198-CqGZrIgtO8C3Zipk3pkYpA-1; Fri, 31 Mar 2023 08:52:01 -0400
-X-MC-Unique: CqGZrIgtO8C3Zipk3pkYpA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 407E7857FB3;
-        Fri, 31 Mar 2023 12:52:01 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.43.17.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A1C084042AC0;
-        Fri, 31 Mar 2023 12:51:59 +0000 (UTC)
-From:   Denys Vlasenko <dvlasenk@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Denys Vlasenko <dvlasenk@redhat.com>, dash@vger.kernel.org
-Subject: [PATCH] jobs: drop unused node parameter in makejob()
-Date:   Fri, 31 Mar 2023 14:51:57 +0200
-Message-Id: <20230331125158.26821-1-dvlasenk@redhat.com>
+        with ESMTP id S231703AbjCaOr2 (ORCPT <rfc822;dash@vger.kernel.org>);
+        Fri, 31 Mar 2023 10:47:28 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C52531E726
+        for <dash@vger.kernel.org>; Fri, 31 Mar 2023 07:47:09 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id b19so16819565oib.7
+        for <dash@vger.kernel.org>; Fri, 31 Mar 2023 07:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20210112; t=1680274029;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tRrtGTk5s3jJozUOcdPSSY3iyFN8MEUKpaIM1oEmDdU=;
+        b=W7aS9nw5cCj4bCV2eVZCKT/pgitwQ2b0Hz3+DZCrZk77S9wtt2mRsvdCoNBgwhQvDT
+         Tr3AkEJfN6L3aWFB8Am4V1hVsAuhVDvonGecopcudSDCtcYyTp/jJpaYchiE4MOqAcxV
+         BMQPjMlj/4gaQNNRlMFZWehGs6HCcypWxtpwjMSJTG7vnvCGX+aTrmoOq1YKg0+RcjR3
+         X7TF0ORv0/gxYuRK3YFgAhpa/0+AfSfsl4o9fG341xnVtqdD99xnOBEv8Xv3KoUoxYOI
+         3M1rQOQE6poSvyWNtYQN1esZE5nKpAivKgkzyvDoTAGNEhEPv3634AajU/wJoPETdy2Z
+         GawA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680274029;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tRrtGTk5s3jJozUOcdPSSY3iyFN8MEUKpaIM1oEmDdU=;
+        b=Ty/ljlaa/N2o+vfZpw1YzEV0lQVPensZlh8vMJscwyt34AGdukPo3rvT8RGz7ItWnX
+         +H/fw7Sk6nADTUe831dBGq3chnJSaNsAHt0uryVfzbm6sy74k1S6xqq5rrVi+d5XxNvT
+         2GSMyG0tOFIjNlK57zATpiAWaKUy7bliTzpzcTmbmaRrU0FLTkoQUXiiUScbxDsnrt1F
+         +mIa8lfd/235YNsWpbSFfQKrAY56GzhPtxTwUf/Fb/xhqqZ7sGtw4jHiZSKAeFvlQ8fo
+         Pgy4xwwjyDSLY5T7A8cocTotxbYY+pYDSikPBS2uOVlSUmS91CABQklz4uWCG4nE459I
+         CQeA==
+X-Gm-Message-State: AO0yUKUo0jIyRlRzbhzX6D+e3mdeVdsUqLCDd8Y9pKuJSB4xj/wJQWE1
+        QxnW44gBxfVbEklePjuqQf75oogAHMIeYJFfrnrqZvp6pIM=
+X-Google-Smtp-Source: AK7set902+eVH+nt8hNeFe4mxN/VGBb/+rTNAn/dIA+0mLMV+gTusOL7wDZi8rb/efjvlemUb56JE8sf4cPKMmrc0L0=
+X-Received: by 2002:a05:6808:4c7:b0:386:d50e:aa12 with SMTP id
+ a7-20020a05680804c700b00386d50eaa12mr7300721oie.5.1680274028691; Fri, 31 Mar
+ 2023 07:47:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+From:   Denys Vlasenko <vda.linux@googlemail.com>
+Date:   Fri, 31 Mar 2023 16:46:57 +0200
+Message-ID: <CAK1hOcPzt0+SOct3LZ1-go6zzKUVkceoAtS0bZ5=Pqb363cjXQ@mail.gmail.com>
+Subject: Bug: cd BOGUSDIR/.. always works
+To:     DASH shell mailing list <dash@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-CC: dash@vger.kernel.org
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Denys Vlasenko <dvlasenk@redhat.com>
----
- src/eval.c | 6 +++---
- src/jobs.c | 6 +++---
- src/jobs.h | 2 +-
- 3 files changed, 7 insertions(+), 7 deletions(-)
+cd DIR
 
-diff --git a/src/eval.c b/src/eval.c
-index fa43b68..978a174 100644
---- a/src/eval.c
-+++ b/src/eval.c
-@@ -494,7 +494,7 @@ evalsubshell(union node *n, int flags)
- 		forkreset();
- 		goto nofork;
- 	}
--	jp = makejob(n, 1);
-+	jp = makejob(1);
- 	if (forkshell(jp, n, backgnd) == 0) {
- 		flags |= EV_EXIT;
- 		if (backgnd)
-@@ -571,7 +571,7 @@ evalpipe(union node *n, int flags)
- 		pipelen++;
- 	flags |= EV_EXIT;
- 	INTOFF;
--	jp = makejob(n, pipelen);
-+	jp = makejob(pipelen);
- 	prevfd = -1;
- 	for (lp = n->npipe.cmdlist ; lp ; lp = lp->next) {
- 		prehash(lp->n);
-@@ -637,7 +637,7 @@ evalbackcmd(union node *n, struct backcmd *result)
- 
- 	if (pipe(pip) < 0)
- 		sh_error("Pipe call failed");
--	jp = makejob(n, 1);
-+	jp = makejob(1);
- 	if (forkshell(jp, n, FORK_NOJOB) == 0) {
- 		FORCEINTON;
- 		close(pip[0]);
-diff --git a/src/jobs.c b/src/jobs.c
-index f3b9ffc..5a0886e 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -749,7 +749,7 @@ err:
-  */
- 
- struct job *
--makejob(union node *node, int nprocs)
-+makejob(int nprocs)
- {
- 	int i;
- 	struct job *jp;
-@@ -780,7 +780,7 @@ makejob(union node *node, int nprocs)
- 	if (nprocs > 1) {
- 		jp->ps = ckmalloc(nprocs * sizeof (struct procstat));
- 	}
--	TRACE(("makejob(0x%lx, %d) returns %%%d\n", (long)node, nprocs,
-+	TRACE(("makejob(%d) returns %%%d\n", nprocs,
- 	    jobno(jp)));
- 	return jp;
- }
-@@ -963,7 +963,7 @@ struct job *vforkexec(union node *n, char **argv, const char *path, int idx)
- 	struct job *jp;
- 	int pid;
- 
--	jp = makejob(n, 1);
-+	jp = makejob(1);
- 
- 	sigblockall(NULL);
- 	vforked++;
-diff --git a/src/jobs.h b/src/jobs.h
-index 6ac6c56..2832d64 100644
---- a/src/jobs.h
-+++ b/src/jobs.h
-@@ -102,7 +102,7 @@ int jobscmd(int, char **);
- struct output;
- void showjobs(struct output *, int);
- int waitcmd(int, char **);
--struct job *makejob(union node *, int);
-+struct job *makejob(int);
- int forkshell(struct job *, union node *, int);
- struct job *vforkexec(union node *n, char **argv, const char *path, int idx);
- int waitforjob(struct job *);
--- 
-2.37.2
+does the foillowing: cdcmd() -> docd() -> updatepwd(), and updatepwd
+has the code which "normalizes" the DIR: prepends current dir if DIR
+is not absolute, then eliminates "SUBDIR/.." sections.
 
+The bug is, it does not care whether SUBDIR exists.
+
+cd BOGUSDIR/..
+
+always works - it chdir's into current directory.
