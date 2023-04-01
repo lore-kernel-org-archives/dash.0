@@ -2,127 +2,101 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 773D8C6FD1D
-	for <linux-dash@archiver.kernel.org>; Sat,  1 Apr 2023 19:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB9EC77B60
+	for <linux-dash@archiver.kernel.org>; Sat,  1 Apr 2023 20:50:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbjDATOA (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Sat, 1 Apr 2023 15:14:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44380 "EHLO
+        id S229780AbjDAUuT (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Sat, 1 Apr 2023 16:50:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjDATOA (ORCPT <rfc822;dash@vger.kernel.org>);
-        Sat, 1 Apr 2023 15:14:00 -0400
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E7966CA00
-        for <dash@vger.kernel.org>; Sat,  1 Apr 2023 12:13:58 -0700 (PDT)
-Received: from [192.168.178.37] (uk.gigawatt.nl [51.148.134.205])
-        by mail.gigawatt.nl (Postfix) with ESMTPSA id 414B6739;
-        Sat,  1 Apr 2023 20:13:57 +0100 (BST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 414B6739
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-        s=default; t=1680376437;
-        bh=JmjafdJ4YAhGeegAMcYOR8W9xpbEmG9vuo9xD810/fk=; l=3882;
-        h=Date:Subject:To:References:From:In-Reply-To:From;
-        b=VAifF4cBoNrazku5oyTol/HCfT3qjbOrlKZx7CUoGo52wJioEHKDdg8KpqLsHwCvh
-         mro2/g+AsnYu3bNHPf9vmWFU8z7O3cfHKX0snX5qkLu8StPL0IhX7bkmRIUAswVjqI
-         P+utBrZ5eiJwJVWeYvDXD+rfFCoMTHYytX96KfEs=
-Message-ID: <e69d7554-6047-f527-9489-0d8e872643ae@gigawatt.nl>
-Date:   Sat, 1 Apr 2023 20:13:57 +0100
+        with ESMTP id S229708AbjDAUuS (ORCPT <rfc822;dash@vger.kernel.org>);
+        Sat, 1 Apr 2023 16:50:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BC72700F
+        for <dash@vger.kernel.org>; Sat,  1 Apr 2023 13:49:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680382174;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Lsy5ooVlReT+7vFNJ2+va0ZU62hzPNrhZPFWK4pUb34=;
+        b=NgYnkd0hBi6sVuDRgcapgum5TVKKRXsZTwelpgdNVmNzzMJwW/yXhk9kahKMNktbIyzmVx
+        3Xym/b9unZio7xCiEbb+lQixxwP62t1BHs2drOJfuj35Kh26Sb1LYMPQK7pZY8aFxQlCP7
+        /s0/b2jkPBaxMJypv4Nq7hwk6ze8OVg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-fQqd4-lyO0KcqS-zSvlNaQ-1; Sat, 01 Apr 2023 16:49:32 -0400
+X-MC-Unique: fQqd4-lyO0KcqS-zSvlNaQ-1
+Received: by mail-ed1-f72.google.com with SMTP id a40-20020a509eab000000b005024c025bf4so23802971edf.14
+        for <dash@vger.kernel.org>; Sat, 01 Apr 2023 13:49:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680382171;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lsy5ooVlReT+7vFNJ2+va0ZU62hzPNrhZPFWK4pUb34=;
+        b=QBM2IUtekXxwHL2qJt++v0bHtgLG44U458Forqm3r4ybN52NFrwE2Jmo5RuBJSOtXn
+         4YB3uV2Pk0xEVwZXgAw3riQvgTPrGBPRq1mDZI3xMzdXcVNkNK9gLXiNcKRrO6bKiQe7
+         Np13i9cnA8oap8ycPnuTlzQTJAob0UVsrqAcJ+6XAYJpX860QD1hZ+4Ft2S7P21XH5uq
+         DBElqfJRqXQyc9bZ8yGXNHsk52F8PPO3/TXP51UQCBtyEJlVfAwVF8lvlAkvDWGQpB1D
+         AEL0d24pToxHzQeGc+ZLW0tdQnJFI2hiu+TwBd6cfQb4XPFR4Rmx0aZujzo/GTNKOgOU
+         nzjw==
+X-Gm-Message-State: AAQBX9dL4eSvZYXniMBHEtYUiEWo42SBMpviQJ8XJ7vbXQSOnjQrac5k
+        GkuVonTiaeZbZf6f0OIJroM1Jp7PQur/4l+sO+Kb1AmPHNhbqiDv2jCezaANzfcXY/ozFedsMJM
+        oz2Nb0STo/LR2AgGNSQGj4w==
+X-Received: by 2002:a17:907:1c21:b0:8dd:5710:a017 with SMTP id nc33-20020a1709071c2100b008dd5710a017mr39668055ejc.4.1680382171134;
+        Sat, 01 Apr 2023 13:49:31 -0700 (PDT)
+X-Google-Smtp-Source: AKy350aK/zllMeTxg4gBbbhMpJfs7zd8bGqn3X4PDrGPhZaj2Y21IMAkFhDa21pyKRX61U3Ey+kImw==
+X-Received: by 2002:a17:907:1c21:b0:8dd:5710:a017 with SMTP id nc33-20020a1709071c2100b008dd5710a017mr39668046ejc.4.1680382170854;
+        Sat, 01 Apr 2023 13:49:30 -0700 (PDT)
+Received: from [192.168.1.220] ([78.157.137.28])
+        by smtp.gmail.com with ESMTPSA id l6-20020a170906230600b008d68d018153sm2442391eja.23.2023.04.01.13.49.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 01 Apr 2023 13:49:30 -0700 (PDT)
+Message-ID: <e57e26c4-a37f-37e8-90bf-6f19295eab59@redhat.com>
+Date:   Sat, 1 Apr 2023 22:49:29 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:110.0) Gecko/20100101
- Thunderbird/110.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
 Subject: Re: Are there users of ash's "pathopts"? Do other shells have such a
  thing?
-To:     Denys Vlasenko <dvlasenk@redhat.com>, dash@vger.kernel.org
-References: <aad32205-1e0a-fea6-0825-8eb45c6ae915@redhat.com>
 Content-Language: en-US
-From:   Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <aad32205-1e0a-fea6-0825-8eb45c6ae915@redhat.com>
+To:     Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
+References: <aad32205-1e0a-fea6-0825-8eb45c6ae915@redhat.com>
+ <e69d7554-6047-f527-9489-0d8e872643ae@gigawatt.nl>
+From:   Denys Vlasenko <dvlasenk@redhat.com>
+In-Reply-To: <e69d7554-6047-f527-9489-0d8e872643ae@gigawatt.nl>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-On 01/04/2023 19:46, Denys Vlasenko wrote:
-> ash allows PATH to contain "%builtin" and "DIR%func"
-> pseudo-directories.
+On 4/1/23 21:13, Harald van Dijk wrote:
+>> I assume it's rarely (never?) used in the wild.
+>> It interferes with valid directories with percents in names.
+>> It's non-standard, and not a typical feature of other Bourne-like shells
+>>    (maybe we (ash family) are the only ones?)
+>> Code complication to support it is a chore.
 > 
-> %builtin shows in what order builtins to be found
-> relative to searching directories for external commands.
+> It is not clear to me whether you mean "non-standard" as "conflicts with the standard", or "not required by the standard".
 
-Indeed. This is a desirable feature, regardless of whether the current 
-implementation is the right way of doing it. POSIX intends for it to be 
-possible to have a way to specify that a directory in PATH takes 
-precedence over built-in commands. The way it tried to specify this was 
-broken, and did not have the desired effect. The way it is implemented 
-in dash using %builtin is one way of doing something that works.
+"not required".
 
-I am not a fan of the precise way %builtin is implemented, and took that 
-out in my fork, but do intend to make the feature available in *some* 
-way again at some point and would suggest not just dropping it without a 
-replacement in dash.
+More importantly, no one else among shells seems to have such extension.
+This means it's probably not terribly useful.
 
-> DIR%func allows to have a directory of "auto-loadable" functions.
-> (dash git tree seems to have an example of it as src/funcs/*).
+There is value in *not* having extensions "just because we can".
+Extensions fragment user base.
+IOW: extensions make sense when they are *useful*.
 
-When I used dash, I did use this feature. It is roughly equivalent to 
-ksh's FPATH feature. In my own fork of dash I modified it to support 
-that instead, and dropped %func since it no longer served a purpose, but 
-if I were still using dash, I would still be using %func.
+Shells already have way too much of featuritis.
+Just now, I learned that CDPATH is a thing... oh god.
+Yet another danger of subtle bugs in scripts when one
+of their innocuous "mkdir subdir; cd subdir" suddenly
+cd's somewhere else...
+..and this "feature" seems to be in bash too,
+and who knows where else.
 
-> I tried a few searches on the internet and this feature
-> seems to be almost entirely not documented. I found exactly one
-> manpage documenting it:
-> 
-> https://www.unix.com/man-page/minix/1/ash/
-> 
->      Path Search
-> 
->         When locating a command, the shell first looks to see if it has 
-> a shell function by that name.  Then, if PATH does not contain an entry for
->         "%builtin", it looks for a builtin command by that name.  
-> Finally, it searches each entry in PATH in turn for the command.
-> 
->         The value of the PATH variable should be a series of entries 
-> separated by colons.  Each entry consists of a directory name, or a  
-> directory
->         name followed by a flag beginning with a percent sign.  The 
-> current directory should be indicated by an empty directory name.
-> 
->         If  no  percent    sign  is  present,  then  the entry causes 
-> the shell to search for the command in the specified directory.  If the 
-> flag is
->         ``%builtin'' then the list of shell builtin commands is 
-> searched.  If the flag is ``%func'' then the directory is searched for a 
-> file which
->         is read as input to the shell.  This file should define a 
-> function whose name is the name of the command being searched for.
-> 
-> Here is an example of a user having a problem because he has a PATH with
-> directory containing "GNU%2fLinux" string in its name:
-> 
-> https://unix.stackexchange.com/questions/126955/percent-in-path-environment-variable
-
-This is unfortunate. It is well-known that arbitrary directory names 
-cannot be used in PATH -- directory names containing : cannot be -- but 
-it is less well-known that this extends to other directory names.
-
-> So... maybe we can drop it?
-> 
-> I assume it's rarely (never?) used in the wild.
-> It interferes with valid directories with percents in names.
-> It's non-standard, and not a typical feature of other Bourne-like shells
->    (maybe we (ash family) are the only ones?)
-> Code complication to support it is a chore.
-
-It is not clear to me whether you mean "non-standard" as "conflicts with 
-the standard", or "not required by the standard". It is an extension, 
-but it is now a permitted extension: POSIX is being changed to permit 
-this behaviour. In the latest POSIX draft, PATH lookup specifies:
-
-   If PATH is unset or is set to null, or if a path prefix in PATH
-   contains a <percent-sign> character ('%'), the path search is
-   implementation-defined.
-
-Cheers,
-Harald van Dijk
