@@ -2,151 +2,121 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF6DC77B7A
-	for <linux-dash@archiver.kernel.org>; Wed,  7 Jun 2023 13:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9379C7EE29
+	for <linux-dash@archiver.kernel.org>; Wed,  7 Jun 2023 14:22:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239338AbjFGN0g (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 7 Jun 2023 09:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50498 "EHLO
+        id S240407AbjFGOWf (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 7 Jun 2023 10:22:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240400AbjFGN0e (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 7 Jun 2023 09:26:34 -0400
-Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7DFE595
-        for <dash@vger.kernel.org>; Wed,  7 Jun 2023 06:26:28 -0700 (PDT)
-Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 6FFB2A080
-        for <dash@vger.kernel.org>; Wed,  7 Jun 2023 15:26:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202305; t=1686144384;
-        bh=qA5FPyyuIeeDO+I/iZN3cOt7KypErfXukYIEi8tZ8NQ=;
-        h=Date:From:To:Subject:From;
-        b=RXUXf5zmmOll1KeqBg+VTAQkxe7S2YLV1TMutP9FbbvdzB/i1r7KYkjff1SyWYchm
-         hVmoVMm9E345dPXpVP+Dy9+N4zpgawnaINJ+TzlNO3DhykCVtqgBU/WZTzswbcd/Wx
-         F1dSuZRa8pPKUVKe9+RgdMW0u1fmpWudDh8fjibWxX2ZS/GmhHhH49gi5M3GU2JTbV
-         h/Ey/Ll160hdwEbR1S6fuxFWGsxK3AnDwy5Puy0Fhv6ZQXJwN/T5JBnMk1TEqyKD4y
-         F9krZHsSp/tZ01xAT1Ib7AhR440BzkhNfJhP8Rp37uKGg7Ru5pK2h5q7kcEka+93qM
-         h7FLUz8+GUChA==
-Date:   Wed, 7 Jun 2023 15:26:23 +0200
-From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
-To:     dash@vger.kernel.org
-Subject: [Debian#1037195] dash: $(here-doc in <<substitution) is always
- empty, must consume subsequent lines per POSIX?
-Message-ID: <7ygxq63mk22evfzirlilu4eexc2q44uul6zsade73om5hgbvj7@a6er2aqswli7>
+        with ESMTP id S235922AbjFGOWb (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 7 Jun 2023 10:22:31 -0400
+X-Greylist: delayed 561 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 07 Jun 2023 07:22:24 PDT
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1EB01FD7
+        for <dash@vger.kernel.org>; Wed,  7 Jun 2023 07:22:24 -0700 (PDT)
+Received: from [IPV6:2a02:8010:68a1:0:404b:37aa:f9a:f0ea] (unknown [IPv6:2a02:8010:68a1:0:404b:37aa:f9a:f0ea])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id BAC2746E;
+        Wed,  7 Jun 2023 15:13:01 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl BAC2746E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1686147181;
+        bh=hrjD/xjJXUF7l3GwUS8POS3J7lD5drlWh6jdNyOIn8I=; l=3488;
+        h=Date:Subject:To:References:From:In-Reply-To:From;
+        b=IkNyrslXMG+ETXCmBH9vNB8z4knQhmUSCHdF46DN92+ciJtp151bWVnMuQOHK27Pw
+         2KW8D1+oOO3AjevQioV+HI3JbLvROpszOHOqxwldEhRIkt03ennT9IrgXBJRGZMiNL
+         lDFOYnEzpOqn1onYYAR/lKL69wNfrN0sjO3pIPvs=
+Message-ID: <56675584-c4b5-b064-0c13-82c0a1dd336c@gigawatt.nl>
+Date:   Wed, 7 Jun 2023 15:13:00 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="42knarkebbhvxtwz"
-Content-Disposition: inline
-User-Agent: NeoMutt/20230517
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:110.0) Gecko/20100101
+ Thunderbird/110.0
+Subject: Re: [Debian#1037195] dash: $(here-doc in <<substitution) is always
+ empty, must consume subsequent lines per POSIX?
+To:     =?UTF-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>,
+        dash@vger.kernel.org
+References: <7ygxq63mk22evfzirlilu4eexc2q44uul6zsade73om5hgbvj7@a6er2aqswli7>
+Content-Language: en-US
+From:   Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <7ygxq63mk22evfzirlilu4eexc2q44uul6zsade73om5hgbvj7@a6er2aqswli7>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
+Hi,
 
---42knarkebbhvxtwz
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 07/06/2023 14:26, наб wrote:
+> Forwarding from Debian #1037195:
+> 
+> bullseye (0.5.11+git20200708+dd9ef66-5),
+> sid (0.5.12-2) and
+> git (b00288fd28c1b39d0f1531b6e6d86de59de4be8d)
+> dash observe the following:
+>    $ cat -n boment
+>          1  echo "$(head -n1 <<EOF)"
+>          2  # 2
+>          3  # 3
+>          4  EOF
+>    $ sh boment
+>    
+>    boment: 4: EOF: not found
+>    $ sh -x boment
+>    + head -n1
+>    + echo
+>    
+>    + EOF
+>    boment: 4: EOF: not found
+>    $
+> This agrees with bullseye bash (5.1-2+deb11u1) but not sid bash
+> (5.2.15-2+b2), which outputs "# 2" (and a warning);
+> I believe that bash is correct here (sans the warning).
 
-Forwarding from Debian #1037195:
+As far as I know, this is not intended to be valid. Shells are permitted 
+but not required to accept it, and if they accept it, it need not behave 
+in any particular way.
 
-bullseye (0.5.11+git20200708+dd9ef66-5),
-sid (0.5.12-2) and
-git (b00288fd28c1b39d0f1531b6e6d86de59de4be8d)
-dash observe the following:
-  $ cat -n boment
-        1  echo "$(head -n1 <<EOF)"
-        2  # 2
-        3  # 3
-        4  EOF
-  $ sh boment
- =20
-  boment: 4: EOF: not found
-  $ sh -x boment
-  + head -n1
-  + echo
- =20
-  + EOF
-  boment: 4: EOF: not found
-  $=20
-This agrees with bullseye bash (5.1-2+deb11u1) but not sid bash
-(5.2.15-2+b2), which outputs "# 2" (and a warning);
-I believe that bash is correct here (sans the warning).
+> POSIX Issue 7, XCU, 2. Shell Command Language says
+>     2.7.4 Here-Document
+>    
+>    The redirection operators "<<" and "<<-" both allow redirection of subsequent lines read by the shell to the input of a command. The redirected lines are known as a "here-document".
+>    
+>    The here-document shall be treated as a single word that begins after the next <newline> and continues until there is a line containing only the delimiter and a <newline>, with no <blank> characters in between. Then the next here-document starts, if there is one. The format is as follows:
+> and its counterpart in Issue 8 Draft 3
+>    80601  2.7.4 Here-Document
+>    80602  The redirection operators "<<" and "<<-" both allow redirection of subsequent lines read by
+>    80603  the shell to the input of a command. The redirected lines are known as a ``here-document’’.
+>    80604  The here-document shall be treated as a single word that begins after the next NEWLINE token
+>    80605  and continues until there is a line containing only the delimiter and a <newline>, with no
+>    80606  <blank> characters in between. Then the next here-document starts, if there is one. For the
+>    80607  purposes of locating this terminating line, the end of a command_string operand (see sh) shall be
+>    80608  treated as a <newline> character, and the end of the commands string in $(commands) and
+>    80609  `commands` may be treated as a <newline>. If the end of input is reached without finding the
+>    80610  terminating line, the shell should, but need not, treat this as a redirection error. The format is as
+>    80611  follows:
 
-POSIX Issue 7, XCU, 2. Shell Command Language says
-   2.7.4 Here-Document
- =20
-  The redirection operators "<<" and "<<-" both allow redirection of subseq=
-uent lines read by the shell to the input of a command. The redirected line=
-s are known as a "here-document".
- =20
-  The here-document shall be treated as a single word that begins after the=
- next <newline> and continues until there is a line containing only the del=
-imiter and a <newline>, with no <blank> characters in between. Then the nex=
-t here-document starts, if there is one. The format is as follows:
-and its counterpart in Issue 8 Draft 3
-  80601  2.7.4 Here-Document
-  80602  The redirection operators "<<" and "<<-" both allow redirection of=
- subsequent lines read by
-  80603  the shell to the input of a command. The redirected lines are know=
-n as a ``here-document=E2=80=99=E2=80=99.
-  80604  The here-document shall be treated as a single word that begins af=
-ter the next NEWLINE token=20
-  80605  and continues until there is a line containing only the delimiter =
-and a <newline>, with no
-  80606  <blank> characters in between. Then the next here-document starts,=
- if there is one. For the
-  80607  purposes of locating this terminating line, the end of a command_s=
-tring operand (see sh) shall be
-  80608  treated as a <newline> character, and the end of the commands stri=
-ng in $(commands) and=20
-  80609  `commands` may be treated as a <newline>. If the end of input is r=
-eached without finding the
-  80610  terminating line, the shell should, but need not, treat this as a =
-redirection error. The format is as
-  80611  follows:
+The relevant bit here is "If the end of input is reached without finding 
+the terminating line, the shell should, but need not, treat this as a 
+redirection error."
 
-That is, as I understand it:
-  echo "$(head -n1 <<EOF
-  abc
-  def
-  EOF
-  )"
-and
-  echo "$(head -n1 <<EOF)"
-  abc
-  def
-  EOF
-are always required to work, and Issue 8 allows shells to have
-  echo "$(head -n1 <<EOF
-  abc
-  def
-  EOF)"
-work as well.
+The command substitution's command is head -n1 <<EOF. There is no 
+terminator for the <<EOF heredoc in the command substitution's command. 
+There is not even the newline to start the heredoc. Issue 8 says this 
+should be (but needn't be) treated as a redirection error. If a shell 
+does not treat it as a redirection error, the behaviour is implicitly 
+unspecified.
 
-Either way, this looks to me like a POSIX violation?
+Even in Issue 7, it says "continues until there is a line containing 
+only the delimiter and a <newline>", with nothing to say what happens 
+when no such line is found, also implicitly making the behaviour 
+unspecified.
 
-Best,
-=D0=BD=D0=B0=D0=B1
+That said, this did use to work in dash as it does in bash, and both 
+this and the otherwise equivalent form with `` (which never worked in 
+bash or dash, as far as I know) are possible to support if dash so 
+desires: I have implemented this in my own version a while ago. It 
+works. It is possible for dash to do the same.
 
---42knarkebbhvxtwz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmSAhX4ACgkQvP0LAY0m
-WPEaxw//c5eZnG/0R9MH7p8EBbojkL1jm6UhlBAvpwSMucZijmYV12zuozgrz1HU
-B1Iw1vlH8wm9mA51V8cc+4fl96HlLz3ZH6+2P7yTd623JefuJC/ZnHXptOEuY1F3
-h1YleOGJMxDjgwHNpSYaXuyVb8kO5tI3GOh6efEY8ZO17MHIBWJpJFsK+8Etl5M9
-tYt7PlIC8Zdehvn0d2oItNauXFuc9Khe8cCehp+kMy/Q/BdktigQDEiCpUgwVuSu
-LPJ7qorwntc+HuCYLY33RRUxO//VN/SY2LVL9vEw2jikbYy0u19YHHbiVFGQml6d
-P68KLTjC1eAIfp9JASlpIZOb9hB64u70DNTovvz+rqHy4PRhuiasH3ydRdTx0OaG
-DHom2ry137xVs85jGTHNlWT+B2YPDQcPUfBNYPfKCalKsDY/NlHHrgQy1bJ2sAFA
-+F39ZDMJnaBGJgcpUiA2pucG8dMRGZL3frtMIWikJP+gyngWjU9rygSkj2/x+23m
-eiYgHOQtQE4ajfIZiojv0SYiE96anpGvIyuC2JNwlzUctj1xldjalk28/e+Nnvxq
-mihGUGDugnK4zhWa02ApBMJ3Kil7GO/zlltywBiAyNOvEszqLV51g3rACgADzrJi
-DtnfBYP8eAzFpeXQ2eYAZqAhTjS+IFjgJQ61k6TrA3fCopCgp9U=
-=zjYs
------END PGP SIGNATURE-----
-
---42knarkebbhvxtwz--
+Cheers,
+Harald van Dijk
