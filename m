@@ -2,94 +2,119 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E5FE8FDDB
-	for <linux-dash@archiver.kernel.org>; Wed,  4 Oct 2023 08:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B9FE7B604
+	for <linux-dash@archiver.kernel.org>; Wed,  4 Oct 2023 12:34:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239265AbjJDIrR (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 4 Oct 2023 04:47:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56116 "EHLO
+        id S232964AbjJDMes (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 4 Oct 2023 08:34:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232650AbjJDIrQ (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 4 Oct 2023 04:47:16 -0400
-Received: from mail.aegee.org (mail.aegee.org [144.76.142.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D755F98
-        for <dash@vger.kernel.org>; Wed,  4 Oct 2023 01:47:12 -0700 (PDT)
-Received: from webmail.aegee.org (localhost [127.0.0.1])
-        by mail.aegee.org (8.17.2/8.17.2) with ESMTP id 3948lBKF3795601
-        for <dash@vger.kernel.org>; Wed, 4 Oct 2023 08:47:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aegee.org; s=k4096;
-        t=1696409231; i=dkim+sm-localhost@aegee.org;
-        bh=o5EHD3SYsE/aSTCKIJG8ABMBHsk7OmXLNbiuoKaVJNA=;
-        h=Date:From:To:Subject;
-        b=Blb7zYlTp5K/aGjOjwYXA2/A9NUWtNNUfkPwqyNE6iUvDIYqdCnmbGg+dW/H1Mj43
-         Q9sCf8sr5KxoXZag9uKmhzX9/nwYTPM1elmdQv71vZtog2rOgqbZwign5W+ENVpybM
-         ttZuWIe99hIQZCq2w12qIMZRR9B1tO+3JHVceI/4qY3GkV+xcdDeM3iY6cmyVxQMfW
-         KOLUmNIODq55m8KoPnU15653vErDppDYHA2YYHU0+RduwRqlmhAID1ssYSL9Fr2emT
-         oOwbMoEBup1NZtbtjJmURgbLGaUxp2WhIoy3QLteeGoKUad11xNX9Wt7HxwHftG+tc
-         q8NyRy+AKuG79TN9RSUX6yiR1vRRDiA5J3ha5lUmSjg1Pu8PBeZkvUwacYkTIae09f
-         LRX1Kiz/C24F4Y5DIMLzV9KBH2TtVLHGtlizyeRXe7UIRQrMtVzYaUzbrFM8brXEt/
-         BB5SuXxDnQnQM8SXFfpS383fv9/HmyOfeuLn2FjW91gLTmtH2MvT3QlCfRvBNGmgil
-         ardNEM/U6WFRS540EKCTKhTlC7eO26jgGFomXA+nTRn4Q4LTXpqbjLACf4dDA8tcw2
-         r2kI+FBA+zke+oJPD15X7WDrYA+NSFFWeKwvreDzWrtOw5TgplrC4mWNxVY0PIMW6d
-         3I0gI2j8uPesIqwa5uInjMRw=
-Authentication-Results: mail.aegee.org/3948lBKF3795601; dkim=none
+        with ESMTP id S232896AbjJDMes (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 4 Oct 2023 08:34:48 -0400
+X-Greylist: delayed 400 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 Oct 2023 05:34:43 PDT
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F2D1A93
+        for <dash@vger.kernel.org>; Wed,  4 Oct 2023 05:34:43 -0700 (PDT)
+Received: from [IPV6:2a02:8010:68a1:0:5f15:791d:7617:b54] (unknown [IPv6:2a02:8010:68a1:0:5f15:791d:7617:b54])
+        by mail.gigawatt.nl (Postfix) with ESMTPSA id 09555177;
+        Wed,  4 Oct 2023 13:28:01 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 09555177
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+        s=default; t=1696422481;
+        bh=Vupmyr3us0KZrV2BdyW73EKufTlDWRN3Ep0zkApq9nE=; l=2192;
+        h=Date:Subject:To:References:From:In-Reply-To:From;
+        b=M0pFyfv0Ip+IK5Dcl3UJGanHQM59HoTjGWZmI3IWxZlIiKDR5SosM1V0rtk3o83zW
+         Pw7iAu1RV1LIkMaq5NldxzFy/JgXVUvsN/Ab5R+5EPV5qI7v/O7QE70EG+BtwCOWMQ
+         VzwQuvEZLYgH/4piBHiSO1Q7jzQ9GSE8gHFuooKY=
+Message-ID: <15ef5aaa-8766-48f7-9f3d-6b11838a0b95@gigawatt.nl>
+Date:   Wed, 4 Oct 2023 13:28:00 +0100
 MIME-Version: 1.0
-Date:   Wed, 04 Oct 2023 10:47:10 +0200
-From:   =?UTF-8?Q?=D0=94=D0=B8=D0=BB=D1=8F=D0=BD_=D0=9F=D0=B0=D0=BB=D0=B0?=
-         =?UTF-8?Q?=D1=83=D0=B7=D0=BE=D0=B2?= <dilyan.palauzov@aegee.org>
-To:     dash@vger.kernel.org
-Subject: Printing C:\abc in a portable way
-Message-ID: <bc35891262faa710fa1f0dc08233c5fe@aegee.org>
-X-Sender: dilyan.palauzov@aegee.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: Printing C:\abc in a portable way
+Content-Language: en-US
+To:     =?UTF-8?B?0JTQuNC70Y/QvSDQn9Cw0LvQsNGD0LfQvtCy?= 
+        <dilyan.palauzov@aegee.org>, dash@vger.kernel.org
+References: <bc35891262faa710fa1f0dc08233c5fe@aegee.org>
+From:   Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <bc35891262faa710fa1f0dc08233c5fe@aegee.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-Hello,
+Hi,
 
-I want to print C:\abc in a portable way.  Or rather, store the value 
-C:\abc in a variable.  I have bash 5.2.15-3.fc38 and dash 0.5.12-1.fc38. 
-  /bin/sh is a symlink to bash.
+On 04/10/2023 09:47, Дилян Палаузов wrote:
+> Hello,
+> 
+> I want to print C:\abc in a portable way.  Or rather, store the value 
+> C:\abc in a variable.  I have bash 5.2.15-3.fc38 and dash 0.5.12-1.fc38. 
+>   /bin/sh is a symlink to bash.
+> 
+> In interactive bash
+> 
+> echo "C:\\abc"
+> 
+> prints
+> 
+> C:\abc . The same happens when I store in a file and execute it:
+> 
+> #!/bin/bash
+> echo "C:\\abc"
+> 
+> 
+> #!/bin/bash --posix
+> echo "C:\\abc"
+> 
+> 
+> #!/bin/sh
+> echo "C:\\abc"
+> 
+> With dash it is different:
+> 
+> #!/bin/dash
+> echo "C:\\abc"
+> 
+> prints C:bc .  When I replace above a with k, echo "C:\\kbc" prints 
+> C:\kbc .
 
-In interactive bash
+In dash, backslash acts as an escape character within echo. In bash, it 
+is configurable, it can either act as an escape character the same way 
+by default, or it can limit escape sequence processing to when the -e 
+option is used. In bash, the behaviour can be changed via
+shopt -s xpg_echo and shopt -u xpg_echo. The default varies between systems.
 
-echo "C:\\abc"
+> When I replace the double quotes with single quotes, echo 'C:\\abc' , 
+> dash prints C:\abc, but bash (interactive, /bin/sh and bash --posix) 
+> prints C:\\abc .
 
-prints
+With shopt -s xpg_echo, this also prints C:\abc in bash. Note that this 
+configuration option is independent of POSIX mode, as POSIX allows 
+either behaviour.
 
-C:\abc . The same happens when I store in a file and execute it:
+To print a variable literally, without special treatment of backslash, 
+use the printf builtin instead.
 
-#!/bin/bash
-echo "C:\\abc"
+   printf "%s\n" "$var"
 
+will output exactly the string that is stored in $var. If it contains 
+backslashes, this will print backslashes. And this works the same way in 
+dash and bash.
 
-#!/bin/bash --posix
-echo "C:\\abc"
+> All that said I think this is a bug in dash.
+> 
+> The above echos are simplified use case, in reality I want to execute 
+> A="C:\\abc" ./script and the script shall see C:\abc as value to the 
+> variable A.
 
+What you have there already achieves that. The special handling of 
+backslash in the echo command is specific to the echo command. For 
+passing environment variables to other processes, nothing special 
+happens (at least, nothing special that relates to backslashes).
 
-#!/bin/sh
-echo "C:\\abc"
+> Kind regards
+>    Dilyan
 
-With dash it is different:
-
-#!/bin/dash
-echo "C:\\abc"
-
-prints C:bc .  When I replace above a with k, echo "C:\\kbc" prints 
-C:\kbc .
-
-When I replace the double quotes with single quotes, echo 'C:\\abc' , 
-dash prints C:\abc, but bash (interactive, /bin/sh and bash --posix) 
-prints C:\\abc .
-
-All that said I think this is a bug in dash.
-
-The above echos are simplified use case, in reality I want to execute 
-A="C:\\abc" ./script and the script shall see C:\abc as value to the 
-variable A.
-
-Kind regards
-   Dilyan
+Cheers,
+Harald van Dijk
