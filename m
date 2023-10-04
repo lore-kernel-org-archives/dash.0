@@ -2,119 +2,643 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B9FE7B604
-	for <linux-dash@archiver.kernel.org>; Wed,  4 Oct 2023 12:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EC0E7C4E7
+	for <linux-dash@archiver.kernel.org>; Wed,  4 Oct 2023 17:49:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232964AbjJDMes (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 4 Oct 2023 08:34:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58554 "EHLO
+        id S233819AbjJDRtR (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 4 Oct 2023 13:49:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232896AbjJDMes (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 4 Oct 2023 08:34:48 -0400
-X-Greylist: delayed 400 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 Oct 2023 05:34:43 PDT
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F2D1A93
-        for <dash@vger.kernel.org>; Wed,  4 Oct 2023 05:34:43 -0700 (PDT)
-Received: from [IPV6:2a02:8010:68a1:0:5f15:791d:7617:b54] (unknown [IPv6:2a02:8010:68a1:0:5f15:791d:7617:b54])
-        by mail.gigawatt.nl (Postfix) with ESMTPSA id 09555177;
-        Wed,  4 Oct 2023 13:28:01 +0100 (BST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 09555177
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-        s=default; t=1696422481;
-        bh=Vupmyr3us0KZrV2BdyW73EKufTlDWRN3Ep0zkApq9nE=; l=2192;
-        h=Date:Subject:To:References:From:In-Reply-To:From;
-        b=M0pFyfv0Ip+IK5Dcl3UJGanHQM59HoTjGWZmI3IWxZlIiKDR5SosM1V0rtk3o83zW
-         Pw7iAu1RV1LIkMaq5NldxzFy/JgXVUvsN/Ab5R+5EPV5qI7v/O7QE70EG+BtwCOWMQ
-         VzwQuvEZLYgH/4piBHiSO1Q7jzQ9GSE8gHFuooKY=
-Message-ID: <15ef5aaa-8766-48f7-9f3d-6b11838a0b95@gigawatt.nl>
-Date:   Wed, 4 Oct 2023 13:28:00 +0100
+        with ESMTP id S233239AbjJDRtR (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 4 Oct 2023 13:49:17 -0400
+X-Greylist: delayed 319 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 Oct 2023 10:49:12 PDT
+Received: from sdaoden.eu (sdaoden.eu [217.144.132.164])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBBA69E
+        for <dash@vger.kernel.org>; Wed,  4 Oct 2023 10:49:12 -0700 (PDT)
+Date:   Wed, 04 Oct 2023 19:43:46 +0200
+Author: Steffen Nurpmeso <steffen@sdaoden.eu>
+From:   Steffen Nurpmeso <steffen@sdaoden.eu>
+To:     Thorsten Otto <admin@tho-otto.de>
+Cc:     dash@vger.kernel.org
+Subject: Re: Signal names when cross-compiling
+Message-ID: <20231004174346.gkjIE%steffen@sdaoden.eu>
+In-Reply-To: <19502212.sIn9rWBj0N@earendil>
+References: <19502212.sIn9rWBj0N@earendil>
+User-Agent: s-nail v14.9.24-524-gd5f7c65f62
+OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
+ url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
+BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
+ the world can make no bugs.
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Printing C:\abc in a portable way
-Content-Language: en-US
-To:     =?UTF-8?B?0JTQuNC70Y/QvSDQn9Cw0LvQsNGD0LfQvtCy?= 
-        <dilyan.palauzov@aegee.org>, dash@vger.kernel.org
-References: <bc35891262faa710fa1f0dc08233c5fe@aegee.org>
-From:   Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <bc35891262faa710fa1f0dc08233c5fe@aegee.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed;
+ boundary="=-=7swh7BPSDg4j2aEnZZBjZatSbJeqHrz-S0s1=-="
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-Hi,
+This is a multi-part message in MIME format.
 
-On 04/10/2023 09:47, Дилян Палаузов wrote:
-> Hello,
-> 
-> I want to print C:\abc in a portable way.  Or rather, store the value 
-> C:\abc in a variable.  I have bash 5.2.15-3.fc38 and dash 0.5.12-1.fc38. 
->   /bin/sh is a symlink to bash.
-> 
-> In interactive bash
-> 
-> echo "C:\\abc"
-> 
-> prints
-> 
-> C:\abc . The same happens when I store in a file and execute it:
-> 
-> #!/bin/bash
-> echo "C:\\abc"
-> 
-> 
-> #!/bin/bash --posix
-> echo "C:\\abc"
-> 
-> 
-> #!/bin/sh
-> echo "C:\\abc"
-> 
-> With dash it is different:
-> 
-> #!/bin/dash
-> echo "C:\\abc"
-> 
-> prints C:bc .  When I replace above a with k, echo "C:\\kbc" prints 
-> C:\kbc .
+--=-=7swh7BPSDg4j2aEnZZBjZatSbJeqHrz-S0s1=-=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-ID: <20231004174346.F7rJT%steffen@sdaoden.eu>
 
-In dash, backslash acts as an escape character within echo. In bash, it 
-is configurable, it can either act as an escape character the same way 
-by default, or it can limit escape sequence processing to when the -e 
-option is used. In bash, the behaviour can be changed via
-shopt -s xpg_echo and shopt -u xpg_echo. The default varies between systems.
+Hello.
 
-> When I replace the double quotes with single quotes, echo 'C:\\abc' , 
-> dash prints C:\abc, but bash (interactive, /bin/sh and bash --posix) 
-> prints C:\\abc .
+Thorsten Otto wrote in
+ <19502212.sIn9rWBj0N@earendil>:
+ |when cross-compiling dash, signames.c is generated by a mksignames \
+ |that was 
+ |compiled for the host. This will generate wrong signal mappings because 
+ |obviously this will use the signal numbers of the build system, not the 
+ |target.
+ |
+ |I currently dont't have no idea how to solve that, other than populating \
+ |the 
+ |signal_names array at runtime rather than compile time.
 
-With shopt -s xpg_echo, this also prints C:\abc in bash. Note that this 
-configuration option is independent of POSIX mode, as POSIX allows 
-either behaviour.
+Actually i have no idea, but i do have a yet unused script for
+signals names (that mirrors one for errors names that is in use
+for years.  I will attach it.  It is meant for the MUA i maintain
+(a future lib part of it) and does lots of things you surely do
+not need, as it is for C and C++ and creates mapping tables for
+by-name etc lookups, the signal documentation strings etc etc.
+You run it local to create the portable stuff (uses perl, and the
+MUA i maintain for creating hash values), and then during compile
+time.  This compile_time() function is surely what you want, it
+requires some POSIX tools (awk, sort, rm) and a C compiler ($CC),
+actually only the preprocessing stage (much easier to let the
+compiler to the C preprocessor part), which' output is then
+parsed.  Eg
 
-To print a variable literally, without special treatment of backslash, 
-use the printf builtin instead.
+  TARGET=./output-file sh su-make-signals.sh compile_time
 
-   printf "%s\n" "$var"
+--steffen
+|
+|Der Kragenbaer,                The moon bear,
+|der holt sich munter           he cheerfully and one by one
+|einen nach dem anderen runter  wa.ks himself off
+|(By Robert Gernhardt)
 
-will output exactly the string that is stored in $var. If it contains 
-backslashes, this will print backslashes. And this works the same way in 
-dash and bash.
+--=-=7swh7BPSDg4j2aEnZZBjZatSbJeqHrz-S0s1=-=
+Content-Type: application/x-sh; charset=us-ascii
+Content-Disposition: attachment; filename="su-make-signals.sh"
+Content-ID: <20231004174346.IWPYJ%steffen@sdaoden.eu>
 
-> All that said I think this is a bug in dash.
-> 
-> The above echos are simplified use case, in reality I want to execute 
-> A="C:\\abc" ./script and the script shall see C:\abc as value to the 
-> variable A.
+#!/bin/sh -
+#@ Either create src/su/gen-signals.h, or, at compile time, the OS<>SU map.
+#
+# Public Domain
 
-What you have there already achieves that. The special handling of 
-backslash in the echo command is specific to the echo command. For 
-passing environment variables to other processes, nothing special 
-happens (at least, nothing special that relates to backslashes).
+IN="${SRCDIR}"su/gen-signals.h
+XOUT=src/su/gen-signals.h
 
-> Kind regards
->    Dilyan
+# We use `csop' for hashing
+MAILX='LC_ALL=C s-nail -#:/'
 
-Cheers,
-Harald van Dijk
+# Acceptable "longest distance" from hash-modulo-index to key
+MAXDISTANCE_PENALTY=6
+
+# Generate a more verbose output.  Not for shipout versions.
+VERB=1
+
+##
+
+LC_ALL=C
+export LC_ALL MAXDISTANCE_PENALTY VERB MAILX IN XOUT
+
+: ${awk:=awk}
+# Compile-time only
+: ${rm:=rm}
+: ${sort:=sort}
+
+# The set of signals we support {{{
+SIGNALS="
+	NONE='No signal' \
+	ABRT='Abort signal' \
+	ALRM='Timer signal' \
+	BUS='Bus error (bad memory access)' \
+	CHLD='Child stopped or terminated' \
+	CLD='Child stopped or terminated' \
+	CONT='Continue process if stopped' \
+	EMT='Emulator trap' \
+	FPE='Floating-point exception' \
+	HUP='Hangup of controlling terminal, or death of controlling process' \
+	ILL='Illegal instruction' \
+	INFO='Power failure' \
+	INT='Interrupt from keyboard' \
+	IO='I/O now possible' \
+	IOT='IOT trap / abort signal' \
+	KILL='Kill signal' \
+	LOST='File lock lost' \
+	PIPE='Broken pipe: write to pipe with no readers' \
+	POLL='Pollable event' \
+	PROF='Profiling timer expired' \
+	PWR='Power failure' \
+	QUIT='Quit from keyboard' \
+	SEGV='Segementation violation: invalid memory reference' \
+	STKFLT='Stack fault on coprocessor' \
+	STOP='Stop process' \
+	TSTP='Stop from terminal' \
+	SYS='Bad system call' \
+	TERM='Termination signal' \
+	TRAP='Trace or breakpoint trap' \
+	TTIN='Terminal input for background process' \
+	TTOU='Terminal output from background process' \
+	UNUSED='Bad system call' \
+	URG='Urgent condition on socket' \
+	USR1='User-defined signal 1' \
+	USR2='User-defined signal 2' \
+	VTALRM='Virtual alarm clock' \
+	XCPU='CPU time limit exceeded' \
+	XFSZ='File size limit exceeded' \
+	WINCH='Window resize signal' \
+"
+export SIGNALS
+# }}}
+
+signal_parse() {
+	j=\'
+	${awk} -v dodoc="${1}" -v incnone="${2}" -v input="${SIGNALS}" '
+		BEGIN{
+			for(i = 0;;){
+				voff = match(input, /[0-9a-zA-Z_]+(='${j}'[^'${j}']+)?/)
+				if(voff == 0)
+					break
+				v = substr(input, voff, RLENGTH)
+				input = substr(input, voff + RLENGTH)
+				doff = index(v, "=")
+				if(doff > 0){
+					d = substr(v, doff + 2, length(v) - doff - 1)
+					v = substr(v, 1, doff - 1)
+				}
+				if(!incnone && v == "NONE")
+					continue
+				print dodoc ? d : v
+			}
+		}
+	'
+}
+
+compile_time() { # {{{
+	[ -n "${TARGET}" ] || {
+		echo >&2 'Invalid usage'
+		exit 1
+	}
+	set -e
+	pipefail=
+	( set -o pipefail ) >/dev/null 2>&1 && pipefail=y
+	[ -n "${pipefail}" ] && set -o pipefail
+
+	{
+		printf '#include <signal.h>\nsu_SIGNAL_START\n'
+		for n in $(signal_parse 0 0); do
+			printf '#ifdef SIG%s\nSIG%s "%s"\n#else\n-1 "%s"\n#endif\n' $n $n $n $n
+		done
+	} > "${TARGET}".c
+
+	# The problem is that at least (some versions of) gcc mangle output.
+	# Ensure we get both arguments on one line.
+	# While here sort numerically.
+	${CC} -E "${TARGET}".c |
+		${awk} '
+			function stripsym(sym){
+				sym = substr(sym, 2)
+				sym = substr(sym, 1, length(sym) - 1)
+				return sym
+			}
+			BEGIN{hot=0; conti=0}
+			/^[	 ]*$/{next}
+			/^[	 ]*#/{next}
+			/^su_SIGNAL_START$/{hot=1; next}
+			{
+				if(!hot)
+					next
+				i = conti ? stripsym($1) "\n" : $1 " "
+				printf i
+				if(conti)
+					conti = 0
+				else if($2 != "")
+					printf "%s\n", stripsym($2)
+				else
+					conti = 1
+			}
+		' |
+		${sort} -n > "${TARGET}".txt
+
+	# EBCDIC/ASCII: we use \134 for reverse solidus \
+	j=\'
+	${awk} -v verb="${VERB}" -v input="${SIGNALS}" -v dat="${TARGET}.txt" '
+		BEGIN{
+			verb = (verb != 0) ? "	" : ""
+
+			# Read in our OS data
+
+			unavail = 0
+			max = 0
+			oscnt = 0
+			while((getline dl < dat) > 0){
+				split(dl, ia)
+
+				++oscnt
+				osnoa[oscnt] = ia[1]
+				osnaa[oscnt] = ia[2]
+
+				if(ia[1] < 0)
+					++unavail
+				else{
+					if(ia[1] > max)
+						max = ia[1]
+				}
+			}
+			close(dat)
+
+			# Maximum signal number defines the datatype to use.
+			# we warp all non-available errors to numbers too high
+			# to be regular errors, counting backwards
+
+			i = max + unavail + 1
+			if(i >= 65535){
+				t = "u32"
+				max = "0xFFFFFFFFu"
+			}else if(i >= 255){
+				t = "u16"
+				max = "0xFFFFu"
+			}else{
+				t = "u8"
+				max = "0xFFu"
+			}
+			print "#define su__SIG_NUMBER_TYPE " t
+			print "#define su__SIG_NUMBER_MAX " max
+
+			# Dump C table
+
+			cnt = 0
+			print "#define su__SIG_NUMBER_ENUM_C \134"
+
+			print verb "su_SIG_NONE = 0,\134"
+			++cnt
+
+			# Since our final table is searched with binary sort,
+			# place the non-available backward counting once last
+			unavail = j = k = 0
+			for(i = 1; i <= oscnt; ++i){
+				if(osnoa[i] >= 0){
+					map[osnaa[i]] = osnoa[i]
+					print verb "su_SIG_" osnaa[i] " = " osnoa[i] ",\134"
+					++cnt
+				}else{
+					++unavail
+					the_unavail[unavail] = "su_SIG_" osnaa[i] " = " "(su__SIG_NUMBER_MAX - " unavail ")"
+				}
+			}
+			for(i = unavail; i >= 1; --i){
+				print verb the_unavail[i] ",\134"
+				++cnt
+			}
+
+			print verb "su__SIG_NUMBER = " cnt
+
+			# The C++ mapping table
+
+			print "#ifdef __cplusplus"
+			print "# define su__CXX_SIG_NUMBER_ENUM \134"
+			print verb "none = su_SIG_NONE,\134"
+
+			unavail = 0
+			for(i = 1; i <= oscnt; ++i){
+				cxxn = tolower(osnaa[i])
+				if(cxxn !~ "^[_[:alpha:]]")
+					cxxn = "s" cxxn
+				if(osnoa[i] >= 0)
+					print verb cxxn " = su_SIG_" osnaa[i] ",\134"
+				else{
+					++unavail
+					the_unavail[unavail] = cxxn " = su_SIG_" osnaa[i]
+				}
+			}
+			for(i = unavail; i >= 1; --i){
+				print verb the_unavail[i] ",\134"
+				++cnt
+			}
+			print verb "s__number = su__SIG_NUMBER"
+
+			print "#endif /* __cplusplus */"
+
+			# And our OS signal -> name map offset table
+			# (This "OS" however includes the unavail ones)
+
+			voidoff = 0
+			for(mapoff = 0;; ++mapoff){
+				voff = match(input, /[0-9a-zA-Z_]+(='${j}'[^'${j}']+)?/)
+				if(voff == 0)
+					break
+
+				v = substr(input, voff, RLENGTH)
+				input = substr(input, voff + RLENGTH)
+				doff = index(v, "=")
+				if(doff > 0){
+					d = substr(v, doff + 2, length(v) - doff - 1)
+					v = substr(v, 1, doff - 1)
+				}
+				mapo[v] = mapoff
+				if(v == "UNUSED")
+					voidoff = mapoff
+			}
+
+			uniq = 0
+			print "#define su__SIG_NUMBER_VOIDOFF " voidoff
+			print "#define su__SIG_NUMBER_TO_MAPOFF \134"
+
+			print verb "a_X(0, 0) \134"
+			++uniq
+
+			unavail = 0
+			mapdups[0] = 1
+			for(i = 1; i <= oscnt; ++i){
+				if(osnoa[i] < 0){
+					the_unavail[++unavail] = i
+					continue
+				}
+				if(mapdups[osnoa[i]])
+					continue
+				mapdups[osnoa[i]] = 1
+				print verb "a_X(" osnoa[i] ", " mapo[osnaa[i]] ") \134"
+				++uniq
+			}
+
+			for(i = unavail; i >= 1; --i){
+				print verb "a_X(" "su__SIG_NUMBER_MAX - " i ", " mapo[osnaa[the_unavail[i]]] ")\134"
+				++uniq
+			}
+
+			print verb "a_X(su__SIG_NUMBER_MAX, su__SIG_NUMBER_VOIDOFF) \134"
+			++uniq
+			print verb "/* " uniq " unique members */"
+		}
+	' >> "${TARGET}"
+
+	${rm} "${TARGET}".*
+	exit 0
+} # }}}
+
+if [ ${#} -ne 0 ]; then
+	if [ "${1}" = noverbose ]; then
+		shift
+		VERB=0
+		export VERB
+	fi
+fi
+
+if [ ${#} -eq 1 ]; then
+	[ "${1}" = compile_time ] && compile_time
+elif [ ${#} -eq 0 ]; then
+	# Now start perl(1) without PERL5OPT set to avoid multibyte sequence errors
+	PERL5OPT= PERL5LIB= exec perl -x "${0}"
+fi
+echo >&2 'Invalid usage'
+exit 1
+
+#' PERL {{{
+# Thanks to perl(5) and its -x / #! perl / __END__ mechanism!
+# Why can env(1) not be used for such easy things in #!?
+#!perl
+
+use strict;
+use warnings;
+
+use FileHandle;
+use IPC::Open2;
+
+use sigtrap qw(handler cleanup normal-signals);
+
+my ($S, @ENTS, $CTOOL, $CTOOL_EXE) = ($ENV{VERB} ? '	' : '');
+
+sub main_fun{
+	create_ents();
+
+	create_c_tool();
+
+	hash_em();
+
+	dump_map(); # Starts output file
+
+	reverser(); # Ends output file
+
+	cleanup(undef);
+	exit 0
+}
+
+sub cleanup{
+	die "$CTOOL_EXE: couldn't unlink: $^E" if $CTOOL_EXE && -f $CTOOL_EXE && 1 != unlink $CTOOL_EXE;
+	die "$CTOOL: couldn't unlink: $^E" if $CTOOL && -f $CTOOL && 1 != unlink $CTOOL;
+	die "Terminating due to signal $_[0]" if $_[0]
+}
+
+sub basen{
+	my $n = $_[0];
+	$n =~ s/^(.*\/)?([^\/]+)$/$2/;
+	$n
+}
+
+sub create_ents{
+	my $input = $ENV{SIGNALS};
+	while($input =~ /([[:alnum:]_]+)='([^']+)'(.*)/){
+		$input = $3;
+		my %vals;
+		$vals{name} = $1;
+		$vals{doc} = $2;
+		push @ENTS, \%vals
+	}
+}
+
+sub create_c_tool{
+	$CTOOL = './tmp-signals-tool-' . $$ . '.c';
+	$CTOOL_EXE = $CTOOL . '.exe';
+
+	die "$CTOOL: open: $^E" unless open F, '>', $CTOOL;
+	print F '#define MAX_DISTANCE_PENALTY ', $ENV{MAXDISTANCE_PENALTY}, "\n";
+# >>>>>>>>>>>>>>>>>>>
+	print F <<'_EOT';
+#define __CREATE_SIGNALS_SH
+#define su_SOURCE
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#define su_NELEM(A) (sizeof(A) / sizeof((A)[0]))
+
+#define u32 uint32_t
+#define s32 int32_t
+#define u16 uint16_t
+#define u8 uint8_t
+
+struct a_corsig_map{
+	u32 csm_hash; /* Hash of name */
+	u32 csm_nameoff; /* Into a_corsig_names[] */
+	u32 csm_docoff; /* Into a_corsig_docs[] */
+	s32 csm_errno;	 /* OS signal value for this one */
+};
+
+_EOT
+
+	print F '#include "', $ENV{XOUT}, "\"\n\n";
+
+	print F <<'_EOT';
+static u8 seen_wraparound;
+static size_t longest_distance;
+
+static size_t
+next_prime(size_t no){ /* blush (brute force) */
+jredo:
+	++no;
+	for(size_t i = 3; i < no; i += 2)
+		if(no % i == 0)
+			goto jredo;
+	return no;
+}
+
+static size_t *
+reversy(size_t size){
+	struct a_corsig_map const *csmp = a_corsig_map, *csmaxp = csmp + su_NELEM(a_corsig_map);
+	size_t ldist = 0, *arr;
+
+	arr = (size_t*)malloc(sizeof *arr * size);
+	for(size_t i = 0; i < size; ++i)
+		arr[i] = su_NELEM(a_corsig_map);
+
+	seen_wraparound = 0;
+	longest_distance = 0;
+
+	while(csmp < csmaxp){
+		u32 hash = csmp->csm_hash, i = hash % size, l;
+
+		for(l = 0; arr[i] != su_NELEM(a_corsig_map); ++l)
+			if(++i == size){
+				seen_wraparound = 1;
+				i = 0;
+			}
+		if(l > longest_distance)
+			longest_distance = l;
+		arr[i] = (size_t)(csmp++ - a_corsig_map);
+	}
+	return arr;
+}
+
+int
+main(int argc, char **argv){
+	size_t *arr, size = su_NELEM(a_corsig_map);
+
+	fprintf(stderr, "Starting reversy, okeys=%zu\n", size);
+	for(;;){
+		arr = reversy(size = next_prime(size));
+		fprintf(stderr, " - size=%zu longest_distance=%zu seen_wraparound=%d\n",
+			size, longest_distance, seen_wraparound);
+		if(longest_distance <= MAX_DISTANCE_PENALTY)
+			break;
+		free(arr);
+	}
+
+	printf(
+		"#ifdef su_SOURCE /* Lock-out compile-time-tools */\n"
+		"# define a_CORSIG_REV_ILL %zuu\n"
+		"# define a_CORSIG_REV_PRIME %zuu\n"
+		"# define a_CORSIG_REV_LONGEST %zuu\n"
+		"# define a_CORSIG_REV_WRAPAROUND %d\n"
+		"static %s const a_corsig_revmap[a_CORSIG_REV_PRIME] = {\n%s",
+		su_NELEM(a_corsig_map), size, longest_distance, seen_wraparound,
+		argv[1], (argc > 2 ? "	" : ""));
+	for(size_t i = 0; i < size; ++i)
+		printf("%s%zuu", (i == 0 ? "" : (i % 10 == 0 ? (argc > 2 ? ",\n	" : ",\n") : (argc > 2 ? ", " : ","))),
+			arr[i]);
+	printf("\n};\n#endif /* su_SOURCE */\n");
+	return 0;
+}
+_EOT
+# <<<<<<<<<<<<<<<<<<<
+	close F
+}
+
+sub hash_em{
+	die "hash_em: open: $^E" unless my $pid = open2 *RFD, *WFD, $ENV{MAILX};
+	foreach my $e (@ENTS){
+		print WFD "csop hash32?case $e->{name}\n";
+		my $h = <RFD>;
+		chomp $h;
+		$e->{hash} = $h
+	}
+	print WFD "x\n";
+	waitpid $pid, 0;
+}
+
+sub dump_map{
+	my ($i, $alen);
+
+	die "$ENV{XOUT}: open: $^E" unless open F, '>', $ENV{XOUT};
+	print F '/*@ ', scalar basen($ENV{XOUT}), ', generated by ', scalar basen($0),
+		".\n *@ See core-signals.c for more */\n\n";
+
+	($i, $alen) = (0, 0);
+	print F '#ifdef su_SOURCE', "\n", 'static char const a_corsig_names[] = {', "\n";
+	($i, $alen) = (0, 0);
+	foreach my $e (@ENTS){
+		$e->{nameoff} = $alen;
+		my $k = $e->{name};
+		my $l = length $k;
+		my $a = join '\',\'', split(//, $k);
+		my (@fa);
+		print F "${S}/* $i. [$alen]+$l $k */\n" if $ENV{VERB};
+		print F "${S}'$a','\\0',\n";
+		++$i;
+		$alen += $l + 1
+	}
+	print F '};', "\n\n";
+
+	print F '# undef a_X', "\n", '# define a_X(X)', "\n";
+	print F 'static char const a_corsig_docs[] = {', "\n";
+	($i, $alen) = (0, 0);
+	foreach my $e (@ENTS){
+		$e->{docoff} = $alen;
+		my $k = $e->{doc};
+		my $l = length $k;
+		my $a = join '\',\'', split(//, $k);
+		my (@fa);
+		print F "${S}/* $i. [$alen]+$l $e->{name} */ ", "a_X(N_(\"$e->{doc}\"))\n" if $ENV{VERB};
+		print F "${S}'$a','\\0',\n";
+		++$i;
+		$alen += $l + 1
+	}
+	print F '};', "\n# undef a_X\n\n";
+
+	print F <<_EOT;
+# undef a_X
+# ifndef __CREATE_SIGNALS_SH
+#  define a_X(X) X
+# else
+#  define a_X(X) 0
+# endif
+static struct a_corsig_map const a_corsig_map[] = {
+_EOT
+	foreach my $e (@ENTS){
+		print F "${S}{$e->{hash}u, $e->{nameoff}u, $e->{docoff}u, a_X(su_SIG_$e->{name})},\n"
+	}
+	print F '};', "\n", '# undef a_X', "\n",
+		'#endif /* su_SOURCE */', "\n\n";
+
+	die "$ENV{XOUT}: close: $^E" unless close F
+}
+
+sub reverser{
+	my $argv2 = $ENV{VERB} ? ' verb' : '';
+	system("\$CC -I. -o $CTOOL_EXE $CTOOL");
+	my $t = (@ENTS < 0xFF ? 'u8' : (@ENTS < 0xFFFF ? 'u16' : 'u32'));
+	`$CTOOL_EXE $t$argv2 >> $ENV{XOUT}`
+}
+
+{package main; main_fun()}
+# }}}
+
+# s-itt-mode
+
+--=-=7swh7BPSDg4j2aEnZZBjZatSbJeqHrz-S0s1=-=--
