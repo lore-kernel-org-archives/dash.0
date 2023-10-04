@@ -2,643 +2,179 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EC0E7C4E7
-	for <linux-dash@archiver.kernel.org>; Wed,  4 Oct 2023 17:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B26E7C4F0
+	for <linux-dash@archiver.kernel.org>; Wed,  4 Oct 2023 19:45:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233819AbjJDRtR (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 4 Oct 2023 13:49:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39208 "EHLO
+        id S233552AbjJDTpl (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 4 Oct 2023 15:45:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233239AbjJDRtR (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 4 Oct 2023 13:49:17 -0400
-X-Greylist: delayed 319 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 Oct 2023 10:49:12 PDT
-Received: from sdaoden.eu (sdaoden.eu [217.144.132.164])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBBA69E
-        for <dash@vger.kernel.org>; Wed,  4 Oct 2023 10:49:12 -0700 (PDT)
-Date:   Wed, 04 Oct 2023 19:43:46 +0200
-Author: Steffen Nurpmeso <steffen@sdaoden.eu>
-From:   Steffen Nurpmeso <steffen@sdaoden.eu>
-To:     Thorsten Otto <admin@tho-otto.de>
-Cc:     dash@vger.kernel.org
-Subject: Re: Signal names when cross-compiling
-Message-ID: <20231004174346.gkjIE%steffen@sdaoden.eu>
-In-Reply-To: <19502212.sIn9rWBj0N@earendil>
+        with ESMTP id S233784AbjJDTpk (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 4 Oct 2023 15:45:40 -0400
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4BDBD8
+        for <dash@vger.kernel.org>; Wed,  4 Oct 2023 12:45:36 -0700 (PDT)
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+        by mx0a-0064b401.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 394JC2a4024532
+        for <dash@vger.kernel.org>; Wed, 4 Oct 2023 12:45:36 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+         h=from:to:subject:date:message-id:references:in-reply-to
+        :content-type:content-transfer-encoding:mime-version; s=
+        PPS06212021; bh=fymBQ9Y1svKATHgccQ2eTrfv2HfrSGQFTbezmFXJGEM=; b=
+        fxNHBZETbAJSu2tUgGIMC0tzcN3FxEw7B8HKQ1vyP2t5WEbbM4TIJbWKlHaZXt/q
+        n2cT2mI+hLMBVWmPIlbcdIPqY8hmv6+/O9aTYe2tywTQmZo0MVvCaZFY4JlEWxPH
+        yFc+tlcXrIHu1JCOTV1AOWfgIn3VSjf/ue1Hp8Pn9SQExFr3ELnWKH5QqtA3nn4h
+        TiuPUUpIIgfJ9VErvVKMZ6WPl+XmeGQNGwBX3qQJzM7mQkPoOYCviJU58WSCbvVE
+        Ln2/DOqsmTWecz9tTnAigiveAD1CLooDpu/hci3EmUp7DHnGGQbGe+/IsRCOOSJj
+        n8EOjDq0hOitTOb2wx9uDg==
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2107.outbound.protection.outlook.com [104.47.58.107])
+        by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3tek6g40xm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <dash@vger.kernel.org>; Wed, 04 Oct 2023 12:45:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UvsSdf8ZYBcPgxFtA618OZGCBhp4EDNtZ4gFPwu1B+L/VNR/1fj+xguvIg5ArN7qZdu6Q5s+y4QE5+AwtbGf4aK3IjmMvmPpPeJEdsmWjhqYxKYBVtqPjl3ZtF3D0rMinwcdCVZj47+PBXd7eWbu3hU1UwSprTqu4fh6gBpgHpesohaZhZpPO/goka9Uhr5As50n9VVM5kOnO0XgFoHNeoBQfc1hxikRIQLgwGR4YQjNRr62RoPUfWKN5aikx/P/JZYLwcSPU5WDEY/mXybDVO6wIRDnJGlT1PzQchEF2ppiZZO9hl7BG2WEG4unR/uMoVtjNuR/KwLgfopVM5GPig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fymBQ9Y1svKATHgccQ2eTrfv2HfrSGQFTbezmFXJGEM=;
+ b=QQZwQyqSWqHnvH6aYniwzsCQxCibrPDsCVp+TVNl6xoej9sbX6tl4E+XtdyPnBiSKuBRoRtMhMbQxnOc+Ai5b9jsET2kbxK5toZ1Y/bWUEXT5dS1Ri4QNhXQF3tslbmNjpwfCJORbUenTcdra4sJXNMeGoTS9cN9CdFiYlxxfTFrPnZ0xhpY+3W1Ow95flgtOrIHv1WApQYeJxST+y8zT6CmMsTOIfRxuOM72Jj7Eo1Ybcwgt6ggyRYYQT5XKAR+cGSGZm7kZVQsUggUWhQNVwD5GSqc3BlZIq7emZvkyOGp+5KcxzXO6cl8FY3e4yq0VLaEDA9o7kZ+bnWd0nLGWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=windriver.com; dmarc=pass action=none
+ header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
+Received: from DM6PR11MB4108.namprd11.prod.outlook.com (2603:10b6:5:197::16)
+ by SJ0PR11MB5055.namprd11.prod.outlook.com (2603:10b6:a03:2d9::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Wed, 4 Oct
+ 2023 19:45:17 +0000
+Received: from DM6PR11MB4108.namprd11.prod.outlook.com
+ ([fe80::b3:8311:f811:c854]) by DM6PR11MB4108.namprd11.prod.outlook.com
+ ([fe80::b3:8311:f811:c854%5]) with mapi id 15.20.6838.030; Wed, 4 Oct 2023
+ 19:45:17 +0000
+From:   "Kuhl, Brian" <brian.kuhl@windriver.com>
+To:     "dash@vger.kernel.org" <dash@vger.kernel.org>
+Subject: RE: Signal names when cross-compiling
+Thread-Topic: Signal names when cross-compiling
+Thread-Index: AQHZ9utsW4dRkBpZVkK4aZYC4+AeXrA6B75A
+Date:   Wed, 4 Oct 2023 19:45:17 +0000
+Message-ID: <DM6PR11MB410813D5DE3610ABEB73C6F999CBA@DM6PR11MB4108.namprd11.prod.outlook.com>
 References: <19502212.sIn9rWBj0N@earendil>
-User-Agent: s-nail v14.9.24-524-gd5f7c65f62
-OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
- url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
-BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
- the world can make no bugs.
+ <20231004174346.gkjIE%steffen@sdaoden.eu>
+In-Reply-To: <20231004174346.gkjIE%steffen@sdaoden.eu>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4108:EE_|SJ0PR11MB5055:EE_
+x-ms-office365-filtering-correlation-id: 940e11eb-5efd-4168-404f-08dbc5126f63
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: D8LoyDlmeBGzJ3WspIBF2YlO0PcJgYXjizCVLtpEEb/MTltKz/d3Ioe2FRt+51bTSTH9gmQo8vxBe39NzqajNftcAXW5wKv9uA9yt685KUXzHdjjkmAUgDv4Ffy5AZmQyJfUJEnhvBDr2brSwUsDv8vCF6+XvXaIlaPETVgla7qLoHCckYp7/BjrkMIqRaEmoMmbk7ZHtsDcvMcySM/4bLgSkVdzDNOIfPNJVXBah/lduqOJRwKVopqNZfg/xLOZSCQ8s/MVNYZ8xQknLhrRQLqwOpvn1hfzgx49g8NpX4Qzn9OusjJZ8yCyGJO27iJus47POgqitpQI5rAzkCxIJDbKl6CLkcCwyumC0NM9SINrbUTjyAGjam8ec2OL8LxlBnqNP43vfh2E1J8Q1LLji1FZjpVm6HBuh9NtcbseDH1qWYs4nipSTKX4YLfL7ZbMxSK284oZ8v1mbk5NVnlFYzUfOgDex1Z2QbtbnNxBuSRPQVWrOnF+hvaL2yPcs/NJYr3r+tTXPvHZoNnTlD+sHJfcWEFyWQ/UpHrWqmEJ1aMR2aU503HvMuvXlPV4XlqwkVh4vgLZGVssBoFvhu6R3QMNi0PchKIltvhwAbgTqjqltkYZ1RjPGgtfAyxq0we5
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4108.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(136003)(396003)(39850400004)(376002)(230922051799003)(1800799009)(64100799003)(451199024)(186009)(76116006)(66476007)(52536014)(38100700002)(66946007)(66446008)(5660300002)(66556008)(41300700001)(316002)(8936002)(6916009)(8676002)(64756008)(2906002)(55016003)(122000001)(38070700005)(86362001)(71200400001)(7696005)(53546011)(83380400001)(26005)(9686003)(33656002)(478600001)(6506007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1+DALfsS4jTA0oQs2uB3krpGeU+22mjconidMZUcwW02/Ga+eycvQ07k9WbR?=
+ =?us-ascii?Q?ZMcbwi9CnzwdrwZE1wFBmAe1i7tbbcX08Zht5BXrHxwip1SEbbbbDCrzt+tt?=
+ =?us-ascii?Q?D+eOo6n3cE/sxYfT5URBF/jQad6FYTnRNsaHrFZd9+JMf+l0g5toEGA44lCl?=
+ =?us-ascii?Q?pAmt4Ewb8cRm7etkfJ0RhCXERVDTmJacB3RPtRpTbtRG71yvdxOs3vwIspVZ?=
+ =?us-ascii?Q?QSnY3D9a6e0j4BvigkFfau9neaIrf7IDp9G7o7dsdcHDeeRLeqrysSJyej8c?=
+ =?us-ascii?Q?+/7KCtooGhEVUnINoOQkWSx0rx3ORsIvOIjl7dCGKry6Ng881WZ9MvDFXQ+r?=
+ =?us-ascii?Q?a4o8MplFvLWnetVCyMukXPmtczEHs+TNtXO1GN39pxT0yTaFYy1rE8VSeber?=
+ =?us-ascii?Q?tnybq6c6xCFPYZeZzZEq3ksmaeQ5Gb9hWrkfP3uZ/ispRpwYFffc7iN0i39g?=
+ =?us-ascii?Q?OwBkT9JsFAlDouX7Bs5Aw4iZB1loUidzCzcaxvZonPgDnCLhtDJShDJ1pyV0?=
+ =?us-ascii?Q?jkthPgiMtqsnY17x3qdCOzvRzNY2/vLU82UA0SpD9VYYLtJjAJYMxZpBYS2d?=
+ =?us-ascii?Q?0WGOM9vW0EepUhpWuoC9lFOBF7gGLPMaD/beSp5WD4njLcjEOz89hc6f7PxX?=
+ =?us-ascii?Q?5OJkkH08FDb1ioXxtfebKsNlVXm02BjK7b/vmN633WU6q+nSYcSv+H4VY96D?=
+ =?us-ascii?Q?uhK0paNOIXTPoRbw93Rgz6TfGF3dxGbEgQ/lTfhcMRqH0zbq8zyyI6wgrPbh?=
+ =?us-ascii?Q?KirJxze3p8/py594kPhwf+M8JO/p7vIidFWPV09FmVT3xpCisAPS2Lc1pA/r?=
+ =?us-ascii?Q?YQ1H3G6zEYJC3Zb0YufEcLyWmj/uivzxJZV2lnVHarcG36j+QxiYu6IOTdNN?=
+ =?us-ascii?Q?dkPU9qgLqjieI0Oq8UnAb9ApgDavDiApw313tp22nBd3CP9AecIxmBuC93Wt?=
+ =?us-ascii?Q?K/UI9EercHfLd8cgCojBdOiMgYgUmiYR+oYA01w+zu2kaICze0DaOoldOsZq?=
+ =?us-ascii?Q?jN7ZzTWCEJirN9nh4vofA4ezribFzE7Zfbz0xI2ZG9aCTNrTkW3Ze8v6uvqi?=
+ =?us-ascii?Q?oiqvCbYGQgKJJnC2aFDIMAVf0/WME+6/eOvi1tZdl4qhAjpLthzv19wCPRiF?=
+ =?us-ascii?Q?RtNgD34OijHvxUaRuYMjcCYRVuE0U6REdJWIXZTE3/+tt7uAsQ1Yp379F8pQ?=
+ =?us-ascii?Q?/wFdbyr9+zbXRh2QEnpH0f+3dBGZYIhRZhZi9zpFWi7rlVJICU9AmQIciEf6?=
+ =?us-ascii?Q?psHzf+FKTBzvdfeazcg8wr9CT40M2JOT3JihMJCgsVfaoILMf4IrwxQskD8S?=
+ =?us-ascii?Q?Y4w0uol0ycsCY/vzsBTCZY27Fjp8Btba1PnRi+XRC4Wk/EQdU79wDcXh6LIR?=
+ =?us-ascii?Q?INR7n+focAmhRPdAz0rzWG0GrxEWBHU6pd+hMsOOIC9aLUTDBM5aGlWYG3cV?=
+ =?us-ascii?Q?KCcnBTSRY9Y8DTjAXpd/+bfKkcvFBXcuOzfHcpg0lt/xnf9n1rMGwwlRESG3?=
+ =?us-ascii?Q?W6oZuWzYnT7/qMOi5dPP4kl0gl6losJUeXJfhWLfPqxHk4jYDSISjYXO6WHN?=
+ =?us-ascii?Q?HRbwO2JFoNuAh9T8Wd6PQZuwcQEIzsNzBz7pFMij?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="=-=7swh7BPSDg4j2aEnZZBjZatSbJeqHrz-S0s1=-="
+X-OriginatorOrg: windriver.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4108.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 940e11eb-5efd-4168-404f-08dbc5126f63
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Oct 2023 19:45:17.1303
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5x+GmG2O7wOq2yKp1BdNQtKi6Pl5URW97NPg+fLhITEsZRdDt3v/7TzW+F1+cwojnjyTMHZjWFnLARqpl+E74h9fQW+HNluOopGJj1VubVA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5055
+X-Proofpoint-ORIG-GUID: iK4X7JyyKxyCZTFNsvFXjd4ZSj03u-nM
+X-Proofpoint-GUID: iK4X7JyyKxyCZTFNsvFXjd4ZSj03u-nM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-04_10,2023-10-02_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1011 malwarescore=0 mlxlogscore=504 suspectscore=0
+ lowpriorityscore=0 phishscore=0 impostorscore=0 mlxscore=0 bulkscore=0
+ adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2309180000 definitions=main-2310040146
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-This is a multi-part message in MIME format.
+When cross compiling you need to break the mksignames compilation apart fro=
+m the rule that runs it.
+You run it against you sysroot for your target arch/platform and it grabs t=
+he correct signals from the sysroot instead of the host.
 
---=-=7swh7BPSDg4j2aEnZZBjZatSbJeqHrz-S0s1=-=
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-ID: <20231004174346.F7rJT%steffen@sdaoden.eu>
+Brian
+
+-----Original Message-----
+From: Steffen Nurpmeso <steffen@sdaoden.eu>=20
+Sent: Wednesday, October 4, 2023 1:44 PM
+To: Thorsten Otto <admin@tho-otto.de>
+Cc: dash@vger.kernel.org
+Subject: Re: Signal names when cross-compiling
+
+CAUTION: This email comes from a non Wind River email account!
+Do not click links or open attachments unless you recognize the sender and =
+know the content is safe.
 
 Hello.
 
 Thorsten Otto wrote in
  <19502212.sIn9rWBj0N@earendil>:
- |when cross-compiling dash, signames.c is generated by a mksignames \
- |that was 
- |compiled for the host. This will generate wrong signal mappings because 
- |obviously this will use the signal numbers of the build system, not the 
- |target.
+ |when cross-compiling dash, signames.c is generated by a mksignames \  |th=
+at was  |compiled for the host. This will generate wrong signal mappings be=
+cause  |obviously this will use the signal numbers of the build system, not=
+ the  |target.
  |
- |I currently dont't have no idea how to solve that, other than populating \
- |the 
- |signal_names array at runtime rather than compile time.
+ |I currently dont't have no idea how to solve that, other than populating =
+\  |the  |signal_names array at runtime rather than compile time.
 
-Actually i have no idea, but i do have a yet unused script for
-signals names (that mirrors one for errors names that is in use
-for years.  I will attach it.  It is meant for the MUA i maintain
-(a future lib part of it) and does lots of things you surely do
-not need, as it is for C and C++ and creates mapping tables for
-by-name etc lookups, the signal documentation strings etc etc.
-You run it local to create the portable stuff (uses perl, and the
-MUA i maintain for creating hash values), and then during compile
-time.  This compile_time() function is surely what you want, it
-requires some POSIX tools (awk, sort, rm) and a C compiler ($CC),
-actually only the preprocessing stage (much easier to let the
-compiler to the C preprocessor part), which' output is then
-parsed.  Eg
+Actually i have no idea, but i do have a yet unused script for signals name=
+s (that mirrors one for errors names that is in use for years.  I will atta=
+ch it.  It is meant for the MUA i maintain (a future lib part of it) and do=
+es lots of things you surely do not need, as it is for C and C++ and create=
+s mapping tables for by-name etc lookups, the signal documentation strings =
+etc etc.
+You run it local to create the portable stuff (uses perl, and the MUA i mai=
+ntain for creating hash values), and then during compile time.  This compil=
+e_time() function is surely what you want, it requires some POSIX tools (aw=
+k, sort, rm) and a C compiler ($CC), actually only the preprocessing stage =
+(much easier to let the compiler to the C preprocessor part), which' output=
+ is then parsed.  Eg
 
-  TARGET=./output-file sh su-make-signals.sh compile_time
+  TARGET=3D./output-file sh su-make-signals.sh compile_time
 
 --steffen
 |
 |Der Kragenbaer,                The moon bear,
 |der holt sich munter           he cheerfully and one by one
-|einen nach dem anderen runter  wa.ks himself off
-|(By Robert Gernhardt)
-
---=-=7swh7BPSDg4j2aEnZZBjZatSbJeqHrz-S0s1=-=
-Content-Type: application/x-sh; charset=us-ascii
-Content-Disposition: attachment; filename="su-make-signals.sh"
-Content-ID: <20231004174346.IWPYJ%steffen@sdaoden.eu>
-
-#!/bin/sh -
-#@ Either create src/su/gen-signals.h, or, at compile time, the OS<>SU map.
-#
-# Public Domain
-
-IN="${SRCDIR}"su/gen-signals.h
-XOUT=src/su/gen-signals.h
-
-# We use `csop' for hashing
-MAILX='LC_ALL=C s-nail -#:/'
-
-# Acceptable "longest distance" from hash-modulo-index to key
-MAXDISTANCE_PENALTY=6
-
-# Generate a more verbose output.  Not for shipout versions.
-VERB=1
-
-##
-
-LC_ALL=C
-export LC_ALL MAXDISTANCE_PENALTY VERB MAILX IN XOUT
-
-: ${awk:=awk}
-# Compile-time only
-: ${rm:=rm}
-: ${sort:=sort}
-
-# The set of signals we support {{{
-SIGNALS="
-	NONE='No signal' \
-	ABRT='Abort signal' \
-	ALRM='Timer signal' \
-	BUS='Bus error (bad memory access)' \
-	CHLD='Child stopped or terminated' \
-	CLD='Child stopped or terminated' \
-	CONT='Continue process if stopped' \
-	EMT='Emulator trap' \
-	FPE='Floating-point exception' \
-	HUP='Hangup of controlling terminal, or death of controlling process' \
-	ILL='Illegal instruction' \
-	INFO='Power failure' \
-	INT='Interrupt from keyboard' \
-	IO='I/O now possible' \
-	IOT='IOT trap / abort signal' \
-	KILL='Kill signal' \
-	LOST='File lock lost' \
-	PIPE='Broken pipe: write to pipe with no readers' \
-	POLL='Pollable event' \
-	PROF='Profiling timer expired' \
-	PWR='Power failure' \
-	QUIT='Quit from keyboard' \
-	SEGV='Segementation violation: invalid memory reference' \
-	STKFLT='Stack fault on coprocessor' \
-	STOP='Stop process' \
-	TSTP='Stop from terminal' \
-	SYS='Bad system call' \
-	TERM='Termination signal' \
-	TRAP='Trace or breakpoint trap' \
-	TTIN='Terminal input for background process' \
-	TTOU='Terminal output from background process' \
-	UNUSED='Bad system call' \
-	URG='Urgent condition on socket' \
-	USR1='User-defined signal 1' \
-	USR2='User-defined signal 2' \
-	VTALRM='Virtual alarm clock' \
-	XCPU='CPU time limit exceeded' \
-	XFSZ='File size limit exceeded' \
-	WINCH='Window resize signal' \
-"
-export SIGNALS
-# }}}
-
-signal_parse() {
-	j=\'
-	${awk} -v dodoc="${1}" -v incnone="${2}" -v input="${SIGNALS}" '
-		BEGIN{
-			for(i = 0;;){
-				voff = match(input, /[0-9a-zA-Z_]+(='${j}'[^'${j}']+)?/)
-				if(voff == 0)
-					break
-				v = substr(input, voff, RLENGTH)
-				input = substr(input, voff + RLENGTH)
-				doff = index(v, "=")
-				if(doff > 0){
-					d = substr(v, doff + 2, length(v) - doff - 1)
-					v = substr(v, 1, doff - 1)
-				}
-				if(!incnone && v == "NONE")
-					continue
-				print dodoc ? d : v
-			}
-		}
-	'
-}
-
-compile_time() { # {{{
-	[ -n "${TARGET}" ] || {
-		echo >&2 'Invalid usage'
-		exit 1
-	}
-	set -e
-	pipefail=
-	( set -o pipefail ) >/dev/null 2>&1 && pipefail=y
-	[ -n "${pipefail}" ] && set -o pipefail
-
-	{
-		printf '#include <signal.h>\nsu_SIGNAL_START\n'
-		for n in $(signal_parse 0 0); do
-			printf '#ifdef SIG%s\nSIG%s "%s"\n#else\n-1 "%s"\n#endif\n' $n $n $n $n
-		done
-	} > "${TARGET}".c
-
-	# The problem is that at least (some versions of) gcc mangle output.
-	# Ensure we get both arguments on one line.
-	# While here sort numerically.
-	${CC} -E "${TARGET}".c |
-		${awk} '
-			function stripsym(sym){
-				sym = substr(sym, 2)
-				sym = substr(sym, 1, length(sym) - 1)
-				return sym
-			}
-			BEGIN{hot=0; conti=0}
-			/^[	 ]*$/{next}
-			/^[	 ]*#/{next}
-			/^su_SIGNAL_START$/{hot=1; next}
-			{
-				if(!hot)
-					next
-				i = conti ? stripsym($1) "\n" : $1 " "
-				printf i
-				if(conti)
-					conti = 0
-				else if($2 != "")
-					printf "%s\n", stripsym($2)
-				else
-					conti = 1
-			}
-		' |
-		${sort} -n > "${TARGET}".txt
-
-	# EBCDIC/ASCII: we use \134 for reverse solidus \
-	j=\'
-	${awk} -v verb="${VERB}" -v input="${SIGNALS}" -v dat="${TARGET}.txt" '
-		BEGIN{
-			verb = (verb != 0) ? "	" : ""
-
-			# Read in our OS data
-
-			unavail = 0
-			max = 0
-			oscnt = 0
-			while((getline dl < dat) > 0){
-				split(dl, ia)
-
-				++oscnt
-				osnoa[oscnt] = ia[1]
-				osnaa[oscnt] = ia[2]
-
-				if(ia[1] < 0)
-					++unavail
-				else{
-					if(ia[1] > max)
-						max = ia[1]
-				}
-			}
-			close(dat)
-
-			# Maximum signal number defines the datatype to use.
-			# we warp all non-available errors to numbers too high
-			# to be regular errors, counting backwards
-
-			i = max + unavail + 1
-			if(i >= 65535){
-				t = "u32"
-				max = "0xFFFFFFFFu"
-			}else if(i >= 255){
-				t = "u16"
-				max = "0xFFFFu"
-			}else{
-				t = "u8"
-				max = "0xFFu"
-			}
-			print "#define su__SIG_NUMBER_TYPE " t
-			print "#define su__SIG_NUMBER_MAX " max
-
-			# Dump C table
-
-			cnt = 0
-			print "#define su__SIG_NUMBER_ENUM_C \134"
-
-			print verb "su_SIG_NONE = 0,\134"
-			++cnt
-
-			# Since our final table is searched with binary sort,
-			# place the non-available backward counting once last
-			unavail = j = k = 0
-			for(i = 1; i <= oscnt; ++i){
-				if(osnoa[i] >= 0){
-					map[osnaa[i]] = osnoa[i]
-					print verb "su_SIG_" osnaa[i] " = " osnoa[i] ",\134"
-					++cnt
-				}else{
-					++unavail
-					the_unavail[unavail] = "su_SIG_" osnaa[i] " = " "(su__SIG_NUMBER_MAX - " unavail ")"
-				}
-			}
-			for(i = unavail; i >= 1; --i){
-				print verb the_unavail[i] ",\134"
-				++cnt
-			}
-
-			print verb "su__SIG_NUMBER = " cnt
-
-			# The C++ mapping table
-
-			print "#ifdef __cplusplus"
-			print "# define su__CXX_SIG_NUMBER_ENUM \134"
-			print verb "none = su_SIG_NONE,\134"
-
-			unavail = 0
-			for(i = 1; i <= oscnt; ++i){
-				cxxn = tolower(osnaa[i])
-				if(cxxn !~ "^[_[:alpha:]]")
-					cxxn = "s" cxxn
-				if(osnoa[i] >= 0)
-					print verb cxxn " = su_SIG_" osnaa[i] ",\134"
-				else{
-					++unavail
-					the_unavail[unavail] = cxxn " = su_SIG_" osnaa[i]
-				}
-			}
-			for(i = unavail; i >= 1; --i){
-				print verb the_unavail[i] ",\134"
-				++cnt
-			}
-			print verb "s__number = su__SIG_NUMBER"
-
-			print "#endif /* __cplusplus */"
-
-			# And our OS signal -> name map offset table
-			# (This "OS" however includes the unavail ones)
-
-			voidoff = 0
-			for(mapoff = 0;; ++mapoff){
-				voff = match(input, /[0-9a-zA-Z_]+(='${j}'[^'${j}']+)?/)
-				if(voff == 0)
-					break
-
-				v = substr(input, voff, RLENGTH)
-				input = substr(input, voff + RLENGTH)
-				doff = index(v, "=")
-				if(doff > 0){
-					d = substr(v, doff + 2, length(v) - doff - 1)
-					v = substr(v, 1, doff - 1)
-				}
-				mapo[v] = mapoff
-				if(v == "UNUSED")
-					voidoff = mapoff
-			}
-
-			uniq = 0
-			print "#define su__SIG_NUMBER_VOIDOFF " voidoff
-			print "#define su__SIG_NUMBER_TO_MAPOFF \134"
-
-			print verb "a_X(0, 0) \134"
-			++uniq
-
-			unavail = 0
-			mapdups[0] = 1
-			for(i = 1; i <= oscnt; ++i){
-				if(osnoa[i] < 0){
-					the_unavail[++unavail] = i
-					continue
-				}
-				if(mapdups[osnoa[i]])
-					continue
-				mapdups[osnoa[i]] = 1
-				print verb "a_X(" osnoa[i] ", " mapo[osnaa[i]] ") \134"
-				++uniq
-			}
-
-			for(i = unavail; i >= 1; --i){
-				print verb "a_X(" "su__SIG_NUMBER_MAX - " i ", " mapo[osnaa[the_unavail[i]]] ")\134"
-				++uniq
-			}
-
-			print verb "a_X(su__SIG_NUMBER_MAX, su__SIG_NUMBER_VOIDOFF) \134"
-			++uniq
-			print verb "/* " uniq " unique members */"
-		}
-	' >> "${TARGET}"
-
-	${rm} "${TARGET}".*
-	exit 0
-} # }}}
-
-if [ ${#} -ne 0 ]; then
-	if [ "${1}" = noverbose ]; then
-		shift
-		VERB=0
-		export VERB
-	fi
-fi
-
-if [ ${#} -eq 1 ]; then
-	[ "${1}" = compile_time ] && compile_time
-elif [ ${#} -eq 0 ]; then
-	# Now start perl(1) without PERL5OPT set to avoid multibyte sequence errors
-	PERL5OPT= PERL5LIB= exec perl -x "${0}"
-fi
-echo >&2 'Invalid usage'
-exit 1
-
-#' PERL {{{
-# Thanks to perl(5) and its -x / #! perl / __END__ mechanism!
-# Why can env(1) not be used for such easy things in #!?
-#!perl
-
-use strict;
-use warnings;
-
-use FileHandle;
-use IPC::Open2;
-
-use sigtrap qw(handler cleanup normal-signals);
-
-my ($S, @ENTS, $CTOOL, $CTOOL_EXE) = ($ENV{VERB} ? '	' : '');
-
-sub main_fun{
-	create_ents();
-
-	create_c_tool();
-
-	hash_em();
-
-	dump_map(); # Starts output file
-
-	reverser(); # Ends output file
-
-	cleanup(undef);
-	exit 0
-}
-
-sub cleanup{
-	die "$CTOOL_EXE: couldn't unlink: $^E" if $CTOOL_EXE && -f $CTOOL_EXE && 1 != unlink $CTOOL_EXE;
-	die "$CTOOL: couldn't unlink: $^E" if $CTOOL && -f $CTOOL && 1 != unlink $CTOOL;
-	die "Terminating due to signal $_[0]" if $_[0]
-}
-
-sub basen{
-	my $n = $_[0];
-	$n =~ s/^(.*\/)?([^\/]+)$/$2/;
-	$n
-}
-
-sub create_ents{
-	my $input = $ENV{SIGNALS};
-	while($input =~ /([[:alnum:]_]+)='([^']+)'(.*)/){
-		$input = $3;
-		my %vals;
-		$vals{name} = $1;
-		$vals{doc} = $2;
-		push @ENTS, \%vals
-	}
-}
-
-sub create_c_tool{
-	$CTOOL = './tmp-signals-tool-' . $$ . '.c';
-	$CTOOL_EXE = $CTOOL . '.exe';
-
-	die "$CTOOL: open: $^E" unless open F, '>', $CTOOL;
-	print F '#define MAX_DISTANCE_PENALTY ', $ENV{MAXDISTANCE_PENALTY}, "\n";
-# >>>>>>>>>>>>>>>>>>>
-	print F <<'_EOT';
-#define __CREATE_SIGNALS_SH
-#define su_SOURCE
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#define su_NELEM(A) (sizeof(A) / sizeof((A)[0]))
-
-#define u32 uint32_t
-#define s32 int32_t
-#define u16 uint16_t
-#define u8 uint8_t
-
-struct a_corsig_map{
-	u32 csm_hash; /* Hash of name */
-	u32 csm_nameoff; /* Into a_corsig_names[] */
-	u32 csm_docoff; /* Into a_corsig_docs[] */
-	s32 csm_errno;	 /* OS signal value for this one */
-};
-
-_EOT
-
-	print F '#include "', $ENV{XOUT}, "\"\n\n";
-
-	print F <<'_EOT';
-static u8 seen_wraparound;
-static size_t longest_distance;
-
-static size_t
-next_prime(size_t no){ /* blush (brute force) */
-jredo:
-	++no;
-	for(size_t i = 3; i < no; i += 2)
-		if(no % i == 0)
-			goto jredo;
-	return no;
-}
-
-static size_t *
-reversy(size_t size){
-	struct a_corsig_map const *csmp = a_corsig_map, *csmaxp = csmp + su_NELEM(a_corsig_map);
-	size_t ldist = 0, *arr;
-
-	arr = (size_t*)malloc(sizeof *arr * size);
-	for(size_t i = 0; i < size; ++i)
-		arr[i] = su_NELEM(a_corsig_map);
-
-	seen_wraparound = 0;
-	longest_distance = 0;
-
-	while(csmp < csmaxp){
-		u32 hash = csmp->csm_hash, i = hash % size, l;
-
-		for(l = 0; arr[i] != su_NELEM(a_corsig_map); ++l)
-			if(++i == size){
-				seen_wraparound = 1;
-				i = 0;
-			}
-		if(l > longest_distance)
-			longest_distance = l;
-		arr[i] = (size_t)(csmp++ - a_corsig_map);
-	}
-	return arr;
-}
-
-int
-main(int argc, char **argv){
-	size_t *arr, size = su_NELEM(a_corsig_map);
-
-	fprintf(stderr, "Starting reversy, okeys=%zu\n", size);
-	for(;;){
-		arr = reversy(size = next_prime(size));
-		fprintf(stderr, " - size=%zu longest_distance=%zu seen_wraparound=%d\n",
-			size, longest_distance, seen_wraparound);
-		if(longest_distance <= MAX_DISTANCE_PENALTY)
-			break;
-		free(arr);
-	}
-
-	printf(
-		"#ifdef su_SOURCE /* Lock-out compile-time-tools */\n"
-		"# define a_CORSIG_REV_ILL %zuu\n"
-		"# define a_CORSIG_REV_PRIME %zuu\n"
-		"# define a_CORSIG_REV_LONGEST %zuu\n"
-		"# define a_CORSIG_REV_WRAPAROUND %d\n"
-		"static %s const a_corsig_revmap[a_CORSIG_REV_PRIME] = {\n%s",
-		su_NELEM(a_corsig_map), size, longest_distance, seen_wraparound,
-		argv[1], (argc > 2 ? "	" : ""));
-	for(size_t i = 0; i < size; ++i)
-		printf("%s%zuu", (i == 0 ? "" : (i % 10 == 0 ? (argc > 2 ? ",\n	" : ",\n") : (argc > 2 ? ", " : ","))),
-			arr[i]);
-	printf("\n};\n#endif /* su_SOURCE */\n");
-	return 0;
-}
-_EOT
-# <<<<<<<<<<<<<<<<<<<
-	close F
-}
-
-sub hash_em{
-	die "hash_em: open: $^E" unless my $pid = open2 *RFD, *WFD, $ENV{MAILX};
-	foreach my $e (@ENTS){
-		print WFD "csop hash32?case $e->{name}\n";
-		my $h = <RFD>;
-		chomp $h;
-		$e->{hash} = $h
-	}
-	print WFD "x\n";
-	waitpid $pid, 0;
-}
-
-sub dump_map{
-	my ($i, $alen);
-
-	die "$ENV{XOUT}: open: $^E" unless open F, '>', $ENV{XOUT};
-	print F '/*@ ', scalar basen($ENV{XOUT}), ', generated by ', scalar basen($0),
-		".\n *@ See core-signals.c for more */\n\n";
-
-	($i, $alen) = (0, 0);
-	print F '#ifdef su_SOURCE', "\n", 'static char const a_corsig_names[] = {', "\n";
-	($i, $alen) = (0, 0);
-	foreach my $e (@ENTS){
-		$e->{nameoff} = $alen;
-		my $k = $e->{name};
-		my $l = length $k;
-		my $a = join '\',\'', split(//, $k);
-		my (@fa);
-		print F "${S}/* $i. [$alen]+$l $k */\n" if $ENV{VERB};
-		print F "${S}'$a','\\0',\n";
-		++$i;
-		$alen += $l + 1
-	}
-	print F '};', "\n\n";
-
-	print F '# undef a_X', "\n", '# define a_X(X)', "\n";
-	print F 'static char const a_corsig_docs[] = {', "\n";
-	($i, $alen) = (0, 0);
-	foreach my $e (@ENTS){
-		$e->{docoff} = $alen;
-		my $k = $e->{doc};
-		my $l = length $k;
-		my $a = join '\',\'', split(//, $k);
-		my (@fa);
-		print F "${S}/* $i. [$alen]+$l $e->{name} */ ", "a_X(N_(\"$e->{doc}\"))\n" if $ENV{VERB};
-		print F "${S}'$a','\\0',\n";
-		++$i;
-		$alen += $l + 1
-	}
-	print F '};', "\n# undef a_X\n\n";
-
-	print F <<_EOT;
-# undef a_X
-# ifndef __CREATE_SIGNALS_SH
-#  define a_X(X) X
-# else
-#  define a_X(X) 0
-# endif
-static struct a_corsig_map const a_corsig_map[] = {
-_EOT
-	foreach my $e (@ENTS){
-		print F "${S}{$e->{hash}u, $e->{nameoff}u, $e->{docoff}u, a_X(su_SIG_$e->{name})},\n"
-	}
-	print F '};', "\n", '# undef a_X', "\n",
-		'#endif /* su_SOURCE */', "\n\n";
-
-	die "$ENV{XOUT}: close: $^E" unless close F
-}
-
-sub reverser{
-	my $argv2 = $ENV{VERB} ? ' verb' : '';
-	system("\$CC -I. -o $CTOOL_EXE $CTOOL");
-	my $t = (@ENTS < 0xFF ? 'u8' : (@ENTS < 0xFFFF ? 'u16' : 'u32'));
-	`$CTOOL_EXE $t$argv2 >> $ENV{XOUT}`
-}
-
-{package main; main_fun()}
-# }}}
-
-# s-itt-mode
-
---=-=7swh7BPSDg4j2aEnZZBjZatSbJeqHrz-S0s1=-=--
+|einen nach dem anderen runter  wa.ks himself off (By Robert Gernhardt)
