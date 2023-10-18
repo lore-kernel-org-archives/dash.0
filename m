@@ -2,55 +2,47 @@ Return-Path: <dash-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C5FEE7C4F1
-	for <linux-dash@archiver.kernel.org>; Wed,  4 Oct 2023 20:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BBDACDB482
+	for <linux-dash@archiver.kernel.org>; Wed, 18 Oct 2023 19:08:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233233AbjJDUQr convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-dash@archiver.kernel.org>);
-        Wed, 4 Oct 2023 16:16:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60670 "EHLO
+        id S229963AbjJRTIT (ORCPT <rfc822;linux-dash@archiver.kernel.org>);
+        Wed, 18 Oct 2023 15:08:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232977AbjJDUQr (ORCPT <rfc822;dash@vger.kernel.org>);
-        Wed, 4 Oct 2023 16:16:47 -0400
-Received: from sdaoden.eu (sdaoden.eu [217.144.132.164])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EABB993
-        for <dash@vger.kernel.org>; Wed,  4 Oct 2023 13:16:43 -0700 (PDT)
-Date:   Wed, 04 Oct 2023 22:16:41 +0200
-Author: Steffen Nurpmeso <steffen@sdaoden.eu>
-From:   Steffen Nurpmeso <steffen@sdaoden.eu>
-To:     "Kuhl, Brian" <brian.kuhl@windriver.com>
-Cc:     "dash@vger.kernel.org" <dash@vger.kernel.org>
-Subject: Re: Signal names when cross-compiling
-Message-ID: <20231004201641._qz4M%steffen@sdaoden.eu>
-In-Reply-To: <DM6PR11MB410813D5DE3610ABEB73C6F999CBA@DM6PR11MB4108.namprd11.prod.outlook.com>
-References: <19502212.sIn9rWBj0N@earendil>
- <20231004174346.gkjIE%steffen@sdaoden.eu>
- <DM6PR11MB410813D5DE3610ABEB73C6F999CBA@DM6PR11MB4108.namprd11.prod.outlook.com>
-User-Agent: s-nail v14.9.24-524-gd5f7c65f62
-OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
- url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
-BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
- the world can make no bugs.
+        with ESMTP id S231248AbjJRTIR (ORCPT <rfc822;dash@vger.kernel.org>);
+        Wed, 18 Oct 2023 15:08:17 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A4D109
+        for <dash@vger.kernel.org>; Wed, 18 Oct 2023 12:08:16 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97F61C433C8;
+        Wed, 18 Oct 2023 19:08:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1697656095;
+        bh=ZiBfzE6+qQPI57w+HRXmYofYgojcwSrAzgVoexEQlWY=;
+        h=Date:From:To:Subject:From;
+        b=AiJT7GupIDktCS5DLDNooOsu6GmlHUDANmiUFWxb+rcdTY2rJh1xkDRCwb2G2zEHD
+         G6YwwljU37JGdgVzak9NMDDGe52D1lnlEj12CCmRzBhzqrM0r1m8Y73VqFEN6lOcGi
+         usYh9bZBMtB5w0Azer7WjO+KMSJPTbwBiqjdL/jo=
+Date:   Wed, 18 Oct 2023 15:08:14 -0400
+From:   Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To:     dash@vger.kernel.org
+Subject: Migrating the dash list to new vger infrastructure
+Message-ID: <20231018-overstate-hubcap-edee89@meerkat>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <dash.vger.kernel.org>
 X-Mailing-List: dash@vger.kernel.org
 
-Kuhl, Brian wrote in
- <DM6PR11MB410813D5DE3610ABEB73C6F999CBA@DM6PR11MB4108.namprd11.prod.outl\
- ook.com>:
- |When cross compiling you need to break the mksignames compilation apart \
- |from the rule that runs it.
- |You run it against you sysroot for your target arch/platform and it \
- |grabs the correct signals from the sysroot instead of the host.
+Good day!
 
-Hä?
+I'd like to migrate the dash@vger.kernel.org list to the new infrastructure.
+We're still doing it list-by-list to make sure that we don't run into scaling
+issues with the new infra.
 
---steffen
-|
-|Der Kragenbaer,                The moon bear,
-|der holt sich munter           he cheerfully and one by one
-|einen nach dem anderen runter  wa.ks himself off
-|(By Robert Gernhardt)
+The process should be fully transparent and without downtime, so can be done
+at any time if you give the go-ahead.
+
+Best wishes,
+-K
