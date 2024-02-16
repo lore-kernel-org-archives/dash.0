@@ -1,97 +1,105 @@
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71ED12C1B8
-	for <dash@vger.kernel.org>; Thu,  8 Feb 2024 04:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244807E0F4
+	for <dash@vger.kernel.org>; Fri, 16 Feb 2024 16:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707365434; cv=none; b=s7HCRmxYQQueCQ6Fep1epVvKjqZpTpJ3hSlASEpiB5LTkUaMIKjJkCUuKVECmglbt1o/jOyWVFOosgaH8w8AQwi8TcL6SHukm7kMa6S0v1yCI63elYE3CvCgRjCkZNwzLop7H+2j0JIRS3HhTD4U57fbadU0yvCgYHAdz//qeeE=
+	t=1708101207; cv=none; b=LI6flp9cp+JB9utVoPf9rPKyVf+qT7LXLI6V06FpoA0EzuY8HYY+LgxNTP2PpolB+D6Fd5/1uZD84lGVoHehWM6UP2Fnlp8JHzpj/8QKymYsqNE74qdS1dgqvcvBccDVLGQShgA9MZGM/ttJIhv3jYxDy4nn+e/4V0RMWygHy6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707365434; c=relaxed/simple;
-	bh=N9EaVVpUOEuKKnT6HzZKuLzl8PCHn26Q+UX4F8lW5SY=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=Mvgqw488F9n52RQB9kok4ZdpNMOvp/cOx+b/O1G1u52vTskw3atu255adDAwgkgfTGfO+Hdd0u8IFiPM/pfwfhaQqXzpwAJkOqIScI8DjiKaaMMfQa6x+f/leSlhMhft3lBW2c4sVzm16e4HTKEmxIG79h3KJsFRpi7nvMU0bgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me; spf=pass smtp.mailfrom=larryv.me; dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b=CD+yR3QG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BueMByBV; arc=none smtp.client-ip=66.111.4.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=larryv.me
+	s=arc-20240116; t=1708101207; c=relaxed/simple;
+	bh=LU6edrgM9ArsOmDxZq9TxpNLcVIxpBb9/sgainEL7vo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B8H+g4Sm3bFr+ev2qvVZRo8QyuntS9Rv+f5q1egbmj/51rJLXQFDFlprTj/+YGSi5Cp4Iau+sjWeNEni1xBQOQaWvhSIi2AVgXXmfo8amABy0qsTNsAsoIFWzDF9e8CCfmfQGEcXR1SaVYwxhOmCiq9AeouP0Hvug46FBtMgNz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e+OkavjR; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b="CD+yR3QG";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="BueMByBV"
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.nyi.internal (Postfix) with ESMTP id 4D8615C00FC;
-	Wed,  7 Feb 2024 23:10:31 -0500 (EST)
-Received: from imap48 ([10.202.2.98])
-  by compute2.internal (MEProxy); Wed, 07 Feb 2024 23:10:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=larryv.me; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1707365431; x=1707451831; bh=AJNszBUMh4
-	DPHUyi+vrzC4jehCKfHiXrkNVRJc3sOFw=; b=CD+yR3QGr9qF5d6eRaJhMLWXpN
-	hs8cryW9QDYE8tm5lhtXtrQwNqt8cN/7E7f80X7WXLC0WyLygZ+KT/EmfLHw3utR
-	mCxTUn3Hgive9RI4xg2oFUocoRNOjoYfi6GPCYZBZSwHOTAxnv2DuJwwm/9d5MV7
-	3Q/mWqSl/0bdbCy/HsSRBNzwWyxBrmWqe0LDj2hv7BuOyHDTlZuDpep/6mHeiU1G
-	qfILFTBcoW/lgiKu8pstPMK2Kmi0F2XGG16tJqwoLNquTeJLD94xoZO/VqRngrIy
-	bPE/U6wTYolNiWf/9NT1BiYYpQR4k3wGyc6emLydTtAhZXGNQFO8vmkR9+ag==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1707365431; x=1707451831; bh=AJNszBUMh4DPHUyi+vrzC4jehCKf
-	HiXrkNVRJc3sOFw=; b=BueMByBVP7suDylk+bZMBOcEQaaNlIfUU9Yabgd7+uCA
-	p6qazIGsVRFruIwNy+W7p+6I+2bElmdTplMag+501HLFb1h7tZ3Yaxhw+iaWD32Z
-	Lw5AAR8FiaFOzzGvOBZtuhVySeKxzPVC7o3HDsXzjsVF7KI4x2+zvvQCbLAupWMg
-	O2MZ+QGn17/NKIKnjKiR+OK68QFh43zeWKbIphLibZyXXLxJacoeMVRqt56VKp1l
-	8vfDA5wrI9BKTjRmI+RLH9ANXxpSqjp7pCo92Sf5jLWhjY+jvYhwF+4Lu+BycfJ6
-	4iQ8tjTql+ekA8XtjVxpCisbB5LambsJGmzqeJy4zA==
-X-ME-Sender: <xms:N1TEZSB506sTn9Xd6fZwnA0gSOj05HIQLUTdo2BlJ42gPoGkBDyHHQ>
-    <xme:N1TEZchuU9mc00zZDJIbqsNPdqCqlw0V7UhzW45R2na6_MJgQoswXRY7pTqbCyD-X
-    fhDN1eSiqWA-UGCvw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrtdefgdeikecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecunecujfgurhepofgfggfkjghffffhvfevufgtsehttd
-    ertderreejnecuhfhrohhmpefnrgifrhgvnhgtvgcugggvlhojiihquhgviicuoehvqhes
-    lhgrrhhrhihvrdhmvgeqnecuggftrfgrthhtvghrnhepheejiedtjefhiefffeetvdfhtd
-    efhfdvheduveevgfegleeludejveetgfdthefgnecuffhomhgrihhnpegrphgrnhgrrdho
-    rhhgrdgruhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpehvqheslhgrrhhrhihvrdhmvg
-X-ME-Proxy: <xmx:N1TEZVkzzgUMNdDZV2ZiBBrvJiP60BC04n7OmGjVbXQjFVZnfCTXvg>
-    <xmx:N1TEZQw_3YN8Sf0oPktq3fL1vECp7vCeXkJZfEVGGabDewuTaGFmKw>
-    <xmx:N1TEZXRkLK-txG5If15ys8bxnMmuJoLa3TXrZhQaPlTIkgX1vPm79g>
-    <xmx:N1TEZaOyO4ChLy7N6bibySV1NikrsZsRQu82OjK3LjhMvje_CpQtRg>
-Feedback-ID: i0b2842c6:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 11FD231A0065; Wed,  7 Feb 2024 23:10:30 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-144-ge5821d614e-fm-20240125.002-ge5821d61
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e+OkavjR"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41242be3460so6337605e9.1
+        for <dash@vger.kernel.org>; Fri, 16 Feb 2024 08:33:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708101203; x=1708706003; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HXqSQGaW6wyqnxpQA/qilgbJhv0pohUYx1JjPT/9xs0=;
+        b=e+OkavjRHWlUXGLZJ6VA9iEspKpUf3PeTB1obTQsqn+WMncTHck9xADAx47gUmcrww
+         oRRip3p+4Yv6SdKXlsv13K3F69u5+K+Ru6vT7la9n4fKVwswZkVxXaVqGw6SX/CAyOPy
+         hYc0Xrx/pOAy7HAxOKiW5ZhkY0RMPIFgjCLzEQuaejCY31fwfLLHSpNEZfH+pWPn38Mc
+         kGpvqiOFj+zbyJHz0A91jQ2IDp3db2xF3Aykjlq+ci+2eKZIEv7I32gMS/urTpyQEcH4
+         vtODUvCUK3K4bhDSEV1hRlSHr6i/kINEBBMDrTxTrhifNInFVyDnO8hxtpEKWMkQ6iCr
+         mRZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708101203; x=1708706003;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HXqSQGaW6wyqnxpQA/qilgbJhv0pohUYx1JjPT/9xs0=;
+        b=YbFNNqUNy0ohTSoUT/YdGi1f0OX5iIuAq4IzsasXpM/iO0ljavf0e3NdjaWEnGP20K
+         yaGpyRm4v5ooY8i9xu+B+Wgw21pq/a2b3Vpv14+R/vziNXNd7FdbJCcWIp1kYTL4XPyz
+         k0+K3ViN4PUAawiQVje0FuUGQoJ3JfvyMgMYRPBX04hvy6WR012mJLLpdUOYJTqFFOG+
+         UVOtLTrhS/rmOWx+0MPphAdIqrNgTCKjVfWdOZCb1jTq4sQhiRDqtcC2OnT/nSW2Pzom
+         empiKqarPpmK6dJTyyb6DrI7RMbg8LNwtknDSkiGxiexfFqlbQWs1KLa4HP/V8qfpdMS
+         aDzQ==
+X-Gm-Message-State: AOJu0YwbCKeDjLYpDomOYRuTu3QHo1QfO4McVz4BzwRCZtHVPCFOlcLv
+	i0xG1ebOWASqAs7wIgQbeCF45M2243RVu9R8kkCCZrLuzK3g0S4r/USjKXAr1NQ=
+X-Google-Smtp-Source: AGHT+IFCjld2Qx1M81DdltHZ26xQPaF+VwenEN+L0gK+Tg9O2dQbtccdoQ+tJodGLSQEOHNAqo5TcA==
+X-Received: by 2002:a05:600c:4688:b0:412:3b33:d130 with SMTP id p8-20020a05600c468800b004123b33d130mr1803101wmo.25.1708101203245;
+        Fri, 16 Feb 2024 08:33:23 -0800 (PST)
+Received: from kali.home (lfbn-ren-1-787-165.w83-197.abo.wanadoo.fr. [83.197.114.165])
+        by smtp.gmail.com with ESMTPSA id 6-20020a05600c228600b00410ac2d6b40sm2801070wmf.8.2024.02.16.08.33.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Feb 2024 08:33:22 -0800 (PST)
+From: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+To: dash@vger.kernel.org
+Cc: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+Subject: [PATCH] configure.ac: drop -Wl,--fatal-warnings
+Date: Fri, 16 Feb 2024 17:33:19 +0100
+Message-ID: <20240216163319.860768-1-fontaine.fabrice@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <2a426634-f7ad-4845-a8b1-e4ca70a0a688@app.fastmail.com>
-In-Reply-To: 
- <aRG78GcOZDf-ubkUaw94g2nSB5t_9WEkn0kCvz-Ml4ZbIm3liEMn-Gc2ob6KbhOh7-AS48Fk0c7U-folOekEzPMd_DUVavdD6wH64m63ef8=@proton.me>
-References: 
- <viaF6idqZWuv2mRhxKCxmwfrikK6rWtbBkIrB2J-d5ftaPZAzAftfib9Kv3R1gdC0cC6zamlSG6YtkodLgFWhzb37y64dUBOwUIFvl903b4=@proton.me>
- <8a0c7152-a67f-45d2-9cba-62eb564e7bdc@app.fastmail.com>
- <aRG78GcOZDf-ubkUaw94g2nSB5t_9WEkn0kCvz-Ml4ZbIm3liEMn-Gc2ob6KbhOh7-AS48Fk0c7U-folOekEzPMd_DUVavdD6wH64m63ef8=@proton.me>
-Date: Wed, 07 Feb 2024 23:09:51 -0500
-From: =?UTF-8?Q?Lawrence_Vel=C3=A1zquez?= <vq@larryv.me>
-To: "Oliver Webb" <aquahobbyist@proton.me>
-Cc: dash@vger.kernel.org
-Subject: Re: (No Subject)
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 7, 2024, at 11:04 PM, Oliver Webb wrote:
-> Thanks, although the correct address appears to now be 
-> "dash+subscribe@vger.kernel.org",
-> since majordomo commands aren't supported anymore
+Drop -Wl,--fatal-warnings with --enable-static to avoid the following
+static build failure:
 
-Ah, I suppose that has something to do with the vger migration last
-October.  The homepage (<http://gondor.apana.org.au/~herbert/dash/>)
-should be updated then.
+configure:4778: checking for strtod
+configure:4778: /home/autobuild/autobuild/instance-8/output-1/host/bin/powerpc-buildroot-linux-uclibcspe-gcc -o conftest -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -mabi=spe -mfloat-gprs=single -Wa,-me500 -Os -g0  -static -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -static -Wl,--fatal-warnings conftest.c  >&5
+/home/autobuild/autobuild/instance-8/output-1/host/lib/gcc/powerpc-buildroot-linux-uclibcspe/8.4.0/../../../../powerpc-buildroot-linux-uclibcspe/bin/ld: warning: conftest has a LOAD segment with RWX permissions
+collect2: error: ld returned 1 exit status
 
+[...]
+
+In file included from arith_yylex.c:44:
+system.h:74:22: error: static declaration of 'strtod' follows non-static declaration
+ static inline double strtod(const char *nptr, char **endptr)
+                      ^~~~~~
+
+Fixes:
+ - http://autobuild.buildroot.org/results/a54fdc7d1b94beb47203373ae35b08d9cea8d42c
+
+Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 5524650..6993364 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -34,7 +34,7 @@ fi
+ AC_ARG_ENABLE(static, AS_HELP_STRING(--enable-static, \
+ 				     [Build statical linked program]))
+ if test "$enable_static" = "yes"; then
+-	export LDFLAGS="-static -Wl,--fatal-warnings"
++	export LDFLAGS="-static"
+ fi
+ 
+ AC_ARG_ENABLE(fnmatch, AS_HELP_STRING(--disable-fnmatch, \
 -- 
-vq
+2.43.0
+
