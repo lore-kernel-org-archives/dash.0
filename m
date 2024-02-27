@@ -1,122 +1,112 @@
-Received: from poodle.tulip.relay.mailchannels.net (poodle.tulip.relay.mailchannels.net [23.83.218.249])
+Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C891BF24
-	for <dash@vger.kernel.org>; Tue, 27 Feb 2024 03:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.249
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709005016; cv=pass; b=pIMcQG16bkDxygf3bDzPih37vyBggiyEFrfUoLU+SkikJ+fWFtH6AboUYOF1gDwPsuxPFA+UPMv9H5o2zeG/5I+4sPEvf3lLTXN5Zs0dzRqAl6w+IKPwQ9OxxmMv5ND/ZyjbsSz3JwcsW1Ez5aHS6Zt8eyazqI1zNSmxCPhtTWg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709005016; c=relaxed/simple;
-	bh=4pDHYldWXOpY1rusWIVdYHyZmqpLY/khG5Sap79xKZo=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Y0w1TCIZhRNQAnS1Qqvo825YiiBpKbb8sOBLlERz8syb8sz/C+lP5TcXWhh/2vk+VnTpXhIcvOuFvi5oo94iSojBYMhRaHDLELRSE8BMIeETmjSEM7OaihO6pn/9LZO5MhK6xMaDalH0dYC98xUT2ocpNqNLIAw8W65cbOGlHno=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.218.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id CB1607A2DE5;
-	Tue, 27 Feb 2024 03:28:55 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (unknown [127.0.0.6])
-	(Authenticated sender: instrampxe0y3a)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 027877A2DA0;
-	Tue, 27 Feb 2024 03:28:54 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1709004535; a=rsa-sha256;
-	cv=none;
-	b=Ls/XnSdNjJTW173xSbVNCdupToXJrN29NRsaPvLHlTHflZfTCWnJ+NuLYo+R0mLYDB1yC0
-	c4ziJc8Hg2DtLQFuAzx3NUwM9r0cWdhrwsD+quewSpWUBUo9rncEnDtMj8JaHZW99AYph9
-	SyXQvxR/R0NHxtYWbMtS0B93z5Wyq8m5C4Af30ZdZumOaeAQmRptWTBABAO7qV/rUkCoAt
-	ps5H4Vc6EaDNR5CJsULneIhEq5RMgGsLsCxEfCbh58S/IP1hCWVVQzSUylOq6loyxs2C1n
-	SxI9j4Slbq+47G+WPhgCgPrmEXMC/SBG3mfDkHv2BuUNjk9FH/S8httlReuRIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1709004535;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XwOgXVbn3DhRFRjtrYcuO1FxLfftpbNhEE/TJaazZuE=;
-	b=5wdcLmfKmJvNPvJs0OSSlsXD36NdbiHGxdXfXdlHOAykta6XqwouUVcVg3HuDDX3FtkyA5
-	bb6ZQei93wUsNBTINgkK+Dfpo6G4ShOXxb2v+v0g5GOGozwVL1CsxwRj/GNtLF3swB5dMu
-	9jeZccKasv9GfGjkr2vX9YPjrpxatLXIwU1Bbr9mg1dzF+F6SN2dcVJIo2Ye+D8bg2jA+P
-	6siYeghAL0V0i0t3ecyxl8L5BCpZpTlJr8IJKGYDihT/Kcxs8mDwI3kfRMKDWUXqLvfc+h
-	vuheWISEuP15GzH7Q//+SSieFHsolG8dq8+DyktFA2rOcKjgjTJFtCZLg9Ahpg==
-ARC-Authentication-Results: i=1;
-	rspamd-55b4bfd7cb-6kzsj;
-	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Chief-Supply: 075e0f0466b09634_1709004535638_2067403097
-X-MC-Loop-Signature: 1709004535638:4095156185
-X-MC-Ingress-Time: 1709004535638
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384)
-	by 100.112.142.233 (trex/6.9.2);
-	Tue, 27 Feb 2024 03:28:55 +0000
-Received: from p5b0edc93.dip0.t-ipconnect.de ([91.14.220.147]:43016 helo=heisenberg.fritz.box)
-	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <calestyo@scientia.org>)
-	id 1reo9A-00076I-2e;
-	Tue, 27 Feb 2024 03:28:51 +0000
-Message-ID: <fdaa6e5ea49f1eecae637929d8c3e7feb84bbd5e.camel@scientia.org>
-Subject: Re: wrong behaviour when unsetting/setting some variables
-From: Christoph Anton Mitterer <calestyo@scientia.org>
-To: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
-Date: Tue, 27 Feb 2024 04:28:46 +0100
-In-Reply-To: <18ce9b6d-f9fa-467a-ab3b-5a4ddc5ed36b@gigawatt.nl>
-References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
-	 <18ce9b6d-f9fa-467a-ab3b-5a4ddc5ed36b@gigawatt.nl>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3-1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CD24D9E0
+	for <dash@vger.kernel.org>; Tue, 27 Feb 2024 04:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709007820; cv=none; b=HK5X1kuH3Er21oH2U/blEnSPA2HJkS/7SNSTMhoz11NlO2NqrfeSMsJePNrcDHDWyku+I1+FCJQymK3afBqyacem1dGJ6+AstUSJLeRIogO8l6O3HmZURbZ0qM5fBL5tQ9tNiTQHfiN2BW7tQWMQbPh+TY4ARRrkBvgGKbFyWD8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709007820; c=relaxed/simple;
+	bh=OGMMw+wgYW3erNZnIVCDIXlljlkKrwlYrs+zixeXx1w=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=rwf38TxBhKXGgZ5Wp4k1XY2NXLFOS6BW1X+IZWCQUSeqjXY/cVVwEKbsV0iXAGN6exuqPVlFZoZndRcDUEscenDZFalflJt7eiJosAe4SJ8SjgYsxKwYfPThlMUvzVWkHZzSmAFLQbI6BV+Y63U7NB2DYM+dZx5jZ1MuDdYMk6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me; spf=pass smtp.mailfrom=larryv.me; dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b=UuyoJWGe; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=haQikzbG; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=larryv.me
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b="UuyoJWGe";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="haQikzbG"
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id A21C71140092;
+	Mon, 26 Feb 2024 23:23:37 -0500 (EST)
+Received: from imap48 ([10.202.2.98])
+  by compute2.internal (MEProxy); Mon, 26 Feb 2024 23:23:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=larryv.me; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1709007817;
+	 x=1709094217; bh=oNxO4JwqzwXU4XJzMXQg8UdZYuXA5ykshkEOsvw2Y5E=; b=
+	UuyoJWGeKPbi+cZPkqmLSycG5XyPOZpeJh0slY3xw2D4TZAta7tF24LAshEcABOl
+	fk2m5lcq+xUdW7c6gmOq+OIWqF4DnM0hByk2MGhMttEf1x84Uhdq7UfmQYCmt7lq
+	Fuq0LsfdpHljr+sByWP9gXBxBS0HBVCyLrHCF66kupPMu4/l8UMFR52zpkLMfr87
+	Aq+0hUWqcD1zt99ybAzcn9j/FivJUtpdDtVpIC0F9oxEvDCKHFZP9wY6OMgVJN6U
+	b1egj5mvWBMQ6HnOCKF+gtBvp8rJN94W6vwwTeszBLNKS+iG6+EUao/xoHd/4qVn
+	3fuby7MmoNNZr7Gdn04D7g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1709007817; x=
+	1709094217; bh=oNxO4JwqzwXU4XJzMXQg8UdZYuXA5ykshkEOsvw2Y5E=; b=h
+	aQikzbG8hmvbedxoMTwakVcT73WLtQbuuVl78aZ6frFqYDBKl+6fZv0+6sJseuFB
+	7jlXstPrwaFcLGGUrc1vC2/AQXiCQXK/nA2hBL+bDnbhTR6o3cnDCGKQBB4KmKpg
+	57IY9ocZSLlpfLKhmazogaQKXZIayYY9gQ36cgsXxqAx9J7DieM/azUqW3lr2Cdg
+	NCkljizKSHBT1HsVowK7QgU3SuMh/GegOMFk8dh6+7F6/8/1yA3pem5sG701W+um
+	fVDgv1CZAgSKpdzKctMGyx5xK24CgpSyHdfZRD6+AfOngCdXHWj8a5C7qVLQpsHw
+	uUyuQG5+b8f+AHl5wgeHw==
+X-ME-Sender: <xms:yWPdZZIMH1fUPSeEoCiA7LLNEH4CpcSmyXWDqcZh4rHHmtSqTQPd6Q>
+    <xme:yWPdZVKiEXgSzDwJ5lfj_ihTM41Wm7kuDISZgSBJjHL8OyFTxbwYpPpuBQmYvUNwa
+    WcERQ9Wv8tRau6asA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrgeefgdeilecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecunecujfgurhepofgfggfkjghffffhvfevufgtgfesth
+    hqredtreerjeenucfhrhhomhepnfgrfihrvghntggvucggvghljoiiqhhuvgiiuceovhhq
+    sehlrghrrhihvhdrmhgvqeenucggtffrrghtthgvrhhnpeelleefgedutdegjeelgfdule
+    fgvdffvdelhfduhfelheekgedvkeffjefhkeegveenucevlhhushhtvghrufhiiigvpedt
+    necurfgrrhgrmhepmhgrihhlfhhrohhmpehvqheslhgrrhhrhihvrdhmvg
+X-ME-Proxy: <xmx:yWPdZRshUK7bO92ma6qc3DoSfegJbgq0yXlfKN9oiMCwpp198W8zdA>
+    <xmx:yWPdZabGo2mjikQPNx8tdqbJ2hoFtzbftFz5LEkDUWViybTsmagSyw>
+    <xmx:yWPdZQZ9gHC3dnCIGVAz6NFuYbqGMqUVRajYTJqP0SURlUO-jTtwxQ>
+    <xmx:yWPdZbzA0kEQGsiKVtM9_Sqzj1gMrNCfTPPyjIXsX2bukdkVN8tjiA>
+Feedback-ID: i0b2842c6:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 6260A31A0066; Mon, 26 Feb 2024 23:23:37 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-153-g7e3bb84806-fm-20240215.007-g7e3bb848
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AuthUser: calestyo@scientia.org
+Message-Id: <e1f38631-18fa-4962-89ee-d9bddd83eb58@app.fastmail.com>
+In-Reply-To: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
+References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
+Date: Mon, 26 Feb 2024 23:23:16 -0500
+From: =?UTF-8?Q?Lawrence_Vel=C3=A1zquez?= <vq@larryv.me>
+To: "Christoph Anton Mitterer" <calestyo@scientia.org>
+Cc: dash@vger.kernel.org
+Subject: Re: wrong behaviour when unsetting/setting some variables
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2024-02-27 at 03:07 +0000, Harald van Dijk wrote:
-> I suspect the reason you don't see it happen with TERM, LINENO, and=20
-> HISTSIZE is because you have built dash in a configuration in which=20
-> these variables are not special.
+On Mon, Feb 26, 2024, at 9:07 PM, Christoph Anton Mitterer wrote:
+> The consequence of that is at least, that one has no chance to fully
+> unset these variables and even if they loose their value, they=E2=80=99=
+ll be
+> exported to executed commands, possibly altering their behaviour.
 
-Ah, I see... well I merely took the Debian unstable version of it.
+They are not exported.
 
+	% env -i /opt/local/bin/dash
+	$ export MAIL=3Dv
+	$ unset -v MAIL
+	$ export
+	export MAIL
+	export PWD=3D'/private/tmp'
+	$ env
+	PWD=3D/private/tmp
 
-> For special variables, we get to
->=20
-> =C2=A0=C2=A0 flags |=3D vp->flags & ~(VTEXTFIXED|VSTACK|VNOSAVE|VUNSET);
->=20
-> where we preserve the VEXPORT of the previous value. In case of
-> VUNSET,=20
-> we should not be doing that. I agree with your expectations, unset=20
-> should clear the export attribute.
+Their local counterparts are not exported, either.
 
-So is it really just:
-   --- a/src/var.c	2024-02-27 04:25:32.000000000 +0100
-   +++ b/src/var.c	2024-02-27 04:22:40.744456151 +0100
-   @@ -295,7 +295,7 @@
-    			goto out;
-    		}
-   =20
-   -		flags |=3D vp->flags & ~(VTEXTFIXED|VSTACK|VNOSAVE|VUNSET);
-   +		flags |=3D vp->flags & ~(VEXPORT|VTEXTFIXED|VSTACK|VNOSAVE|VUNSET);
-    	} else {
-    		if (flags & VNOSET)
-    			goto out;
+	% env -i /opt/local/bin/dash
+	$ f() { local FOO=3Dv; export FOO; unset -v FOO; export; env; }
+	$ f
+	export FOO
+	export PWD=3D'/private/tmp'
+	PWD=3D/private/tmp
 
-I had even had that before, and it seemed to work, but wasn't really
-sure whether it doesn't mess anything up behind the scenes which I
-didn't understand.
-
-If so, are you going to send a proper - or shall I?
-
-Thanks,
-Chris.
+--=20
+vq
