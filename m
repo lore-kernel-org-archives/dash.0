@@ -1,112 +1,140 @@
-Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+Received: from seashell.cherry.relay.mailchannels.net (seashell.cherry.relay.mailchannels.net [23.83.223.162])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CD24D9E0
-	for <dash@vger.kernel.org>; Tue, 27 Feb 2024 04:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709007820; cv=none; b=HK5X1kuH3Er21oH2U/blEnSPA2HJkS/7SNSTMhoz11NlO2NqrfeSMsJePNrcDHDWyku+I1+FCJQymK3afBqyacem1dGJ6+AstUSJLeRIogO8l6O3HmZURbZ0qM5fBL5tQ9tNiTQHfiN2BW7tQWMQbPh+TY4ARRrkBvgGKbFyWD8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709007820; c=relaxed/simple;
-	bh=OGMMw+wgYW3erNZnIVCDIXlljlkKrwlYrs+zixeXx1w=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=rwf38TxBhKXGgZ5Wp4k1XY2NXLFOS6BW1X+IZWCQUSeqjXY/cVVwEKbsV0iXAGN6exuqPVlFZoZndRcDUEscenDZFalflJt7eiJosAe4SJ8SjgYsxKwYfPThlMUvzVWkHZzSmAFLQbI6BV+Y63U7NB2DYM+dZx5jZ1MuDdYMk6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me; spf=pass smtp.mailfrom=larryv.me; dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b=UuyoJWGe; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=haQikzbG; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=larryv.me
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b="UuyoJWGe";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="haQikzbG"
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id A21C71140092;
-	Mon, 26 Feb 2024 23:23:37 -0500 (EST)
-Received: from imap48 ([10.202.2.98])
-  by compute2.internal (MEProxy); Mon, 26 Feb 2024 23:23:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=larryv.me; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1709007817;
-	 x=1709094217; bh=oNxO4JwqzwXU4XJzMXQg8UdZYuXA5ykshkEOsvw2Y5E=; b=
-	UuyoJWGeKPbi+cZPkqmLSycG5XyPOZpeJh0slY3xw2D4TZAta7tF24LAshEcABOl
-	fk2m5lcq+xUdW7c6gmOq+OIWqF4DnM0hByk2MGhMttEf1x84Uhdq7UfmQYCmt7lq
-	Fuq0LsfdpHljr+sByWP9gXBxBS0HBVCyLrHCF66kupPMu4/l8UMFR52zpkLMfr87
-	Aq+0hUWqcD1zt99ybAzcn9j/FivJUtpdDtVpIC0F9oxEvDCKHFZP9wY6OMgVJN6U
-	b1egj5mvWBMQ6HnOCKF+gtBvp8rJN94W6vwwTeszBLNKS+iG6+EUao/xoHd/4qVn
-	3fuby7MmoNNZr7Gdn04D7g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1709007817; x=
-	1709094217; bh=oNxO4JwqzwXU4XJzMXQg8UdZYuXA5ykshkEOsvw2Y5E=; b=h
-	aQikzbG8hmvbedxoMTwakVcT73WLtQbuuVl78aZ6frFqYDBKl+6fZv0+6sJseuFB
-	7jlXstPrwaFcLGGUrc1vC2/AQXiCQXK/nA2hBL+bDnbhTR6o3cnDCGKQBB4KmKpg
-	57IY9ocZSLlpfLKhmazogaQKXZIayYY9gQ36cgsXxqAx9J7DieM/azUqW3lr2Cdg
-	NCkljizKSHBT1HsVowK7QgU3SuMh/GegOMFk8dh6+7F6/8/1yA3pem5sG701W+um
-	fVDgv1CZAgSKpdzKctMGyx5xK24CgpSyHdfZRD6+AfOngCdXHWj8a5C7qVLQpsHw
-	uUyuQG5+b8f+AHl5wgeHw==
-X-ME-Sender: <xms:yWPdZZIMH1fUPSeEoCiA7LLNEH4CpcSmyXWDqcZh4rHHmtSqTQPd6Q>
-    <xme:yWPdZVKiEXgSzDwJ5lfj_ihTM41Wm7kuDISZgSBJjHL8OyFTxbwYpPpuBQmYvUNwa
-    WcERQ9Wv8tRau6asA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrgeefgdeilecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecunecujfgurhepofgfggfkjghffffhvfevufgtgfesth
-    hqredtreerjeenucfhrhhomhepnfgrfihrvghntggvucggvghljoiiqhhuvgiiuceovhhq
-    sehlrghrrhihvhdrmhgvqeenucggtffrrghtthgvrhhnpeelleefgedutdegjeelgfdule
-    fgvdffvdelhfduhfelheekgedvkeffjefhkeegveenucevlhhushhtvghrufhiiigvpedt
-    necurfgrrhgrmhepmhgrihhlfhhrohhmpehvqheslhgrrhhrhihvrdhmvg
-X-ME-Proxy: <xmx:yWPdZRshUK7bO92ma6qc3DoSfegJbgq0yXlfKN9oiMCwpp198W8zdA>
-    <xmx:yWPdZabGo2mjikQPNx8tdqbJ2hoFtzbftFz5LEkDUWViybTsmagSyw>
-    <xmx:yWPdZQZ9gHC3dnCIGVAz6NFuYbqGMqUVRajYTJqP0SURlUO-jTtwxQ>
-    <xmx:yWPdZbzA0kEQGsiKVtM9_Sqzj1gMrNCfTPPyjIXsX2bukdkVN8tjiA>
-Feedback-ID: i0b2842c6:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 6260A31A0066; Mon, 26 Feb 2024 23:23:37 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-153-g7e3bb84806-fm-20240215.007-g7e3bb848
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACDD2D04E
+	for <dash@vger.kernel.org>; Tue, 27 Feb 2024 05:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.223.162
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709011625; cv=pass; b=j8jtxsHNGhL97QJpUV4DGYOkoMsZadAQPYFFheNhrrSsaGWwVkWbJJU5yha1LgAQIfn27AFPx/s1WU87W+G/PVML+eMtLZRXMu0wstVj2xyTXDIM4axKcrYTvqQidyJIjFlOkp38BPTUufj2W8PDlkCowWMys68IWMgzPLq6NkA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709011625; c=relaxed/simple;
+	bh=eIcSEfth5pivFWmBuLXWG7x7Lp3ccoQneyIxGGaR6Ck=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZaLYuvxJxlwOJNjUvOcUt6QBEVLRlCj7EkP6hO283jJWm2YHteqgFCTym54Y9Au+3X8nkEJ3921qIgqeCjcBjeIREU9EWgRdx33/vHcEhd/2WkvcweIUwFdxvY52YlH5Cn2UybAQvO+IN9RQgLGtilKS/QkqM1n4AByPjw/6wsk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.223.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 9253C362DA8;
+	Tue, 27 Feb 2024 05:11:10 +0000 (UTC)
+Received: from cpanel-007-fra.hostingww.com (unknown [127.0.0.6])
+	(Authenticated sender: instrampxe0y3a)
+	by relay.mailchannels.net (Postfix) with ESMTPA id AADAE363960;
+	Tue, 27 Feb 2024 05:11:09 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1709010670; a=rsa-sha256;
+	cv=none;
+	b=IYbxZTci4ajq9PgMS33En5odVPSn0FStcieqEPABNuICjtljsEikeqegb2p4KX7eFHr/n3
+	QxrAOtUrbT+PzaeVSuuY/GaWDJrxbcETwxnu2dsYDGyp5kYOrNlGZ5AredTvtPG0DIFZzy
+	GWTDCo2eyYSdhQCxc8sQ09yox6fjvjbSkT3kaqJQBKuOpDoWDdMUUx13FG9WSEigGSsfRS
+	5+unLpH++3bJ+YzLlQx6KaIfosmozuAAepVBEUt/adkmDjz7bmSOUI8RInHJklkuHtxicv
+	/VeEdXARx1lM5sIesxnK4JmKt7YtlNaToblbG5ebxiMhNYz57DhT7TS/O9VOGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1709010670;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W+g4wZooqotDvr51GZpp48Vg5C5btIZC3cjqPAZcBg8=;
+	b=0hF7UD2ZTWsgbGSuHIxDEv6Q8UZDhDOLKcLEmr8wd94zHXieqApdrG8tqb7ZULQq3EXOQx
+	0YRb1KKtVkS+uAzMG4ZnaKtto9jrbM8ZUTwSl+eimmxEMK3+i0nyTuZphcToncf0v6JE3k
+	VYLxgULXFgK7qXd5+ssOxZ+uIGKkSGnpcmeMulKFUnY6+yxBi6T7rlfgx65CtZwXZNHpKW
+	abt6UlFfHKiugWxHNgQOyVFMeqgb7EsOOwIQi5Czxj7S3aZtVMzeFD8JVLoQCaqw9EZcXL
+	9xO2ksDfTYlQc5oshWbABH73xLVh/Rv2d8oIWS9hRkgaLEIrQUSWYLzVSHjfdQ==
+ARC-Authentication-Results: i=1;
+	rspamd-55b4bfd7cb-dbnc6;
+	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MailChannels-Auth-Id: instrampxe0y3a
+X-Reaction-Attack: 56f27ac725d7a120_1709010670350_1095159486
+X-MC-Loop-Signature: 1709010670350:587469200
+X-MC-Ingress-Time: 1709010670349
+Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
+ [3.69.87.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384)
+	by 100.101.14.245 (trex/6.9.2);
+	Tue, 27 Feb 2024 05:11:10 +0000
+Received: from p5b0edc93.dip0.t-ipconnect.de ([91.14.220.147]:54228 helo=heisenberg.fritz.box)
+	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <calestyo@scientia.org>)
+	id 1repk9-0008IL-1w;
+	Tue, 27 Feb 2024 05:11:08 +0000
+Message-ID: <f101dc542647549d78bb17c96b88055874f5e722.camel@scientia.org>
+Subject: Re: wrong behaviour when unsetting/setting some variables
+From: Christoph Anton Mitterer <calestyo@scientia.org>
+To: Lawrence =?ISO-8859-1?Q?Vel=E1zquez?= <vq@larryv.me>
+Cc: dash@vger.kernel.org
+Date: Tue, 27 Feb 2024 06:11:03 +0100
+In-Reply-To: <e1f38631-18fa-4962-89ee-d9bddd83eb58@app.fastmail.com>
+References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
+	 <e1f38631-18fa-4962-89ee-d9bddd83eb58@app.fastmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3-1 
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <e1f38631-18fa-4962-89ee-d9bddd83eb58@app.fastmail.com>
-In-Reply-To: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
-References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
-Date: Mon, 26 Feb 2024 23:23:16 -0500
-From: =?UTF-8?Q?Lawrence_Vel=C3=A1zquez?= <vq@larryv.me>
-To: "Christoph Anton Mitterer" <calestyo@scientia.org>
-Cc: dash@vger.kernel.org
-Subject: Re: wrong behaviour when unsetting/setting some variables
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-AuthUser: calestyo@scientia.org
 
-On Mon, Feb 26, 2024, at 9:07 PM, Christoph Anton Mitterer wrote:
-> The consequence of that is at least, that one has no chance to fully
-> unset these variables and even if they loose their value, they=E2=80=99=
-ll be
-> exported to executed commands, possibly altering their behaviour.
+On Mon, 2024-02-26 at 23:23 -0500, Lawrence Vel=C3=A1zquez wrote:
+> They are not exported.
+>=20
+> 	% env -i /opt/local/bin/dash
+> 	$ export MAIL=3Dv
+> 	$ unset -v MAIL
+> 	$ export
+> 	export MAIL
+> 	export PWD=3D'/private/tmp'
+> 	$ env
+> 	PWD=3D/private/tmp
+>=20
+> Their local counterparts are not exported, either.
+>=20
+> 	% env -i /opt/local/bin/dash
+> 	$ f() { local FOO=3Dv; export FOO; unset -v FOO; export; env;
+> }
+> 	$ f
+> 	export FOO
+> 	export PWD=3D'/private/tmp'
+> 	PWD=3D/private/tmp
 
-They are not exported.
+Interesting.
+I guess it simply doesn't export any vars for which no value is set
+(i.e. not even the empty value)?!
 
-	% env -i /opt/local/bin/dash
-	$ export MAIL=3Dv
-	$ unset -v MAIL
-	$ export
-	export MAIL
-	export PWD=3D'/private/tmp'
-	$ env
-	PWD=3D/private/tmp
 
-Their local counterparts are not exported, either.
+Is that POSIXly correct?
 
-	% env -i /opt/local/bin/dash
-	$ f() { local FOO=3Dv; export FOO; unset -v FOO; export; env; }
-	$ f
-	export FOO
-	export PWD=3D'/private/tmp'
-	PWD=3D/private/tmp
 
---=20
-vq
+Even draft 4.1 says only:
+> The shell shall give the export attribute to the variables
+> corresponding to the specified names, which shall cause them to be
+> in the environment of subsequently executed commands.
+at the description of export.
+
+It doesn't say that variables with just the attribute should not be
+exported.
+
+OTOH, 8.1 Environment Variable Definition says:
+> The array is pointed to by the external variable environ, which is
+> defined as:
+> extern char **environ;
+> These strings have the form name=3Dvalue;
+
+So one might argue, that env vars must have some =3Dvalue, and that this
+couldn't be done for exported shell vars with no (not even the empty)
+value.
+
+
+It does seem to export a local exported var, if it has some value.
+
+
+Cheers,
+Chris.
