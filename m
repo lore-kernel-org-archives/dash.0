@@ -1,107 +1,104 @@
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CC8132C1E
-	for <dash@vger.kernel.org>; Thu, 29 Feb 2024 18:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709232966; cv=none; b=mhIvBtA9FHY9j6tEd785uRx9uFvOARLiCq6TY6FVfvnoQ6bax1OamKuoDVnEZj5+0OhsanLh5fCYoo0W8Vi7UAyeg/NJdraQqn21SfceJbe90FGAqpk+VtstkLM97eJB/BPRenH9NoKeB50C1qyb/Ow+YAZapjYdP+cZXig89t4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709232966; c=relaxed/simple;
-	bh=I7XPBgU11n2gscVP1Jv2Vuow8J+zWA1rt8yVqSmt7ac=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=fqu2HfUtU9Rnk61CxUR6vTGT2tzBfdopGReyu2ZvoAHdau5DrZKjizkU3W7W/K0mfr38q5RctTHbB2WLNPF0/DAmHZ74DwQXhyJ0G658PyUSGGsT5vpzbEkFdZjAhSsKr3MDXtSKIbVkasVDElUnFKybNQnayPTfdhwr2Y9j1J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=P6HEM+vN; arc=none smtp.client-ip=51.68.198.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="P6HEM+vN"
-Received: from [IPV6:2a02:8010:68a1:0:e69:c5c8:93ab:b95] (unknown [IPv6:2a02:8010:68a1:0:e69:c5c8:93ab:b95])
-	by mail.gigawatt.nl (Postfix) with ESMTPSA id 45B90162B;
-	Thu, 29 Feb 2024 18:56:01 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 45B90162B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1709232961;
-	bh=cXqFIUR4C0tzCqNumEwQ44FenOH6RU05b7UYQ7eE+vI=; l=2668;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=P6HEM+vNx/3LMwX1NVSkjPMY4/W9vxK2QTHWc7ch3eOcg+W8/c5HwVP4mZvremYCK
-	 +YLxDFeftMIm2HQBEjECc5mH5t31cWwJHT10MoRqoh8w1eW6ThJ3zkUvtyaCfU32lF
-	 MFn3Q91AAXwT2t3C0KX//vmAui+OnTa+jmkBimis=
-Message-ID: <6e4e70da-b137-44c9-944a-4b4eb4ef2174@gigawatt.nl>
-Date: Thu, 29 Feb 2024 18:56:00 +0000
+Received: from buffalo.tulip.relay.mailchannels.net (buffalo.tulip.relay.mailchannels.net [23.83.218.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40FC13C9FE
+	for <dash@vger.kernel.org>; Thu, 29 Feb 2024 20:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709238065; cv=pass; b=E+YwvVcjfrwXhzL8zMUVYhTpAZhxGwxnSAZZ9HLxaNDtft5cAVnhc2szK+7MdFJynnqADnxk6nQClB6ylkXwMw5MAL/x5rmUyqVc5mXt7nmQ4QjpeRa682ggLj85v4rkUCy11BTlps7+ZAKRpaeYxh4Odn+zyaNOrhZsbtyX1/M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709238065; c=relaxed/simple;
+	bh=UW0n4zKTz1tj3z6gOq49C07o/bofextU/zdMuMEX92M=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ng10Xi3y9EhlPkdD4oOaZsjPDxspUVV4Err1rMXBdYaMPWE5EEjj06gnGxcZcgRMPkVHRKBW/M4aBBsrDSVpWdqGCcR5ixGTf60oSZ9LlItIfG27MG+yYbSVY857m1bNMVHVYUlI9ZY5+uHWRiJFY/NYqZUn4x5qPVYvBuQOb/U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.218.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 6799183A24;
+	Thu, 29 Feb 2024 19:03:50 +0000 (UTC)
+Received: from cpanel-007-fra.hostingww.com (unknown [127.0.0.6])
+	(Authenticated sender: instrampxe0y3a)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 54AB28382A;
+	Thu, 29 Feb 2024 19:03:49 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1709233429; a=rsa-sha256;
+	cv=none;
+	b=GEuOqJr/slheFh9TtceFWgE7mS50e8JCzDEs3ire1LEPkp5IDyMyiG/3NVIatlJC3JeFXE
+	5SmnhCeTEQaXhc01Ot3fD780a1O2L/uLGYfClxKnFoIeTCqE8N9aZTiCPbulta8F56e57P
+	0TZ2qhot8jHmxciWgjP/g/k5/tWk9FkIrCPxoUbSnZG+Cv5pezLO7+a6q6MDg62L4+9iTy
+	rNMwPh4ptRplQyGzK1SqqH/xWi2g4cfGauSp/V9pCA3N1RCXlgvjXc7GJjuuP8qbKuW9to
+	/UoTty+zGpHEARB7+bHcq2YcAmmf83+lvIei6Ch7erXfuZKUZwn5xyMfAUBJSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1709233429;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UW0n4zKTz1tj3z6gOq49C07o/bofextU/zdMuMEX92M=;
+	b=QfP333D/nQbS9ROXV7x4yAVeoxw3Zu34R5Tvjgq4qWri6woJpcOuz4vh27NRW78gPvYJCR
+	wi6YUo9bU16v47g8OmpjeowuSwLjWrNVp0tm2iWtXlMLvRpo+pW2Q6kz7faDnFQGMqUhI7
+	qNOtQdupvoNjFks7M1mtJzB0dUKjmxDzl3Zuihr09KWP+DqAuSWHq13AJJLVKt0NqBTGrE
+	WUcU+ySkvzE/k/Upqnx9VSX1LzmKzJ/IvuSxuW6dkUMXL3zJMEwPGu3r1i1DE8dMAXYQGx
+	42ueViZQVuA0tpn8C88FwNzG4A0TqoPF/g3Pob3xsAP48/rzEAysR1/Vg8mTaQ==
+ARC-Authentication-Results: i=1;
+	rspamd-7f9dd9fb96-sjg2c;
+	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MailChannels-Auth-Id: instrampxe0y3a
+X-Whispering-Society: 3887caf715273cec_1709233429987_3665145069
+X-MC-Loop-Signature: 1709233429987:4062446036
+X-MC-Ingress-Time: 1709233429986
+Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
+ [3.69.87.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384)
+	by 100.111.192.177 (trex/6.9.2);
+	Thu, 29 Feb 2024 19:03:49 +0000
+Received: from p5b0ed132.dip0.t-ipconnect.de ([91.14.209.50]:40192 helo=heisenberg.fritz.box)
+	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <calestyo@scientia.org>)
+	id 1rflh3-0002JG-2w;
+	Thu, 29 Feb 2024 19:03:47 +0000
+Message-ID: <b83fbaba7b5d6d5935131febbcecb10fe9152628.camel@scientia.org>
+Subject: Re: wrong behaviour when unsetting/setting some variables
+From: Christoph Anton Mitterer <calestyo@scientia.org>
+To: Martijn Dekker <martijn@inlv.org>, DASH shell mailing list
+	 <dash@vger.kernel.org>
+Date: Thu, 29 Feb 2024 20:03:41 +0100
+In-Reply-To: <96806056-0aa2-467b-9460-71f142b71bad@inlv.org>
+References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
+	 <e1f38631-18fa-4962-89ee-d9bddd83eb58@app.fastmail.com>
+	 <f101dc542647549d78bb17c96b88055874f5e722.camel@scientia.org>
+	 <00e1ca47-2cbc-4d00-a1bb-f7ea6115d1ce@app.fastmail.com>
+	 <4ca7f5600a243a884c12616b24644e78a56a988a.camel@scientia.org>
+	 <96806056-0aa2-467b-9460-71f142b71bad@inlv.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3-1 
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: wrong behaviour when unsetting/setting some variables
-Content-Language: en-GB
-To: Martijn Dekker <martijn@inlv.org>,
- DASH shell mailing list <dash@vger.kernel.org>
-References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
- <ac893750-085d-421a-b296-a182ae51f1ec@gigawatt.nl>
- <0fd6f8b9-7175-4cc9-9d99-586beb3ede48@inlv.org>
- <252ec2b0-70dc-4621-96c2-285aa915cce0@gigawatt.nl>
- <4bcfdb66-c60f-4172-9f4c-cc25c3e99ddc@inlv.org>
-From: Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <4bcfdb66-c60f-4172-9f4c-cc25c3e99ddc@inlv.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-AuthUser: calestyo@scientia.org
 
-On 29/02/2024 18:45, Martijn Dekker wrote:
-> Op 29-02-2024 om 18:07 schreef Harald van Dijk:
->> On 29/02/2024 17:41, Martijn Dekker wrote:
->>> Op 28-02-2024 om 00:56 schreef Harald van Dijk:
->>>> However, trying to fix this I come across a corner case where it is 
->>>> not clear to me what the intended behaviour is.
->>>>
->>>>    set -a; readonly foo=bar; export # some shells export, not all
->>>
->>> IMO, the shell should export it in that case; POSIXly, 'set -a' 
->>> should cause the variable to be exported whenever a value is 
->>> effectively assigned to it (whether this is by a "true" shell 
->>> assignment, an assignment-argument, an expansion like ${foo=bar} or 
->>> ${foo:=bar}, indirectly by 'read' or 'getopts', or maybe other cases 
->>> I'm not thinking of).
->>
->> Spec-wise, the thing that troubles me is that the option is specified as
->>
->>  > When this option is on, the export attribute shall be set for each
->>  > variable to which an assignment is performed; see XBD Variable
->>  > Assignment.
->>
->> where XBD Variable Assignment is only about the assignment syntax of 
->> the shell, not other syntax or other commands even if they also cause 
->> variables to become assigned.
-> 
-> Yeah, that's confusing (and IMO should be fixed in the spec), but that 
-> same paragraph goes on to mention 'getopts' and 'read' as examples of 
-> utilities that perform assignments. In other words, though 'read var' is 
-> no XBD "Variable Assignment" assignment, it's stated explicitly that 
-> 'var', on which 'read' performs an assignment, should gain the export 
-> attribute.
+On Thu, 2024-02-29 at 17:58 +0000, Martijn Dekker wrote:
+> No shell currently behaves like that, and it would make no sense, as
+> 'unset'=20
+> and 'empty value' are distinct states.
 
-Good point, though by special-casing getopts and read, it kind of 
-implies that it does not apply to other commands and utilities.
+Well in the end I don't mind what's done, but would prefer that the
+specs unambiguously describe it, and even if just says that the
+behaviour is unspecified.
 
-Anyway, now that I think we are on the same page about what shells 
-*should* do: in dash, a quick search suggests this should be the following:
-
-* Substitutions may perform assignment (the ones you mentioned, plus
-   $((...)) arithmetic)
-* The for command performs assignments to the loop variable.
-* The cd command sets PWD and OLDPWD.
-* The getopts command does not merely assign to the specified variable,
-   also to OPTARG and OPTIND.
-* The local and readonly commands perform assignments to specified
-   variables.
-* Every command causes a value to be assigned to LINENO.
-* Every simple command causes a value to be assigned to _.
-
-The way I implemented LINENO, the implicit export does not work for 
-that, and for consistency, it should, even if no one is going to be 
-relying on that. I have not gone over the other ones to check if they 
-are all handled correctly.
+People read it, and by just reading the description of the export tool
+one might conclude, that such variable is exported to the environment
+of an executed command.
 
 Cheers,
-Harald van Dijk
+Chris.
