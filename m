@@ -1,104 +1,216 @@
-Received: from buffalo.tulip.relay.mailchannels.net (buffalo.tulip.relay.mailchannels.net [23.83.218.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40FC13C9FE
-	for <dash@vger.kernel.org>; Thu, 29 Feb 2024 20:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.24
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709238065; cv=pass; b=E+YwvVcjfrwXhzL8zMUVYhTpAZhxGwxnSAZZ9HLxaNDtft5cAVnhc2szK+7MdFJynnqADnxk6nQClB6ylkXwMw5MAL/x5rmUyqVc5mXt7nmQ4QjpeRa682ggLj85v4rkUCy11BTlps7+ZAKRpaeYxh4Odn+zyaNOrhZsbtyX1/M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709238065; c=relaxed/simple;
-	bh=UW0n4zKTz1tj3z6gOq49C07o/bofextU/zdMuMEX92M=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ng10Xi3y9EhlPkdD4oOaZsjPDxspUVV4Err1rMXBdYaMPWE5EEjj06gnGxcZcgRMPkVHRKBW/M4aBBsrDSVpWdqGCcR5ixGTf60oSZ9LlItIfG27MG+yYbSVY857m1bNMVHVYUlI9ZY5+uHWRiJFY/NYqZUn4x5qPVYvBuQOb/U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.218.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 6799183A24;
-	Thu, 29 Feb 2024 19:03:50 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (unknown [127.0.0.6])
-	(Authenticated sender: instrampxe0y3a)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 54AB28382A;
-	Thu, 29 Feb 2024 19:03:49 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1709233429; a=rsa-sha256;
-	cv=none;
-	b=GEuOqJr/slheFh9TtceFWgE7mS50e8JCzDEs3ire1LEPkp5IDyMyiG/3NVIatlJC3JeFXE
-	5SmnhCeTEQaXhc01Ot3fD780a1O2L/uLGYfClxKnFoIeTCqE8N9aZTiCPbulta8F56e57P
-	0TZ2qhot8jHmxciWgjP/g/k5/tWk9FkIrCPxoUbSnZG+Cv5pezLO7+a6q6MDg62L4+9iTy
-	rNMwPh4ptRplQyGzK1SqqH/xWi2g4cfGauSp/V9pCA3N1RCXlgvjXc7GJjuuP8qbKuW9to
-	/UoTty+zGpHEARB7+bHcq2YcAmmf83+lvIei6Ch7erXfuZKUZwn5xyMfAUBJSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1709233429;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UW0n4zKTz1tj3z6gOq49C07o/bofextU/zdMuMEX92M=;
-	b=QfP333D/nQbS9ROXV7x4yAVeoxw3Zu34R5Tvjgq4qWri6woJpcOuz4vh27NRW78gPvYJCR
-	wi6YUo9bU16v47g8OmpjeowuSwLjWrNVp0tm2iWtXlMLvRpo+pW2Q6kz7faDnFQGMqUhI7
-	qNOtQdupvoNjFks7M1mtJzB0dUKjmxDzl3Zuihr09KWP+DqAuSWHq13AJJLVKt0NqBTGrE
-	WUcU+ySkvzE/k/Upqnx9VSX1LzmKzJ/IvuSxuW6dkUMXL3zJMEwPGu3r1i1DE8dMAXYQGx
-	42ueViZQVuA0tpn8C88FwNzG4A0TqoPF/g3Pob3xsAP48/rzEAysR1/Vg8mTaQ==
-ARC-Authentication-Results: i=1;
-	rspamd-7f9dd9fb96-sjg2c;
-	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Whispering-Society: 3887caf715273cec_1709233429987_3665145069
-X-MC-Loop-Signature: 1709233429987:4062446036
-X-MC-Ingress-Time: 1709233429986
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384)
-	by 100.111.192.177 (trex/6.9.2);
-	Thu, 29 Feb 2024 19:03:49 +0000
-Received: from p5b0ed132.dip0.t-ipconnect.de ([91.14.209.50]:40192 helo=heisenberg.fritz.box)
-	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <calestyo@scientia.org>)
-	id 1rflh3-0002JG-2w;
-	Thu, 29 Feb 2024 19:03:47 +0000
-Message-ID: <b83fbaba7b5d6d5935131febbcecb10fe9152628.camel@scientia.org>
-Subject: Re: wrong behaviour when unsetting/setting some variables
-From: Christoph Anton Mitterer <calestyo@scientia.org>
-To: Martijn Dekker <martijn@inlv.org>, DASH shell mailing list
-	 <dash@vger.kernel.org>
-Date: Thu, 29 Feb 2024 20:03:41 +0100
-In-Reply-To: <96806056-0aa2-467b-9460-71f142b71bad@inlv.org>
-References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
-	 <e1f38631-18fa-4962-89ee-d9bddd83eb58@app.fastmail.com>
-	 <f101dc542647549d78bb17c96b88055874f5e722.camel@scientia.org>
-	 <00e1ca47-2cbc-4d00-a1bb-f7ea6115d1ce@app.fastmail.com>
-	 <4ca7f5600a243a884c12616b24644e78a56a988a.camel@scientia.org>
-	 <96806056-0aa2-467b-9460-71f142b71bad@inlv.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3-1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F17F54BF1
+	for <dash@vger.kernel.org>; Fri,  8 Mar 2024 11:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709896191; cv=none; b=bAqJ9SklLOVki1L0HgGLAB4LLU/di0qDCa/aXht7/sU4/i4FJMYuu2OxH58e9qL2lKigB1p0vzUM+yTbpEBRvBsadcU+yQa60+/SVqI72b+7fEq32tcOzaYGzMKPQdQeMbOnlkK6AuBN3TrnAjYnFosGVCURLmjwOGfo1HWwCo8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709896191; c=relaxed/simple;
+	bh=gocDj/7myIT3J++mmwgHVXRJlLzzXxTbIi0lEXzZq3c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QrKD1dNlqV96vwimROc5XzUyOIed5OJ8yEk189Tl3LSbPZEZJIKF6U3fFsY65k9/qmoIVt0y2+WuJMENwMVjvTK+uK/Jm9kwNy9T11uJMIddwMBZEJprJMoHItGkZy++Eb67WswEh4LTJjxGjwyIGiH0aXeOYVRJE0HT9jnNFdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GK/WbxJE; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GK/WbxJE"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5658082d2c4so2486138a12.1
+        for <dash@vger.kernel.org>; Fri, 08 Mar 2024 03:09:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709896187; x=1710500987; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rOvPIOztKiqw5kQE5Y6CIwt6Zzf+PM7rP8IpJpDN+FQ=;
+        b=GK/WbxJEmWAc1ccBKjqYa8OwJForKx/4Ju+zmnNsggzWNzRyD7yUaON5ljADpfB9aX
+         marOVM3jldxGaSj+qnzms+Vu4cpsonFCs5deIBYq2NlBQobnjANKYK0UrwUQ9e3h7J+y
+         9Y8lfInps8oAOyviLVlxe6z+U926lqpvdE4lT1N63+bk7KfVAesp4oIlIJC4qvwoa6l2
+         c0mBOLhPaWKs7c/ZDKgkwjTZVtq2QRBTEdx1O4sVyoCj/a0YQkka0/w3AWQjcsoAFYDU
+         V7xUraY1iu4zz+Zw4QvO2uLSOlEErzMuB64P/rfvXOxS2VDEBUCeVdp+PDQdK9CL+vys
+         V2tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709896187; x=1710500987;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rOvPIOztKiqw5kQE5Y6CIwt6Zzf+PM7rP8IpJpDN+FQ=;
+        b=H7qkzyYNsvCqn8r6Y2R5GCYIbl2QFoWJ4cFW9hNo3oNOuK6yshRbfDWtcbaf0VWt2a
+         zFf9mzTZm3X6uzFTy7joF+Xt1Rhs03B6utiexPhbj4mU1iBt1+3HuDrWgPQ6ICtgjmmt
+         WiysJrf+qOroxz7DeHqlxyslLpw8a7E8XDUtfjMgLf1W9kQPGhXmPh5LB80b83SD3qZa
+         AnrfbhWCNAQCQNKUOu9xK680rufaI2ieat5xvtj2dNIxGvLcuawEBRGqkRqLxYuTO9G2
+         nfRTELmETl9DJkL1iAbAB78Llv9JhaRdpdVvkmGZNCmLvKVtgOqMnZRTjYfad8N1Bnht
+         qrYw==
+X-Gm-Message-State: AOJu0YzNnQwIPDSj3L8/xKqwcqlomdfGL8KrY8E0oFBRctK0o20ZYimX
+	HyHgtTQygs/2R3GDT96l6aSZzfIn4GDdB+tjP0VGtVCKkD1O5fualemJrme7
+X-Google-Smtp-Source: AGHT+IFk4q5u7oBAcl/kLFlG06w8oQlS2W6brsUlS5ZQo8vgbZU1kG8M3eMTcyCP7537mIz37pxN2w==
+X-Received: by 2002:a17:906:fccc:b0:a45:ad61:c612 with SMTP id qx12-20020a170906fccc00b00a45ad61c612mr6176370ejb.43.1709896187325;
+        Fri, 08 Mar 2024 03:09:47 -0800 (PST)
+Received: from localhost.localdomain (193-81-211-167.adsl.highway.telekom.at. [193.81.211.167])
+        by smtp.gmail.com with ESMTPSA id f8-20020a17090660c800b00a45a09e7e23sm4059674ejk.136.2024.03.08.03.09.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 03:09:47 -0800 (PST)
+From: Johannes Altmanninger <aclopte@gmail.com>
+To: dash@vger.kernel.org
+Cc: Johannes Altmanninger <aclopte@gmail.com>
+Subject: [RFC PATCH] Allow trap to override permanently-ignored signals in background shells
+Date: Fri,  8 Mar 2024 12:01:55 +0100
+Message-ID: <20240308110158.2459219-1-aclopte@gmail.com>
+X-Mailer: git-send-email 2.44.0.rc1.17.g3e0d3cd5c7
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AuthUser: calestyo@scientia.org
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2024-02-29 at 17:58 +0000, Martijn Dekker wrote:
-> No shell currently behaves like that, and it would make no sense, as
-> 'unset'=20
-> and 'empty value' are distinct states.
+TL;DR: I think this job should exit on Control-C.
 
-Well in the end I don't mind what's done, but would prefer that the
-specs unambiguously describe it, and even if just says that the
-behaviour is unspecified.
+	( trap - INT; sleep inf ) &
 
-People read it, and by just reading the description of the export tool
-one might conclude, that such variable is exported to the environment
-of an executed command.
+With shell=bash or shell=zsh this works with below script.
+Meanwhile, shell=dash fails
 
-Cheers,
-Chris.
+	shell=dash
+	set -e
+	n=123
+	pkill -f "sleep.$n" ||:
+	pid=$(setsid "$shell" -c "( trap - INT; sleep $n ) </dev/null >/dev/null 2>&1 & echo \$\$")
+	sleep 1
+	kill -INT -$pid
+	ps aux | grep "[s]leep.$n"
+
+POSIX[*] Section 2.11 on Signals and Error Handling says about
+background execution:
+
+> If job control is disabled (see the description of set -m) when
+> the shell executes an asynchronous list, the commands in the list
+> shall inherit from the shell a signal action of ignored (SIG_IGN)
+> for the SIGINT and SIGQUIT signals.
+
+and continues:
+
+> In all other cases, commands executed by the shell shall inherit the
+> same signal actions as those inherited by the shell from its parent
+> unless a signal action is modified by the trap special built-in
+> (see trap)
+
+It is not clear to me whether the trap builtin is supposed to override
+the ignore. Intuitively, I'd say yes, and the Bash maintainer seems
+to agree responding to a related bug report about Bash functions[**]
+
+> The issue is that the processes in this list have to ignore SIGINT
+> [...] but they have to be allowed to use trap to change the signal
+> dispositions (POSIX interp 751)
+
+Attached patch works for me though it's barely thought-through or
+tested. Happy to take it to completion.
+
+[*]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html
+[**]: https://lists.gnu.org/archive/html/bug-bash/2023-01/msg00050.html
+
+{{{
+
+Backstory:
+
+The Kakoune[1] editor likes to run shell commands that boil down to
+
+	mkfifo /tmp/fifo
+	(
+		sleep inf # in practice "make"
+	) >/tmp/fifo 2>&1 &
+
+On Control-C, the editor traditionally sends SIGINT to the process
+group. Bash documentation says[2]:
+
+> When job control is not in effect, asynchronous commands ignore
+> SIGINT and SIGQUIT in addition to these inherited handlers.
+
+This means that the "sleep inf" process ignores SIGINT.
+We have worked around this fact by sending SIGTERM instead[3].
+
+If the forked process sets a SIGINT handler of any form, for example
+by using "signal(SIGINT, SIG_DFL)", it will no longer ignore SIGINT.
+
+It seems reasonable to give (sub)shells the same powers, via the
+"trap" builtin. This would allow me to change the above subshell to
+
+	(
+		trap - INT
+		sleep inf
+	) >/tmp/fifo 2>&1 &
+
+to have it be terminated by SIGINT.
+
+In general, I wonder if SIGINT is only for actual shells, and SIGTERM
+is the signal to use in our situation.
+
+[1]: https://kakoune.org/
+[2]: https://www.gnu.org/software/bash/manual/html_node/Signals.html
+[3]: https://lists.sr.ht/~mawww/kakoune/%3C20240307135831.1967826-3-aclopte@gmail.com%3E
+
+}}}
+---
+ src/trap.c | 12 +++++++++---
+ src/trap.h |  1 +
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/src/trap.c b/src/trap.c
+index cd84814..a6778e8 100644
+--- a/src/trap.c
++++ b/src/trap.c
+@@ -159,7 +159,7 @@ trapcmd(int argc, char **argv)
+ 		}
+ 		trap[signo] = action;
+ 		if (signo != 0)
+-			setsignal(signo);
++			setsignal_maybe_user(signo, 1);
+ 		INTON;
+ 		ap++;
+ 	}
+@@ -175,6 +175,12 @@ trapcmd(int argc, char **argv)
+ 
+ void
+ setsignal(int signo)
++{
++    setsignal_maybe_user(signo, 0);
++}
++
++void
++setsignal_maybe_user(int signo, int user)
+ {
+ 	int action;
+ 	int lvforked;
+@@ -234,7 +240,7 @@ setsignal(int signo)
+ 		}
+ 		if (act.sa_handler == SIG_IGN) {
+ 			if (mflag && (signo == SIGTSTP ||
+-			     signo == SIGTTIN || signo == SIGTTOU)) {
++			              signo == SIGTTIN || signo == SIGTTOU)) {
+ 				tsig = S_IGN;	/* don't hard ignore these */
+ 			} else
+ 				tsig = S_HARD_IGN;
+@@ -242,7 +248,7 @@ setsignal(int signo)
+ 			tsig = S_RESET;	/* force to be set */
+ 		}
+ 	}
+-	if (tsig == S_HARD_IGN || tsig == action)
++	if ((!user && tsig == S_HARD_IGN) || tsig == action)
+ 		return;
+ 	switch (action) {
+ 	case S_CATCH:
+diff --git a/src/trap.h b/src/trap.h
+index beaf660..595992c 100644
+--- a/src/trap.h
++++ b/src/trap.h
+@@ -43,6 +43,7 @@ extern volatile sig_atomic_t gotsigchld;
+ 
+ int trapcmd(int, char **);
+ void setsignal(int);
++void setsignal_maybe_user(int, int);
+ void ignoresig(int);
+ void onsig(int);
+ void dotrap(void);
+-- 
+2.44.0.rc1.17.g3e0d3cd5c7
+
