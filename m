@@ -1,32 +1,35 @@
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B6B56464
-	for <dash@vger.kernel.org>; Fri,  8 Mar 2024 11:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
+Received: from freekahlil.inlv.org (freekahlil.inlv.org [46.19.33.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64CE23B19D
+	for <dash@vger.kernel.org>; Sun, 10 Mar 2024 22:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.19.33.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709898819; cv=none; b=dUfSKyR11+mJT0HsOIfehd5ghc3ZS1+RyjP3UAhq7MWL6zkJ5SKvwAuebdhxof/fvJhMrpw6m181tPMgLqgZHqAwWR2USZt54DpyCV+zrHdI5N3HzLpI+dtQYX6HTfDPiwQhXo0KIT85zg+S+S0vbcWfV6ElLir4Ca1g+ySqb+Q=
+	t=1710108011; cv=none; b=X7OJsSI3lX8YEPPjvMe+8IgxQHfgVuBmJSTreux6dMoaqktVCADHqxlWikxvAWLGCmdTBifO4y0BiaVp7pgKUbxs7ef+qCkv8Gq2ftAGXompLYSCtOqdGXTeqdPSD7Px7HWECgZN5e7/GNUxJ8kJD2gZV5opTwRt7NOehXuwxa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709898819; c=relaxed/simple;
-	bh=71jLNJBMQHLz5FO3dlfSvkruJxqjggxwxLi15+VKKhY=;
+	s=arc-20240116; t=1710108011; c=relaxed/simple;
+	bh=zWTU039GES5T0LgmDWHMG6RwbQBXC9XjUTblDgAJJTA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=DgkETHTWqmRlDyRauFsqunSa7gz4gHXHrE23vSGrVxE+egGiD4FABkhbX1WuBGmsjyj7XOAgPe63pwdT2pN2lnB/b6CqZQC4xcV34Kpyrm38ZLu6lRypoxT5mc2uA+vPjWU8IYp6+B7ZpTdXfKp8OvFc6DX/q5lAbItKFa5PZrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=QTZ7hqTa; arc=none smtp.client-ip=51.68.198.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
+	 In-Reply-To:Content-Type; b=bnaWcRRYcHIFb1D1Ll+9Nf0r1YKBsFypx+xwYWbcI9acd6SyNX8QD5So43dAlfOdm0IAbH2XrmxEnEile8L9V6NP2HWZlZlTv+xCXAPVmdUedPytEHUfJI/V704oTZ55mMDmSVadFJXK+3l3IB6CWD2nGQrRtlkVZPitXUKWpfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inlv.org; spf=pass smtp.mailfrom=inlv.org; dkim=pass (1024-bit key) header.d=inlv.org header.i=@inlv.org header.b=fJlBVNbL; arc=none smtp.client-ip=46.19.33.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inlv.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inlv.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="QTZ7hqTa"
-Received: from [IPV6:2a02:8010:68a1:0:e69:c5c8:93ab:b95] (unknown [IPv6:2a02:8010:68a1:0:e69:c5c8:93ab:b95])
-	by mail.gigawatt.nl (Postfix) with ESMTPSA id 8F18D72C;
-	Fri,  8 Mar 2024 11:48:14 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 8F18D72C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1709898494;
-	bh=S/fAwTo5R4emgNOxhJklp9wUdE7QaS9UuteP5CC18n0=; l=1047;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=QTZ7hqTaZHiY4aHO2iO7z/040jCFp72l+IIMTTyHnT/aJEtcFdiUcux368VwbAZms
-	 xPQk8cmz+lJOZiYN+dbsxsg2vjd5O0xXjSAkH9mEOLaOlHqlH6nUrOF4OIl6JyxT4P
-	 fqhRgS+4TzQvKDloJ9sA6m3ym3ltkJFVgErXfxJA=
-Message-ID: <b42dbf13-989d-4609-bbcb-8b9eababbe65@gigawatt.nl>
-Date: Fri, 8 Mar 2024 11:48:11 +0000
+	dkim=pass (1024-bit key) header.d=inlv.org header.i=@inlv.org header.b="fJlBVNbL"
+Received: from [IPV6:2a00:23c6:5398:5e01:c814:cd21:9305:1670] ([IPv6:2a00:23c6:5398:5e01:c814:cd21:9305:1670])
+	(authenticated bits=0)
+	by freekahlil.inlv.org (8.16.1/8.16.1) with ESMTPSA id 42ALXp0f014781
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sun, 10 Mar 2024 22:33:51 +0100 (CET)
+	(envelope-from martijn@inlv.org)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=inlv.org; s=inlv;
+	t=1710106431; bh=zWTU039GES5T0LgmDWHMG6RwbQBXC9XjUTblDgAJJTA=;
+	h=From:From;
+	b=fJlBVNbL1HNGLugqlmVAgsUL9nkKe/JKeVbpvaUj6+g5ksG84OODFILiEkO1uZUpp
+	 mQQ38s6fGv+PlPocnhP75We5oInnKenDR3zwR10vvGth3J9ETB34Mrqzhw7qPJjc+O
+	 mtOq2l1ysdCJjE13xCqjd1b4+lJEKRhinh/MZK68=
+Message-ID: <d307bc34-f8f4-43d6-9c09-76e02df7d02f@inlv.org>
+Date: Sun, 10 Mar 2024 21:33:51 +0000
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -34,40 +37,49 @@ List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] Allow trap to override permanently-ignored signals in
- background shells
+Subject: Re: wrong behaviour when unsetting/setting some variables
 Content-Language: en-GB
-To: Johannes Altmanninger <aclopte@gmail.com>, dash@vger.kernel.org
-References: <20240308110158.2459219-1-aclopte@gmail.com>
-From: Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <20240308110158.2459219-1-aclopte@gmail.com>
+To: Harald van Dijk <harald@gigawatt.nl>,
+        DASH shell mailing list <dash@vger.kernel.org>
+References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
+ <ac893750-085d-421a-b296-a182ae51f1ec@gigawatt.nl>
+ <0fd6f8b9-7175-4cc9-9d99-586beb3ede48@inlv.org>
+ <252ec2b0-70dc-4621-96c2-285aa915cce0@gigawatt.nl>
+ <4bcfdb66-c60f-4172-9f4c-cc25c3e99ddc@inlv.org>
+ <6e4e70da-b137-44c9-944a-4b4eb4ef2174@gigawatt.nl>
+From: Martijn Dekker <martijn@inlv.org>
+In-Reply-To: <6e4e70da-b137-44c9-944a-4b4eb4ef2174@gigawatt.nl>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Op 29-02-2024 om 18:56 schreef Harald van Dijk:
+> Good point, though by special-casing getopts and read, it kind of 
+> implies that it does not apply to other commands and utilities.
 
-On 08/03/2024 11:01, Johannes Altmanninger wrote:
-> TL;DR: I think this job should exit on Control-C.
-> 
-> 	( trap - INT; sleep inf ) &
+I'd forgotten I'd filed an Austin Group bug for this about two years ago:
+https://www.austingroupbugs.net/view.php?id=1555
 
-The TL;DR is oversimplified: Control-C would not result in SIGINT being 
-sent to the sleep command, because it runs in the background.
+It was resolved that the text in the next version of the standard will be:
 
-Your fuller version, I agree, I think that is a bug in dash. There are 
-some more known bugs in its handling of the trap command in subshells 
-that require a bigger rework (particularly the one where, despite traps 
-being reset in subshells, the 'trap' command should print the parent 
-shell's traps if called in a subshell) that maybe should be looked at at 
-the same time.
+| Set the export attribute for all variable assignments. When this option
+| is on, whenever a value is assigned to a variable in the current shell
+| execution environment, the export attribute shall be set for the variable.
+| This applies to all forms of assignment, including those made as a
+| side-effect of variable expansions or arithmetic expansions, and those made
+| as a result of the operation of the cd, getopts, or read utilities.
+|
+| <small>Note: As discussed in Section 2.9.1, not all variable assignments
+| happen in the current execution environment. When an assignment happens in
+| a separate shell execution environment, the export attribute is still set
+| for the variable, but that does not affect the current shell execution
+| environment.</small>
 
-> In general, I wonder if SIGINT is only for actual shells, and SIGTERM
-> is the signal to use in our situation.
+HTH.
 
-SIGINT is not limited to shells. At first glance, sending SIGINT to 
-another process or process group upon receipt of SIGINT, because that 
-other process or process group is what it was intended for, seems like 
-an appropriate use to me.
+-- 
+||	modernish -- harness the shell
+||	https://github.com/modernish/modernish
+||
+||	KornShell lives!
+||	https://github.com/ksh93/ksh
 
-Cheers,
-Harald van Dijk
