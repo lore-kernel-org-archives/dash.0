@@ -1,39 +1,66 @@
-Received: from mail02.stack.nl (scw01.stack.nl [51.15.111.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250F985942
-	for <dash@vger.kernel.org>; Fri, 29 Mar 2024 13:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.15.111.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D7A1C0DD2
+	for <dash@vger.kernel.org>; Fri, 29 Mar 2024 15:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711720769; cv=none; b=Cqtd0hxZ3n1lzo7caz4ADifRalt9BuBL9ublPKjlu+IvqMKX8B1xN4hgUeGRJShmEt5bMenQvnXCGOFXPZ+83X3lUr17k7h/slpXWocE0PJ+PB88h3Y6uAirodi2faATDqDMis4+QvGf8UeOYN2b0DWIPzLs/BD12DwmQkgNKPM=
+	t=1711724511; cv=none; b=YYK/oQRALg3iHAHaiVsw7/Y6PqYL50r7XVbtooN4FzQsA3URAJj8LigJ0fuAye3myuKraj+7k8PG4DR/p8SsKgXACmI1K0ZJtLA+ZI0L3FO119vFDe5lMG27vpfteSa6Gk2fokCR8OxAI334vYycZjkNK/mMxLJN9bp/SQZvp4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711720769; c=relaxed/simple;
-	bh=VfSlY0u9TMd/srEGp1Q73+gr7biYbRd88L3+fT2NMIw=;
+	s=arc-20240116; t=1711724511; c=relaxed/simple;
+	bh=R1+yWziHaf44ZBtSfpYTRf4IeZ5QjA35rdHv6FZMx1U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m8UW8/p8q54KcvQMAaEUZ1WXMKAq0Iwim6Kh6+E7W/C8favGa+Xz/GD/CF2OzHablPsTXZ7JUWd5/lTCx8rpFlKvN+kZDasEYJsf6qXb3Q0km2GSSsxYuHwMy4MekToEwPBuL69efwWZAJ3tPkl40s3Vdq00ihy7cAAMscOpVK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stack.nl; spf=pass smtp.mailfrom=stack.nl; arc=none smtp.client-ip=51.15.111.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stack.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stack.nl
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail02.stack.nl (Postfix) with ESMTP id EA0451E0157;
-	Fri, 29 Mar 2024 13:50:42 +0000 (UTC)
-Received: from mail02.stack.nl ([127.0.0.1])
-	by localhost (mail02.stack.nl [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id y28NP5zPpJpI; Fri, 29 Mar 2024 13:50:39 +0000 (UTC)
-Received: from blade.stack.nl (blade.stack.nl [192.168.121.130])
-	by mail02.stack.nl (Postfix) with ESMTP id D572E1E0156;
-	Fri, 29 Mar 2024 13:50:39 +0000 (UTC)
-Received: by blade.stack.nl (Postfix, from userid 1677)
-	id C0284237C50; Fri, 29 Mar 2024 14:50:39 +0100 (CET)
-Date: Fri, 29 Mar 2024 14:50:39 +0100
-From: Jilles Tjoelker <jilles@stack.nl>
-To: Johannes Altmanninger <aclopte@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H/r/Z1kVrJ7QJJsaCLqt4ED1K8uQfob3Ji+L7/1ZDb/NHh1+9spUZV9yEPIpi2phSV+CBm1yOkTYLV8iljjQD7+GAMaqXeaXG9gv+ByeAfpicBAHcOt0Dr1fCWJP6E9O5077d23dmcqr/5ucXZDYT8D/sQ+BzQ06MX1dYn1A3Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NcvvNCxC; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NcvvNCxC"
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56c0a249bacso2622686a12.1
+        for <dash@vger.kernel.org>; Fri, 29 Mar 2024 08:01:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711724506; x=1712329306; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2s5tOLVKPkXlwrA/EgZHuM0Fbi+4tW7rVTv5JBu8KsM=;
+        b=NcvvNCxCvKwT9Dki6qyklH36T+CtTsvmPGX2+4Z+2Y/n4LLgB4LFtiugORXHNP/Ghc
+         ULjDSNWV2WF+0Da64vYjk2PiKPcDdL7d9Zk9xFEYUCkUUED4NuO6TlsBuW7AlyQtMuqo
+         MayfKr6WQy2MU06Y3fQyMhIOBNh+VOmaOoNRRuV5t6LuPAQDxT3R4End+RXhWMOCy/V1
+         IRTaDcoo57f646T2u7z9j7tenOyMxYH47kQ2967MicctZGR4RPnHtfjI/rki+1lAtwgU
+         Wz6qrDZE4Po/bmD48cjVUmTtzYy79sXFveX5/9UdADUY9/qfv2R/aWxPo3qCcN4e1G3z
+         rmUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711724506; x=1712329306;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2s5tOLVKPkXlwrA/EgZHuM0Fbi+4tW7rVTv5JBu8KsM=;
+        b=AlXHQXuJz4S78UgXbkxyBU2Dj6RAzvG0YLS2t1oDs+8R0KioE77aRKmtmwlLH/Zv9w
+         vP3ZO92Q2YLd+vqToc1SDHqI8RkGNmmxyDIXXZ7FkE3T5qOPQufzuFkLN/Sktd0VDh1p
+         1F5foImCBh7akEesqPxIGbzCSbRlEYPE6joBjOWveSDU5h52OCeqUU5qjPREtptr/2PL
+         h1zuzz8Zk8rsjr19md61A90WEFI+Ncx3IMTiMejd3F3lf7yuJPq3wEq4TAVH9aj59K5K
+         XcGSQFsGDZusw/+tDTSp4WIRvFrtf1nwm8ygmNHPDmCVsi3W1eZV7+m1fUDSTAGiG/xj
+         qxmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXTMrQ/NZ+NsImxh1yuFnPD20jvGRoe2jVJlr2bTVE2TKrOCfIz9mrBm0hP0b71sMWyuCFIB0klvr7fvIBKC71h04Ew1A==
+X-Gm-Message-State: AOJu0Yz/f6ylAr6UTT1uo/ocBUaEUTtqbMmkJprflP/U7HoJSbUwN0co
+	z+x9GGdfjgIzfZNI3jyN3WFmDG0IMxUtLh4QYuRWNIHKOOzcC+h3
+X-Google-Smtp-Source: AGHT+IEdidMVZJ7A+lI0JEfowhu3I9RYnPuDTk0b6V2PYLfsOqUbh94VFiBr+fd/NghPTE+QwvducA==
+X-Received: by 2002:a50:d4cb:0:b0:56b:d158:c5de with SMTP id e11-20020a50d4cb000000b0056bd158c5demr1440226edj.16.1711724506313;
+        Fri, 29 Mar 2024 08:01:46 -0700 (PDT)
+Received: from gmail.com (193-81-214-13.adsl.highway.telekom.at. [193.81.214.13])
+        by smtp.gmail.com with ESMTPSA id g5-20020a056402428500b0056c3013485csm2088549edc.69.2024.03.29.08.01.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Mar 2024 08:01:45 -0700 (PDT)
+Date: Fri, 29 Mar 2024 16:02:26 +0100
+From: Johannes Altmanninger <aclopte@gmail.com>
+To: Jilles Tjoelker <jilles@stack.nl>
 Cc: harald@gigawatt.nl, dash@vger.kernel.org
 Subject: Re: [PATCH v2] Allow trap to un-ignore SIGINT in asynchronous
  subshells
-Message-ID: <20240329135039.GA20398@stack.nl>
+Message-ID: <ZgbYAvgixaQEsF4K@gmail.com>
 References: <b42dbf13-989d-4609-bbcb-8b9eababbe65@gigawatt.nl>
  <20240329112419.1571653-1-aclopte@gmail.com>
+ <20240329135039.GA20398@stack.nl>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -42,70 +69,53 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240329112419.1571653-1-aclopte@gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20240329135039.GA20398@stack.nl>
 
-On Fri, Mar 29, 2024 at 12:24:00PM +0100, Johannes Altmanninger wrote:
-> Unlike in Bash or Zsh, this asynchronous job ignores SIGINT, despite
-> builtin trap explicitly resetting the SIGINT handler.
+On Fri, Mar 29, 2024 at 02:50:39PM +0100, Jilles Tjoelker wrote:
+> On Fri, Mar 29, 2024 at 12:24:00PM +0100, Johannes Altmanninger wrote:
+> > [*]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html
+> > [**]: https://lists.gnu.org/archive/html/bug-bash/2023-01/msg00050.html
+> 
+> There is definitely a good reason for S_HARD_IGN: it implements the
+> following requirement of the trap builtin (XCU 2.14 Special Built-In
+> Utilities -> trap):
+> 
+> ] Signals that were ignored on entry to a non-interactive shell cannot
+> ] be trapped or reset, although no error need be reported when
+> ] attempting to do so.
 
-> 	dash -c '( trap - INT; sleep inf ) &'
+The wording in [*] is extremely confusing.  To me, "If job control
+is disabled (see the description of set -m) when the shell executes
+an asynchronous list, the commands in the list shall inherit from
+the shell a signal action of ignored (SIG_IGN) for the SIGINT and
+SIGQUIT signals." sounds like those signals are ignored on entry,
+so it sounds like "cannot be trapped or reset" applies.
 
-> POSIX[*] Section 2.11 on Signals and Error Handling says about
-> background execution:
+I guess we are dealing with two different sets of inherited signal
+handlers, the specific SIGINT/SIGQUIT for asynchronous subshells,
+and the others that were inherited normally.
 
-> > If job control is disabled (see the description of set -m) when
-> > the shell executes an asynchronous list, the commands in the list
-> > shall inherit from the shell a signal action of ignored (SIG_IGN)
-> > for the SIGINT and SIGQUIT signals.  In all other cases, commands
-> > executed by the shell shall inherit the same signal actions as those
-> > inherited by the shell from its parent unless a signal action is
-> > modified by the trap special built-in (see trap)
+> ] An interactive shell may reset or catch signals ] ignored on entry.
+> 
+> The change that should be made is that the automatic ignore of SIGINT
+> and SIGQUIT in background subshells should not use hard ignore.
+> Hard ignore still applies if the shell inherits ignored signals
+> from its parent.
 
-> It is not clear to me from this description whether the trap builtin is
-> supposed to un-ignore SIGINT and SIGQUIT in the above asynchronous job.
-> I think yes because processes like "sh -c 'trap ...'"  can already
-> do that, so why treat subshells differently.  The Bash maintainer
-> seems to agree when responding to a related bug report[**]
-> although that one is not about subshells specifically.
+Oh, I had thought, ignoresig(SIGINT) and ignoresig(SIGQUIT) on
+background subshell entry were our only uses of S_HARD_IGN.
+So this means that this logic from setsignal()
 
-> > The issue is that the processes in this list have to ignore SIGINT
-> > [...] but they have to be allowed to use trap to change the signal
-> > dispositions (POSIX interp 751)
+	if (act.sa_handler == SIG_IGN) {
+		if (mflag && (signo == SIGTSTP ||
+		     signo == SIGTTIN || signo == SIGTTOU)) {
+			tsig = S_IGN;	/* don't hard ignore these */
+		} else
+			tsig = S_HARD_IGN;
+	}
 
-> This issue exists because we "hard-ignore" (meaning ignore
-> permanently) SIGINT and SIGQUIT in backgrounded subshells; I'm
-> not sure why.  Git blame is not helpful since this existed since
-> the initial Git import. I failed to find a test suite; no luck at
-> http://www.opengroup.org/testing/testsuites/vscpcts2003.htm where I
-> get SSL errors.
+interprets all inherited-as-ignored signals as being hard-ignored,
+but that doesn't include SIGINT/SIGQUIT because they were inherited
+in a different way, via ignoresig()
 
-> Since I don't see any reason for hard-ignore logic, remove it
-> altogether.  This means that either of
-
-> 	trap - INT; trap - QUIT
-> 	set -i
-
-> in a backgrounded subshell will now un-ignore SIGINT and SIGQUIT.
-> I did not find other behavior changes but maybe there is a good reason
-> for S_HARD_IGN?
-
-> [*]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html
-> [**]: https://lists.gnu.org/archive/html/bug-bash/2023-01/msg00050.html
-
-There is definitely a good reason for S_HARD_IGN: it implements the
-following requirement of the trap builtin (XCU 2.14 Special Built-In
-Utilities -> trap):
-
-] Signals that were ignored on entry to a non-interactive shell cannot
-] be trapped or reset, although no error need be reported when
-] attempting to do so. An interactive shell may reset or catch signals
-] ignored on entry.
-
-The change that should be made is that the automatic ignore of SIGINT
-and SIGQUIT in background subshells should not use hard ignore. Hard
-ignore still applies if the shell inherits ignored signals from its
-parent.
-
--- 
-Jilles Tjoelker
+Will fix.
