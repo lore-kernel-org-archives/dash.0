@@ -1,184 +1,144 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2369217550
-	for <dash@vger.kernel.org>; Fri, 29 Mar 2024 15:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D286DD0D
+	for <dash@vger.kernel.org>; Wed,  3 Apr 2024 13:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711726757; cv=none; b=eFAZOI4DwAvE5GV3wSeq453Iyk0orMo+GcH4aFhrCol1dBp3b4PRyX7cksrGx610sxNAhb/o/i7/eo16HaONCFfscasdjX21foIKYlY2OYI524St40M8oeQ4JaovFHTXpVKOskK43axiGo5M/DBwrCdT7DvtUBdkWK09GF+ucQ4=
+	t=1712150064; cv=none; b=IfuY8sfB5bqaUBHGSd6OQw5B2TQY3gX5OZRVdWXFyOPd0UjGlzXDEtzQKiRwZiRZt4RUkn4fCWaQRjarVVRNawezvmtwN7LYzbioNcVFYwBEEonWHnk3TXCW66w5NcbOZnLTI2QIytKnVqRc9NDViljhZSialYQoNCsjkkOvUJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711726757; c=relaxed/simple;
-	bh=uUQ+0dtGRtc5kCkiRzZoz5tI75M5V3A2X4LlCMsTw/o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GIIESUv3p0NMCtVI1V1/xzblUGeI/VIATGZKvMmJjhS/RgALfZN67pywbYkyx2RwfSAmlUnMFS9PTCG4i7EAPF6t+f2SNgWwwLKA7Avkhmc5KQnPmEKf4PlPxgQZzYybEV0oI6gDC0KzcHg+gs2iaDt0glhQuRzAxaz3AXCJ+0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pt4A52iG; arc=none smtp.client-ip=209.85.208.49
+	s=arc-20240116; t=1712150064; c=relaxed/simple;
+	bh=ZNLx7A2ms5iZGp8rfF10QnjMA4DttRIHvGhs2JyIukk=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=nTTBsipzUyImcbJfiiw5kK/C6o8rrBFeEbjOhhOBOwpGrJEvA7/zMlRLVGgfPAkRXowQX3vRd9FQMeB6mq1GRR9sRdOO+R4zbB46COULdF9xdOEfE+6Tbqssl6sWablMF7REq41FC4zPCzXEa0subBMhO7tIVhit4S5970nA/Mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jy6qjKuG; arc=none smtp.client-ip=209.85.167.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pt4A52iG"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56d5d4d2e2bso535980a12.3
-        for <dash@vger.kernel.org>; Fri, 29 Mar 2024 08:39:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jy6qjKuG"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-516b6e75dc3so1913167e87.3
+        for <dash@vger.kernel.org>; Wed, 03 Apr 2024 06:14:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711726753; x=1712331553; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JSM/H6C02KO1CMredI4hecRoPVCmnOG+kWeF/Me1IVA=;
-        b=Pt4A52iG1q5oB/gtga8ew1N6E7KgKqn90/eFOOxWN9XCdmpB7p1jGuGxYQJgcJfOEW
-         2h4RE8G1PkfBdepWzlArBtRYUZYY7HkAYYmYzMDfeV96dYJ6qrYFujGm49ZKCWMS4y2q
-         lbFQZVKz+zZoD7iPXXukpHAVSZGRx4CToIFuQJyUnDx1Uor7QsL5pVuNXAWL3fA1bZj6
-         6Mb5VrcTcWW2nVvZRX6ilAq4SFsBa3ZNfcqkYEuXvYy+6CCcXGIma6xgZX0f2KUhjwzo
-         jhHQNvbOyKxCSVMtVH9/DF2Tl76GNjwqA58KI6z8PoXzQKpEoSEZVxblFJ9ViJ8ouiV6
-         ewmA==
+        d=gmail.com; s=20230601; t=1712150061; x=1712754861; darn=vger.kernel.org;
+        h=autocrypt:subject:from:to:content-language:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZNLx7A2ms5iZGp8rfF10QnjMA4DttRIHvGhs2JyIukk=;
+        b=jy6qjKuGA8yt9yDdU8b3DyUqX0CyqpcmZ8eQE8mNBPw30eZ04Y7guG+t1GBf8U+K/O
+         wCLQbiePeTxP+j3cvvhmRVaIKCtYDd+VSYkjhAc7sY6ZBX8TChJ4M3bnAkveU8zpcJNz
+         CYdQBaIKo6xBeap+Lj9JEtFarbTYbjQMEgG/zJqCRo0hR69zfUfjTsqGwlr7u9oYky7X
+         kIFYJ7LVcYbbZPSL5dMFxComwPXJvOU1WW/eul38q3++nRCZ44NSBxb8OvOCdn/DfcJw
+         vUyxg4KlxhAFJsEe7UrH2t+g4EL/cOdUPO7zEc0gqq7OE7CwLNARswm8pSjqkshExMTd
+         t55Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711726753; x=1712331553;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JSM/H6C02KO1CMredI4hecRoPVCmnOG+kWeF/Me1IVA=;
-        b=TiBovr8wkmEDT1QeLyUpDlp8Y1erEwdQ8OuGnxsyR+Z75VlHd/C80zo2YnyeL7/GOf
-         twBvaOvtrH/wr8DgAwGBLkPr2TR78vNmxsF3ehvMAX0P5Itl8ujAAd2LDOJsj2BmdxKH
-         OwXCBj7jas6fjfczOl2BM88sAUvMh3Oy89p2qSFKBuag00di/X6jp5ppltycFDiTgff7
-         bAMyvMxp/Xq+p0ce7AklHkiaRAgg3w4tfu0xG0FOZn0VL8rU5tGQ0AKJU8NttWKQmSKA
-         MZScEX8su9HbMMt2tKLnVUv5Dm15tAEOTRYbdPa52Rm+GUdm9DyFV2A7LAupgGP8JswD
-         ckPA==
-X-Forwarded-Encrypted: i=1; AJvYcCUaIZy6Use4ip0k9o71pSDrxaU6P/HTJGYfJgkBLcL5XUAyj89NED3R2nrl4Du3L0nBxAKtiEzwiUblAXxL3xoNXGntVA==
-X-Gm-Message-State: AOJu0YzpiAj4DvzKhbs79IJATgkKvzRRQpK11y0kZdPmED25wdGYLzzq
-	mREoauFecx9lOak1d9e+lnObQzUZTGVYxHv1sLokNX+ugtZjATWt
-X-Google-Smtp-Source: AGHT+IEwAxXvZzv3PDhARGFekvGmMNo8B9NDDo/ORVnueAResAZa0ll1ricTdENl/8TH2VZRf7H16A==
-X-Received: by 2002:a05:6402:4315:b0:567:29d9:99ae with SMTP id m21-20020a056402431500b0056729d999aemr1867774edc.28.1711726753192;
-        Fri, 29 Mar 2024 08:39:13 -0700 (PDT)
-Received: from localhost.localdomain (193-81-214-13.adsl.highway.telekom.at. [193.81.214.13])
-        by smtp.gmail.com with ESMTPSA id co3-20020a0564020c0300b0056bb6a51dd9sm2129731edb.24.2024.03.29.08.39.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 08:39:12 -0700 (PDT)
-From: Johannes Altmanninger <aclopte@gmail.com>
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: harald@gigawatt.nl,
-	dash@vger.kernel.org,
-	Johannes Altmanninger <aclopte@gmail.com>
-Subject: [PATCH v3] Allow trap to un-ignore SIGINT/SIGQUIT in async subshells
-Date: Fri, 29 Mar 2024 16:39:01 +0100
-Message-ID: <20240329153905.154792-2-aclopte@gmail.com>
-X-Mailer: git-send-email 2.44.0.368.gc75fd8d815
-In-Reply-To: <ZgbYAvgixaQEsF4K@gmail.com>
-References: <ZgbYAvgixaQEsF4K@gmail.com>
+        d=1e100.net; s=20230601; t=1712150061; x=1712754861;
+        h=autocrypt:subject:from:to:content-language:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZNLx7A2ms5iZGp8rfF10QnjMA4DttRIHvGhs2JyIukk=;
+        b=N0+I9Imem1fLVzl9twUE92jGpe/N07dTCUMQ0SLGGcSLykZrJqu8D46PqHMxb/jqPH
+         Fw4tjyBgdxPUuFjHeVtp1Jc5ni228zpVkZeLONpl2+OW+aIdy6KXYr0WtwH4cOuLWXgl
+         t9LXqKaboLyQWikfY1T8i2Y1vv4to4KeefrG0bw5Ohgdf5+9ir83k12Nr82+rfgVo8Ih
+         8a2olEcZKHJ6N8Rwrm+9Chd9IntaRd1eEvlhfR7YHJTJnxhlDFQboE4cWcY0IcXzsb9m
+         i7ngcOg2t6blxA4BW0UkKsa8auZM8uqSSKKofft0o66EMxz2lbKWty3yAVN1QjLFpqkE
+         8mtw==
+X-Gm-Message-State: AOJu0Yw0YzJAUYXYInBu6EaQJ2VmdM/I/ZItZhtER8Egxp4QbCc2iWr9
+	uKcoXJ2mgeTOVt3veKCSvUv9Ko+w8RuvdnlYE8yb1DEEQMUEOOz+XcHjsGXQ
+X-Google-Smtp-Source: AGHT+IGXN89gw3mJwKbG2xJTwU04UOGdxrNvqn/xgndzat80vrES3FIo/iz/oxqtl4wezIqT2XHJnQ==
+X-Received: by 2002:a50:d6d2:0:b0:56d:c88a:f37 with SMTP id l18-20020a50d6d2000000b0056dc88a0f37mr6591174edj.26.1712149667558;
+        Wed, 03 Apr 2024 06:07:47 -0700 (PDT)
+Received: from [192.168.0.152] (mob-5-91-247-24.net.vodafone.it. [5.91.247.24])
+        by smtp.gmail.com with ESMTPSA id p28-20020a056402501c00b0056c4a5c350asm7952779eda.11.2024.04.03.06.07.46
+        for <dash@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Apr 2024 06:07:46 -0700 (PDT)
+Message-ID: <ce0529c8-872b-4ee5-9f9b-37f8b191d6ba@gmail.com>
+Date: Wed, 3 Apr 2024 15:07:43 +0200
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: dash@vger.kernel.org
+From: Martin Guy <martinwguy@gmail.com>
+Subject: Issue: Document ulimit's "unlimited" limit in manual page
+Autocrypt: addr=martinwguy@gmail.com; keydata=
+ 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
+ KCqywkkM
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------jQrke1JAFPUiqbMOp8252sUK"
 
-Unlike in Bash or Zsh, this asynchronous job ignores SIGINT, despite
-builtin trap explicitly resetting the SIGINT handler.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------jQrke1JAFPUiqbMOp8252sUK
+Content-Type: multipart/mixed; boundary="------------8yQRZVXJTRAu5SH660HF03SF";
+ protected-headers="v1"
+From: Martin Guy <martinwguy@gmail.com>
+To: dash@vger.kernel.org
+Message-ID: <ce0529c8-872b-4ee5-9f9b-37f8b191d6ba@gmail.com>
+Subject: Issue: Document ulimit's "unlimited" limit in manual page
 
-	dash -c '( trap - INT; sleep inf ) &'
+--------------8yQRZVXJTRAu5SH660HF03SF
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-POSIX Section 2.11 on [Signals] and Error Handling says about
-background execution:
+SGkuIEkgZG9uJ3Qgc2VlIGEgYnVnIHRyYWNrZXIsIHNvIGhlcmU6DQoNCg0KIMKgwqDCoCB1
+bGltaXQgLWMgdW5saW1pdGVkDQoNCg0KVGhlICJ1bmxpbWl0ZWQiIGtleXdvcmQgaXMgbm90
+IG1lbnRpb25lZCBpbiB0aGUgbWFudWFsIHBhZ2UsIGFuZCBzaG91bGQgYmUuDQoNCihub3Ig
+aXMgaXQgZm9yIGJhc2goMSkgc28gaXQgbG9va3MgbGlrZSBzb21lb25lIGNvcGllZCBzb21l
+IGVsc2UncyANCm1hbnVhbCBwYWdlISkNCg0KDQpXaXRoIHRoYW5rcyBmb3IgYSBmaW5lLCBs
+ZWFuIHNoZWxsDQoNCg0KIMKgwqDCoCBNDQoNCg==
 
-> If job control is disabled (see the description of set -m) when
-> the shell executes an asynchronous list, the commands in the list
-> shall inherit from the shell a signal action of ignored (SIG_IGN)
-> for the SIGINT and SIGQUIT signals.
+--------------8yQRZVXJTRAu5SH660HF03SF--
 
-Builtin [trap] has this requirement:
+--------------jQrke1JAFPUiqbMOp8252sUK
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-> Signals that were ignored on entry to a non-interactive shell
-> cannot be trapped or reset, although no error need be reported when
-> attempting to do so.
+-----BEGIN PGP SIGNATURE-----
 
-Apparently this only applies to signals that were inherited as ignored,
-not to the special case of SIGINT/SIGQUIT begin ignored in asynchronous
-subshells.
+wsD5BAABCAAjFiEE7ruZ0Yy8BOSWJJ+Vi0B6xFixsSgFAmYNVKAFAwAAAAAACgkQi0B6xFixsSgZ
+DAv9EgW+9xa5/5OUQOz8k+ItLa8NUe6xnv/qoY/E2wu/meiXTpPOniFnj7zy0LIpXg9FTiqTCtYH
+vaS2toc4BTrZZ3n79PboXjkSFfONMSgB/Ij/u1ovgUvLKbtLEgntRWaK78WEffxxv3IJ6ZScQByV
++py2gN/n16opkgnDgz9o03KLwKaz/ft5/uimBn9f4Gzsg0d59qDd1d+aqt3lbEFlYuuWeLANOIH3
+GYO+WufM2Ady7D99CMrWP2vk3oHf/PNkZ44Uf7GvJ/Q572yS9NwcLllAq8OcEihXY8t05M943Wfm
+16BJsFxO8lk3gkiM8f6DoueOJeyrFXhjH+h8JNcPKCa/07oFsgNGd5aEJBH5wRccW7/MIlDPNNxd
+WEXFtCa/8fvzLG/f77CRzgM5AE5YA0FxMjgWX1D0fYT890S8dLfp2rdFedm3Hv8SHotToSdsFwpw
+AWATJAYUkKVenxVHhRQChEIURgmwxJ3fsFqCtg2wgPyPsqip66L4tgRz7s9o
+=JKJo
+-----END PGP SIGNATURE-----
 
-Make it so. This means that either of
-
-	trap - INT; trap - QUIT
-	set -i
-
-in a backgrounded subshell will now un-ignore SIGINT and SIGQUIT.
-
-[Signals]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html
-[trap]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#trap
-
-{{{ Test cases:
-
-shell=src/dash
-
-set -e
-
-SubshellWith() {
-	parent_pid=$(setsid "$shell" -c "( $1; sleep 99 ) </dev/null >/dev/null 2>&1 & echo \$\$")
-	sleep 1
-	subshell_pid=$(ps -o pid= -$parent_pid | tail -n 1)
-}
-
-trap 'kill -TERM -$parent_pid 2>/dev//null ||:' EXIT # Tear down after a failure.
-
-echo Scenario 0: '"set -i"' makes a subshell un-ignore SIGINT.
-SubshellWith 'set -i'
-kill -INT $subshell_pid
-! ps -p $subshell_pid | grep sleep || exit 1
-kill -TERM -$parent_pid 2>/dev//null ||: # Tear down.
-
-echo Scenario 1: resetting SIGINT handler.
-SubshellWith 'trap - INT'
-kill -INT -$parent_pid # kill the whole process group since that's the my use case
-! ps -p $subshell_pid | grep sleep || exit 1
-kill -TERM -$parent_pid 2>/dev//null ||: # Tear down.
-
-echo Scenario 2: ignoring SIGINT.
-SubshellWith 'trap "" INT'
-kill -INT $subshell_pid
-ps -p $subshell_pid | grep sleep || exit 1
-kill -TERM -$parent_pid 2>/dev//null ||: # Tear down.
-
-}}}
-
-{{{ Backstory/motivation:
-
-The Kakoune[1] editor likes to run noninteractive shell commands that
-boil down to
-
-	mkfifo /tmp/fifo
-	(
-		trap - INT
-		make
-	) >/tmp/fifo 2>&1 &
-
-On Control-C, the editor sends SIGINT to its process group,
-which should terminate the subshell running make[2].
-
-We experimented with sending SIGTERM instead but found issues,
-specifically if the editor is invoked (without exec) from a wrapper
-script, sending SIGTERM to the whole process group would kill the
-wrapper script, which in turn makes it send SIGTERM to the editor,
-which then terminates.
-
-[1]: https://kakoune.org/
-[2]: https://lists.sr.ht/~mawww/kakoune/%3C20240307135831.1967826-3-aclopte@gmail.com%3E
-
-}}}
----
- src/trap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/trap.c b/src/trap.c
-index cd84814..dbf81ea 100644
---- a/src/trap.c
-+++ b/src/trap.c
-@@ -272,7 +272,7 @@ ignoresig(int signo)
- 		signal(signo, SIG_IGN);
- 	}
- 	if (!vforked)
--		sigmode[signo - 1] = S_HARD_IGN;
-+		sigmode[signo - 1] = S_IGN;
- }
- 
- 
--- 
-2.44.0.368.gc75fd8d815
-
+--------------jQrke1JAFPUiqbMOp8252sUK--
