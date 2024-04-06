@@ -1,30 +1,33 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7977208D4
-	for <dash@vger.kernel.org>; Sat,  6 Apr 2024 06:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2901803D
+	for <dash@vger.kernel.org>; Sat,  6 Apr 2024 06:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712384578; cv=none; b=AUHWph8COAA9CktrQ+G53t81/oRZA920UNWSYHGZeJzKWJfV/NL5tqwpcqT9IFbau6meTAr/+wqkTEQTFCLdiSBGh9P8s8OyNLjCuznvrT8CIIGKBI3BUbY+6Zt/KE3K3ZkyOyxYLsTZbVPU2NmbzufN8y/ZIqLm8/Kg++p1rJs=
+	t=1712384747; cv=none; b=LrCr8yZg4I3PQR/BVyrLBzAm6T4VZFa9sEqH7GjaTdZ0ovul1mbZA5JAn0ZkgXRE+yFU7+uQ6nQJu48IwkUatUYb5ubho8ZdoephlTJpVxmKqN81Jrxwq+zhmSINtVAaVm91FHqMUWSJxIrnYpnYrEAPuSJcTIJBmC2bGBOeX8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712384578; c=relaxed/simple;
-	bh=duosC3iPwsPJm9ZNgocTnQH0OojDswfRliDfNolH3nE=;
+	s=arc-20240116; t=1712384747; c=relaxed/simple;
+	bh=qYKYu101K7C401vPY4NLYMgPN+wRMRXh6iUOUE1b5Cc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JyFB8wR9+PL20hzxeU9GJrKsEEVbiwlr5T9MeQh+7/L102jYrGYhHKX5VwdsxkuwoHFhJGLO77UDWsda2NPJ4S0jJWCIiMyCttgTjcT9BJl5QoC6n9gQ/dasK/X4PqwqsFGyfIW6DdLfBY/T93+RNg2Kerjkx2OPlK2cL+6IPuU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZtqDy1K4RK8oOKfORq8NpgtoYcCH1BiMtH33/8ksKKrRXOP2z+/wveOo77SLdUEJo98K880KpI/nKEMX7RJcq8JxGL5FIwem7Ijim9FdT8F8VTBtbSVJYgblAYuYiM3zq7/cqjX0XfKDADPcuY25IwJmWQ0f/1RiAUJHn1xxBiY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rszRs-00FppB-71; Sat, 06 Apr 2024 14:22:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 06 Apr 2024 14:23:01 +0800
-Date: Sat, 6 Apr 2024 14:23:01 +0800
+	id 1rszUg-00Fpqs-Vp; Sat, 06 Apr 2024 14:25:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 06 Apr 2024 14:25:56 +0800
+Date: Sat, 6 Apr 2024 14:25:56 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Forest <forestix@sonic.net>
+To: Alain Knaff <alain@knaff.lu>
 Cc: dash@vger.kernel.org
-Subject: Re: [PATCH] man page: redirection operators: fix swapped stdin/stdout
-Message-ID: <ZhDqRT0zVzK7Fur0@gondor.apana.org.au>
-References: <hpl58htt4cqjtgkt4lvqus3fpc8jc5fdls@4ax.com>
+Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
+ PC
+Message-ID: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
+References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
+ <6ea7da38-204f-54bf-7156-085a1589c40b@knaff.lu>
+ <6cacf608-326e-211a-7d37-164041710980@knaff.lu>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -33,22 +36,15 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <hpl58htt4cqjtgkt4lvqus3fpc8jc5fdls@4ax.com>
+In-Reply-To: <6cacf608-326e-211a-7d37-164041710980@knaff.lu>
 
-On Mon, May 16, 2022 at 04:02:24PM -0700, Forest wrote:
-> The Redirections section incorrectly claimed that <& replaces stdout
-> and >& replaces stdin. Swapped them to make it read correctly.
+On Sat, Oct 01, 2022 at 08:45:50PM +0200, Alain Knaff wrote:
 > 
-> Ref:
-> https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_07_05
-> 
-> Both errors were followed by extra text that looked like remains of a
-> mostly-deleted sentence. Removed those.
-> ---
->  src/dash.1 | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+> Sorry, yet another update to the patch. Apparently when I did the diff, 
+> the src/system.c file of my "reference" tree was not clean.
 
-Patch applied.  Thanks.
+Thanks but this needs to be split up into smaller patches so
+that each patch fixes just one problem.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
