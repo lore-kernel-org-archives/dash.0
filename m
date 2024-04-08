@@ -1,72 +1,106 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from sdaoden.eu (sdaoden.eu [217.144.132.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF041FC8
-	for <dash@vger.kernel.org>; Mon,  8 Apr 2024 04:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4D91D558
+	for <dash@vger.kernel.org>; Mon,  8 Apr 2024 22:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.144.132.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712552093; cv=none; b=D1qYmwAA7imyGa5PH3nZbt0MaFzRW20h+xCAvDHcUsd4vovrL/Gs1fsGej4MXIBhXB4ckqFLcz6GPZ1XztforJcqfVD2ZCsF62eBqtHsaCFucSgC5TtZlNaiA5vTRWB+FYPN26F7VEsGnX84uqeDSTIw1qIBG2U1M0GfJljOY78=
+	t=1712616874; cv=none; b=VHU1EtnYddoYgOnoDujl5t3fPbk8Kjwxuh6MKv2FlipvK5DeLQcyNjd23xMM23wcJ22uUBLK38YIuzzBcYKZclaFf8RXAWgZE5s6fLaGR5S+asoq1+Fhq18Pwt8OQ0zQxUoi2/e0s7GQcWee8q+Bq6Fx7J0khtK5cYPxOu58tio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712552093; c=relaxed/simple;
-	bh=XUzSY3Xyo2oQNUiTmLAx3dvzfsA+DueiDAQnz899YAc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=edH1T6SAiSkyVf1JxtIzyWFKs9LkbB7YXB+U297KzRl76j0bsYXKswBP1Zma/onaKSt9+FqSMVq5/jZfoIClITLoA0Q84dyctdUSXw/91nJVT9xYTjiT6gmUG1bBbuOsNExTzhU7dIOvXmy0DnxjrBmmNg/Ykf07SU1gHDZpQ54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rth1p-00GSdy-S4; Mon, 08 Apr 2024 12:54:46 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 08 Apr 2024 12:55:03 +0800
-Date: Mon, 8 Apr 2024 12:55:03 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: dash@vger.kernel.org
-Subject: [PATCH] alias: Fix out-of-bound access
-Message-ID: <ZhN4p6axGxEpiUu+@gondor.apana.org.au>
+	s=arc-20240116; t=1712616874; c=relaxed/simple;
+	bh=ZkxnrflcxJ5+5xoWoyDo0xetgjXJYcF8xmL40VrkORM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References; b=WeZPJU7kYoPZJl/lUQqh3dmwEXOHp78ccEKU2hYKRBqyPdX4kikSYyIYGNT0HrhSrAr2AnLx0d+Wre+Yh9T0iaIUhxwlmm1pSMhWUL349i0vACQO+LDEisVQRlhBGsLjOix2/yibcz/NEMwAWD6ELdyXBjM4anverxWkUojZT48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu; spf=none smtp.mailfrom=sdaoden.eu; dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=OkLfG+j+; dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=ieWcDFnV; arc=none smtp.client-ip=217.144.132.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sdaoden.eu
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="OkLfG+j+";
+	dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="ieWcDFnV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sdaoden.eu;
+ s=citron; t=1712616862; x=1713283528; h=date:author:from:to:cc:subject:
+  message-id:in-reply-to:references:openpgp:blahblahblah:author:from:
+  subject:date:to:cc:resent-date:resent-from:resent-to:resent-cc:
+  in-reply-to:references:mime-version:content-type:
+  content-transfer-encoding:message-id:mail-followup-to:openpgp:
+  blahblahblah; bh=b3C+bitbbE/MKEdHI7gZB9s7p1z3WGTV1Ct0UMwuYrk=;
+ b=OkLfG+j+8ChjjhF00axe7gcWZFOWD4Hbd7+sAEnrAyAnJSsxrO+W1I/9azVhOgHvWSBnUlc2
+  OQn2+VkXiDOuIOHsEho2VPjyUisFNSppmP9WbxxP5cCWlwrkPngj2PgxN3EDYmXRvaTR/DXIkp
+  UlQBwsePewLGwpvul2UxG1nKuTducUbnrtK+OPDNQd22rGmUNF2u/ixy1J9dGR3ZlHWnIhOayC
+  dtaOF0hD53KUULBfscqwmMfnNGkfW4pRY+dkePMiDM9vxlVCJs8OcQW3eAwpB7naOIpSGlZJVh
+  bmoCOhFDDDBSbOalsnQC2VNKWJ2N6+fA4owF+g3ikOzTq72g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sdaoden.eu;
+ s=orange; t=1712616862; x=1713283528; h=date:author:from:to:cc:subject:
+  message-id:in-reply-to:references:openpgp:blahblahblah:author:from:
+  subject:date:to:cc:resent-date:resent-from:resent-to:resent-cc:
+  in-reply-to:references:mime-version:content-type:
+  content-transfer-encoding:message-id:mail-followup-to:openpgp:
+  blahblahblah; bh=b3C+bitbbE/MKEdHI7gZB9s7p1z3WGTV1Ct0UMwuYrk=;
+ b=ieWcDFnVK97/Y5mbkemOpOIXF4v4sjCisG0EKjo3gAakHRcIkqasJczcQQtgo1UFwoTmFkCR
+  pcp7RYcUz+/0Bw==
+Date: Tue, 09 Apr 2024 00:54:20 +0200
+Author: Steffen Nurpmeso <steffen@sdaoden.eu>
+From: Steffen Nurpmeso <steffen@sdaoden.eu>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org,
+ Ganael LAPLANCHE <ganael.laplanche@martymac.org>,
+ Jilles Tjoelker <jilles@stack.nl>
+Subject: Re: [v2 PATCH] jobs: Allow monitor mode without a tty in
+ non-interactive mode
+Message-ID: <20240408225420.hz8nC3ly@steffen%sdaoden.eu>
+In-Reply-To: <ZhJhpbIEe1RyBfk0@gondor.apana.org.au>
+References: <dedaa3fa370ea9c4aeb1771b5568a7bef4065b04.1675113321.git.steffen@sdaoden.eu>
+ <ZhJhpbIEe1RyBfk0@gondor.apana.org.au>
+User-Agent: s-nail v14.9.24-612-g7e3bfac540
+OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
+ url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
+BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
+ the world can make no bugs.
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc839b61-a7d5-6a36-ed47-db8363989379@gigawatt.nl>
-X-Newsgroups: apana.lists.os.linux.dash
 
-Harald van Dijk <harald@gigawatt.nl> wrote:
->
-> I had trusted that this "n+1: funny ksh stuff" logic which allows an 
-> alias to start with = was because ksh allows this, but I tested this 
-> now, it does not and I can find no evidence that it ever did. Maybe it 
-> would be good to just remove this exception, or if dash wants to keep 
-> it, document it as an ash extension rather than claim it as a ksh thing?
+Hello.
 
-Thanks.  This patch should fix the overrun.
+Sorry for the late response.
 
----8<---
-Check for empty string before searching for equal sign starting at
-n+1 in aliascmd.
+Herbert Xu wrote in
+ <ZhJhpbIEe1RyBfk0@gondor.apana.org.au>:
+ |On Mon, Jan 30, 2023 at 10:15:40PM +0100, Steffen Nurpmeso wrote:
+ |> This is a take-over of the FreeBSD bin/sh
+ |> 
+ |>   commit cd60e2c67d52e1f957841af19128c7227880743a
+ |>   Author:     Jilles Tjoelker <jilles@FreeBSD.org>
+ |>   AuthorDate: 2014-09-04 21:48:33 +0000
+ |>   Commit:     Jilles Tjoelker <jilles@FreeBSD.org>
+ |>   CommitDate: 2014-09-04 21:48:33 +0000
+ |> 
+ |>       sh: Allow enabling job control without a tty in non-interactive \
+ |>       mode.
+ |> 
+ |>       If no tty is available, 'set -m' is still useful to put jobs \
+ |>       in their own
+ |>       process groups.
+ ...
+ |Thanks for the patch.  I've rewritten it to minimise the impact.
 
-Reported-by: Harald van Dijk <harald@gigawatt.nl>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+The patch is much smaller.
 
-diff --git a/src/alias.c b/src/alias.c
-index fcad43b..cee07e9 100644
---- a/src/alias.c
-+++ b/src/alias.c
-@@ -143,7 +143,8 @@ aliascmd(int argc, char **argv)
- 		return (0);
- 	}
- 	while ((n = *++argv) != NULL) {
--		if ((v = strchr(n+1, '=')) == NULL) { /* n+1: funny ksh stuff */
-+		/* n + 1: funny ksh stuff (from 44lite) */
-+		if (!*n || !(v = strchr(n + 1, '='))) {
- 			if ((ap = *__lookupalias(n)) == NULL) {
- 				outfmt(out2, "%s: %s not found\n", "alias", n);
- 				ret = 1;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ |However, the end result should be fairly similar.
+ |
+ |Please test this and let me know if there are any issues.
+
+Running the script with it has the desired result.
+
+  ..
+ --End of <ZhJhpbIEe1RyBfk0@gondor.apana.org.au>
+
+Ciao, and greetings from Germany,
+
+--steffen
+|
+|Der Kragenbaer,                The moon bear,
+|der holt sich munter           he cheerfully and one by one
+|einen nach dem anderen runter  wa.ks himself off
+|(By Robert Gernhardt)
