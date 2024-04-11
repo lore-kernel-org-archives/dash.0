@@ -1,38 +1,28 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645D813E03B
-	for <dash@vger.kernel.org>; Thu, 11 Apr 2024 07:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F21613E410
+	for <dash@vger.kernel.org>; Thu, 11 Apr 2024 07:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712821421; cv=none; b=frtMX5a0GF7iwazzQQJRVhrQeGu1WxM2Nn+TzQ8ATJU0dGEezygE3On7Jd950T6D96stLDZVxaZyr043LG7fulInSyGR4sC/MpYanJzr4Qde2CuLInGB6EYnQ+eJGyFLI6vu8wwNhrwhSar5dKA+mkCOCwiGU0xiXBLUAoeVKVk=
+	t=1712821577; cv=none; b=oc4mPfS2nXEbzoEvl4FENogpmAjj58HMYHQpA/+PeWNJZ0erSKHUXjtX+qkvvWPnPnycRj5GHeDnWk3KpfS46vJvnAh06vJ4L14JTQ4BNes8A0m/ommXsIP/o83WgbIvyk33bCzGH65fJqMYZSV979kBtnjKbX4sIzWgPPtwXQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712821421; c=relaxed/simple;
-	bh=CHK0TBbukuvJzf3WSMTokB0DJ/Keh6Geh+EtO+HNU5k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RCdKM888OVDVVlB7ncs2T7BtA4wJ4fflr8eOj6/0DpBTTVkT94z41/KzWyraXligxQ0aKUEkqrBXBGR5LvcdgMY8SRMzR1DqjMqHboQAT1AJP042zxrfqxSXZIkNKr/I6ZFOEAGXHrTr5TP8K3FehTPIny59PuTTxT4tXvws1O8=
+	s=arc-20240116; t=1712821577; c=relaxed/simple;
+	bh=p+ijQYwdnU/m1GL4KK4HxGA8VnoXW1GS1/lEF/tLV7s=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mV1pevtSa7UOlsjPT1mXzH23TnxBpZglvRde5s8Awrd7L5wh+td67KLdQUCVpNhRsZR7x4zeXi2KgigA3xVN5OGFPydvLcB8oFdFgZCh6S1X+v8a1tXaI62FkbIRb1MWtAtC5nDSEw3NqjvwYtilstVJaChOiNrBEaYoGSPUq6g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rup5q-000G5E-KK; Thu, 11 Apr 2024 15:43:35 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 Apr 2024 15:43:52 +0800
-Date: Thu, 11 Apr 2024 15:43:52 +0800
+	id 1rup8N-000G8u-2S; Thu, 11 Apr 2024 15:46:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 Apr 2024 15:46:28 +0800
+Date: Thu, 11 Apr 2024 15:46:28 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Christoph Anton Mitterer <calestyo@scientia.org>
-Cc: DASH shell mailing list <dash@vger.kernel.org>,
-	Harald van Dijk <harald@gigawatt.nl>
-Subject: [PATCH] var: Fix unexporting of local variables using unset
-Message-ID: <ZheUuMS9rReRzEY5@gondor.apana.org.au>
-References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
- <ac893750-085d-421a-b296-a182ae51f1ec@gigawatt.nl>
- <0fd6f8b9-7175-4cc9-9d99-586beb3ede48@inlv.org>
- <252ec2b0-70dc-4621-96c2-285aa915cce0@gigawatt.nl>
- <4bcfdb66-c60f-4172-9f4c-cc25c3e99ddc@inlv.org>
- <6e4e70da-b137-44c9-944a-4b4eb4ef2174@gigawatt.nl>
- <d307bc34-f8f4-43d6-9c09-76e02df7d02f@inlv.org>
- <98c5a2b67554676839deded400d4669934b9cd07.camel@scientia.org>
+To: dash@vger.kernel.org
+Subject: [PATCH] var: Remove unused VNOSET
+Message-ID: <ZheVVMDfOsWg/Ihu@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -41,61 +31,47 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <98c5a2b67554676839deded400d4669934b9cd07.camel@scientia.org>
 
-On Thu, Apr 11, 2024 at 03:26:53AM +0200, Christoph Anton Mitterer wrote:
-> 
-> With all the recently merged patches... any chance that we get this
-> issue(s) here fixed?
-> Or at least those, where it's clear what should happen?
+The bit VNOSET is no longer used.  Remove it.
 
-Thanks for the reminder.  This patch should fix the problem.
-
----8<---
-Local variables and other variables with the flag VSTRFIXED set
-could not be unexported using the unset command.  Fix this by
-adding a special case in setvareq for them.
-
-Reported-by: Christoph Anton Mitterer <calestyo@scientia.org>
-Fixes: e3c9a7dd7097 ("[VAR] Move unsetvar functionality into setvareq")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/src/var.c b/src/var.c
-index 21e0abf..6f85be3 100644
+index 6f85be3..895eabc 100644
 --- a/src/var.c
 +++ b/src/var.c
-@@ -255,6 +255,8 @@ struct var *setvareq(char *s, int flags)
- 	vpp = findvar(s);
- 	vp = *vpp;
- 	if (vp) {
-+		unsigned bits;
-+
- 		if (vp->flags & VREADONLY) {
- 			const char *n;
- 
-@@ -274,8 +276,11 @@ struct var *setvareq(char *s, int flags)
- 		if ((vp->flags & (VTEXTFIXED|VSTACK)) == 0)
- 			ckfree(vp->text);
- 
--		if (((flags & (VEXPORT|VREADONLY|VSTRFIXED|VUNSET)) |
--		     (vp->flags & VSTRFIXED)) == VUNSET) {
-+		if ((flags & (VEXPORT|VREADONLY|VSTRFIXED|VUNSET)) != VUNSET)
-+			bits = ~(VTEXTFIXED|VSTACK|VNOSAVE|VUNSET);
-+		else if ((vp->flags & VSTRFIXED))
-+			bits = VSTRFIXED;
-+		else {
- 			*vpp = vp->next;
- 			ckfree(vp);
- out_free:
-@@ -284,7 +289,7 @@ out_free:
- 			goto out;
+@@ -267,9 +267,6 @@ struct var *setvareq(char *s, int flags)
+ 				 n);
  		}
  
--		flags |= vp->flags & ~(VTEXTFIXED|VSTACK|VNOSAVE|VUNSET);
-+		flags |= vp->flags & bits;
+-		if (flags & VNOSET)
+-			goto out;
+-
+ 		if (vp->func && (flags & VNOFUNC) == 0)
+ 			(*vp->func)(varnull(s));
+ 
+@@ -291,8 +288,6 @@ out_free:
+ 
+ 		flags |= vp->flags & bits;
  	} else {
- 		if (flags & VNOSET)
- 			goto out;
+-		if (flags & VNOSET)
+-			goto out;
+ 		if ((flags & (VEXPORT|VREADONLY|VSTRFIXED|VUNSET)) == VUNSET)
+ 			goto out_free;
+ 		/* not found */
+diff --git a/src/var.h b/src/var.h
+index aa7575a..953a694 100644
+--- a/src/var.h
++++ b/src/var.h
+@@ -48,7 +48,7 @@
+ #define VSTACK		0x10	/* text is allocated on the stack */
+ #define VUNSET		0x20	/* the variable is not set */
+ #define VNOFUNC		0x40	/* don't call the callback function */
+-#define VNOSET		0x80	/* do not set variable - just readonly test */
++/* #define VNOSET	0x80	   do not set variable - just readonly test */
+ #define VNOSAVE		0x100	/* when text is on the heap before setvareq */
+ 
+ 
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
