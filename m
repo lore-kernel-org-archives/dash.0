@@ -1,101 +1,83 @@
-Received: from iguana.tulip.relay.mailchannels.net (iguana.tulip.relay.mailchannels.net [23.83.218.253])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54897148306
-	for <dash@vger.kernel.org>; Thu, 11 Apr 2024 13:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.253
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712842094; cv=pass; b=reoHwLAgK8fcXEsOYLcFBNkF3mXohuCg+FhruD/v64yUcqZEwsjdMpxbh1XvF2A7uRQg4yHDhqSW9vEMaYMLmd+D1psevUFI3RG4jJeTPGljkifhFj8NLdOu1x9vTGfwU4ezkXnrDAAakWgnF/YkweO78RoPABtXDjd1ttrhHD0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712842094; c=relaxed/simple;
-	bh=LOknrwdp/VoLbniWHtYEWci0wQ7qnvDCSPPAIej6TwA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nDpBVEW12dvy3QT6r/daq9EI7INbOxd7Hu+yOPYq6d4RwgXfN0YTXfIUCQfosvuPpeq650AXw395VdsEYA3M5BYM47x7BS7ZjDVwAZ7MrU9JvpcH+G2Up6QZqtckCmztWv3flxm4mP/C83ErMkauUUHXQtrAlCCABOjBdGp1wPQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.218.253
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 37B5442A24;
-	Thu, 11 Apr 2024 13:28:04 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (unknown [127.0.0.6])
-	(Authenticated sender: instrampxe0y3a)
-	by relay.mailchannels.net (Postfix) with ESMTPA id D719843453;
-	Thu, 11 Apr 2024 13:28:01 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1712842082; a=rsa-sha256;
-	cv=none;
-	b=xQxrhMi0NUKgSz59z6HeWQN8yuKvFZP5ko6qRbaMEKFhMT3rpWmFYDRstC3Do5rP49MD1u
-	ynJw2P8HhNCpdTElcpBT9Vbf88sphhkY9j5Nwk5sM5jVTDGHWC1AJTWt3AaYbXL6HDwNx0
-	8uAB96LnUrgO2+c9kF2Mn98coj25C3XbI14NKrOemEqcXargQfLxTMVHCC0PjzjxOr+LQM
-	NCmA5s8fdfyD5c/MBSLhJD81IMciTDg2+U0g1CJ3W47ard7/a66yewR/qoAr8qfDlSpfR6
-	eEW7VerXRAaVjq38ZrzQaEzNRKkrm2EbHoC6tsLerjkhUr8sAUM5EgJ+TAo+fA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1712842082;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LOknrwdp/VoLbniWHtYEWci0wQ7qnvDCSPPAIej6TwA=;
-	b=lhA6heYrOqFdP1wAWBWaTD/5PoP7rCMkPwTfjZ/0fNuYx+Nd285CeugKZGmUwPBAvtZzqM
-	tMjDXUmQXt+W6OBN1UuRyj/NQSrWTn3sIYidKOg3vFKZYnO5cQlvAq8zU9ANBrF93r49F5
-	3rIg5564S5Dta9GIg6KUVoOg5ghE28NqQR86OdWXuj6CxzXM3lam3wppkhozoZwNCx45sn
-	IpN0bwNVD/GsajVL9EbxMJ57I9olSPm6LamQwtok/LJMB8iKhupP8EWINe7bvzYwfTqaE4
-	Q0jl+NGbN+NqW/14mBoMT46z724DQrBTcNLCWHBJ98QNJ1eZlj+x3IMBZxAyFQ==
-ARC-Authentication-Results: i=1;
-	rspamd-6f64594bc9-tcxc5;
-	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Battle-Desert: 59bfd98e5ac8dde4_1712842082477_1913106960
-X-MC-Loop-Signature: 1712842082477:212837488
-X-MC-Ingress-Time: 1712842082477
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384)
-	by 100.125.113.89 (trex/6.9.2);
-	Thu, 11 Apr 2024 13:28:02 +0000
-Received: from p5090f28b.dip0.t-ipconnect.de ([80.144.242.139]:38298 helo=heisenberg.fritz.box)
-	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <calestyo@scientia.org>)
-	id 1ruuT8-0006f5-09;
-	Thu, 11 Apr 2024 13:28:00 +0000
-Message-ID: <bf7a9bc7a3108dcd78d4600ebe3807cc74c7a752.camel@scientia.org>
-Subject: Re: [PATCH] var: Fix unexporting of local variables using unset
-From: Christoph Anton Mitterer <calestyo@scientia.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: DASH shell mailing list <dash@vger.kernel.org>, Harald van Dijk
-	 <harald@gigawatt.nl>
-Date: Thu, 11 Apr 2024 15:27:54 +0200
-In-Reply-To: <ZheUuMS9rReRzEY5@gondor.apana.org.au>
-References: <43f0631aea36f6b49e5c3dfdfe481a5a2b1fec6c.camel@scientia.org>
-	 <ac893750-085d-421a-b296-a182ae51f1ec@gigawatt.nl>
-	 <0fd6f8b9-7175-4cc9-9d99-586beb3ede48@inlv.org>
-	 <252ec2b0-70dc-4621-96c2-285aa915cce0@gigawatt.nl>
-	 <4bcfdb66-c60f-4172-9f4c-cc25c3e99ddc@inlv.org>
-	 <6e4e70da-b137-44c9-944a-4b4eb4ef2174@gigawatt.nl>
-	 <d307bc34-f8f4-43d6-9c09-76e02df7d02f@inlv.org>
-	 <98c5a2b67554676839deded400d4669934b9cd07.camel@scientia.org>
-	 <ZheUuMS9rReRzEY5@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3-1+b1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6055337A
+	for <dash@vger.kernel.org>; Fri, 12 Apr 2024 09:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712915477; cv=none; b=KjzLq8S6i8E2BKuP+HNYWAV1D4smldIm+PNCw2+/8eqaI1w8VF+Vm0dMC52O0kX6wG7BtkF+4In85wHvNt+6MUQfANXxHMMsEk154gQdvNke7HDFnMd4A4cIRG5CHAy1wdgp9VmY932FpW+qgt4EArnlF4c08ovBBTZDpdktObY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712915477; c=relaxed/simple;
+	bh=tdiydCE3+xtc/EjRQhkNC5k86y0vcemeKwrpzOjEyAU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l3LgRenJ3HXSTIEkvmMNbMkng9a9Q42gl9CCaXmiQmdQh2s2vder0+rmIMSz8w4EljwKpVFyqvEscIoV2GvQLYwn2MuSmA16kGUmHULsFK49O0pqVwH8HNBSmdYrLXKspDxJY4RdqhypZYvtKSBuBvzNLjhfy+wuWS9BMRJKkJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rvDYq-000pCo-Ca; Fri, 12 Apr 2024 17:51:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Apr 2024 17:51:25 +0800
+Date: Fri, 12 Apr 2024 17:51:25 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: DASH shell mailing list <dash@vger.kernel.org>
+Subject: [PATCH] alias: Disallow non-CWORD characters
+Message-ID: <ZhkEHWODl9ZFKBhq@gondor.apana.org.au>
+References: <444eaa61-35a8-15f4-5aeb-14a56aa38d07@gigawatt.nl>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AuthUser: calestyo@scientia.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <444eaa61-35a8-15f4-5aeb-14a56aa38d07@gigawatt.nl>
 
-On Thu, 2024-04-11 at 15:43 +0800, Herbert Xu wrote:
-> Thanks for the reminder.=C2=A0 This patch should fix the problem.
+On Wed, Jan 11, 2023 at 02:01:03AM +0000, Harald van Dijk wrote:
+>
+> Supporting alias names containing non-ASCII characters, while not required
+> by POSIX, seems desirable, and almost all other shells (mksh being the
+> exception) do appear to support this. I am not yet seeing a good way of
+> solving this.
 
-Thanks for the patch :-)
+I looked at supporting this properly by either adding or removing
+quotes but the complexity is just not worth it.  Let's just ban
+these characters.
 
+---8<---
+Alias names containing control characters may match words from
+the parser that shouldn't be matched.  Disallow such characters
+from appearing in an alias name.
 
-Cheers,
-Chris.
+Reported-by: Harald van Dijk <harald@gigawatt.nl>
+
+diff --git a/src/alias.c b/src/alias.c
+index cee07e9..3cd3413 100644
+--- a/src/alias.c
++++ b/src/alias.c
+@@ -41,6 +41,7 @@
+ #include "mystring.h"
+ #include "alias.h"
+ #include "options.h"	/* XXX for argptr (should remove?) */
++#include "syntax.h"
+ 
+ #define ATABSIZE 39
+ 
+@@ -55,6 +56,11 @@ void
+ setalias(const char *name, const char *val)
+ {
+ 	struct alias *ap, **app;
++	const char *p;
++
++	for (p = name; *p; p++)
++		if (BASESYNTAX[(signed char)*p] != CWORD)
++			sh_error("Invalid alias name: %s", name);
+ 
+ 	app = __lookupalias(name);
+ 	ap = *app;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
