@@ -1,29 +1,29 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AA042062
-	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 11:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934AC42062
+	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 11:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714216026; cv=none; b=J1noXYhEHtJJyMw5qk8Dpj//ISsQE2n4GFsHRTjHCJOUtm9ODvOU4jQkELFgYMBF29UTKSBDrn+nEuE0t3GzxB7ebWsPxExZ4O7YxAp899MtGHJSvn/sQRSlmiPXglmbLQc6/hpl+Y5QEzDlWwIe8bmAOqCtQUjo23qXVCMp0SI=
+	t=1714216028; cv=none; b=TuRVM9bPDr6H09f0ly+/pM9RM4ufe/+cyR2iwwgszFSiIeRwC2VECA0mkLyb9ZUz56V2LkhgNEXwIzM9J+ruXCUGokdKbjqnw2sHPBl+hX69qo0cUJcmRH+uihd52SrglEHpXPjcC/MTVndMI5zI/HqH896GOGc12TlPvfI3zUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714216026; c=relaxed/simple;
-	bh=QSNOuGchN7VIKs3Dii5wq9S5Z13unfd2KegrKIUOKMs=;
-	h=Message-Id:In-Reply-To:References:From:Date:Subject:To; b=UBpYVkOiu0k5ybQU7W9qWOFIZnert6Q30hJPYEPWMpBIp8vrBSD5O250i8bVlDujzeHGjlKBdhuMXV/AmzOsOcbRUs1HRjDg8552GfAEjFXmJoTfG4qZmUkXsK3iPmuh8gBdtRpa6vCeEaRiJzFmwFuMNNaacgDW4S9cYjQ+OwE=
+	s=arc-20240116; t=1714216028; c=relaxed/simple;
+	bh=WM4K4qsej20xU9qC+ULpNgYM938hmoTCpH8V5sWVgEA=;
+	h=Message-Id:In-Reply-To:References:From:Date:Subject:To; b=WJ+3fuo3RTOQ+8mj06K/VUr7jjraDPXrF14As14SRzL04p/ZT7qKCEPkVYatZCaNh7u/dQm4WQPcMCJ5r3QZ2uOuMOfDdAZABhtMyzUu9hHYxJahgyFjoZ8ERoszwMRmYDyoISG1Dsb6h6kWDt4UZDdTbPddCk0m6tHgKvld5I8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s0ftU-0079ly-1d;
-	Sat, 27 Apr 2024 19:07:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 27 Apr 2024 19:07:18 +0800
-Message-Id: <3b5e2370bf49d9d1eb103f80abd93b8ca51d0568.1714215826.git.herbert@gondor.apana.org.au>
+	id 1s0ftW-0079mE-2f;
+	Sat, 27 Apr 2024 19:07:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 27 Apr 2024 19:07:20 +0800
+Message-Id: <edd263ecc3cc833eee1d44b10a0e3cbb74c64edd.1714215826.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1714215826.git.herbert@gondor.apana.org.au>
 References: <cover.1714215826.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Tue, 16 Apr 2024 18:38:42 +0800
-Subject: [PATCH 2/8] shell: Use strcoll instead of strcmp where applicable
+Date: Wed, 17 Apr 2024 07:13:16 +0800
+Subject: [PATCH 3/8] expand: Count multi-byte characters for VSLENGTH
 To: DASH Mailing List <dash@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
@@ -31,51 +31,160 @@ List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 
-Use strcoll instead of strcmp so that the locale is taken into
-account when sorting strings during pathname expansion, and for
-the built-in test(1) string comparison operators.
+Count multi-byte characters in variables and rather than bytes
+and return that as the length expansion.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- src/bltin/test.c | 8 ++++----
- src/expand.c     | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ src/expand.c | 62 +++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 44 insertions(+), 18 deletions(-)
 
-diff --git a/src/bltin/test.c b/src/bltin/test.c
-index fd8a43b..2db4d0f 100644
---- a/src/bltin/test.c
-+++ b/src/bltin/test.c
-@@ -353,13 +353,13 @@ binop(void)
- 		/* NOTREACHED */
- #endif
- 	case STREQ:
--		return strcmp(opnd1, opnd2) == 0;
-+		return strcoll(opnd1, opnd2) == 0;
- 	case STRNE:
--		return strcmp(opnd1, opnd2) != 0;
-+		return strcoll(opnd1, opnd2) != 0;
- 	case STRLT:
--		return strcmp(opnd1, opnd2) < 0;
-+		return strcoll(opnd1, opnd2) < 0;
- 	case STRGT:
--		return strcmp(opnd1, opnd2) > 0;
-+		return strcoll(opnd1, opnd2) > 0;
- 	case INTEQ:
- 		return getn(opnd1) == getn(opnd2);
- 	case INTNE:
 diff --git a/src/expand.c b/src/expand.c
-index 0db2b29..9ac981e 100644
+index 9ac981e..ad186b0 100644
 --- a/src/expand.c
 +++ b/src/expand.c
-@@ -1476,7 +1476,7 @@ msort(struct strlist *list, int len)
- 	p = msort(p, len - half);		/* sort second half */
- 	lpp = &list;
- 	for (;;) {
--		if (strcmp(p->text, q->text) < 0) {
-+		if (strcoll(p->text, q->text) < 0) {
- 			*lpp = p;
- 			lpp = &p->next;
- 			if ((p = *lpp) == NULL) {
+@@ -53,6 +53,7 @@
+ #endif
+ #include <ctype.h>
+ #include <stdbool.h>
++#include <wchar.h>
+ 
+ /*
+  * Routines to expand arguments to commands.  We have to deal with
+@@ -796,6 +797,18 @@ really_record:
+ 	return p;
+ }
+ 
++static char *chtodest(int c, int flags, char *out)
++{
++	const char *syntax = flags & EXP_QUOTED ? DQSYNTAX : BASESYNTAX;
++
++	if ((flags & QUOTES_ESC) &&
++	    ((syntax[c] == CCTL) ||
++	     (flags & EXP_QUOTED && syntax[c] == CBACK)))
++		USTPUTC(CTLESC, out);
++	USTPUTC(c, out);
++
++	return out;
++}
+ 
+ /*
+  * Put a string on the stack.
+@@ -803,38 +816,48 @@ really_record:
+ 
+ static size_t memtodest(const char *p, size_t len, int flags)
+ {
+-	const char *syntax = flags & EXP_QUOTED ? DQSYNTAX : BASESYNTAX;
++	size_t count = 0;
+ 	char *q;
+-	char *s;
++	int c;
+ 
+ 	if (unlikely(!len))
+ 		return 0;
+ 
+ 	q = makestrspace(len * 2, expdest);
+-	s = q;
+ 
+ 	do {
+-		int c = (signed char)*p++;
+-		if (c) {
+-			if ((flags & QUOTES_ESC) &&
+-			    ((syntax[c] == CCTL) ||
+-			     (flags & EXP_QUOTED && syntax[c] == CBACK)))
+-				USTPUTC(CTLESC, q);
+-		} else if (!(flags & EXP_KEEPNUL))
++		c = (signed char)*p++;
++
++		if (c)
++			count++;
++		else if (!(flags & EXP_KEEPNUL))
+ 			continue;
+-		USTPUTC(c, q);
++
++		if (c < 0) {
++			mbstate_t mbs = {};
++
++			p--;
++			do {
++				q = chtodest(c, flags, q);
++			} while (mbrlen(p++, 1, &mbs) == -2 &&
++				 (c = *p, --len));
++			if (!len)
++				break;
++			continue;
++		}
++
++		q = chtodest(c, flags, q);
+ 	} while (--len);
+ 
+ 	expdest = q;
+-	return q - s;
++	return count;
+ }
+ 
+ 
+ static size_t strtodest(const char *p, int flags)
+ {
+ 	size_t len = strlen(p);
+-	memtodest(p, len, flags);
+-	return len;
++	return memtodest(p, len, flags);
+ }
+ 
+ 
+@@ -856,6 +879,7 @@ varvalue(char *name, int varflags, int flags, int quoted)
+ 	int discard = (subtype == VSPLUS || subtype == VSLENGTH) |
+ 		      (flags & EXP_DISCARD);
+ 	ssize_t len = 0;
++	size_t start;
+ 	char c;
+ 
+ 	if (!subtype) {
+@@ -865,9 +889,9 @@ varvalue(char *name, int varflags, int flags, int quoted)
+ 		sh_error("Bad substitution");
+ 	}
+ 
+-	flags |= EXP_KEEPNUL;
+ 	flags &= discard ? ~QUOTES_ESC : ~0;
+ 	sep = (flags & EXP_FULL) << CHAR_BIT;
++	start = expdest - (char *)stackblock();
+ 
+ 	switch (*name) {
+ 	case '$':
+@@ -927,7 +951,7 @@ param:
+ 
+ 			if (*ap && sep) {
+ 				len++;
+-				memtodest(&sepc, 1, flags);
++				memtodest(&sepc, 1, flags | EXP_KEEPNUL);
+ 			}
+ 		}
+ 		break;
+@@ -957,7 +981,7 @@ value:
+ 	}
+ 
+ 	if (discard)
+-		STADJUST(-len, expdest);
++		expdest = (char *)stackblock() + start;
+ 
+ 	return len;
+ }
+@@ -1758,11 +1782,13 @@ casematch(union node *pattern, char *val)
+ 
+ static size_t cvtnum(intmax_t num, int flags)
+ {
++	size_t start = expdest - (char *)stackblock();
+ 	int len = max_int_length(sizeof(num));
+ 	char buf[len];
+ 
+ 	len = fmtstr(buf, len, "%" PRIdMAX, num);
+-	return memtodest(buf, len, flags);
++	memtodest(buf, len, flags);
++	return (expdest - (char *)stackblock()) - start;
+ }
+ 
+ STATIC void
 -- 
 2.39.2
 
