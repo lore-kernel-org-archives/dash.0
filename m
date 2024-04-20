@@ -1,39 +1,31 @@
-Received: from mail02.stack.nl (scw01.stack.nl [51.15.111.152])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0CBA168C4
-	for <dash@vger.kernel.org>; Fri, 19 Apr 2024 21:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.15.111.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D2517C
+	for <dash@vger.kernel.org>; Sat, 20 Apr 2024 00:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713563073; cv=none; b=IKPzdAYzlKbhwEENIZlYj76Gfx6LMlIXIjrfFx/DjEQrMzaJtlW/SGePS+Od9PPb2/XfP0H+viBwQSjB9V/OWONHb2LwQP6WVCW5VEnYN3AAmK5VQgu8/qETCQU521GRfLs10zcl0xozcpaF8Z8GakKqfSYI23NFqhZEbuakQUw=
+	t=1713572131; cv=none; b=RIEfGRVueUlKxpibmyP7ExyryP+s5TTRsDXLOLfImGKVbdyuXDvEWQR18bgWf00C0aaYZALpZ5aFWrZefAx4AnP3yXbK0ZIPZGhF/Zr7Lh5BkSvQYkDmx4cVrgpwLioAWxeolnnfUgKJrTOITIWqCVPY5/QSCvRHbMZUu2l4D4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713563073; c=relaxed/simple;
-	bh=5pHDQc7R0BWIOv+m2k4J2r/CZNDvfAwxezWrkyCtCTg=;
+	s=arc-20240116; t=1713572131; c=relaxed/simple;
+	bh=+FSxrixIxgFk5IR+XpSdjFv3QNBy1qAL91DnoZQlsNY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dCc4NzqiONQ9gHJ28pqXifhwVD5HfkUoFwSWvGa0K0GnLHbhlX5ea//EATyEViSaLYF9PGm38E3Smbi40MviA9hezSW48tuyZyBLOkCnrd1VXEpM8FbiEg04y8oOsoYdA+GI7WAX/ycLw+s+4IfdsPMqjIiHT7KYf5ozz+l0OtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stack.nl; spf=pass smtp.mailfrom=stack.nl; arc=none smtp.client-ip=51.15.111.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stack.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stack.nl
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail02.stack.nl (Postfix) with ESMTP id 8C3821E014B;
-	Fri, 19 Apr 2024 21:44:27 +0000 (UTC)
-Received: from mail02.stack.nl ([127.0.0.1])
-	by localhost (mail02.stack.nl [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TovHUZKiYcGq; Fri, 19 Apr 2024 21:44:25 +0000 (UTC)
-Received: from blade.stack.nl (blade.stack.nl [192.168.121.130])
-	by mail02.stack.nl (Postfix) with ESMTP id 5911D1E002E;
-	Fri, 19 Apr 2024 21:44:25 +0000 (UTC)
-Received: by blade.stack.nl (Postfix, from userid 1677)
-	id 3DFDF237C4D; Fri, 19 Apr 2024 23:44:25 +0200 (CEST)
-Date: Fri, 19 Apr 2024 23:44:25 +0200
-From: Jilles Tjoelker <jilles@stack.nl>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qylArrkY+64aHQFeiDqRE2d9km1Sf/3uZrcPtsSNW1rkaJa8di3piZuUWU0eRHUZ86QsruBV9k4gbzIsNGTa0/0josAQlpiOs6PdMKFiIpAYqZ2ps+EUwYcQF//Nbt0oYt6Zy9dLiOIYK7VbeVgAgnbl+6Lh95z+yjP0utGH92k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rxyO0-0047Qw-KB; Sat, 20 Apr 2024 08:15:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 20 Apr 2024 08:15:38 +0800
+Date: Sat, 20 Apr 2024 08:15:38 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jilles Tjoelker <jilles@stack.nl>
 Cc: dash@vger.kernel.org
-Subject: Re: [v2 PATCH] trap: Preserve parent traps for trap-only command
- substitution
-Message-ID: <20240419214425.GB24704@stack.nl>
-References: <ZhuLNH4dCxqs0Ge1@gondor.apana.org.au>
- <Zhz+wALFljSAqnDU@gondor.apana.org.au>
+Subject: Re: [PATCH] redir: Use memfd_create instead of pipe
+Message-ID: <ZiMJKhTAm5eyp7jO@gondor.apana.org.au>
+References: <ZhuLCZfwRfflgv0v@gondor.apana.org.au>
+ <20240419212446.GA24704@stack.nl>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -42,27 +34,20 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zhz+wALFljSAqnDU@gondor.apana.org.au>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20240419212446.GA24704@stack.nl>
 
-On Mon, Apr 15, 2024 at 06:17:36PM +0800, Herbert Xu wrote:
-> v2 restricts the preservation to command substitution only and
-> only if the command's first word is "trap".
+On Fri, Apr 19, 2024 at 11:24:46PM +0200, Jilles Tjoelker wrote:
+>
+> Using pipe or memfd conditionally based on the length of the
+> here-document and whether memfd_create(2) fails transiently might cause
+> even more obscure issues.
 
-> ---8<---
-> Traps are reset when a subshell is started.  When a subshell is
-> started for command substitution with a simple command whose first
-> word is "trap", preserve the parent trap text so that they can be
-> printed.
+The reason is that memfd ends up being a lot slower than pipe.
+Of course it's still way faster than fork + pipe, but until it
+catches up with pipe, we're better off using both.
 
-It looks like this will execute the EXIT trap in a subshell $(trap).
-
-On the other hand, things like $(trap "echo subshell exit >&2" EXIT) and
-$(trap "echo other trap >&2" USR1) seem to be handled correctly.
-
-I think the intent of https://austingroupbugs.net/view.php?id=53 is that
-things like $('trap') and $(\trap) should also work (although an
-expansion that expands to trap need not work).
-
+Cheers,
 -- 
-Jilles Tjoelker
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
