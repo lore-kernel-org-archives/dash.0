@@ -1,33 +1,32 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FC938F
-	for <dash@vger.kernel.org>; Sat, 20 Apr 2024 00:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E96563B
+	for <dash@vger.kernel.org>; Sun, 21 Apr 2024 00:33:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713573360; cv=none; b=IerWvRCl0AF/RvA/7NssQeq5Iz8RglstICN6I3jqzgxWMJF0h9aqbCTTyyeOrlVyqoNEJp4hPGHr4VZCfiLdSG29sUlz32tBaZuGQQAJmT6FZgpzWl89hIsaTRRIrmVQkKh1kvQ52r6KioxOGI7O3udp6PErrYUxSZm/Q/TRp1A=
+	t=1713659631; cv=none; b=k7+3ABWZ+w2myRNz5x2q4s3g7qncG17+f9W3jLzS2Rw0tpazcJebPg9uxjYLLIS5OmUX3pPuAv23vC4ZUrEQVWpyMV7tzxTTZUvqy5ee8AFOgxbHx7PP36QDR0joIzFEh8p+zKdC3OqqhfUwoZsHFi6Vw0w+CSBSIl0cfxauEUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713573360; c=relaxed/simple;
-	bh=YKtsSfhfHOsSzITa408RAnS4vm5Ywt8t2M/+qD1Hkvs=;
+	s=arc-20240116; t=1713659631; c=relaxed/simple;
+	bh=zNQkSSVCM00i3y3YBXNwk6hgCpqGggsiYNQCG9BfYQg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jsL4D1xx4RQB2f6vM1y0rgPZAAbdEmaRvbKRdKDfj9gmll4EaBUL4qF+/7E1061bAVvRkOAiQ8mnrXQ2cNHQ2vEW8DXws7Gi60xzMBkR7ovEs22i/tCbMrzxAI5JFOpLUo3sGSrI/vTX4N4F/picyfUk1h+l1yO9LLDLZEpcbwI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=M1Wid/ld5c3zrZxtdVYIg7PI9SrhqV8KIjtz8SVyOagD4doMRRzWUWQl4mZg8vYGAYRu2k99l44y4EcF9Ub44a3T8PfVHV96iMin9PTLdNI91a9mVop6fyE7+rLyNXMZxla2qZacAQLy6nsGZ4viXVMNcv4q9HuZzbSRtG0pz3I=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rxyhm-0047k3-MA; Sat, 20 Apr 2024 08:35:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 20 Apr 2024 08:36:04 +0800
-Date: Sat, 20 Apr 2024 08:36:04 +0800
+	id 1ryL9D-004NuM-N7; Sun, 21 Apr 2024 08:33:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 21 Apr 2024 08:33:53 +0800
+Date: Sun, 21 Apr 2024 08:33:53 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Jilles Tjoelker <jilles@stack.nl>
 Cc: dash@vger.kernel.org
-Subject: [v3 PATCH] trap: Preserve parent traps for trap-only command
- substitution
-Message-ID: <ZiMN9FzMvg+IhjNJ@gondor.apana.org.au>
-References: <ZhuLNH4dCxqs0Ge1@gondor.apana.org.au>
- <Zhz+wALFljSAqnDU@gondor.apana.org.au>
- <20240419214425.GB24704@stack.nl>
+Subject: [v2 PATCH] redir: Use memfd_create instead of pipe
+Message-ID: <ZiRe8XzJC1CLZvHe@gondor.apana.org.au>
+References: <ZhuLCZfwRfflgv0v@gondor.apana.org.au>
+ <20240419212446.GA24704@stack.nl>
+ <ZiMJKhTAm5eyp7jO@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -36,217 +35,196 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240419214425.GB24704@stack.nl>
+In-Reply-To: <ZiMJKhTAm5eyp7jO@gondor.apana.org.au>
 
-On Fri, Apr 19, 2024 at 11:44:25PM +0200, Jilles Tjoelker wrote:
->
-> It looks like this will execute the EXIT trap in a subshell $(trap).
-
-Good catch!
-
-> I think the intent of https://austingroupbugs.net/view.php?id=53 is that
-> things like $('trap') and $(\trap) should also work (although an
-> expansion that expands to trap need not work).
-
-I don't agree with that.  Unless the wording becomes much more
-explicit, I'm not going to support something silly like $('trap').
-
-Thanks,
+v2 fixes a file descriptor leak when dup fails.
 
 ---8<---
-Traps are reset when a subshell is started.  When a subshell is
-started for command substitution with a simple command whose first
-word is "trap", preserve the parent trap text so that they can be
-printed.
+Use memfd_create(2) instead of pipe(2).  With pipe(2), a fork
+is required if the amount of data to be written exceeds the pipe
+size.  This is not the case with memfd_create.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- src/eval.c   |  4 ++--
- src/init.h   |  4 +++-
- src/jobs.c   |  2 +-
- src/mkinit.c |  5 +++--
- src/trap.c   | 57 +++++++++++++++++++++++++++++++++++++++-------------
- 5 files changed, 52 insertions(+), 20 deletions(-)
+ configure.ac |  2 +-
+ src/eval.c   |  3 +--
+ src/redir.c  | 61 +++++++++++++++++++++++++++++++++++-----------------
+ src/redir.h  |  1 +
+ src/system.h |  7 ++++++
+ 5 files changed, 51 insertions(+), 23 deletions(-)
 
+diff --git a/configure.ac b/configure.ac
+index 6993364..cb55c3f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -87,7 +87,7 @@ AC_CHECK_DECL([PRIdMAX],,
+ 
+ dnl Checks for library functions.
+ AC_CHECK_FUNCS(bsearch faccessat getpwnam getrlimit isalpha killpg \
+-	       mempcpy \
++	       memfd_create mempcpy \
+ 	       sigsetmask stpcpy strchrnul strsignal strtod strtoimax \
+ 	       strtoumax sysconf)
+ 
 diff --git a/src/eval.c b/src/eval.c
-index fce5314..d169eb8 100644
+index 978a174..fce5314 100644
 --- a/src/eval.c
 +++ b/src/eval.c
-@@ -491,11 +491,11 @@ evalsubshell(union node *n, int flags)
- 	expredir(n->nredir.redirect);
- 	INTOFF;
- 	if (!backgnd && flags & EV_EXIT && !have_traps()) {
--		forkreset();
-+		forkreset(NULL);
- 		goto nofork;
+@@ -635,8 +635,7 @@ evalbackcmd(union node *n, struct backcmd *result)
+ 		goto out;
  	}
+ 
+-	if (pipe(pip) < 0)
+-		sh_error("Pipe call failed");
++	sh_pipe(pip, 0);
  	jp = makejob(1);
--	if (forkshell(jp, n, backgnd) == 0) {
-+	if (forkshell(jp, n->nredir.n, backgnd) == 0) {
- 		flags |= EV_EXIT;
- 		if (backgnd)
- 			flags &=~ EV_TESTED;
-diff --git a/src/init.h b/src/init.h
-index d56fb28..4f98b5d 100644
---- a/src/init.h
-+++ b/src/init.h
-@@ -34,7 +34,9 @@
-  *	@(#)init.h	8.2 (Berkeley) 5/4/95
+ 	if (forkshell(jp, n, FORK_NOJOB) == 0) {
+ 		FORCEINTON;
+diff --git a/src/redir.c b/src/redir.c
+index bcc81b4..bf5207d 100644
+--- a/src/redir.c
++++ b/src/redir.c
+@@ -32,6 +32,7 @@
+  * SUCH DAMAGE.
   */
  
-+union node;
-+
- void init(void);
- void exitreset(void);
--void forkreset(void);
-+void forkreset(union node *);
- void reset(void);
-diff --git a/src/jobs.c b/src/jobs.c
-index 2a2fe22..dce8e22 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -872,7 +872,7 @@ static void forkchild(struct job *jp, union node *n, int mode)
- 	if (!lvforked) {
- 		shlvl++;
- 
--		forkreset();
-+		forkreset(mode == FORK_NOJOB ? n : NULL);
- 
- #if JOBS
- 		/* do job control only in root shell */
-diff --git a/src/mkinit.c b/src/mkinit.c
-index 9025862..870b64d 100644
---- a/src/mkinit.c
-+++ b/src/mkinit.c
-@@ -91,6 +91,7 @@ struct event {
- 	char *name;		/* name of event (e.g. INIT) */
- 	char *routine;		/* name of routine called on event */
- 	char *comment;		/* comment describing routine */
-+	char *args;		/* arguments to routine */
- 	struct text code;	/* code for handling event */
- };
- 
-@@ -128,7 +129,7 @@ char reset[] = "\
- struct event event[] = {
- 	{"INIT", "init", init},
- 	{"EXITRESET", "exitreset", exitreset},
--	{"FORKRESET", "forkreset", forkreset},
-+	{"FORKRESET", "forkreset", forkreset, "union node *n"},
- 	{"RESET", "reset", reset},
- 	{NULL, NULL}
- };
-@@ -388,7 +389,7 @@ output(void)
- 	for (ep = event ; ep->name ; ep++) {
- 		fputs("\n\n\n", fp);
- 		fputs(ep->comment, fp);
--		fprintf(fp, "\nvoid\n%s() {\n", ep->routine);
-+		fprintf(fp, "\nvoid\n%s(%s) {\n", ep->routine, ep->args ?: "");
- 		writetext(&ep->code, fp);
- 		fprintf(fp, "}\n");
- 	}
-diff --git a/src/trap.c b/src/trap.c
-index cd84814..75501d7 100644
---- a/src/trap.c
-+++ b/src/trap.c
-@@ -66,7 +66,9 @@
- 
- 
- /* trap handler commands */
--MKINIT char *trap[NSIG];
-+static char *trap[NSIG];
-+/* traps have not been fully cleared */
-+static int ptrap;
- /* number of non-null traps */
- int trapcnt;
- /* current value of signal */
-@@ -81,6 +83,7 @@ volatile sig_atomic_t gotsigchld;
- extern char *signal_names[];
- 
- static int decode_signum(const char *);
-+MKINIT void clear_traps(union node *);
- 
- #ifdef mkinit
- INCLUDE "memalloc.h"
-@@ -92,19 +95,7 @@ INIT {
++#include <sys/mman.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <sys/param.h>	/* PIPE_BUF */
+@@ -280,6 +281,21 @@ ecreate:
+ 	sh_open_fail(fname, O_CREAT, EEXIST);
  }
  
- FORKRESET {
--	char **tp;
--
--	INTOFF;
--	for (tp = trap ; tp < &trap[NSIG] ; tp++) {
--		if (*tp && **tp) {	/* trap not NULL or SIG_IGN */
--			ckfree(*tp);
--			*tp = NULL;
--			if (tp != &trap[0])
--				setsignal(tp - trap);
--		}
--	}
--	trapcnt = 0;
--	INTON;
-+	clear_traps(n);
- }
- #endif
- 
-@@ -133,6 +124,8 @@ trapcmd(int argc, char **argv)
- 		}
- 		return 0;
- 	}
-+	if (ptrap)
-+		clear_traps(NULL);
- 	if (!ap[1] || decode_signum(*ap) >= 0)
- 		action = NULL;
- 	else
-@@ -168,6 +161,40 @@ trapcmd(int argc, char **argv)
- 
- 
- 
-+/*
-+ * Clear traps on a fork.
-+ */
-+
-+void clear_traps(union node *n)
++static int sh_dup2(int ofd, int nfd, int cfd)
 +{
-+	int simplecmd;
-+	char **tp;
++	if (nfd < 0) {
++		nfd = dup(ofd);
++		if (nfd >= 0)
++			cfd = -1;
++	} else
++		nfd = dup2(ofd, nfd);
++	if (likely(cfd >= 0))
++		close(cfd);
++	if (nfd < 0)
++		sh_error("%d: %s", ofd, strerror(errno));
 +
-+	simplecmd = n && n->type == NCMD && n->ncmd.args &&
-+		    equal(n->ncmd.args->narg.text, "trap");
-+
-+	INTOFF;
-+	for (tp = trap ; tp < &trap[NSIG] ; tp++) {
-+		if (*tp && **tp) {	/* trap not NULL or SIG_IGN */
-+			char *otp = *tp;
-+
-+			*tp = NULL;
-+			if (tp != &trap[0])
-+				setsignal(tp - trap);
-+
-+			if (simplecmd)
-+				*tp = otp;
-+			else
-+				ckfree(*tp);
++	return nfd;
++}
+ 
+ #ifdef notyet
+ static void dupredirect(union node *redir, int f, char memory[10])
+@@ -288,7 +304,6 @@ static void dupredirect(union node *redir, int f)
+ #endif
+ {
+ 	int fd = redir->nfile.fd;
+-	int err = 0;
+ 
+ #ifdef notyet
+ 	memory[fd] = 0;
+@@ -301,26 +316,31 @@ static void dupredirect(union node *redir, int f)
+ 				memory[fd] = 1;
+ 			else
+ #endif
+-				if (dup2(f, fd) < 0) {
+-					err = errno;
+-					goto err;
+-				}
++				sh_dup2(f, fd, -1);
+ 			return;
+ 		}
+ 		f = fd;
+-	} else if (dup2(f, fd) < 0)
+-		err = errno;
++	} else
++		sh_dup2(f, fd, f);
+ 
+ 	close(f);
+-	if (err < 0)
+-		goto err;
+-
+-	return;
+-
+-err:
+-	sh_error("%d: %s", f, strerror(err));
+ }
+ 
++int sh_pipe(int pip[2], int memfd)
++{
++	if (memfd) {
++		pip[0] = memfd_create("dash", 0);
++		if (pip[0] >= 0) {
++			pip[1] = sh_dup2(pip[0], -1, pip[0]);
++			return 1;
 +		}
 +	}
-+	trapcnt = 0;
-+	ptrap = simplecmd;
-+	INTON;
++
++	if (pipe(pip) < 0)
++		sh_error("Pipe call failed");
++
++	return 0;
 +}
-+
-+
-+
+ 
  /*
-  * Set the signal handler for the specified signal.  The routine figures
-  * out what it should be set to.
-@@ -390,6 +417,8 @@ exitshell(void)
- 	handler = &loc;
- 	if ((p = trap[0])) {
- 		trap[0] = NULL;
-+		if (ptrap)
-+			goto out;
- 		evalskip = 0;
- 		evalstring(p, 0);
- 		evalskip = SKIPFUNCDEF;
+  * Handle here documents.  Normally we fork off a process to write the
+@@ -331,9 +351,10 @@ err:
+ STATIC int
+ openhere(union node *redir)
+ {
+-	char *p;
+-	int pip[2];
+ 	size_t len = 0;
++	int pip[2];
++	int memfd;
++	char *p;
+ 
+ 	p = redir->nhere.doc->narg.text;
+ 	if (redir->type == NXHERE) {
+@@ -341,12 +362,12 @@ openhere(union node *redir)
+ 		p = stackblock();
+ 	}
+ 
+-	if (pipe(pip) < 0)
+-		sh_error("Pipe call failed");
+-
+ 	len = strlen(p);
+-	if (len <= PIPESIZE) {
++	memfd = sh_pipe(pip, len > PIPESIZE);
++
++	if (memfd || len <= PIPESIZE) {
+ 		xwrite(pip[1], p, len);
++		lseek(pip[1], 0, SEEK_SET);
+ 		goto out;
+ 	}
+ 
+diff --git a/src/redir.h b/src/redir.h
+index 16f5c20..0be5f1a 100644
+--- a/src/redir.h
++++ b/src/redir.h
+@@ -50,4 +50,5 @@ int redirectsafe(union node *, int);
+ void unwindredir(struct redirtab *stop);
+ struct redirtab *pushredir(union node *redir);
+ int sh_open(const char *pathname, int flags, int mayfail);
++int sh_pipe(int pip[2], int memfd);
+ 
+diff --git a/src/system.h b/src/system.h
+index 007952c..371c64b 100644
+--- a/src/system.h
++++ b/src/system.h
+@@ -54,6 +54,13 @@ static inline void sigclearmask(void)
+ #endif
+ }
+ 
++#ifndef HAVE_MEMFD_CREATE
++static inline int memfd_create(const char *name, unsigned int flags)
++{
++	return -1;
++}
++#endif
++
+ #ifndef HAVE_MEMPCPY
+ void *mempcpy(void *, const void *, size_t);
+ #endif
 -- 
 2.39.2
 
