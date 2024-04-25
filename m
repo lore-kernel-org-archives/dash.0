@@ -1,148 +1,104 @@
-Received: from mail-4324.protonmail.ch (mail-4324.protonmail.ch [185.70.43.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D626010949
-	for <dash@vger.kernel.org>; Tue, 23 Apr 2024 01:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.24
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA38739ADD
+	for <dash@vger.kernel.org>; Thu, 25 Apr 2024 20:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713835246; cv=none; b=K8kF8yFW/hkWdkZyblyIWzHgB0QOcxwsTaDoQIqZLely2dcaQjXk0qXoRqMkkGZX1+mfCwfZJ5Rll3EiH34KBLYGQZs2VwrHdXZzoedezeeB0CsoaAGNyT27l3tNLtMwXEJMh1Dd3CA6VHSEE9A80kranmiXhcEIOi9UFyhIoSI=
+	t=1714078383; cv=none; b=N119C6aisabpPc0+XSAtXu7+NPA/WgDhGX/mo3y8MN9zS0GQIMKFgyj+K9js+UaU66ynwouZtIkoGt+ZhbP0S12ltCqnpe+W/gZugFIJaFpFeo4H9YkKCkjo8wKW8Cxzzp95V33dnoeQR4d61ZIltWzXgd7ffCVkPdcwjZsbWBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713835246; c=relaxed/simple;
-	bh=jer9wToZiH90S246caFDivD8d14rzVzR7wiu9fTlB4A=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=T/St9senYlao4YaK0It52Luu/1uSR4O2bZNRHq6g5TAijC8v2xJew+vDuSRvhYusCt8hUE+0Rgk35NkLqX49i1zl+O9toZYv+RDr7uNK/NfJ618VFbpNpfc941idKjlbXROXXJEXSOnC5v711f1e5zzQkeyyYDUVUQukbkl2PQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=hxDS+had; arc=none smtp.client-ip=185.70.43.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	s=arc-20240116; t=1714078383; c=relaxed/simple;
+	bh=5Q9oou2U/lzy92KDJiCQ2rLe9p07v8+NTu/nOxGE80M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hz/sZxK4XiEt0DDO8AyyHVpP+ozFvqEZyHupufOqO38SXYOtiUZD4Z6j5uf+q7nQTiNWGwuJ5VqWq7QnoqLqFAvGFQ8FLbMaSRkCdre6BJTtEgIEJNFFO7Hiulh9cwXKnqtK2g2JWyWE7NrlQyHreKOb3ho9/V9FlqPFstGqM9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=E6yx5BcO; arc=none smtp.client-ip=51.68.198.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="hxDS+had"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1713835242; x=1714094442;
-	bh=uoz7kNOLXxxwePHg/nkQ583297tJFPQcpnlQcogAAFw=;
-	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=hxDS+had4aVweBs0+O+8hTWEDKli8pnuBWwD16p2b9nP4aQqagDpCAix0Qut/xrny
-	 GPRSJr5vuH3DtfFw+AzgT2r007Cg2wg0WZWWTqoqTp+pxsgJDihNd7tepjDTqj0+CE
-	 Dt/V8Bn7f/T39av2F/C950YxJAC26pcSOtA46x4niTXgA4ho5K39Y1tjG+jNb2Dtdc
-	 YtWq+Klk4vs6Pv34EEFhL0HyCIs/TRfZiMg1jSMyFs5tp740LyI+w7RgtqqDK5G68+
-	 lxTkgQB96fv9mWU9AdnReboORl4pM1ba5IVd9r/084r26JWVBxFihnGrXB2WyAZ55A
-	 qt5GZh+Oy/nAQ==
-Date: Tue, 23 Apr 2024 01:20:38 +0000
-To: "dash@vger.kernel.org" <dash@vger.kernel.org>
-From: Avid Seeker <avidseeker7@protonmail.com>
-Subject: Dash core dump on network monitoring script
-Message-ID: <WgTCSYEuzKbHuKFOr2TSJ8vLHAP7U_I8xGdY6fJP0LpGnQlFT6wVBbQIlpKZxlVnzr_7odCse-q9myZj5yjrf9XKzKVFvCJsngYL723T4Co=@protonmail.com>
-Feedback-ID: 42841990:user:proton
-X-Pm-Message-ID: a1156deb1406882dbe8e915a0da89b9d1cdc4702
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="E6yx5BcO"
+Received: from [IPV6:2a02:8010:68a1:0:4c43:b4ba:5189:61d2] (unknown [IPv6:2a02:8010:68a1:0:4c43:b4ba:5189:61d2])
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id ACF32759;
+	Thu, 25 Apr 2024 21:46:46 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl ACF32759
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1714078006;
+	bh=OUgKbNDazN6KasqmWRlHERSy3LlEvOe3PRZYfnjeLWA=; l=1566;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=E6yx5BcOhLzINrpzU53iLWtmc6K75k2M8B7XQ861h7NFM6VFeBz6MsmBD2qvnJnmn
+	 dUFcqPk8fOzCsC4sthzv7JxUP1dKdqm4LiTrMkjFC7nKXVxMRwRRLrv2F/AxnZoInG
+	 6/eTchrkZ0WvyiiP164oSBZcARj3mPA9USbRvGgY=
+Message-ID: <b3609a6b-f47c-4aa6-a518-dac1be89fd01@gigawatt.nl>
+Date: Thu, 25 Apr 2024 21:46:45 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Simplify alias storage.
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: DASH shell mailing list <dash@vger.kernel.org>
+References: <c3903caf-06a7-e321-4fa9-5abe0a0f2ae9@gigawatt.nl>
+ <ZhD3eVw1cXMZxZg6@gondor.apana.org.au>
+Content-Language: en-GB
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <ZhD3eVw1cXMZxZg6@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-systemd-coredump[65616]: [=F0=9F=A1=95] Process 65608 (sb-nettraf) of user =
-1000 dumped core.
+On 06/04/2024 08:19, Herbert Xu wrote:
+> On Wed, Jan 11, 2023 at 06:23:41PM +0000, Harald van Dijk wrote:
+>>
+>>   	if (ap) {
+>>   		if (!(ap->flag & ALIASINUSE)) {
+>> -			ckfree(ap->val);
+>> +			ckfree(ap->name);
+>>   		}
+> 
+> I think this breaks ALIASINUSE.  When an alias is marked as INUSE,
+> it will be freed by input.c (popstring).  However, your patch doesn't
+> touch input.c at all.
 
-                                                 Stack trace of thread 6560=
-8:
-                                                 #0  0x00007c545ec90278 n/a=
- (libc.so.6 + 0x4a278)
-                                                 #1  0x00005d3418d15df2 n/a=
- (dash + 0x9df2)
-                                                 #2  0x00005d3418d16057 n/a=
- (dash + 0xa057)
-                                                 #3  0x00005d3418d162e4 n/a=
- (dash + 0xa2e4)
-                                                 #4  0x00005d3418d16395 n/a=
- (dash + 0xa395)
-                                                 #5  0x00005d3418d16413 n/a=
- (dash + 0xa413)
-                                                 #6  0x00005d3418d15ecc n/a=
- (dash + 0x9ecc)
-                                                 #7  0x00005d3418d1673d n/a=
- (dash + 0xa73d)
-                                                 #8  0x00005d3418d20693 n/a=
- (dash + 0x14693)
-                                                 #9  0x00005d3418d1d5e0 n/a=
- (dash + 0x115e0)
-                                                 #10 0x00005d3418d13f57 n/a=
- (dash + 0x7f57)
-                                                 #11 0x00005d3418d13f57 n/a=
- (dash + 0x7f57)
-                                                 #12 0x00005d3418d14318 n/a=
- (dash + 0x8318)
-                                                 #13 0x00005d3418d13f57 n/a=
- (dash + 0x7f57)
-                                                 #14 0x00005d3418d13f57 n/a=
- (dash + 0x7f57)
-                                                 #15 0x00005d3418d13f1b n/a=
- (dash + 0x7f1b)
-                                                 #16 0x00005d3418d13f1b n/a=
- (dash + 0x7f1b)
-                                                 #17 0x00005d3418d13f1b n/a=
- (dash + 0x7f1b)
-                                                 #18 0x00005d3418d13f1b n/a=
- (dash + 0x7f1b)
-                                                 #19 0x00005d3418d14564 n/a=
- (dash + 0x8564)
-                                                 #20 0x00005d3418d1dae5 n/a=
- (dash + 0x11ae5)
-                                                 #21 0x00005d3418d13f57 n/a=
- (dash + 0x7f57)
-                                                 #22 0x00005d3418d16db9 n/a=
- (dash + 0xadb9)
-                                                 #23 0x00005d3418d20693 n/a=
- (dash + 0x14693)
-                                                 #24 0x00005d3418d1d5e0 n/a=
- (dash + 0x115e0)
-                                                 #25 0x00005d3418d13f57 n/a=
- (dash + 0x7f57)
-                                                 #26 0x00005d3418d1ca6a n/a=
- (dash + 0x10a6a)
-                                                 #27 0x00005d3418d10288 n/a=
- (dash + 0x4288)
-                                                 #28 0x00007c545ec6bcd0 n/a=
- (libc.so.6 + 0x25cd0)
-                                                 #29 0x00007c545ec6bd8a __l=
-ibc_start_main (libc.so.6 + 0x25d8a)
-                                                 #30 0x00005d3418d10435 n/a=
- (dash + 0x4435)
-                                                 ELF object binary architec=
-ture: AMD x86-64
+You're quite right, thanks for spotting that. A test case that covers 
+that is
 
-The script is as follows:
+   alias foo='
+   alias foo="echo Hello"
+   '
+   foo
+   foo
 
-#!/bin/sh
+Here, the storage of the original 'foo' alias needs to be kept while the 
+expansion is ongoing, even when the second 'alias' overwrites the 
+original definition. This bug is fixed by below additional patch.
 
-# Module showing network traffic. Shows how much data has been received (RX=
-) or
-# transmitted (TX) since the previous time this script ran. So if run every
-# second, gives network traffic per second.
+However, the patch conflicts with c8db655b because scanning 'name' will 
+now find the '=' character and continue on from that to check the value. 
+That should be relatively easy to avoid, but I am not sure it is worth it.
 
-case $BLOCK_BUTTON in
-=091) setsid -f "$TERMINAL" -e bmon ;;
-=093) notify-send "=F0=9F=8C=90 Network traffic module" "=F0=9F=94=BB: Traf=
-fic received
-=F0=9F=94=BA: Traffic transmitted" ;;
-=096) "$TERMINAL" -e "$EDITOR" "$0" ;;
-esac
+Cheers,
+Harald van Dijk
 
-update() {
-    sum=3D0
-    for arg; do
-        read -r i < "$arg"
-        sum=3D$(( sum + i ))
-    done
-    cache=3D/tmp/${1##*/}
-    [ -f "$cache" ] && read -r old < "$cache" || old=3D0
-    printf %d\\n "$sum" > "$cache"
-    printf %d\\n $(( sum - old ))
-}
+diff --git a/src/input.c b/src/input.c
+index 38969a7..4604945 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -386,7 +386,7 @@ pushstring(char *s, void *ap)
+  	sp->ap = (struct alias *)ap;
+  	if (ap) {
+  		((struct alias *)ap)->flag |= ALIASINUSE;
+-		sp->string = s;
++		sp->string = ((struct alias *)ap)->name;
+  	}
+  	parsefile->nextc = s;
+  	parsefile->nleft = len;
+@@ -405,7 +405,7 @@ static void popstring(void)
+  		    parsefile->nextc[-1] == '\t') {
+  			checkkwd |= CHKALIAS;
+  		}
+-		if (sp->string != sp->ap->val) {
++		if (sp->string != sp->ap->name) {
+  			ckfree(sp->string);
+  		}
+  	}
 
-rx=3D$(update /sys/class/net/[ew]*/statistics/rx_bytes)
-tx=3D$(update /sys/class/net/[ew]*/statistics/tx_bytes)
 
-# shellcheck disable=3DSC2046,2183,2086
-printf "=F0=9F=94=BB%4sB =F0=9F=94=BA%4sB\\n" $(numfmt --to=3Diec $rx $tx)
