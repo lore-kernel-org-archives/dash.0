@@ -1,68 +1,58 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB23EBE
-	for <dash@vger.kernel.org>; Fri, 26 Apr 2024 02:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0BA13F454
+	for <dash@vger.kernel.org>; Fri, 26 Apr 2024 09:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714099768; cv=none; b=OJzlTBwr1zHt2ykKPpfMY2Wc3NqYiAZDxUZcYujSh2fddjN3byjqheuQ0c5RYkBgrgrk42Hby6Ta8q2FYop5wAhsGuhmogcSL8lHWhuCMm3dN2ahoF7a6xCviNlt+uwnxBz/4/b1jv3xIeEKzojQ0Up/Na6+ZdrWU87mH9/IhKk=
+	t=1714125032; cv=none; b=fWxIybuZYfH/R5CafPexDj9XaVTP41fPjn6/qSwOCY6xZg3f6ZXFbkHEqESekpJPpp5gx8qKMgY9qGe1bF9+9BJq2HAJ0Kou1B2aydWLArQ+MeSF86w7GtBDLVQfnjnCV0yO75d8FmyMP2wyMKH3Ehqn1tasw2bRpAi65dBA/Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714099768; c=relaxed/simple;
-	bh=P8Ko9ARKfaxfJbb39PXBvTGdd0fkBRxRsj5pkAHTv5M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tMn9m2rp4SEMKaSd/L3T13yz2IrtD3LnohK0CphvWtFDWEz2Uf1Eb+sXKsVBgHJfbyMswZBpB9mg/nX14AAqtbzmAzNgjjNcKZr9BehJSBpDXEsqjRytzqRAuFwKY6nXpjnLPp7hA15RktKqieSUqgXx3n+JJiBgUHQnGWky+rU=
+	s=arc-20240116; t=1714125032; c=relaxed/simple;
+	bh=9MGfRnT2UQjS8RbgkQuEMqkahPcc+CtnccJmC0ZOpI4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=EmnIl7nDnJPtP0nw8l9Au5SBDw+7psLeQ2XmeMeXPlStaxRIBOoCXHCfPGIGkNTSwPRPdIxjWNHTV5aeIMCSOWCPkpN6BvL4TVYAjTgiaVo1s7gafP6/hgJb8nSVSi6Bxxzq16HEK7Uh0tTZgY55FIRVrHOOuCnDfykoE67bUak=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1s0BeE-006WtC-Vu; Fri, 26 Apr 2024 10:49:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Apr 2024 10:49:32 +0800
-Date: Fri, 26 Apr 2024 10:49:32 +0800
+	id 1s0IDq-006enq-6X; Fri, 26 Apr 2024 17:50:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Apr 2024 17:50:44 +0800
+Date: Fri, 26 Apr 2024 17:50:44 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: DASH shell mailing list <dash@vger.kernel.org>
-Subject: Re: [PATCH] Simplify alias storage.
-Message-ID: <ZisWPO5Zc9DdQjgd@gondor.apana.org.au>
-References: <c3903caf-06a7-e321-4fa9-5abe0a0f2ae9@gigawatt.nl>
- <ZhD3eVw1cXMZxZg6@gondor.apana.org.au>
- <b3609a6b-f47c-4aa6-a518-dac1be89fd01@gigawatt.nl>
+To: Avid Seeker <avidseeker7@protonmail.com>
+Cc: dash@vger.kernel.org
+Subject: Re: Dash core dump on network monitoring script
+Message-ID: <Zit49MRjj26XtjNt@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <b3609a6b-f47c-4aa6-a518-dac1be89fd01@gigawatt.nl>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <WgTCSYEuzKbHuKFOr2TSJ8vLHAP7U_I8xGdY6fJP0LpGnQlFT6wVBbQIlpKZxlVnzr_7odCse-q9myZj5yjrf9XKzKVFvCJsngYL723T4Co=@protonmail.com>
+X-Newsgroups: apana.lists.os.linux.dash
 
-On Thu, Apr 25, 2024 at 09:46:45PM +0100, Harald van Dijk wrote:
->
-> You're quite right, thanks for spotting that. A test case that covers that
-> is
-> 
->   alias foo='
->   alias foo="echo Hello"
->   '
->   foo
->   foo
-> 
-> Here, the storage of the original 'foo' alias needs to be kept while the
-> expansion is ongoing, even when the second 'alias' overwrites the original
-> definition. This bug is fixed by below additional patch.
+Avid Seeker <avidseeker7@protonmail.com> wrote:
+> systemd-coredump[65616]: [🡕] Process 65608 (sb-nettraf) of user 1000 dumped core.
 
-Could you please post a combined patch? Thanks!
+Is this crash reproducible?
 
-> However, the patch conflicts with c8db655b because scanning 'name' will now
-> find the '=' character and continue on from that to check the value. That
-> should be relatively easy to avoid, but I am not sure it is worth it.
+If the answer is no then a lot of digging would be needed to
+get anywhere with this.  You could start by deciphering the
+numerical addresses using the source code of your distribution.
 
-Don't worry about that one.  I can back it out if necessary.
-In fact, I'll probably fix it in a different way as I'm adding
-multi-byte support.
+>                                                 Stack trace of thread 65608:
+>                                                 #0  0x00007c545ec90278 n/a (libc.so.6 + 0x4a278)
+>                                                 #1  0x00005d3418d15df2 n/a (dash + 0x9df2)
 
-Cheers,
+If you could at least decipher this address then the report
+becomes a lot more useful.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
