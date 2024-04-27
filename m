@@ -1,278 +1,119 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00494AECA
-	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 11:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D6F4AEF8
+	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 11:32:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714216039; cv=none; b=uAPTSuoD9IXaRtsIoSE90OD1+CE9SfVpgBTxvD75VLGVg0Bmz8zoqZnaS6W+QCdjKxaankYdjzIuIaRNYIiAf/L03uZzPTK46TMPEzFBNiH8naoF3xMMjP5sqT0WFwXTAZzALcy25uoMPe+MavMPqnkPkw233AdI0FahCqe8wHM=
+	t=1714217554; cv=none; b=RW5f7wH68527B/HmS5eVxQzHYrsjtKFqla6eYk5w/hyOrrtY7SJPH5nwZ9p1YXeer5EvRNr0Wf5o+xf2bKqrO1ravKJ3O2gZHAh7UO/AAteDVHWcQnlN0u/vWKJb4+gUdOvlBTzGjLy0NQ46vrjVLIQkuPpubFK1PxGTp1mRFkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714216039; c=relaxed/simple;
-	bh=+AzRcGwyC7KLieni1Ij1thKLA+FYTOMpheL9m2xuzsI=;
-	h=Message-Id:In-Reply-To:References:From:Date:Subject:To; b=kqZ/lXxDxX8J/DF/aotKmtHo/lAlGzwa33pk+KbDEoS/eXyBa+vuptRfeGSXj0+asAk4+ecM1DsWiH+UKzbe/eD9BNWk1mHUM5Ts3CGTbl2oF4CYWu58IliAeqYHH27BXLrzCJMiCDxfJbSkLWzDEgm1fhGx6xZLDOalnY4gPmc=
+	s=arc-20240116; t=1714217554; c=relaxed/simple;
+	bh=5GTHrZv1n+ol0fUP4U63nkseMZ2Bg6kc4VSvAcQr0gQ=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=F4i2v4pYu6nJccExF5g/i2gpaf8iaWqnTiAPiZljqhmNUgL09u+uIrp5f+cvHHURMKAc8lmqDkcSzOuh5+pHIsBMskJAXd6T73W5cfBHyMmuYJw4cUTAcuF51Q7i0qnhNJxJ89DDnu6v8xyEDCNNfdVxyz4zDk8bDfUUvekBUbU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s0fti-0079pK-0y;
-	Sat, 27 Apr 2024 19:07:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 27 Apr 2024 19:07:32 +0800
-Message-Id: <dce77dcec0adb6d2dbaecdb3025b35425981a41c.1714215826.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1714215826.git.herbert@gondor.apana.org.au>
-References: <cover.1714215826.git.herbert@gondor.apana.org.au>
+	id 1s0fpH-0079fC-0B;
+	Sat, 27 Apr 2024 19:02:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 27 Apr 2024 19:02:57 +0800
+Date: Sat, 27 Apr 2024 19:02:57 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Sat, 27 Apr 2024 16:41:00 +0800
-Subject: [PATCH 8/8] parser: Add support for multi-byte characters
 To: DASH Mailing List <dash@vger.kernel.org>
+Subject: [PATCH] expand: Fix naked backslah leakage
+Message-ID: <ZizbYRti9EydVOg4@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Add the requisite markers for multi-byte characters so that the
-expansion code can recognise them.  Also allow wide blank characters
-to terminate words.
+Naked backslashes in patterns may incorrectly unquote subsequent
+wild characters that are themselves quoted.  Fix this by adding
+an extra backslash when necessary.
+
+Test case:
+
+	a="\\*bc"; b="\\"; c="*"; echo "<${a##$b"$c"}>"
+
+Old result:
+
+	<>
+
+New result:
+
+	<bc>
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- src/expand.c |  19 ++++++++
- src/parser.c | 127 +++++++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 121 insertions(+), 25 deletions(-)
+ src/expand.c   | 10 ++++++++--
+ src/mystring.c |  1 +
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/src/expand.c b/src/expand.c
-index 679bbb8..7c3f350 100644
+index 2ed02d6..0db2b29 100644
 --- a/src/expand.c
 +++ b/src/expand.c
-@@ -265,6 +265,7 @@ static char *argstr(char *p, int flag)
- 		CTLESC,
- 		CTLVAR,
- 		CTLBACKQ,
-+		CTLMBCHAR,
- 		CTLARI,
- 		CTLENDARI,
- 		0
-@@ -289,6 +290,8 @@ tilde:
- start:
- 	startloc = expdest - (char *)stackblock();
- 	for (;;) {
-+		unsigned ml;
-+		unsigned mb;
- 		int end;
+@@ -1658,6 +1658,7 @@ _rmescapes(char *str, int flag)
+ 	char *p, *q, *r;
+ 	int notescaped;
+ 	int globbing;
++	int inquotes;
  
- 		length += strcspn(p + length, reject);
-@@ -351,6 +354,22 @@ addquote:
- 				startloc++;
- 			}
- 			break;
-+		case CTLMBCHAR:
-+			c = (signed char)*p--;
-+			mb = mbnext(p);
-+			ml = (mb >> 8) - 2;
-+			if (flag & QUOTES_ESC) {
-+				length = (mb >> 8) + (mb & 0xff);
-+				if (c == (char)CTLESC)
-+					startloc += length;
-+				break;
-+			}
-+			if (c == CTLESC)
-+				startloc += ml;
-+			p += mb & 0xff;
-+			expdest = stnputs(p, ml, expdest);
-+			p += mb >> 8;
-+			break;
- 		case CTLESC:
- 			startloc++;
- 			length++;
-diff --git a/src/parser.c b/src/parser.c
-index 27611f0..c23cc9b 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -36,7 +36,11 @@
- #include <alloca.h>
- #endif
- 
-+#include <limits.h>
-+#include <stdbool.h>
- #include <stdlib.h>
-+#include <wchar.h>
-+#include <wctype.h>
- 
- #include "shell.h"
- #include "parser.h"
-@@ -876,7 +880,53 @@ static void synstack_pop(struct synstack **stack)
- 	*stack = (*stack)->next;
- }
- 
-+static unsigned getmbc(int c, char *out, int mode)
-+{
-+	char *const start = out;
-+	mbstate_t mbst = {};
-+	unsigned ml = 0;
-+	size_t ml2;
-+	wchar_t wc;
-+	char *mbc;
- 
-+	if (likely(c >= 0))
-+		return 0;
-+
-+	mbc = (mode & 3) < 2 ? out + 2 + (mode == 1) : out;
-+	mbc[ml] = c;
-+	while ((ml2 = mbrtowc(&wc, mbc + ml++, 1, &mbst)) == -2) {
-+		if (ml >= MB_LEN_MAX)
-+			break;
-+		c = pgetc();
-+		if (c == PEOF)
-+			break;
-+		mbc[ml] = c;
-+	}
-+
-+	if (ml2 == 1 && ml > 1) {
-+		if (mode == 4 && iswblank(wc))
-+			return 1;
-+
-+		if ((mode & 3) < 2) {
-+			USTPUTC(CTLMBCHAR, out);
-+			if (mode == 1)
-+				USTPUTC(CTLESC, out);
-+			USTPUTC(ml, out);
-+		}
-+		STADJUST(ml, out);
-+		if ((mode & 3) < 2) {
-+			USTPUTC(ml, out);
-+			USTPUTC(CTLMBCHAR, out);
-+		}
-+
-+		return out - start;
-+	}
-+
-+	if (ml > 1)
-+		pungetn(ml - 1);
-+
-+	return 0;
-+}
- 
- /*
-  * If eofmark is NULL, read a word or a redirection symbol.  If eofmark
-@@ -929,12 +979,27 @@ readtoken1(int firstc, char const *syntax, char *eofmark, int striptabs)
- 		}
- #endif
- 		CHECKEND();	/* set c to PEOF if at end of here document */
--		for (;;) {	/* until end of line or end of word */
--			CHECKSTRSPACE(4, out);	/* permit 4 calls to USTPUTC */
-+		/* Until end of line or end of word */
-+		for (;; c = pgetc_top(synstack)) {
-+			int fieldsplitting;
-+			unsigned ml;
-+
-+			/* Permit max(MB_LEN_MAX, 23) calls to USTPUTC. */
-+			CHECKSTRSPACE((MB_LEN_MAX > 16 ? MB_LEN_MAX : 16) + 7,
-+				      out);
-+			fieldsplitting = synstack->syntax == BASESYNTAX &&
-+					 !synstack->varnest ? 4 : 0;
-+			ml = getmbc(c, out, fieldsplitting);
-+			if (ml == 1) {
-+				c = pgetc();
-+				break;
-+			}
-+			out += ml;
-+			if (ml)
-+				continue;
- 			switch(synstack->syntax[c]) {
- 			case CNL:	/* '\n' */
--				if (synstack->syntax == BASESYNTAX &&
--				    !synstack->varnest)
-+				if (fieldsplitting)
- 					goto endword;	/* exit outer loop */
- 				USTPUTC(c, out);
- 				nlprompt();
-@@ -956,26 +1021,33 @@ readtoken1(int firstc, char const *syntax, char *eofmark, int striptabs)
- 					USTPUTC(CTLESC, out);
- 					USTPUTC('\\', out);
- 					pungetc();
--				} else {
--					if (
--						synstack->dblquote &&
--						c != '\\' && c != '`' &&
--						c != '$' && (
--							c != '"' ||
--							(eofmark != NULL &&
--							 !synstack->varnest)
--						) && (
--							c != '}' ||
--							!synstack->varnest
--						)
--					) {
--						USTPUTC(CTLESC, out);
--						USTPUTC('\\', out);
--					}
--					USTPUTC(CTLESC, out);
--					USTPUTC(c, out);
--					quotef++;
-+					break;
- 				}
-+
-+				if (
-+					synstack->dblquote &&
-+					c != '\\' && c != '`' &&
-+					c != '$' && (
-+						c != '"' ||
-+						(eofmark != NULL &&
-+						 !synstack->varnest)
-+					) && (
-+						c != '}' ||
-+						!synstack->varnest
-+					)
-+				) {
-+					USTPUTC(CTLESC, out);
-+					USTPUTC('\\', out);
-+				}
-+				quotef++;
-+
-+				ml = getmbc(c, out, 1);
-+				out += ml;
-+				if (ml)
-+					break;
-+
-+				USTPUTC(CTLESC, out);
-+				USTPUTC(c, out);
- 				break;
- 			case CSQUOTE:
- 				synstack->syntax = SQSYNTAX;
-@@ -1053,11 +1125,10 @@ toggledq:
- 			case CEOF:
- 				goto endword;		/* exit outer loop */
- 			default:
--				if (synstack->varnest == 0)
-+				if (fieldsplitting)
- 					goto endword;	/* exit outer loop */
- 				USTPUTC(c, out);
- 			}
--			c = pgetc_top(synstack);
+ 	p = strpbrk(str, cqchars);
+ 	if (!p) {
+@@ -1692,16 +1693,17 @@ _rmescapes(char *str, int flag)
+ 			q = mempcpy(q, str, len);
  		}
  	}
- endword:
-@@ -1384,6 +1455,7 @@ parsebackq: {
- 	size_t psavelen;
- 	size_t savelen;
- 	union node *n;
-+	unsigned ml;
- 	char *pstr;
- 	char *str;
- 
-@@ -1415,6 +1487,11 @@ parsebackq: {
-                                 if (pc != '\\' && pc != '`' && pc != '$'
-                                     && (!synstack->dblquote || pc != '"'))
-                                         STPUTC('\\', pout);
-+				CHECKSTRSPACE(MB_LEN_MAX, pout);
-+				ml = getmbc(pc, pout, 2);
-+				pout += ml;
-+				if (ml)
-+					continue;
- 				break;
- 
- 			case PEOF:
++	inquotes = 0;
+ 	notescaped = globbing;
+ 	while (*p) {
+ 		if (*p == (char)CTLQUOTEMARK) {
+ 			p++;
+-			notescaped = globbing;
++			inquotes ^= globbing;
+ 			continue;
+ 		}
+ 		if (*p == '\\') {
+ 			/* naked back slash */
+-			notescaped = 0;
++			notescaped ^= globbing;
+ 			goto copy;
+ 		}
+ 		if (FNMATCH_IS_ENABLED && *p == '^')
+@@ -1711,6 +1713,10 @@ _rmescapes(char *str, int flag)
+ add_escape:
+ 			if (notescaped)
+ 				*q++ = '\\';
++			else if (inquotes) {
++				*q++ = '\\';
++				*q++ = '\\';
++			}
+ 		}
+ 		notescaped = globbing;
+ copy:
+diff --git a/src/mystring.c b/src/mystring.c
+index f651521..5eace6c 100644
+--- a/src/mystring.c
++++ b/src/mystring.c
+@@ -63,6 +63,7 @@ const char snlfmt[] = "%s\n";
+ const char dolatstr[] = { CTLQUOTEMARK, CTLVAR, VSNORMAL | VSBIT, '@', '=',
+ 			  CTLQUOTEMARK, '\0' };
+ const char cqchars[] = {
++	'\\',
+ #ifdef HAVE_FNMATCH
+ 	'^',
+ #endif
 -- 
 2.39.2
 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
