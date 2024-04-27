@@ -1,118 +1,65 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D6F4AEF8
-	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 11:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCA543176
+	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 11:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714217554; cv=none; b=RW5f7wH68527B/HmS5eVxQzHYrsjtKFqla6eYk5w/hyOrrtY7SJPH5nwZ9p1YXeer5EvRNr0Wf5o+xf2bKqrO1ravKJ3O2gZHAh7UO/AAteDVHWcQnlN0u/vWKJb4+gUdOvlBTzGjLy0NQ46vrjVLIQkuPpubFK1PxGTp1mRFkc=
+	t=1714218460; cv=none; b=Okb7Nmg18BXJ41sb30vzXMJiMQj1JMUQrppP5QrXcsL5C7XOGxW1Q/AEL9QOykkCjui9zgB+sxxm8hf8HnXTgGdbS3iYQ12gU0HmGYaW5Fj4posoARkcAw8/Z0vb8PtLZMFKwbDCklS/ABEpEJQhYuR1/Vxap014dw78Ytq9B14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714217554; c=relaxed/simple;
-	bh=5GTHrZv1n+ol0fUP4U63nkseMZ2Bg6kc4VSvAcQr0gQ=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=F4i2v4pYu6nJccExF5g/i2gpaf8iaWqnTiAPiZljqhmNUgL09u+uIrp5f+cvHHURMKAc8lmqDkcSzOuh5+pHIsBMskJAXd6T73W5cfBHyMmuYJw4cUTAcuF51Q7i0qnhNJxJ89DDnu6v8xyEDCNNfdVxyz4zDk8bDfUUvekBUbU=
+	s=arc-20240116; t=1714218460; c=relaxed/simple;
+	bh=MZI43GWVpsNGbDaEUDIzxIXIDwE8KLVgBM72U5lbsh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=LSJ8FsgbCEWTLAmswTZPbpaujVyFcqZqHeg1hzUx0fRWmO77d8MN/Xh8juvEFzg2rCDzqctCPTpA3BeUMwqw27BK9Djv+3ArJErWjnxvwvx0hj3T4a0uR+zdB9G2seRcRX1VM5nhgDEDxlmULXnDVecZqaMZuUHZcM/QLXUy1Og=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s0fpH-0079fC-0B;
-	Sat, 27 Apr 2024 19:02:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 27 Apr 2024 19:02:57 +0800
-Date: Sat, 27 Apr 2024 19:02:57 +0800
+	id 1s0gWj-007Abi-0T;
+	Sat, 27 Apr 2024 19:47:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 27 Apr 2024 19:47:51 +0800
+Date: Sat, 27 Apr 2024 19:47:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: DASH Mailing List <dash@vger.kernel.org>
-Subject: [PATCH] expand: Fix naked backslah leakage
-Message-ID: <ZizbYRti9EydVOg4@gondor.apana.org.au>
+To: Henrik =?iso-8859-1?Q?Lindstr=F6m?= <henrik@lxm.se>
+Cc: dash@vger.kernel.org, henrik@lxm.se
+Subject: Re: [PATCH] Generate signal names at runtime
+Message-ID: <Zizl53et9J5Hg2D5@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240421204648.1156887-1-henrik@lxm.se>
+X-Newsgroups: apana.lists.os.linux.dash
 
-Naked backslashes in patterns may incorrectly unquote subsequent
-wild characters that are themselves quoted.  Fix this by adding
-an extra backslash when necessary.
+Henrik Lindström <henrik@lxm.se> wrote:
+> They were previously generated at buildtime by mksignames.c, but that
+> approach had two flaws:
+> 1. The signal names were generated for the host system rather than the
+>   target system, resulting in broken cross-compiled builds.
+> 2. The SIGRTMIN and SIGRTMAX macros are usually implemented as
+>   function calls and can only be surely known at runtime.
+> 
+> The new implementation has been tested to generate identical signal names
+> as before on these systems:
+> * Debian 12 (glibc, odd number of realtime signals)
+> * Alpine 3.18 (musl, even number of realtime signals)
+> * FreeBSD 14
+> 
+> Signed-off-by: Henrik Lindström <henrik@lxm.se>
 
-Test case:
+Now that glibc has sigabbrev_np we should switch to using that
+on Linux, perhaps with the existing code as a fallback.  BSD
+has always had ways of getting the signal name, though it may
+not be very portable so we'd need different flavours if people
+cared enough to add them.
 
-	a="\\*bc"; b="\\"; c="*"; echo "<${a##$b"$c"}>"
-
-Old result:
-
-	<>
-
-New result:
-
-	<bc>
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- src/expand.c   | 10 ++++++++--
- src/mystring.c |  1 +
- 2 files changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/src/expand.c b/src/expand.c
-index 2ed02d6..0db2b29 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -1658,6 +1658,7 @@ _rmescapes(char *str, int flag)
- 	char *p, *q, *r;
- 	int notescaped;
- 	int globbing;
-+	int inquotes;
- 
- 	p = strpbrk(str, cqchars);
- 	if (!p) {
-@@ -1692,16 +1693,17 @@ _rmescapes(char *str, int flag)
- 			q = mempcpy(q, str, len);
- 		}
- 	}
-+	inquotes = 0;
- 	notescaped = globbing;
- 	while (*p) {
- 		if (*p == (char)CTLQUOTEMARK) {
- 			p++;
--			notescaped = globbing;
-+			inquotes ^= globbing;
- 			continue;
- 		}
- 		if (*p == '\\') {
- 			/* naked back slash */
--			notescaped = 0;
-+			notescaped ^= globbing;
- 			goto copy;
- 		}
- 		if (FNMATCH_IS_ENABLED && *p == '^')
-@@ -1711,6 +1713,10 @@ _rmescapes(char *str, int flag)
- add_escape:
- 			if (notescaped)
- 				*q++ = '\\';
-+			else if (inquotes) {
-+				*q++ = '\\';
-+				*q++ = '\\';
-+			}
- 		}
- 		notescaped = globbing;
- copy:
-diff --git a/src/mystring.c b/src/mystring.c
-index f651521..5eace6c 100644
---- a/src/mystring.c
-+++ b/src/mystring.c
-@@ -63,6 +63,7 @@ const char snlfmt[] = "%s\n";
- const char dolatstr[] = { CTLQUOTEMARK, CTLVAR, VSNORMAL | VSBIT, '@', '=',
- 			  CTLQUOTEMARK, '\0' };
- const char cqchars[] = {
-+	'\\',
- #ifdef HAVE_FNMATCH
- 	'^',
- #endif
--- 
-2.39.2
-
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
