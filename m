@@ -1,59 +1,81 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068F54204C
-	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 12:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7A54D5AC
+	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 13:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714220510; cv=none; b=dcqRmyhy0CwIhmKipCLxX0lT0zxwHC0macptByVMc6jNA0ME+JR3/46d2r2QtIcZUuzrVKJqPDxTW5gfR6bRuF3v42G1pw9RgyWf5KjwjKESblCYdYM5f277q6YFwfbpyVY2pbvttYiOro4UPts4Of0OSpZKwkL+zKG3Gq5Zs1Y=
+	t=1714225574; cv=none; b=G623AxzhNX5BFPKZRnQQP4fEjuzhFpxvraR9jslkUNQRFcpezfFa7aqCeJt4advhEYhMEeCze0yBwBdJD5kb16t/NxQFfL209FC2CtPmXkJ5VURKUHLp3iXzRC8aklgIDrcn859sQ5l+KZkutH08sOy3TzJ2NZN/vXbHfUN+lvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714220510; c=relaxed/simple;
-	bh=n3tX7AtkexaOPpNSNdvwacsaLJ+R+kDyeaRT9SO3UHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=esCzEeeq13JWXAiWqfw9eOr4Y7+UDcPnOMzWFvIBybrvjqsgg63AzLmoNF0z1sRYwmznu4/wWFa8ffEXcZxyiNqfXlaSJ/4+bFJXHabSXNDBjq4sttxJXh2IPoKqwMArZ02+QvrpsUFg/WXad5HpfQ3No8thZm+RxsA66FrF4o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s0h3m-007Asm-35;
-	Sat, 27 Apr 2024 20:21:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 27 Apr 2024 20:22:01 +0800
-Date: Sat, 27 Apr 2024 20:22:01 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: DASH Mailing List <dash@vger.kernel.org>
-Subject: Re: [PATCH] expand: Fix naked backslah leakage
-Message-ID: <Zizt6ZdJrdSFVBhT@gondor.apana.org.au>
-References: <ZizbYRti9EydVOg4@gondor.apana.org.au>
- <000d8fe0-2898-49cc-a841-a78ae7292f6a@gigawatt.nl>
+	s=arc-20240116; t=1714225574; c=relaxed/simple;
+	bh=zoAo6qk1uCshWMDqSw8G/JuPhMeIJERrZeRbl4mjpFE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B/24T1OSDooOMqoOJA3S8GBnpyaaVrGthZKOgkFuYOcaRd7FfcyjFsQ43xNsG37JF89AHE0xJIOPzuh8stb1mkct1x3Rb9PAyLn13tquwuGsFVBp+fM3uXXbY7PbFPQrCDCOxAcaf7LfHFnqnwXgegtGR0Y3h7UE0LCjP4gOtuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=aphccgqq; arc=none smtp.client-ip=51.68.198.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="aphccgqq"
+Received: from [IPV6:2a02:8010:68a1:0:9b52:1030:9fa8:4969] (unknown [IPv6:2a02:8010:68a1:0:9b52:1030:9fa8:4969])
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id 02A89DA3;
+	Sat, 27 Apr 2024 14:46:06 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 02A89DA3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1714225567;
+	bh=CuWuzHMQL5EzwCeXVgSj1oBIdbZjcWKxJcTeI1lTH6Q=; l=1317;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aphccgqqtQECpyYq4IYOxGcgJqyRRyZk1/D3lmgeiuT41dZd7PZZVP1mqblHEYf3a
+	 fEbkZKmEafxopiCnDWyI/ebqoLN3CRxWr5IFcOhT+YrCd/SnUSAacjvdQK8DJJ9/Q7
+	 /heEZi4oeYM53+iar3O0H/GiBbpp/8JII6I1iebk=
+Message-ID: <2bf68a06-2050-4e5c-8e5e-3a703b21c9ee@gigawatt.nl>
+Date: Sat, 27 Apr 2024 14:46:06 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000d8fe0-2898-49cc-a841-a78ae7292f6a@gigawatt.nl>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] expand: Fix naked backslah leakage
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: DASH Mailing List <dash@vger.kernel.org>
+References: <ZizbYRti9EydVOg4@gondor.apana.org.au>
+ <000d8fe0-2898-49cc-a841-a78ae7292f6a@gigawatt.nl>
+ <Zizt6ZdJrdSFVBhT@gondor.apana.org.au>
+Content-Language: en-GB
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <Zizt6ZdJrdSFVBhT@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Apr 27, 2024 at 01:12:19PM +0100, Harald van Dijk wrote:
->
-> The correct result here, I believe, is <\*bc>. The backslash means the next
-> character is taken as literal, even if that character is already also taken
-> as literal because of the quoting. There is nothing to cause the backslash
-> to be taken literally. The result should be that only a leading * is removed
-> from $a.
+On 27/04/2024 13:22, Herbert Xu wrote:
+> On Sat, Apr 27, 2024 at 01:12:19PM +0100, Harald van Dijk wrote:
+>>
+>> The correct result here, I believe, is <\*bc>. The backslash means the next
+>> character is taken as literal, even if that character is already also taken
+>> as literal because of the quoting. There is nothing to cause the backslash
+>> to be taken literally. The result should be that only a leading * is removed
+>> from $a.
+> 
+> While I do see the logic in your reasoning, no other shell implements
+> this behaviour:
 
-While I do see the logic in your reasoning, no other shell implements
-this behaviour:
+I'm aware this isn't what most shells do, but it's not quite the case 
+that no other shell implements this.
 
-*sh -c 'a="*bc"; b="\\"; c="*"; echo "<${a##$b"$c"}>"'
+> *sh -c 'a="*bc"; b="\\"; c="*"; echo "<${a##$b"$c"}>"'
+> 
+> always produces <*bc> across all shells on my system.
 
-always produces <*bc> across all shells on my system.
+This produces <bc> with my shell, at least.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If we are comparing what other shells do, it is probably worth pointing 
+out that shells disagree on your original example.
+
+   a="\\*bc"; b="\\"; c="*"; echo "<${a##$b"$c"}>"
+
+Many shells share the bug where this prints <>, but of shells that do 
+not have this bug, while many print <bc> like what your patch makes dash 
+do, the most commonly used one, bash (as of version 4), does not: it 
+prints <\*bc>. I am not sure what exactly $b"$c" is trying to strip here.
+
+Cheers,
+Harald van Dijk
