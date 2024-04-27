@@ -1,30 +1,29 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F75E48CC6
-	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 11:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A724A990
+	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 11:07:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714216035; cv=none; b=nGXvuQTLAYqXdkBLUuLi9Ln0B7PYDDOq7ys2DJ8ExeBZjjkfK2CRK3Ws3yvS6HpROJyGi43Fz/6NAZsimG+JBOBjBOCrCAQ4GljfMgoCx/XooytX48rRMT6UDGaaAwDt74H4yC8W17hNL1WKMNZVv52claiZhXrEsKZU99sS3Pg=
+	t=1714216037; cv=none; b=afWMvriFezA1eKAgp40plCicbqtsCl+YhSp6S+SDOXDa+X5zFCtGorEp4RvO3LGCQwvmTbxN2piQ40xUCCJw3Hc1jdkX3pBP/Q8c9ykrda7EeSQy4O50ZSE8U5NAgU+1X0dCeOSU+e0zuWbUo6HsjH2lqoidRMvIG9db8KplVEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714216035; c=relaxed/simple;
-	bh=9s6JfnmmE78jXaRBBPwFbDQ2kYWHspnFhst+6dnfxuU=;
-	h=Message-Id:In-Reply-To:References:From:Date:Subject:To; b=qhhUVMtfLpiYeRL/v9K3sZ5U2emVbzY0OdQT0+U/tlUEZ/OMwVAun5Vv//qO4PccU2hdoqE+SCM88CSYf7/XbUdAoqjgnwbE4+53Cb9p4bepBQ27D2aELQ1R/zF2PAnn4gtFzhmv4dYZrx2RSmHzauW2rlngvt28wsncNYiHNJk=
+	s=arc-20240116; t=1714216037; c=relaxed/simple;
+	bh=A2FhhB1B6M9VpjHmg4QUwZ8lF7X6HxYALBXcqawPvrI=;
+	h=Message-Id:In-Reply-To:References:From:Date:Subject:To; b=GtWTiiuVL3dYiJ1v9OqlbJ2wzj6xFjURWSQxUYyTKljH/hEbqdBguc5CFdlv63TEQWdU1CtfTBp94dHdLZez+RKm7UEWDeqiAxekKXCJPDFvb1r6JG8IvI/kvRQYHIRHveOj7Nv/KjZ0702Njc6Wnqo6qB3C5hKaXUNy2fXq4SI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s0ftd-0079oK-2K;
-	Sat, 27 Apr 2024 19:07:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 27 Apr 2024 19:07:27 +0800
-Message-Id: <21825e0a7a41e9deda8ffd85dfec37d2f714c2b1.1714215826.git.herbert@gondor.apana.org.au>
+	id 1s0ftf-0079p6-3D;
+	Sat, 27 Apr 2024 19:07:13 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 27 Apr 2024 19:07:30 +0800
+Message-Id: <28969ecac6ebb141fbe06d0b62a50a3fdbed1efd.1714215826.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1714215826.git.herbert@gondor.apana.org.au>
 References: <cover.1714215826.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Tue, 23 Apr 2024 19:17:22 +0800
-Subject: [PATCH 6/8] expand: Support multi-byte characters during field
- splitting
+Date: Sat, 27 Apr 2024 16:15:52 +0800
+Subject: [PATCH 7/8] input: Allow MB_LEN_MAX calls to pungetc
 To: DASH Mailing List <dash@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
@@ -32,335 +31,216 @@ List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 
-When multi-byte characters are used in IFS, they will be used
-for field splitting.
+In order to parse multi-byte characters which may be up to MB_LEN_MAX
+bytes long, allow enough calls to pungetc to undo a single multi-byte
+character.
+
+Also add a function pungetn to do multiple pungetc calls in a row.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- src/expand.c | 201 +++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 140 insertions(+), 61 deletions(-)
+ src/input.c | 58 ++++++++++++++++++++++++++++++++++-------------------
+ src/input.h | 11 +++++-----
+ 2 files changed, 42 insertions(+), 27 deletions(-)
 
-diff --git a/src/expand.c b/src/expand.c
-index 1e86058..679bbb8 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -54,6 +54,7 @@
- #include <sys/stat.h>
- #include <unistd.h>
- #include <wchar.h>
-+#include <wctype.h>
+diff --git a/src/input.c b/src/input.c
+index fb9858f..c7805ad 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -56,7 +56,7 @@
+ #include "main.h"
+ #include "myhistedit.h"
  
- /*
-  * Routines to expand arguments to commands.  We have to deal with
-@@ -164,6 +165,30 @@ esclen(const char *start, const char *p) {
- 	return esc;
+-#define IBUFSIZ (BUFSIZ + 1)
++#define IBUFSIZ (BUFSIZ + PUNGETC_MAX + 1)
+ 
+ 
+ MKINIT struct parsefile basepf;	/* top level input file */
+@@ -83,13 +83,16 @@ INIT {
  }
  
-+static __attribute__((noinline)) unsigned mbnext(const char *p)
-+{
-+	unsigned start = 0;
-+	unsigned end = 0;
-+	unsigned ml;
+ RESET {
 +	int c;
 +
-+	c = p[end++];
+ 	/* clear input buffer */
+ 	popallfiles();
+-	basepf.unget = 0;
+-	while (basepf.lastc[0] != '\n' &&
+-	       basepf.lastc[0] != PEOF &&
+-	       !int_pending())
+-		pgetc();
 +
-+	switch (c) {
-+	case CTLMBCHAR:
-+		if (p[end] == CTLESC)
-+			end++;
-+		ml = (unsigned char)p[end++];
-+		start = end;
-+		end = ml + 2;
-+		break;
-+	case CTLESC:
-+		start++;
-+		break;
-+	}
-+
-+	return start | end << 8;
-+}
- 
- static inline const char *getpwhome(const char *name)
- {
-@@ -552,6 +577,7 @@ static char *scanleft(char *startp, char *endp, char *rmesc, char *rmescend,
- 	loc2 = rmesc;
- 	do {
- 		const char *s = loc2;
-+		unsigned mb;
- 		unsigned ml;
- 		int match;
- 
-@@ -568,19 +594,9 @@ static char *scanleft(char *startp, char *endp, char *rmesc, char *rmescend,
- 		if (!c)
- 			break;
- 
--		if (*loc != (char)CTLMBCHAR) {
--			if (*loc == (char)CTLESC)
--				loc++;
--			loc++;
--			loc2++;
--			continue;
--		}
--
--		if (*++loc == (char)CTLESC)
--			loc++;
--
--		ml = (unsigned char)*loc;
--		loc += ml + 3;
-+		mb = mbnext(loc);
-+		loc += (mb & 0xff) + (mb >> 8);
-+		ml = (mb >> 8) > 3 ? (mb >> 8) - 2 : 1;
- 		loc2 += ml;
- 	} while (1);
- 	return 0;
-@@ -932,18 +948,22 @@ static size_t strtodest(const char *p, int flags)
- STATIC ssize_t
- varvalue(char *name, int varflags, int flags, int quoted)
- {
-+	int subtype = varflags & VSTYPE;
-+	const char *seps;
-+	ssize_t len = 0;
-+	unsigned seplen;
-+	size_t start;
-+	int discard;
-+	char sepc;
-+	char **ap;
-+	int sep;
- 	int num;
- 	char *p;
- 	int i;
--	int sep;
--	char sepc;
--	char **ap;
--	int subtype = varflags & VSTYPE;
--	int discard = (subtype == VSPLUS || subtype == VSLENGTH) |
--		      (flags & EXP_DISCARD);
--	ssize_t len = 0;
--	size_t start;
--	char c;
-+	int c;
-+
-+	discard = (subtype == VSPLUS || subtype == VSLENGTH) |
-+		  (flags & EXP_DISCARD);
- 
- 	if (!subtype) {
- 		if (discard)
-@@ -1006,15 +1026,27 @@ numvar:
- 		sep &= ~quoted;
- 		sep |= ifsset() ? (unsigned char)(c & ifsval()[0]) : ' ';
- param:
--		sepc = sep;
- 		if (!(ap = shellparam.p))
- 			return -1;
-+		sepc = sep;
-+		seps = &sepc;
-+		seplen = 1;
-+		if (sepc < 0) {
-+			mbstate_t mbs = {};
-+			size_t ml;
-+
-+			ml = mbrlen(ifsval(), strlen(ifsval()), &mbs);
-+			if (ml != -1 && ml != -2 && ml > 1) {
-+				seps = ifsval();
-+				seplen = ml;
-+			}
-+		}
- 		while ((p = *ap++)) {
- 			len += strtodest(p, flags);
- 
- 			if (*ap && sep) {
- 				len++;
--				memtodest(&sepc, 1, flags | EXP_KEEPNUL);
-+				memtodest(seps, seplen, flags | EXP_KEEPNUL);
- 			}
- 		}
- 		break;
-@@ -1076,7 +1108,54 @@ recordregion(int start, int end, int nulonly)
- 	ifslastp->nulonly = nulonly;
++	c = PEOF;
++	if (basepf.nextc - basebuf > basepf.unget)
++		c = basepf.nextc[-basepf.unget];
++	while (c != '\n' && c != PEOF && !int_pending())
++		c = pgetc();
  }
  
-+static __attribute__((noinline)) unsigned ifsisifs(
-+	const char *p, unsigned ml, const char *ifs, size_t ifslen)
+ FORKRESET {
+@@ -131,17 +134,20 @@ static int __pgetc(void)
+ {
+ 	int c;
+ 
+-	if (parsefile->unget)
+-		return parsefile->lastc[--parsefile->unget];
++	if (parsefile->unget) {
++		long unget = -(long)(unsigned)parsefile->unget--;
++
++		if (parsefile->nleft < 0)
++			return preadbuffer();
++
++		return parsefile->nextc[unget];
++	}
+ 
+ 	if (--parsefile->nleft >= 0)
+ 		c = (signed char)*parsefile->nextc++;
+ 	else
+ 		c = preadbuffer();
+ 
+-	parsefile->lastc[1] = parsefile->lastc[0];
+-	parsefile->lastc[0] = c;
+-
+ 	return c;
+ }
+ 
+@@ -176,9 +182,16 @@ static int stdin_clear_nonblock(void)
+ static int
+ preadfd(void)
+ {
++	char *buf = parsefile->buf;
++	int unget;
+ 	int nr;
+-	char *buf =  parsefile->buf;
+-	parsefile->nextc = buf;
++
++	unget = parsefile->nextc - buf;
++	if (unget > PUNGETC_MAX)
++		unget = PUNGETC_MAX;
++
++	memmove(buf, parsefile->nextc - unget, unget);
++	parsefile->nextc = buf += unget;
+ 
+ retry:
+ #ifndef SMALL
+@@ -196,8 +209,8 @@ retry:
+ 			nr = 0;
+ 		else {
+ 			nr = el_len;
+-			if (nr > IBUFSIZ - 1)
+-				nr = IBUFSIZ - 1;
++			if (nr > BUFSIZ)
++				nr = BUFSIZ;
+ 			memcpy(buf, rl_cp, nr);
+ 			if (nr != el_len) {
+ 				el_len -= nr;
+@@ -209,9 +222,9 @@ retry:
+ 	} else
+ #endif
+ 	if (parsefile->fd)
+-		nr = read(parsefile->fd, buf, IBUFSIZ - 1);
++		nr = read(parsefile->fd, buf, BUFSIZ);
+ 	else {
+-		unsigned len = IBUFSIZ - 1;
++		unsigned len = BUFSIZ;
+ 
+ 		nr = 0;
+ 
+@@ -348,6 +361,11 @@ done:
+ 	return (signed char)*parsefile->nextc++;
+ }
+ 
++void pungetn(int n)
 +{
-+	bool isdefifs = false;
-+	size_t slen = ifslen;
-+	const char *s = ifs;
-+	wchar_t c = *p;
-+	bool isifs;
- 
-+	isifs = !c;
-+	if (isifs) {
-+		p = ifs;
-+		c = *p;
-+		slen = 0;
-+	}
-+
-+	while (slen) {
-+		mbstate_t mbst = {};
-+		size_t ifsml;
-+		wchar_t c2;
-+
-+		if ((signed char)*s > 0 ||
-+		    (ifsml = mbrtowc(&c2, s, slen, &mbst),
-+		     ifsml == -2 || ifsml == -1 || ifsml < 2)) {
-+			if (c == *s) {
-+				isifs = true;
-+				break;
-+			}
-+			s++;
-+			slen--;
-+			continue;
-+		}
-+
-+		if (ifsml == ml && !memcmp(p, s, ifsml)) {
-+			isifs = true;
-+			c = c2;
-+			break;
-+		}
-+
-+		s += ifsml;
-+		slen -= ifsml;
-+	}
-+
-+	if (isifs)
-+		isdefifs = iswspace(c);
-+
-+	return isifs | isdefifs << 1;
++	parsefile->unget += n;
 +}
- 
++
  /*
-  * Break the argument string into pieces based upon IFS and add the
-@@ -1088,16 +1167,16 @@ recordregion(int start, int end, int nulonly)
+  * Undo a call to pgetc.  Only two characters may be pushed back.
+  * PEOF may be pushed back.
+@@ -356,7 +374,7 @@ done:
  void
- ifsbreakup(char *string, int maxargs, struct arglist *arglist)
+ pungetc(void)
  {
-+	const char *ifs, *realifs;
- 	struct ifsregion *ifsp;
- 	struct strlist *sp;
-+	char *r = NULL;
-+	size_t ifslen;
- 	char *start;
-+	int nulonly;
-+	int ifsspc;
- 	char *p;
- 	char *q;
--	char *r = NULL;
--	const char *ifs, *realifs;
--	int ifsspc;
--	int nulonly;
--
- 
- 	start = string;
- 	if (ifslastp != NULL) {
-@@ -1112,21 +1191,27 @@ ifsbreakup(char *string, int maxargs, struct arglist *arglist)
- 			afternul = nulonly;
- 			nulonly = ifsp->nulonly;
- 			ifs = nulonly ? nullstr : realifs;
-+			ifslen = strlen(ifs);
- 			ifsspc = 0;
- 			while (p < string + ifsp->endoff) {
--				int c;
--				bool isifs;
-+				unsigned ifschar;
-+				unsigned sisifs;
- 				bool isdefifs;
-+				unsigned ml;
-+				bool isifs;
- 
- 				q = p;
--				c = *p++;
--				if (c == (char)CTLESC)
--					c = *p++;
- 
--				isifs = strchr(ifs, c);
--				isdefifs = false;
--				if (isifs)
--					isdefifs = strchr(defifs, c);
-+				ifschar = mbnext(p);
-+				p += ifschar & 0xff;
-+				ml = (ifschar >> 8) > 3 ?
-+				     (ifschar >> 8) - 2 : 0;
-+
-+				sisifs = ifsisifs(p, ml, ifs, ifslen);
-+				p += ifschar >> 8;
-+
-+				isifs = sisifs & 1;
-+				isdefifs = sisifs >> 1;
- 
- 				/* If only reading one more argument:
- 				 * If we have exactly one field,
-@@ -1382,32 +1467,24 @@ static void expmeta_rmescapes(char *enddir, char *name)
- 	preglob(strcpy(enddir, name), RMESCAPE_EMETA);
+-	parsefile->unget++;
++	pungetn(1);
  }
  
--static unsigned mbcharlen(char *p)
--{
--	int esc = 0;
--
--	if (*++p == (char)CTLESC)
--		esc++;
--
--	return esc + 3 + (unsigned char)p[esc];
--}
--
- static int skipesc(char *p)
- {
-+	unsigned short mb;
- 	int esc = 0;
- 
--	if (p[esc] == (char)CTLMBCHAR)
--		return esc + mbcharlen(p);
-+	mb = mbnext(p);
-+	if ((mb >> 8) > 3)
-+		return (mb & 0xff) + (mb >> 8) - 1;
- 
--	if (*p == (char)CTLESC)
--		esc++;
-+	esc = mb & 0xff;
- 
- 	if (p[esc] == '\\' && p[esc + 1]) {
- 		esc++;
--		if (p[esc] == (char)CTLMBCHAR)
--			return esc + mbcharlen(p + esc);
--		if (p[esc] == (char)CTLESC)
--			esc++;
-+		mb = mbnext(p + esc);
-+		if ((mb >> 8) > 3)
-+			return esc + (mb & 0xff) + (mb >> 8) - 1;
-+
-+		esc += mb & 0xff;
+ /*
+@@ -383,7 +401,6 @@ pushstring(char *s, void *ap)
+ 	sp->prevnleft = parsefile->nleft;
+ 	sp->unget = parsefile->unget;
+ 	sp->spfree = parsefile->spfree;
+-	memcpy(sp->lastc, parsefile->lastc, sizeof(sp->lastc));
+ 	sp->ap = (struct alias *)ap;
+ 	if (ap) {
+ 		((struct alias *)ap)->flag |= ALIASINUSE;
+@@ -413,7 +430,6 @@ static void popstring(void)
+ 	parsefile->nextc = sp->prevstring;
+ 	parsefile->nleft = sp->prevnleft;
+ 	parsefile->unget = sp->unget;
+-	memcpy(parsefile->lastc, sp->lastc, sizeof(sp->lastc));
+ /*dprintf("*** calling popstring: restoring to '%s'\n", parsenextc);*/
+ 	parsefile->strpush = sp->prev;
+ 	parsefile->spfree = sp;
+@@ -457,7 +473,7 @@ setinputfd(int fd, int push)
  	}
+ 	parsefile->fd = fd;
+ 	if (parsefile->buf == NULL)
+-		parsefile->buf = ckmalloc(IBUFSIZ);
++		parsefile->nextc = parsefile->buf = ckmalloc(IBUFSIZ);
+ 	input_set_lleft(parsefile, parsefile->nleft = 0);
+ 	plinno = 1;
+ }
+diff --git a/src/input.h b/src/input.h
+index 1ff5773..5b4a045 100644
+--- a/src/input.h
++++ b/src/input.h
+@@ -34,12 +34,16 @@
+  *	@(#)input.h	8.2 (Berkeley) 5/4/95
+  */
  
- 	return esc;
-@@ -1815,6 +1892,7 @@ _rmescapes(char *str, int flag)
- 	inquotes = 0;
- 	notescaped = globbing;
- 	while (*p) {
-+		unsigned mb;
- 		unsigned ml;
- 
- 		if (*p == (char)CTLQUOTEMARK) {
-@@ -1847,13 +1925,14 @@ add_escape:
- 		}
- 		notescaped = globbing;
- 
--		if (*p != (char)CTLMBCHAR)
-+		mb = mbnext(p);
-+		ml = mb >> 8;
++#include <limits.h>
 +
-+		if (ml <= 3)
- 			goto copy;
+ #ifdef SMALL
+ #define IS_DEFINED_SMALL 1
+ #else
+ #define IS_DEFINED_SMALL 0
+ #endif
  
--		if (*++p == (char)CTLESC)
--			p++;
++#define PUNGETC_MAX (MB_LEN_MAX > 16 ? MB_LEN_MAX : 16)
++
+ /* PEOF (the end of file marker) is defined in syntax.h */
+ 
+ enum {
+@@ -59,9 +63,6 @@ struct strpush {
+ 	/* Delay freeing so we can stop nested aliases. */
+ 	struct strpush *spfree;
+ 
+-	/* Remember last two characters for pungetc. */
+-	int lastc[2];
 -
--		ml = (unsigned char)*p++;
-+		ml -= 2;
-+		p += mb & 0xff;
- 		q = mempcpy(q, p, ml);
- 		p += ml + 2;
- 		continue;
+ 	/* Number of outstanding calls to pungetc. */
+ 	int unget;
+ };
+@@ -87,9 +88,6 @@ struct parsefile {
+ 	/* Delay freeing so we can stop nested aliases. */
+ 	struct strpush *spfree;
+ 
+-	/* Remember last two characters for pungetc. */
+-	int lastc[2];
+-
+ 	/* Number of outstanding calls to pungetc. */
+ 	int unget;
+ };
+@@ -106,6 +104,7 @@ extern struct parsefile *parsefile;
+ int pgetc(void);
+ int pgetc2(void);
+ void pungetc(void);
++void pungetn(int);
+ void pushstring(char *, void *);
+ int setinputfile(const char *, int);
+ void setinputstring(char *);
 -- 
 2.39.2
 
