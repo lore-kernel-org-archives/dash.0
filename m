@@ -1,150 +1,95 @@
-Received: from toucan.tulip.relay.mailchannels.net (toucan.tulip.relay.mailchannels.net [23.83.218.254])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED7E3E494
-	for <dash@vger.kernel.org>; Sun, 28 Apr 2024 06:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.254
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714286207; cv=pass; b=nfMbFPknGQM5bwP6QX5md+0gSasV1Rh+LyM3riDeaOAXiGmwuC34g9snnQnUlCxviDoZxmN+E8w+XYvfGnwaQhwMCvIOG4+lFdu3MyrZUtFW7Df5cHDB8QyrqMJOYBicWY7N9st6lNrYsewcfuF7YndQxDa0mHofDC/cyRSkAnQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714286207; c=relaxed/simple;
-	bh=HFCtydu9HY8d0Cm+zkxOOpj8BAKmG9xCFA8Y4CW5x1U=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=V1MGo4TdV4APjnGEH69GN3YHNXU0Genjp263qAG+bInp86MSkr5EaIxhSAg0jp90p6cgh1/btvnCQMberCBsT9zoIPjzY+eT9iJZVLEbo8xmL/RBid/3UpAg/GvQPzcTZk4w+sKjgE9eeKbytNhhu8Gf+jn82EmRHvH5tGRN+pk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.218.254
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 365949016C1
-	for <dash@vger.kernel.org>; Sun, 28 Apr 2024 02:03:30 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (unknown [127.0.0.6])
-	(Authenticated sender: instrampxe0y3a)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 8EC4C901139
-	for <dash@vger.kernel.org>; Sun, 28 Apr 2024 02:03:29 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1714269809; a=rsa-sha256;
-	cv=none;
-	b=SRrzi3IIoeHlxfO9PaG7ybLwLpDc7eKH4lDQ7+PRqRVve4EOpx7g2XV2enzljzVfLNvjSt
-	MTqdYp/VUW6uPLqJ6/MMZagzwHgVH5j5Y8u2fWjg2KqsNvB+H87uJ+8V1sR6m5lRH30ZPQ
-	adPVD0BsXG8yE7uIJzwaQLoCJZC1VHQ/tjPZUIA3OH++zcJuL6G2IrGASeq8FMPhioqkwg
-	PUJ4XHb2oosNm7ZhG0IJOlxHLCMsRZJhArdC9z9WpbEnDOy8JU4ETZthbX4HwC565pp1RK
-	4IgUgJkzw2br7Uu/2K2yNjzor3PG2c+ZLTzJY7Jhs1AKn34Nvlg0otlVELI6jA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1714269809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rheMmOTuAyvvzsnRV/bInab/hLYG5GwHPoGO5UNsyVA=;
-	b=lbq7TnmD4yhx+/Zm4WlFVlEccPgp/171xbR1pOTmJ/kPkFk6c8h+E4QgTTFKW9gFJeZdS5
-	XoycdZIw/o+lauuQfoxjBj12aZ91tuyVmvBsLUvz7u/fGPttjmB4xDVfTY/gea+dp1C+ZF
-	OLTLP6tiW3TQlF1tHVPrO06rUOUVH2uHmSj1T96twOG59yEP40Fm83FAYHKaSR/WJulkWw
-	iYpks2QR4wcHvo5/ufdwMF58Z94jNigwACoBXXBTtONELOUASBzeGGcoMM1KqjLAgNxI6b
-	QsCLW878iQGOkGmVzkIza/7k87opyrGaADqYXeoXFEVbSq+excPBdI2/z+aEHw==
-ARC-Authentication-Results: i=1;
-	rspamd-67db6f49c6-m7t9r;
-	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Descriptive-Callous: 7c0053b37d30ab19_1714269810083_3971431341
-X-MC-Loop-Signature: 1714269810082:328302903
-X-MC-Ingress-Time: 1714269810082
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.124.116.18 (trex/6.9.2);
-	Sun, 28 Apr 2024 02:03:30 +0000
-Received: from p54b6d4bd.dip0.t-ipconnect.de ([84.182.212.189]:37046 helo=heisenberg.fritz.box)
-	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <calestyo@scientia.org>)
-	id 1s0tt1-00A0z4-2p
-	for dash@vger.kernel.org;
-	Sun, 28 Apr 2024 02:03:28 +0000
-Message-ID: <6a3890716ea21c010fde3c422e7141dd43d4fd62.camel@scientia.org>
-Subject: Re: [PATCH 0/8] Add multi-byte support
-From: Christoph Anton Mitterer <calestyo@scientia.org>
-To: DASH Mailing List <dash@vger.kernel.org>
-Date: Sun, 28 Apr 2024 04:03:23 +0200
-In-Reply-To: <e2d1d076a3a3d7f21bdb64b13cf9c4c3f4967bb2.camel@scientia.org>
-References: <cover.1714215826.git.herbert@gondor.apana.org.au>
-	 <eb927eeff3d1da7406c998d0ce816d3b6a061fc7.camel@scientia.org>
-	 <Zi2dIJQcNVwJgxuN@gondor.apana.org.au>
-	 <e2d1d076a3a3d7f21bdb64b13cf9c4c3f4967bb2.camel@scientia.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3-1+b2 
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395304A01
+	for <dash@vger.kernel.org>; Sun, 28 Apr 2024 14:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714315870; cv=none; b=Oi7v4lIXq3zHrzU9DNlqc4gkJ05ximehfDGhtOgju4TAHE7uiITtUQFbtkcAWxSN4Sfcvzt7jo7Mh1WN5DRbRP49tl8oWyN8Q4XVninyxuF0HtJhCC8a91dvEZyjcRqEI+4CIrSdgW5n3VWJBGPYQRmE0FVFZodZB11qCyulF0E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714315870; c=relaxed/simple;
+	bh=uTIL2+V1DPY8Nk02Y/oanL5Lw13WWJLIkILqDNWAReI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XKWtkB4y7ku6pdnuamM+h5WMNYxI2fEV3kN8OnodNC6HXpy897D0rBiZTTseXe+YRecOuJauLfgfUnJpXNJxg/JR7Ex19DouoqQoRo3iQ038U7jegXtQHSZC36m5RmGFt8LlMWTkM31Y0k1IIOrgyIf31hQTgDg3tBRJmNwevfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=aHSe2cvO; arc=none smtp.client-ip=51.68.198.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="aHSe2cvO"
+Received: from [IPV6:2a02:8010:68a1:0:b093:5565:50db:e14f] (unknown [IPv6:2a02:8010:68a1:0:b093:5565:50db:e14f])
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id 99201DA3;
+	Sun, 28 Apr 2024 15:50:58 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 99201DA3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1714315858;
+	bh=3DwWMw0VsiwBKniB0wEEGB5MKNnmzG2fBbAm/JNLiSc=; l=1928;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aHSe2cvOIaSCmgB3IPonzwYsUQWxmZWp+o7T+mUIx9YsyoLK7xNG0kZtcE88O92H4
+	 0aAqrjuwc+w3R8EmYjqCiNzp/q1mTPNgJtHfh80WSVW5o2FVB+7V5HHNPf9+dE1AAS
+	 /FhrsBhPPvBPKsDxAuRdEaaVzKAk2L2JPkvM12ww=
+Message-ID: <abc8daf0-60ab-4e7c-aba7-9a3f3b973f57@gigawatt.nl>
+Date: Sun, 28 Apr 2024 15:50:57 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AuthUser: calestyo@scientia.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/8] Add multi-byte support
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Christoph Anton Mitterer <calestyo@scientia.org>
+Cc: DASH Mailing List <dash@vger.kernel.org>
+References: <cover.1714215826.git.herbert@gondor.apana.org.au>
+ <eb927eeff3d1da7406c998d0ce816d3b6a061fc7.camel@scientia.org>
+ <Zi2dIJQcNVwJgxuN@gondor.apana.org.au>
+Content-Language: en-GB
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <Zi2dIJQcNVwJgxuN@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Just to give a simple example:
+On 28/04/2024 01:49, Herbert Xu wrote:
+> On Sat, Apr 27, 2024 at 11:31:43PM +0200, Christoph Anton Mitterer wrote:
+>>
+>> Long story short:
+>> The recommended way was to add a sentinel character '.' at the end of
+>> the output within the command substitution and strip that off later
+>> with parameter expansion.
+>> But despite of the very special properties[0] of '.', it's apparently
+>> still required to set LC_ALL=C when stripping the sentinel, because the
+>> pattern matching notation in ${foo%.} is defined only on strings of
+>> characters, not on strings of bytes.
+> 
+> Are you talking about a theoretical undefined condition, or an
+> actual one?  Which shell doesn't deal with ${foo%.} correctly?
 
-x.sh:
-   char=3D=C3=A4
-   printf '%s' "$char" | hd
-  =20
-   byte=3D"$( printf '\244' )"
-   printf '%s' "$byte" | hd
-  =20
-   printf '%s' "${char%$byte}" | hd
+The way you are implementing it, once you get to pmatch(), arguably you 
+will not handle ${foo%.} correctly.
 
+Consider an UTF-8 locale, where '\303' is not a valid multibyte 
+character. In this locale, consider
 
-$ LC_ALL=3Den_US.UTF-8 bash x.sh=20
-00000000  c3 a4                                             |..|
-00000002
-00000000  a4                                                |.|
-00000001
-00000000  c3                                                |.|
-00000001
-$ LC_ALL=3DC bash x.sh=20
-00000000  c3 a4                                             |..|
-00000002
-00000000  a4                                                |.|
-00000001
-00000000  c3                                                |.|
-00000001
+   foo=$(printf '\303.')
+   foo=${foo%.}
 
-$ dash x.sh=20
-00000000  c3 a4                                             |..|
-00000002
-00000000  a4                                                |.|
-00000001
-00000000  c3                                                |.|
-00000001
+This is something I expect to set foo to '\303', and it does in all 
+shells I know of, despite POSIX not saying this needs to work. The way 
+you are implementing multibyte character support, if I am reading it 
+right, as long as a full multibyte character has not been read, the next 
+byte will be taken as part of that multibyte character, meaning you will 
+take '\303.' as a single invalid multibyte character.
 
-but:
+At the same time, '\303\251' is a valid multibyte character, and '\251' 
+is not. So also consider
 
-$ LC_ALL=3Den_US.UTF-8 zsh x.sh=20
-00000000  c3 a4                                             |..|
-00000002
-00000000  a4                                                |.|
-00000001
-00000000  c3 a4                                             |..|
-00000002
-$ LC_ALL=3DC zsh x.sh=20
-00000000  c3 a4                                             |..|
-00000002
-00000000  a4                                                |.|
-00000001
-00000000  c3                                                |.|
-00000001
+   foo=$(printf '\303\251')
+   foo=${foo%$(printf '\251')}
 
+Here, it is not clear what the correct result is, and indeed, shells 
+disagree. bosh, ksh, zsh, and my shell do not break up characters, which 
+I believe to be the most sensible behaviour. bash and mksh do.
 
-Again, not saying that this means dash shouldn't support other
-locales... but people may (of course wrongly) rely on the behaviour
-that dash is always in the C locale.
+The corner cases need to be carefully considered in order to figure out 
+how to write the multibyte character support core functionality.
 
-Even if that doesn't change right now with the fnmatch()
-implementation, it could in principle do so with any change there.
-
-
-Ceers,
-Chris.
+Cheers,
+Harald van Dijk
