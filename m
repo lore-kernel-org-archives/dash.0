@@ -1,144 +1,154 @@
-Received: from skyblue.cherry.relay.mailchannels.net (skyblue.cherry.relay.mailchannels.net [23.83.223.167])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3050723A6
-	for <dash@vger.kernel.org>; Sat, 27 Apr 2024 21:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.223.167
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714255024; cv=pass; b=jHoI80wW5xtSJaVBUC+OHnhS2eNFY8dJnf9+6PreiqtdMoAR9luwLahHFOVgFRXNdIRK5yaZwDVDbotL8Ws4j5iU83ZQP+S+TD05xyc+IX+jk6fRCa4rL0MzLVEJGopncYmqPDfAdAXgKR98MXAAVMfE1FHHKreLbdMN4SCxGH0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714255024; c=relaxed/simple;
-	bh=dcWD59cTwfM5IRu0ZdVAcTmyH3MNp+QLPn81b7SrIF0=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nVuJqMeP5kAcQU0Np97tGXMFGNVQ28NAgiCD+6Sxj0UUlqUM+gtTzXc+XfIZTZbq9TR8rwaVG9Wm6AfDGvNcskBKgLQx5kOHHCjbW5+Z8hh33fMKDiJOFGcgtjNeGfLPh2aITvLcs0JYMiNvznSXGpVNq548oGnk1uxYGph3PYA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.223.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 9770A802524;
-	Sat, 27 Apr 2024 21:31:52 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (unknown [127.0.0.6])
-	(Authenticated sender: instrampxe0y3a)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 0D1D28025AE;
-	Sat, 27 Apr 2024 21:31:50 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1714253511; a=rsa-sha256;
-	cv=none;
-	b=V5/MqH6cXyrpcDPDIe4o39ZUoCiVoHtbcoedoqSNuI1ttyXwcrLGMxrA+cyG1txTRB0HD7
-	7bBM9bhAus+gnF3HRG2tt/8iNTytqqPqTxjGX33+WJ/d1KYm1a8ZpmlOARRW1o2yo1Oe1c
-	ZO6m0T2omUydmzlRX5oTT5awuU/Uf/8AffoHCV0ZYQEE0q39kX/o7k5523jz6iY5uredLB
-	2MlZ5Zn5abl+YeC8NQOX6/+r9xBrLDdBygvdgzM4+tWQceTPZZDDHbqN7OCQz0EYXvWR9X
-	W/wBTfT+T3Y9M8wuOU2AnDJ04xqoMvugdtsI845AunzxujPOILBgn+Q8bCac+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1714253511;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LgVzV2nwzRD/GOC3+/Px251PHgvZ+eMai4DQP2mfpIk=;
-	b=Lsvrx3QwKQ1Nh7BRxB9zkhyBLWWb/8fz/bD5lQrdSoTnDHPGzNQPDXpc0meZvyAtJIL/h+
-	XzX5qKFXStBGf3uOazYvzwihZx5vxE5jeQyNDIH+TvCFpFPEomGzNRKTTZbgqG/GCSsa68
-	1uUfrYDPAnKBvtO6mj5A0It3F+t+fVCCOXtFc5CQ++9KISR529C9X/fmO13xMinGD3LE9P
-	ydMLaAUUxPhbGV7If16nzso2aejNdUq0Um0106pN24tMQVQ8kw2QfgkcQ4z7z0FDG/SjAD
-	KHhMZcNXGTZuiq0r5WDbsUw3MXP+KUii2y2RdY/xEpVoVB1ouFbeyGD2Gj4hWg==
-ARC-Authentication-Results: i=1;
-	rspamd-5c97bbd7c5-nq7qf;
-	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Versed-Lonely: 3c677c4d2c08ffb5_1714253511703_2162660701
-X-MC-Loop-Signature: 1714253511703:3074507184
-X-MC-Ingress-Time: 1714253511703
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.99.222.159 (trex/6.9.2);
-	Sat, 27 Apr 2024 21:31:51 +0000
-Received: from p54b6d4bd.dip0.t-ipconnect.de ([84.182.212.189]:59256 helo=heisenberg.fritz.box)
-	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <calestyo@scientia.org>)
-	id 1s0pe8-009CMl-3A;
-	Sat, 27 Apr 2024 21:31:49 +0000
-Message-ID: <eb927eeff3d1da7406c998d0ce816d3b6a061fc7.camel@scientia.org>
-Subject: Re: [PATCH 0/8] Add multi-byte support
-From: Christoph Anton Mitterer <calestyo@scientia.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>, DASH Mailing List
-	 <dash@vger.kernel.org>
-Date: Sat, 27 Apr 2024 23:31:43 +0200
-In-Reply-To: <cover.1714215826.git.herbert@gondor.apana.org.au>
-References: <cover.1714215826.git.herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3-1+b2 
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D47565C
+	for <dash@vger.kernel.org>; Sun, 28 Apr 2024 00:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714265024; cv=none; b=BPTJxsV5sqe15JNzULgAaNlS1SVWUz4UaaOMwaW7mo3+WW2kow3bAw7U47+FAOCZGTMjcyKLOtU3+Bl91e9vCiTgP0OBjggdM6Y6S0wCTmSwV6HQ2lZz+QdTOW1ydNJM4oJbL2Zpn5QkGfI2Ah+n2e+3qIPLaNavkjbRgTPTgzs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714265024; c=relaxed/simple;
+	bh=+PM0XbiOr8FNkZA+hFo/jMldq370Jkf6d4zaC+d85to=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To; b=RZ47QL8wyBJkqhn+g8bDmsUMK7C58Qpif2/z3Is1/bFwkDBZ+BN5/AnC0c7ZVZyNOTbQKo5noLhU1iquS5MtdJOvJyOjZVX1cbrOxwgMESkUPiSg2OFCWaKS+UnM1EKcApxgFyNGZYY6p/q24l29N6XixfyZSOtD2/L5CcpI39w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=CtpgQlIJ; arc=none smtp.client-ip=51.68.198.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="CtpgQlIJ"
+Received: from [IPV6:2a02:8010:68a1:0:9b52:1030:9fa8:4969] (unknown [IPv6:2a02:8010:68a1:0:9b52:1030:9fa8:4969])
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id 7AE121120;
+	Sun, 28 Apr 2024 01:43:37 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 7AE121120
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1714265017;
+	bh=+PM0XbiOr8FNkZA+hFo/jMldq370Jkf6d4zaC+d85to=; l=6993;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CtpgQlIJeS0TZyGAtcWAD2Y4OWdcRNZ4G/3cRm43bFg3kyB/rAI36euJ3JIrDB3Uh
+	 mefUYgt0INOFeK+QBnGD2w4P6AZ/dIzr0veAb98nEVkSWlb/7eTsLVBiOAVdWcS/lu
+	 shcHtqgxFqlmVfl0YF/YlyFltbQvQaDrg8AbJsSo=
+Content-Type: multipart/mixed; boundary="------------2lSrCyti5Q18WzjuxrQc0PmW"
+Message-ID: <b8e49c10-8d32-4c7b-a046-568c6e020eba@gigawatt.nl>
+Date: Sun, 28 Apr 2024 01:43:37 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AuthUser: calestyo@scientia.org
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH v2] Simplify alias storage.
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: DASH shell mailing list <dash@vger.kernel.org>
+References: <c3903caf-06a7-e321-4fa9-5abe0a0f2ae9@gigawatt.nl>
+ <ZhD3eVw1cXMZxZg6@gondor.apana.org.au>
+ <b3609a6b-f47c-4aa6-a518-dac1be89fd01@gigawatt.nl>
+ <ZisWPO5Zc9DdQjgd@gondor.apana.org.au>
+Content-Language: en-GB
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <ZisWPO5Zc9DdQjgd@gondor.apana.org.au>
 
-Hey.
+This is a multi-part message in MIME format.
+--------------2lSrCyti5Q18WzjuxrQc0PmW
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 26/04/2024 03:49, Herbert Xu wrote:
+> Could you please post a combined patch? Thanks!
 
-On Sat, 2024-04-27 at 19:03 +0800, Herbert Xu wrote:
-> This patch series adds multi-byte support to dash.=C2=A0 For now only
-> fnmatch is supported as the native pmatch function has not been
-> modified to support multi-byte characters.
-
-Nothing against the functionality per se, but I think for all scripts
-that assumed dash's (and thus on may systems /bin/sh's) current
-behaviour of being C locale only even without explicitly setting
-LC_ALL=3DC, this may have quite some subtle issues.
-
-
-AFAIU, in the C locale, all bytes is a character, and thus in
-particular pattern matching notation is defined for every defined
-outcome of command substitution respectively every content of variables
-(that is: in every(!) locale every byte other than NUL).
-
-
-For example:
-************
-A while ago I've asked on the Austin Group mailing list for a portable
-way to get command substitution without stripping of trailing newlines.
-
-Long story short:
-The recommended way was to add a sentinel character '.' at the end of
-the output within the command substitution and strip that off later
-with parameter expansion.
-But despite of the very special properties[0] of '.', it's apparently
-still required to set LC_ALL=3DC when stripping the sentinel, because the
-pattern matching notation in ${foo%.} is defined only on strings of
-characters, not on strings of bytes.
-
-Back then, Harald van Dijk had some ideas how that might be resolved
-for good, but IIRC none of the shell implementors seemed to really have
-interest.
-
-My goal was to make a portable function like
-   command_subst_with_newlines "eval-ed-command-string" "target-variable-na=
-me"
-which, with the requirement of setting LC_ALL proved more or less
-impossible when the function should have no side effects (like keeping
-the LC_ALL overridden, over possibly overriding some existing var like
-OLD_LC_ALL).
-
-
-Anyway... I could image, that if dash becomes multi-byte aware, there
-might be more or less subtle surprises.
-
+Okay, the attached patch combines both. It applies on top of 177072c2.
 
 Cheers,
-Chris.
+Harald van Dijk
+--------------2lSrCyti5Q18WzjuxrQc0PmW
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-Simplify-alias-storage.patch"
+Content-Disposition: attachment; filename="0001-Simplify-alias-storage.patch"
+Content-Transfer-Encoding: base64
 
+RnJvbSAxMDliZjMyYWQ1YjE0ZWMzYzZkMDVkOTdhODdmNTZjMjMzYmVjNWRmIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBIYXJhbGQgdmFuIERpamsgPGhhcmFsZEBnaWdhd2F0
+dC5ubD4KRGF0ZTogU3VuLCAyOCBBcHIgMjAyNCAwMTozODozNCArMDEwMApTdWJqZWN0OiBb
+UEFUQ0hdIFNpbXBsaWZ5IGFsaWFzIHN0b3JhZ2UuCgpSYXRoZXIgdGhhbiBzdG9yaW5nIHRo
+ZSBhbGlhcyBuYW1lIGFuZCB2YWx1ZSBzZXBhcmF0ZWx5LCB3ZSBjYW4gcmVkdWNlCnNpbXBs
+aWZ5IGNvZGUgYW5kIHJlZHVjZSBjb2RlIHNpemUgYnkgc3RvcmluZyB0aGVtIGluIG5hbWU9
+dmFsdWUgZm9ybS4KVGhpcyBhbGxvd3MgdXMgdG8gcmUtdXNlIHNvbWUgY29kZSBmcm9tIHZh
+ci5jIHRvIGhhbmRsZSBoYXNoaW5nIGFuZApjb21wYXJpc29ucywgc28gbG9uZyBhcyB3ZSB1
+cGRhdGUgdGhhdCB0byBhY2NvdW50IGZvciBhbGlhc2VzJyBzcGVjaWFsCmhhbmRsaW5nIG9m
+IGEgbGVhZGluZyA9IGNoYXJhY3Rlci4gVGhpcyBpcyBva2F5IHRvIGRvIGZvciB2YXJpYWJs
+ZXMgYXMKd2VsbCwgYXMgZm9yIHZhcmlhYmxlcyB0aGUgbGVhZGluZyBjaGFyYWN0ZXIgaXMg
+Z3VhcmFudGVlZCB0byBub3QgYmUgPS4KLS0tCiBzcmMvYWxpYXMuYyB8IDMyICsrKysrKysr
+KystLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiBzcmMvaW5wdXQuYyB8ICA0ICsrLS0KIHNyYy92
+YXIuYyAgIHwgMjcgKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tCiBzcmMvdmFyLmggICB8
+IDE1ICsrKysrKysrKysrKysrKwogNCBmaWxlcyBjaGFuZ2VkLCAzOCBpbnNlcnRpb25zKCsp
+LCA0MCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvYWxpYXMuYyBiL3NyYy9hbGlh
+cy5jCmluZGV4IGNlZTA3ZTkuLjE3ZTBmMWIgMTAwNjQ0Ci0tLSBhL3NyYy9hbGlhcy5jCisr
+KyBiL3NyYy9hbGlhcy5jCkBAIC00MSw2ICs0MSw3IEBACiAjaW5jbHVkZSAibXlzdHJpbmcu
+aCIKICNpbmNsdWRlICJhbGlhcy5oIgogI2luY2x1ZGUgIm9wdGlvbnMuaCIJLyogWFhYIGZv
+ciBhcmdwdHIgKHNob3VsZCByZW1vdmU/KSAqLworI2luY2x1ZGUgInZhci5oIgogCiAjZGVm
+aW5lIEFUQUJTSVpFIDM5CiAKQEAgLTU1LDI1ICs1NiwyNiBAQCB2b2lkCiBzZXRhbGlhcyhj
+b25zdCBjaGFyICpuYW1lLCBjb25zdCBjaGFyICp2YWwpCiB7CiAJc3RydWN0IGFsaWFzICph
+cCwgKiphcHA7CisJc2l6ZV90IG5hbWVsZW47CiAKIAlhcHAgPSBfX2xvb2t1cGFsaWFzKG5h
+bWUpOwogCWFwID0gKmFwcDsKIAlJTlRPRkY7CiAJaWYgKGFwKSB7CiAJCWlmICghKGFwLT5m
+bGFnICYgQUxJQVNJTlVTRSkpIHsKLQkJCWNrZnJlZShhcC0+dmFsKTsKKwkJCWNrZnJlZShh
+cC0+bmFtZSk7CiAJCX0KLQkJYXAtPnZhbAk9IHNhdmVzdHIodmFsKTsKIAkJYXAtPmZsYWcg
+Jj0gfkFMSUFTREVBRDsKIAl9IGVsc2UgewogCQkvKiBub3QgZm91bmQgKi8KIAkJYXAgPSBj
+a21hbGxvYyhzaXplb2YgKHN0cnVjdCBhbGlhcykpOwotCQlhcC0+bmFtZSA9IHNhdmVzdHIo
+bmFtZSk7Ci0JCWFwLT52YWwgPSBzYXZlc3RyKHZhbCk7CiAJCWFwLT5mbGFnID0gMDsKIAkJ
+YXAtPm5leHQgPSAwOwogCQkqYXBwID0gYXA7CiAJfQorCW5hbWVsZW4gPSB2YWwgLSBuYW1l
+OworCWFwLT5uYW1lID0gc2F2ZXN0cihuYW1lKTsKKwlhcC0+dmFsID0gYXAtPm5hbWUgKyBu
+YW1lbGVuOwogCUlOVE9OOwogfQogCkBAIC0xNTEsOCArMTUzLDcgQEAgYWxpYXNjbWQoaW50
+IGFyZ2MsIGNoYXIgKiphcmd2KQogCQkJfSBlbHNlCiAJCQkJcHJpbnRhbGlhcyhhcCk7CiAJ
+CX0gZWxzZSB7Ci0JCQkqdisrID0gJ1wwJzsKLQkJCXNldGFsaWFzKG4sIHYpOworCQkJc2V0
+YWxpYXMobiwgdiArIDEpOwogCQl9CiAJfQogCkBAIC0xOTEsMzYgKzE5MiwyMyBAQCBmcmVl
+YWxpYXMoc3RydWN0IGFsaWFzICphcCkgewogCiAJbmV4dCA9IGFwLT5uZXh0OwogCWNrZnJl
+ZShhcC0+bmFtZSk7Ci0JY2tmcmVlKGFwLT52YWwpOwogCWNrZnJlZShhcCk7CiAJcmV0dXJu
+IG5leHQ7CiB9CiAKIHZvaWQKIHByaW50YWxpYXMoY29uc3Qgc3RydWN0IGFsaWFzICphcCkg
+ewotCW91dDFzdHIoc2luZ2xlX3F1b3RlKGFwLT5uYW1lKSk7Ci0Jb3V0MWZtdCgiPSVzXG4i
+LCBzaW5nbGVfcXVvdGUoYXAtPnZhbCkpOworCW91dDFmbXQoIiVzXG4iLCBzaW5nbGVfcXVv
+dGUoYXAtPm5hbWUpKTsKIH0KIAogU1RBVElDIHN0cnVjdCBhbGlhcyAqKgogX19sb29rdXBh
+bGlhcyhjb25zdCBjaGFyICpuYW1lKSB7Ci0JdW5zaWduZWQgaW50IGhhc2h2YWw7CiAJc3Ry
+dWN0IGFsaWFzICoqYXBwOwotCWNvbnN0IGNoYXIgKnA7Ci0JdW5zaWduZWQgaW50IGNoOwog
+Ci0JcCA9IG5hbWU7Ci0KLQljaCA9ICh1bnNpZ25lZCBjaGFyKSpwOwotCWhhc2h2YWwgPSBj
+aCA8PCA0OwotCXdoaWxlIChjaCkgewotCQloYXNodmFsICs9IGNoOwotCQljaCA9ICh1bnNp
+Z25lZCBjaGFyKSorK3A7Ci0JfQotCWFwcCA9ICZhdGFiW2hhc2h2YWwgJSBBVEFCU0laRV07
+CisJYXBwID0gJmF0YWJbaGFzaHZhbChuYW1lKSAlIEFUQUJTSVpFXTsKIAogCWZvciAoOyAq
+YXBwOyBhcHAgPSAmKCphcHApLT5uZXh0KSB7Ci0JCWlmIChlcXVhbChuYW1lLCAoKmFwcCkt
+Pm5hbWUpKSB7CisJCWlmICh2YXJlcXVhbChuYW1lLCAoKmFwcCktPm5hbWUpKSB7CiAJCQli
+cmVhazsKIAkJfQogCX0KZGlmZiAtLWdpdCBhL3NyYy9pbnB1dC5jIGIvc3JjL2lucHV0LmMK
+aW5kZXggMzg5NjlhNy4uNDYwNDk0NSAxMDA2NDQKLS0tIGEvc3JjL2lucHV0LmMKKysrIGIv
+c3JjL2lucHV0LmMKQEAgLTM4Niw3ICszODYsNyBAQCBwdXNoc3RyaW5nKGNoYXIgKnMsIHZv
+aWQgKmFwKQogCXNwLT5hcCA9IChzdHJ1Y3QgYWxpYXMgKilhcDsKIAlpZiAoYXApIHsKIAkJ
+KChzdHJ1Y3QgYWxpYXMgKilhcCktPmZsYWcgfD0gQUxJQVNJTlVTRTsKLQkJc3AtPnN0cmlu
+ZyA9IHM7CisJCXNwLT5zdHJpbmcgPSAoKHN0cnVjdCBhbGlhcyAqKWFwKS0+bmFtZTsKIAl9
+CiAJcGFyc2VmaWxlLT5uZXh0YyA9IHM7CiAJcGFyc2VmaWxlLT5ubGVmdCA9IGxlbjsKQEAg
+LTQwNSw3ICs0MDUsNyBAQCBzdGF0aWMgdm9pZCBwb3BzdHJpbmcodm9pZCkKIAkJICAgIHBh
+cnNlZmlsZS0+bmV4dGNbLTFdID09ICdcdCcpIHsKIAkJCWNoZWNra3dkIHw9IENIS0FMSUFT
+OwogCQl9Ci0JCWlmIChzcC0+c3RyaW5nICE9IHNwLT5hcC0+dmFsKSB7CisJCWlmIChzcC0+
+c3RyaW5nICE9IHNwLT5hcC0+bmFtZSkgewogCQkJY2tmcmVlKHNwLT5zdHJpbmcpOwogCQl9
+CiAJfQpkaWZmIC0tZ2l0IGEvc3JjL3Zhci5jIGIvc3JjL3Zhci5jCmluZGV4IDg5NWVhYmMu
+LjM1ZWE3YzYgMTAwNjQ0Ci0tLSBhL3NyYy92YXIuYworKysgYi9zcmMvdmFyLmMKQEAgLTYy
+MiwxMiArNjIyLDcgQEAgdm9pZCB1bnNldHZhcihjb25zdCBjaGFyICpzKQogU1RBVElDIHN0
+cnVjdCB2YXIgKioKIGhhc2h2YXIoY29uc3QgY2hhciAqcCkKIHsKLQl1bnNpZ25lZCBpbnQg
+aGFzaHZhbDsKLQotCWhhc2h2YWwgPSAoKHVuc2lnbmVkIGNoYXIpICpwKSA8PCA0OwotCXdo
+aWxlICgqcCAmJiAqcCAhPSAnPScpCi0JCWhhc2h2YWwgKz0gKHVuc2lnbmVkIGNoYXIpICpw
+Kys7Ci0JcmV0dXJuICZ2YXJ0YWJbaGFzaHZhbCAlIFZUQUJTSVpFXTsKKwlyZXR1cm4gJnZh
+cnRhYltoYXNodmFsKHApICUgVlRBQlNJWkVdOwogfQogCiAKQEAgLTY0MSwxOSArNjM2LDE5
+IEBAIGhhc2h2YXIoY29uc3QgY2hhciAqcCkKIGludAogdmFyY21wKGNvbnN0IGNoYXIgKnAs
+IGNvbnN0IGNoYXIgKnEpCiB7Ci0JaW50IGMsIGQ7Ci0KLQl3aGlsZSAoKGMgPSAqcCkgPT0g
+KGQgPSAqcSkpIHsKLQkJaWYgKCFjIHx8IGMgPT0gJz0nKQotCQkJZ290byBvdXQ7CisJaW50
+IGMgPSAqcCwgZCA9ICpxOworCXdoaWxlIChjID09IGQpIHsKKwkJaWYgKCFjKQorCQkJYnJl
+YWs7CiAJCXArKzsKIAkJcSsrOworCQljID0gKnA7CisJCWQgPSAqcTsKKwkJaWYgKGMgPT0g
+Jz0nKQorCQkJYyA9ICdcMCc7CisJCWlmIChkID09ICc9JykKKwkJCWQgPSAnXDAnOwogCX0K
+LQlpZiAoYyA9PSAnPScpCi0JCWMgPSAwOwotCWlmIChkID09ICc9JykKLQkJZCA9IDA7Ci1v
+dXQ6CiAJcmV0dXJuIGMgLSBkOwogfQogCmRpZmYgLS1naXQgYS9zcmMvdmFyLmggYi9zcmMv
+dmFyLmgKaW5kZXggOTUzYTY5NC4uZjZmYjMyMCAxMDA2NDQKLS0tIGEvc3JjL3Zhci5oCisr
+KyBiL3NyYy92YXIuaApAQCAtMTUzLDYgKzE1MywyMSBAQCBpbnQgdW5zZXRjbWQoaW50LCBj
+aGFyICoqKTsKIHZvaWQgdW5zZXR2YXIoY29uc3QgY2hhciAqKTsKIGludCB2YXJjbXAoY29u
+c3QgY2hhciAqLCBjb25zdCBjaGFyICopOwogCitzdGF0aWMgaW5saW5lIHVuc2lnbmVkIGlu
+dCBoYXNodmFsKGNvbnN0IGNoYXIgKnApCit7CisJdW5zaWduZWQgaW50IGhhc2h2YWw7CisK
+KwloYXNodmFsID0gKCh1bnNpZ25lZCBjaGFyKSAqcCkgPDwgNDsKKwl3aGlsZSAoKnApIHsK
+KwkJaGFzaHZhbCArPSAodW5zaWduZWQgY2hhcikgKnArKzsKKwkJaWYgKCpwID09ICc9JykK
+KwkJCWJyZWFrOworCX0KKworCXJldHVybiBoYXNodmFsOworfQorCisKIHN0YXRpYyBpbmxp
+bmUgaW50IHZhcmVxdWFsKGNvbnN0IGNoYXIgKmEsIGNvbnN0IGNoYXIgKmIpIHsKIAlyZXR1
+cm4gIXZhcmNtcChhLCBiKTsKIH0KLS0gCjIuNDMuMAoK
 
-[0] https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap06.htm=
-l
-"The encoded values associated with <period>, <slash>, <newline>, and
-<carriage-return> shall be invariant across all locales supported by
-the implementation."
+--------------2lSrCyti5Q18WzjuxrQc0PmW--
