@@ -1,95 +1,68 @@
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395304A01
-	for <dash@vger.kernel.org>; Sun, 28 Apr 2024 14:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF8F10971
+	for <dash@vger.kernel.org>; Mon, 29 Apr 2024 13:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714315870; cv=none; b=Oi7v4lIXq3zHrzU9DNlqc4gkJ05ximehfDGhtOgju4TAHE7uiITtUQFbtkcAWxSN4Sfcvzt7jo7Mh1WN5DRbRP49tl8oWyN8Q4XVninyxuF0HtJhCC8a91dvEZyjcRqEI+4CIrSdgW5n3VWJBGPYQRmE0FVFZodZB11qCyulF0E=
+	t=1714396370; cv=none; b=GWv6UzMPzBC5zTtTBU+QFFCAuc3zVBA+IAE0nELZV4F6nZVkOEhtiVTSrtqPTCFBuuIyhgrn7ElqXZLRujsfsIoItHB01iNqA93E6Xmj08sr3tir0axTRh4D34aWNF/3QSdnFlhI7uDLpc/Obue1IMMhsQBTFIIj6nH7ZWv5JD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714315870; c=relaxed/simple;
-	bh=uTIL2+V1DPY8Nk02Y/oanL5Lw13WWJLIkILqDNWAReI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XKWtkB4y7ku6pdnuamM+h5WMNYxI2fEV3kN8OnodNC6HXpy897D0rBiZTTseXe+YRecOuJauLfgfUnJpXNJxg/JR7Ex19DouoqQoRo3iQ038U7jegXtQHSZC36m5RmGFt8LlMWTkM31Y0k1IIOrgyIf31hQTgDg3tBRJmNwevfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=aHSe2cvO; arc=none smtp.client-ip=51.68.198.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="aHSe2cvO"
-Received: from [IPV6:2a02:8010:68a1:0:b093:5565:50db:e14f] (unknown [IPv6:2a02:8010:68a1:0:b093:5565:50db:e14f])
-	by mail.gigawatt.nl (Postfix) with ESMTPSA id 99201DA3;
-	Sun, 28 Apr 2024 15:50:58 +0100 (BST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 99201DA3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1714315858;
-	bh=3DwWMw0VsiwBKniB0wEEGB5MKNnmzG2fBbAm/JNLiSc=; l=1928;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aHSe2cvOIaSCmgB3IPonzwYsUQWxmZWp+o7T+mUIx9YsyoLK7xNG0kZtcE88O92H4
-	 0aAqrjuwc+w3R8EmYjqCiNzp/q1mTPNgJtHfh80WSVW5o2FVB+7V5HHNPf9+dE1AAS
-	 /FhrsBhPPvBPKsDxAuRdEaaVzKAk2L2JPkvM12ww=
-Message-ID: <abc8daf0-60ab-4e7c-aba7-9a3f3b973f57@gigawatt.nl>
-Date: Sun, 28 Apr 2024 15:50:57 +0100
+	s=arc-20240116; t=1714396370; c=relaxed/simple;
+	bh=oVUyJaoN5TG9KJq3fPCgHlqvoqg1rEFUjIDPAamJvdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R3q7UBWp0roi217kNZPDmST6SI1eMKeX6hIV98bOTqp9rr8/vhHuMBT4tXn14aqVd6et9sVWKbFshG75Eyr8X3QXuFKHAf9MEIdJh99E+JY/2LAWs8KfToae2Vf1I7nC5tDJp8aCNjiX77Mw/XhC3wpeYvuTYxmintSCXbqvXoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1s1Qny-008BuM-04;
+	Mon, 29 Apr 2024 21:12:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 Apr 2024 21:12:44 +0800
+Date: Mon, 29 Apr 2024 21:12:44 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: Christoph Anton Mitterer <calestyo@scientia.org>,
+	DASH Mailing List <dash@vger.kernel.org>
+Subject: Re: [PATCH 0/8] Add multi-byte support
+Message-ID: <Zi+czPiT/X/GbNm1@gondor.apana.org.au>
+References: <cover.1714215826.git.herbert@gondor.apana.org.au>
+ <eb927eeff3d1da7406c998d0ce816d3b6a061fc7.camel@scientia.org>
+ <Zi2dIJQcNVwJgxuN@gondor.apana.org.au>
+ <abc8daf0-60ab-4e7c-aba7-9a3f3b973f57@gigawatt.nl>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/8] Add multi-byte support
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- Christoph Anton Mitterer <calestyo@scientia.org>
-Cc: DASH Mailing List <dash@vger.kernel.org>
-References: <cover.1714215826.git.herbert@gondor.apana.org.au>
- <eb927eeff3d1da7406c998d0ce816d3b6a061fc7.camel@scientia.org>
- <Zi2dIJQcNVwJgxuN@gondor.apana.org.au>
-Content-Language: en-GB
-From: Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <Zi2dIJQcNVwJgxuN@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abc8daf0-60ab-4e7c-aba7-9a3f3b973f57@gigawatt.nl>
 
-On 28/04/2024 01:49, Herbert Xu wrote:
-> On Sat, Apr 27, 2024 at 11:31:43PM +0200, Christoph Anton Mitterer wrote:
->>
->> Long story short:
->> The recommended way was to add a sentinel character '.' at the end of
->> the output within the command substitution and strip that off later
->> with parameter expansion.
->> But despite of the very special properties[0] of '.', it's apparently
->> still required to set LC_ALL=C when stripping the sentinel, because the
->> pattern matching notation in ${foo%.} is defined only on strings of
->> characters, not on strings of bytes.
-> 
-> Are you talking about a theoretical undefined condition, or an
-> actual one?  Which shell doesn't deal with ${foo%.} correctly?
+On Sun, Apr 28, 2024 at 03:50:57PM +0100, Harald van Dijk wrote:
+>
+> The way you are implementing it, once you get to pmatch(), arguably you will
+> not handle ${foo%.} correctly.
 
-The way you are implementing it, once you get to pmatch(), arguably you 
-will not handle ${foo%.} correctly.
+I took the easy way out so for now only the fnmatch path works
+properly.  But eventually I will get to the pmatch path too,
+especially because fnmatch(3) seems to slow down quite a bit
+once locale is set.
+ 
+> This is something I expect to set foo to '\303', and it does in all shells I
+> know of, despite POSIX not saying this needs to work. The way you are
+> implementing multibyte character support, if I am reading it right, as long
+> as a full multibyte character has not been read, the next byte will be taken
+> as part of that multibyte character, meaning you will take '\303.' as a
+> single invalid multibyte character.
 
-Consider an UTF-8 locale, where '\303' is not a valid multibyte 
-character. In this locale, consider
-
-   foo=$(printf '\303.')
-   foo=${foo%.}
-
-This is something I expect to set foo to '\303', and it does in all 
-shells I know of, despite POSIX not saying this needs to work. The way 
-you are implementing multibyte character support, if I am reading it 
-right, as long as a full multibyte character has not been read, the next 
-byte will be taken as part of that multibyte character, meaning you will 
-take '\303.' as a single invalid multibyte character.
-
-At the same time, '\303\251' is a valid multibyte character, and '\251' 
-is not. So also consider
-
-   foo=$(printf '\303\251')
-   foo=${foo%$(printf '\251')}
-
-Here, it is not clear what the correct result is, and indeed, shells 
-disagree. bosh, ksh, zsh, and my shell do not break up characters, which 
-I believe to be the most sensible behaviour. bash and mksh do.
-
-The corner cases need to be carefully considered in order to figure out 
-how to write the multibyte character support core functionality.
+A multi-byte character has to be valid according to mbrtowc
+before I mark it with MBCHAR.  Otherwise it'll be treated as
+just a single-byte character.
 
 Cheers,
-Harald van Dijk
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
