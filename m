@@ -1,90 +1,136 @@
-Received: from sdaoden.eu (sdaoden.eu [217.144.132.164])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20EA883CBA
-	for <dash@vger.kernel.org>; Mon, 29 Apr 2024 17:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.144.132.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E912C853
+	for <dash@vger.kernel.org>; Wed,  1 May 2024 09:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714411044; cv=none; b=f1jXIG+wgKk/dmmokcXp5gMptLmzjPM0vyseBO0NBkjaal8x0sAcqkW2YzN6RO1HW6b8SszZrBDRepPcbfbCPA9nZlkUjxcpykbHxnRwkMJNwEWqpgpjKM3FtojMKHNlLyuwFdRog1XVkZStugXVg/uzx/FRuGfcLRyy/NVa7aE=
+	t=1714554737; cv=none; b=f/VDbmzZA5tsuAcVNul9oP4bpNUjz48m7FqFWCzvaPgPZ6d8VHEeHfEnGnFFxn7vFzOQVHkUr2IOBP8rnIbjjFmwCGc5zx2vQ8gLpXW3Mzy9Rg8NkYDdCER37W4MSzDDyTyAT9vMqsJPrhlu+FVAkQ8fANXOqO0M+TFUDnsMaL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714411044; c=relaxed/simple;
-	bh=hRLCTp8EJHY7JYu65CIvt4T+UHTHpeNWhs1oHukdQ1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nt/x71ax6hUyq3EOEpWBcLp8RFE0m34e1l8DgKpLuHwEs404Zt3TONXdj1SxuCCxTtxfoqskPBj4x5KscyU3OD9/H0MD6xNxT61ByTeGZBKlyj9Jxb8jpil+9INdOxIJ1kp4wGQ1kaCyyr6IbzGMqsBZn0DvY+7O4Fi3vH2rfTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu; spf=none smtp.mailfrom=sdaoden.eu; dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=QbjpZU7h; dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=ACgjW6Ii; arc=none smtp.client-ip=217.144.132.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sdaoden.eu
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="QbjpZU7h";
-	dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="ACgjW6Ii"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sdaoden.eu;
- s=citron; t=1714411032; x=1715077698; h=date:author:from:to:cc:subject:
-  message-id:in-reply-to:references:openpgp:blahblahblah:mime-version:
-  content-type:content-transfer-encoding:author:from:subject:date:to:cc:
-  resent-date:resent-from:resent-to:resent-cc:in-reply-to:references:
-  mime-version:content-type:content-transfer-encoding:message-id:
-  mail-followup-to:openpgp:blahblahblah;
- bh=F4RGg6Nqk9nWbLQrp/Q+wQdKc1Ex3oNBxvK5u95LiEQ=;
- b=QbjpZU7hejdezEkd8Idjs+b6nQhWzBP5k8GIUiAZL0DCgC5ft++nU8m8D4LSLauQf50V7KMF
-  YAxXQMjODuLeScqfEfdSCBgKGJSjZVvCSNusFuFF0yrR6Tz0MZq8xBkKSlcP/YSGrB3/YvHtaE
-  JQiRuXoMpEuKEKBSw4NYY2/HVnxgNrtRjorxvJSFM6TiS0piT6ZCE0v7xyRDcum8FnzrGlO7HG
-  JB+/sZOTiNhQlXVxLLlDrIs3EFoUMwrknWhX173dm6+tNnHd0DJZn7O6xy1cn1iDSR46IhiImv
-  vQRKM9uB29MJND8DJziubsNeiUGseDRoysiVkfxbdoae+Daw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sdaoden.eu;
- s=orange; t=1714411032; x=1715077698; h=date:author:from:to:cc:subject:
-  message-id:in-reply-to:references:openpgp:blahblahblah:mime-version:
-  content-type:content-transfer-encoding:author:from:subject:date:to:cc:
-  resent-date:resent-from:resent-to:resent-cc:in-reply-to:references:
-  mime-version:content-type:content-transfer-encoding:message-id:
-  mail-followup-to:openpgp:blahblahblah;
- bh=F4RGg6Nqk9nWbLQrp/Q+wQdKc1Ex3oNBxvK5u95LiEQ=;
- b=ACgjW6IisrnWecIC6P9wqX+PMweSUTTbazh4UXR2EwBxaNyto1E+ubHdeuYw71rKJ8wE/lC3
-  czJdaRM6T4TbBw==
-Date: Mon, 29 Apr 2024 19:17:11 +0200
-Author: Steffen Nurpmeso <steffen@sdaoden.eu>
-From: Steffen Nurpmeso <steffen@sdaoden.eu>
-To: Henrik =?utf-8?Q?Lindstr=C3=B6m?= <henrik@lxm.se>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
-Subject: Re: [PATCH] Generate signal names at runtime
-Message-ID: <20240429171711.YftL0yTa@steffen%sdaoden.eu>
-In-Reply-To: <d28c0015-3fff-412a-bdb2-39cae101e57f@lxm.se>
-References: <Zizl53et9J5Hg2D5@gondor.apana.org.au>
- <d28c0015-3fff-412a-bdb2-39cae101e57f@lxm.se>
-User-Agent: s-nail v14.9.24-621-g0d1e55f367
-OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
- url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
-BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
- the world can make no bugs.
+	s=arc-20240116; t=1714554737; c=relaxed/simple;
+	bh=lQDwvFnZm0CT7A0NtD0C3nCnXO27r591ZocGEkWHCJs=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=FO+rhltGyeWFV/HAUJTnIQvc1lbG8ty7x4tugplTfndi+o8vnxEKf7I6yYvnN4UCauovE/hWwAxo8liwiwZ8hK/YSAkXc12ApoXoTqeYNH+mP7tkHtJZCQdgmSj6WogitORDuMu43T3QLAv8fBLaiKc3/xg7aQN/seZLAf/WEFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1s260X-0093jJ-0N;
+	Wed, 01 May 2024 17:12:10 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 01 May 2024 17:12:27 +0800
+Date: Wed, 1 May 2024 17:12:27 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: DASH Mailing List <dash@vger.kernel.org>
+Subject: [v2 PATCH] expand: Fix naked backslah leakage
+Message-ID: <ZjIHe+fg42+MivAy@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Henrik Lindstr=C3=B6m wrote in
- <d28c0015-3fff-412a-bdb2-39cae101e57f@lxm.se>:
- |Getting the names from libc sounds ideal, but i don't think there's any w=
-ay
- |to do that with musl, which is what i'm trying to cross compile to. That's
- |why i attempted a more universal solution in my patch, but perhaps there
- |would be interest in musl to add sigabbrev_np instead.
- |
- |As for a fallback, shouldn't the goal be something more similar to my
- |attempt rather than the existing code? Silently building a broken version
- |of dash when cross compiling isn't ideal.
+v2 adjusts qchars to skip the backslash.
 
-People, adjust that fucking if that is possible on an american
-list script of mine (or take it as-is), it requires nothing but
-a C compiler (preprocessor) and POSIX (Solaris: xpg4) tools, and
-it generates a superset of exactly what you want.  Bug reports
-welcome.  I have the same for errno values, too.
+---8<---
+Naked backslashes in patterns may incorrectly unquote subsequent
+wild characters that are themselves quoted.  Fix this by adding
+an extra backslash when necessary.
 
---steffen
-|
-|Der Kragenbaer,                The moon bear,
-|der holt sich munter           he cheerfully and one by one
-|einen nach dem anderen runter  wa.ks himself off
-|(By Robert Gernhardt)
+Test case:
+
+	a="\\*bc"; b="\\"; c="*"; echo "<${a##$b"$c"}>"
+
+Old result:
+
+	<>
+
+New result:
+
+	<bc>
+
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ src/expand.c   | 10 ++++++++--
+ src/mystring.c |  1 +
+ src/mystring.h |  2 +-
+ 3 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/src/expand.c b/src/expand.c
+index 2ed02d6..0db2b29 100644
+--- a/src/expand.c
++++ b/src/expand.c
+@@ -1658,6 +1658,7 @@ _rmescapes(char *str, int flag)
+ 	char *p, *q, *r;
+ 	int notescaped;
+ 	int globbing;
++	int inquotes;
+ 
+ 	p = strpbrk(str, cqchars);
+ 	if (!p) {
+@@ -1692,16 +1693,17 @@ _rmescapes(char *str, int flag)
+ 			q = mempcpy(q, str, len);
+ 		}
+ 	}
++	inquotes = 0;
+ 	notescaped = globbing;
+ 	while (*p) {
+ 		if (*p == (char)CTLQUOTEMARK) {
+ 			p++;
+-			notescaped = globbing;
++			inquotes ^= globbing;
+ 			continue;
+ 		}
+ 		if (*p == '\\') {
+ 			/* naked back slash */
+-			notescaped = 0;
++			notescaped ^= globbing;
+ 			goto copy;
+ 		}
+ 		if (FNMATCH_IS_ENABLED && *p == '^')
+@@ -1711,6 +1713,10 @@ _rmescapes(char *str, int flag)
+ add_escape:
+ 			if (notescaped)
+ 				*q++ = '\\';
++			else if (inquotes) {
++				*q++ = '\\';
++				*q++ = '\\';
++			}
+ 		}
+ 		notescaped = globbing;
+ copy:
+diff --git a/src/mystring.c b/src/mystring.c
+index f651521..5eace6c 100644
+--- a/src/mystring.c
++++ b/src/mystring.c
+@@ -63,6 +63,7 @@ const char snlfmt[] = "%s\n";
+ const char dolatstr[] = { CTLQUOTEMARK, CTLVAR, VSNORMAL | VSBIT, '@', '=',
+ 			  CTLQUOTEMARK, '\0' };
+ const char cqchars[] = {
++	'\\',
+ #ifdef HAVE_FNMATCH
+ 	'^',
+ #endif
+diff --git a/src/mystring.h b/src/mystring.h
+index 564b911..d0ec9dd 100644
+--- a/src/mystring.h
++++ b/src/mystring.h
+@@ -48,7 +48,7 @@ extern const char spcstr[];
+ extern const char dolatstr[];
+ #define DOLATSTRLEN 6
+ extern const char cqchars[];
+-#define qchars (cqchars + FNMATCH_IS_ENABLED)
++#define qchars (cqchars + FNMATCH_IS_ENABLED + 1)
+ extern const char illnum[];
+ extern const char homestr[];
+ 
+-- 
+2.39.2
+
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
