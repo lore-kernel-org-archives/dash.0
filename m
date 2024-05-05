@@ -1,29 +1,29 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA89567F
-	for <dash@vger.kernel.org>; Sun,  5 May 2024 09:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D48567F
+	for <dash@vger.kernel.org>; Sun,  5 May 2024 09:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714900527; cv=none; b=QUCC6678F0HSDtdRERFIATnyYZbEMcQUegNraoetgUO46DjcpRX3NjRZCblgHI7tT76XnW3u4LB2eTFx1TvTp+dEjS5WEGZobFYwwFEOgsREy2m9xHqpTFO16aZ9mQNpJhfWYJfeSl74tBJItPPD8NDNAtRqRJoCjLQmVgytga8=
+	t=1714900530; cv=none; b=KAZhqPZroEUS4ad9nVtmLRuBfhq+ECPQd/5Jsysacb2aSzvXjV6B81VKKWP9R0MhLObJH5y1sn8JRpV3EF7rcppm2DrTzB7UQo7z2LdqNRfF3xFVyK62Mtk8fbVdvj6c1x3eBJ9yhuLJZlj0JQVAXFNGnLfAW+HXy0x4Dw+Dui8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714900527; c=relaxed/simple;
-	bh=5R8h8+ULyTNzfFyzruhP+HZUtKmFtp8dJvKJxrOW9h8=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=pQxPj1zwcqCuGTIN07iwLXpCDHO3UlY9KiDgauLgmmMYOWB6a+a193PX7KYXqQQ/wuMACaAsbQfbMRwAZZyTfblqAP94mFgUemBl5aUie3T6EexK9xh2LjtArs3Dyvk7+Yw+ziIkKtJxlkdc7k48wASIahgUNXm2sdwGUmheawQ=
+	s=arc-20240116; t=1714900530; c=relaxed/simple;
+	bh=Fc2IWehlzBuHjHueNdATIJlsfIzWttnfPNdiYfwlIIQ=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=fdqU7Zt2KqOpW/+7wHgQm1eKYM2hFEGf2/K5fEIRmRrX6iXtF5eiH0kn5x57Bb7bOH4SpBM8jQ+JaCLqKZ66MyoE+E9KGpQzx4MpIQSkqEW9yfwpKuRxkBknxKgjcb4FNmPeDP/R8cWDmB/rL1YDTh28UJwIqBmUm7TFIBakWHQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s3Xxp-00AabI-2t;
-	Sun, 05 May 2024 17:15:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 May 2024 17:15:22 +0800
-Date: Sun, 05 May 2024 17:15:22 +0800
-Message-Id: <2c7cd8666ab0880f282e1259ee74adb43754285a.1714900377.git.herbert@gondor.apana.org.au>
+	id 1s3Xxs-00Aabp-0g;
+	Sun, 05 May 2024 17:15:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 May 2024 17:15:24 +0800
+Date: Sun, 05 May 2024 17:15:24 +0800
+Message-Id: <796a2b5732f4ac033de84ce0afcab4b36ff62296.1714900377.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1714900377.git.herbert@gondor.apana.org.au>
 References: <cover.1714900377.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 11/13] memalloc: Use void * instead of pointer
+Subject: [v3 PATCH 12/13] builtin: Use pgetc in read(1)
 To: DASH Mailing List <dash@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
@@ -31,96 +31,205 @@ List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 
-Use void * instead of the obsolete pointer typedef.
+Use pgetc instead of read(2) in read(1).  This allows any future
+buffering in the input layer to be used by read(1).  This also
+allows read(1) to call helpers in the parser that may use the
+input layer.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- src/memalloc.c | 16 ++++++----------
- src/memalloc.h | 10 +++++-----
- 2 files changed, 11 insertions(+), 15 deletions(-)
+ src/input.c     | 42 ++++++++++++++++++++++++++++--------------
+ src/input.h     |  1 +
+ src/miscbltin.c | 39 +++++++++++++++++++--------------------
+ 3 files changed, 48 insertions(+), 34 deletions(-)
 
-diff --git a/src/memalloc.c b/src/memalloc.c
-index 60637da..7aa8c58 100644
---- a/src/memalloc.c
-+++ b/src/memalloc.c
-@@ -47,10 +47,9 @@
-  * Like malloc, but returns an error when out of space.
+diff --git a/src/input.c b/src/input.c
+index 1712e5f..6779069 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -42,19 +42,20 @@
+  * This file implements the input routines used by the parser.
   */
  
--pointer
--ckmalloc(size_t nbytes)
-+void *ckmalloc(size_t nbytes)
- {
--	pointer p;
-+	void *p;
+-#include "eval.h"
+-#include "shell.h"
+-#include "redir.h"
+-#include "syntax.h"
+-#include "input.h"
+-#include "output.h"
+-#include "options.h"
+-#include "memalloc.h"
+-#include "error.h"
+ #include "alias.h"
+-#include "parser.h"
++#include "error.h"
++#include "eval.h"
++#include "input.h"
+ #include "main.h"
++#include "memalloc.h"
+ #include "myhistedit.h"
++#include "options.h"
++#include "output.h"
++#include "parser.h"
++#include "redir.h"
++#include "shell.h"
++#include "syntax.h"
++#include "trap.h"
  
- 	p = malloc(nbytes);
- 	if (p == NULL)
-@@ -63,8 +62,7 @@ ckmalloc(size_t nbytes)
-  * Same for realloc.
-  */
+ #define IBUFSIZ (BUFSIZ + PUNGETC_MAX + 1)
  
--pointer
--ckrealloc(pointer p, size_t nbytes)
-+void *ckrealloc(void *p, size_t nbytes)
- {
- 	p = realloc(p, nbytes);
- 	if (p == NULL)
-@@ -110,8 +108,7 @@ char *stacknxt = stackbase.space;
- size_t stacknleft = MINSIZE;
- char *sstrend = stackbase.space + MINSIZE;
+@@ -258,7 +259,7 @@ retry:
+ 	}
  
--pointer
--stalloc(size_t nbytes)
-+void *stalloc(size_t nbytes)
- {
- 	char *p;
- 	size_t aligned;
-@@ -144,8 +141,7 @@ stalloc(size_t nbytes)
+ 	if (nr < 0) {
+-		if (errno == EINTR)
++		if (errno == EINTR && !(basepf.prev && pending_sig))
+ 			goto retry;
+ 	}
+ 	return nr;
+@@ -522,6 +523,13 @@ pushfile(void)
+ 	parsefile = pf;
+ }
+ 
++void pushstdin(void)
++{
++	INTOFF;
++	basepf.prev = parsefile;
++	parsefile = &basepf;
++	INTON;
++}
+ 
+ void
+ popfile(void)
+@@ -529,6 +537,11 @@ popfile(void)
+ 	struct parsefile *pf = parsefile;
+ 
+ 	INTOFF;
++	parsefile = pf->prev;
++	pf->prev = NULL;
++	if (pf == &basepf)
++		goto out;
++
+ 	if (pf->fd >= 0)
+ 		close(pf->fd);
+ 	if (pf->buf)
+@@ -539,15 +552,16 @@ popfile(void)
+ 		popstring();
+ 		freestrings(parsefile->spfree);
+ 	}
+-	parsefile = pf->prev;
+ 	ckfree(pf);
++
++out:
+ 	INTON;
  }
  
  
--void
--stunalloc(pointer p)
-+void stunalloc(void *p)
+-void unwindfiles(struct parsefile *stop)
++void __attribute__((noinline)) unwindfiles(struct parsefile *stop)
  {
- #ifdef DEBUG
- 	if (!p || (stacknxt < (char *)p) || ((char *)p < stackp->space)) {
-@@ -221,7 +217,7 @@ static void growstackblock(size_t min)
- 		sp = stackp;
- 		prevstackp = sp->prev;
- 		grosslen = newlen + sizeof(struct stack_block) - MINSIZE;
--		sp = ckrealloc((pointer)sp, grosslen);
-+		sp = ckrealloc(sp, grosslen);
- 		sp->prev = prevstackp;
- 		stackp = sp;
- 		stacknxt = sp->space;
-diff --git a/src/memalloc.h b/src/memalloc.h
-index b9adf76..a7f7996 100644
---- a/src/memalloc.h
-+++ b/src/memalloc.h
-@@ -48,11 +48,11 @@ extern char *stacknxt;
- extern size_t stacknleft;
- extern char *sstrend;
+-	while (parsefile != stop)
++	while (basepf.prev || parsefile != stop)
+ 		popfile();
+ }
  
--pointer ckmalloc(size_t);
--pointer ckrealloc(pointer, size_t);
-+void *ckmalloc(size_t);
-+void *ckrealloc(void *, size_t);
- char *savestr(const char *);
--pointer stalloc(size_t);
--void stunalloc(pointer);
-+void *stalloc(size_t);
-+void stunalloc(void *);
- void pushstackmark(struct stackmark *mark, size_t len);
- void setstackmark(struct stackmark *);
- void popstackmark(struct stackmark *);
-@@ -98,4 +98,4 @@ static inline char *_STPUTC(int c, char *p) {
- #define ungrabstackstr(s, p) stunalloc((s))
- #define stackstrend() ((void *)sstrend)
+diff --git a/src/input.h b/src/input.h
+index 151b1c6..c59d784 100644
+--- a/src/input.h
++++ b/src/input.h
+@@ -109,6 +109,7 @@ void pungetn(int);
+ void pushstring(char *, void *);
+ int setinputfile(const char *, int);
+ void setinputstring(char *);
++void pushstdin(void);
+ void popfile(void);
+ void unwindfiles(struct parsefile *);
+ void popallfiles(void);
+diff --git a/src/miscbltin.c b/src/miscbltin.c
+index 8a0ddf4..10d256e 100644
+--- a/src/miscbltin.c
++++ b/src/miscbltin.c
+@@ -46,18 +46,20 @@
+ #include <ctype.h>
+ #include <inttypes.h>
  
--#define ckfree(p)	free((pointer)(p))
-+#define ckfree(p)	free((void *)(p))
+-#include "shell.h"
+-#include "options.h"
+-#include "var.h"
+-#include "output.h"
+-#include "memalloc.h"
+ #include "error.h"
++#include "expand.h"
++#include "input.h"
++#include "memalloc.h"
+ #include "miscbltin.h"
+ #include "mystring.h"
+ #include "main.h"
+-#include "expand.h"
++#include "options.h"
++#include "output.h"
+ #include "parser.h"
++#include "shell.h"
++#include "syntax.h"
+ #include "trap.h"
++#include "var.h"
+ 
+ #undef rflag
+ 
+@@ -115,14 +117,13 @@ readcmd_handle_line(char *s, int ac, char **ap)
+ int
+ readcmd(int argc, char **argv)
+ {
+-	char **ap;
+-	char c;
+-	int rflag;
+ 	char *prompt;
+-	char *p;
+ 	int startloc;
+ 	int newloc;
+ 	int status;
++	char **ap;
++	int rflag;
++	char *p;
+ 	int i;
+ 
+ 	rflag = 0;
+@@ -145,19 +146,17 @@ readcmd(int argc, char **argv)
+ 	status = 0;
+ 	STARTSTACKSTR(p);
+ 
++	pushstdin();
++
+ 	goto start;
+ 
+ 	for (;;) {
+-		switch (read(0, &c, 1)) {
+-		case 1:
+-			break;
+-		default:
+-			if (errno == EINTR && !pending_sig)
+-				continue;
+-				/* fall through */
+-		case 0:
++		int c;
++
++		c = pgetc();
++		if (c == PEOF) {
+ 			status = 1;
+-			goto out;
++			break;
+ 		}
+ 		if (c == '\0')
+ 			continue;
+@@ -186,7 +185,7 @@ start:
+ 			newloc = startloc - 1;
+ 		}
+ 	}
+-out:
++	popfile();
+ 	recordregion(startloc, p - (char *)stackblock(), 0);
+ 	STACKSTRNUL(p);
+ 	readcmd_handle_line(p + 1, argc - (ap - argv), ap);
 -- 
 2.39.2
 
