@@ -1,29 +1,27 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3E933D5
-	for <dash@vger.kernel.org>; Sun, 19 May 2024 05:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FC333D5
+	for <dash@vger.kernel.org>; Sun, 19 May 2024 05:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716096042; cv=none; b=rZU2aE4TG56NGcjgCvsy9GFSFaqjWrZUTETtwMNL9naYkq8KdBdY23vbujVTuywD5XPt8d+So1qUU1CPvxNkuadIhB0Z4qQycvDDq3tHv3hT9CgsrjgEmr0VNSliXMws7zMrE2qeZpXyGKP/x1KJvNttNnFhT8v7eqmO0zHVFAU=
+	t=1716096182; cv=none; b=YuQe27tVM/See5/8NzbLThzY4HbIwfYLK7L8LQMJ641LSLWnt/DRAspj+aE4HwCIPm8jyylPCsMyA0DCVsH3e7B1IW4s/VCYd5gCYo7v8RPQ+66IGZXTmFE/GPpDEpl+dabiZdAEY4pK85oxCMOshEiOpiTQ1bP8RErdRr2u7gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716096042; c=relaxed/simple;
-	bh=hDxYgMZoW6xdz3Ij8l6UKInfYhu0ULqIOxuPdaYDmXM=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=fkWMjEhV8miFteSsAqgsPp8wtuSrxdsBk3C2PEA9uFZYd0BZ7l3pd39HNeoUh4Q9/eI+19yaKkJrvngxOhT9LgZXT9yIE/HE229XHbpREFhUUZ5jME5E2qYDzv7flm5ek67eU5rYQSwQyG8GT6m4CMKeD+ZGh6uacWZ+802VsJk=
+	s=arc-20240116; t=1716096182; c=relaxed/simple;
+	bh=RdimNYEl8Lrw/W1AVopy5eErePW6GKD+obQijyCbCBg=;
+	h=Date:Message-Id:From:Subject:To; b=BXjU5gzrVG3+Cp4hVaLWpTli1C8ydN2UnRvc8h5kkv6PT3ACKWA0wBQZFjncM+NGpO1FCRmjeyTBG0/OpB4+DxDjvrFWawbzna6ScdqJaF6bZs4rystIPb7edgfJd5JALwLn1V757iYJJAt1MTtykx3o5YSkhfWRTsuybQ1ra0M=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s8YyK-00HGFz-1K;
-	Sun, 19 May 2024 13:20:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 19 May 2024 13:20:37 +0800
-Date: Sun, 19 May 2024 13:20:37 +0800
-Message-Id: <45c43c58d29b88b96679da71ba94f7a956c0c7f3.1716095868.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1716095868.git.herbert@gondor.apana.org.au>
-References: <cover.1716095868.git.herbert@gondor.apana.org.au>
+	id 1s8Z0Z-00HGHq-2p;
+	Sun, 19 May 2024 13:22:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 19 May 2024 13:22:57 +0800
+Date: Sun, 19 May 2024 13:22:57 +0800
+Message-Id: <cover.1716096097.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v4 PATCH 13/13] builtin: Process multi-byte characters in read(1)
+Subject: [v2 PATCH 0/3] Improve performance when reading stdin
 To: DASH Mailing List <dash@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
@@ -31,107 +29,30 @@ List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 
-Add support for multi-byte characters in read(1) by using getmbc
-from the parser.
+v2 rebases on the new multibyte patch-set.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- src/miscbltin.c | 19 +++++++++++++------
- src/parser.c    |  2 +-
- src/parser.h    |  1 +
- 3 files changed, 15 insertions(+), 7 deletions(-)
+The performance when reading stdin has regressed after we started
+reading one byte at a time.  This patch series uses lseek(2) and
+tee(2) to recover performance where possible.
 
-diff --git a/src/miscbltin.c b/src/miscbltin.c
-index 10d256e..5aa2b24 100644
---- a/src/miscbltin.c
-+++ b/src/miscbltin.c
-@@ -36,15 +36,16 @@
-  * Miscelaneous builtins.
-  */
- 
-+#include <ctype.h>
-+#include <inttypes.h>
-+#include <limits.h>
-+#include <stdlib.h>
- #include <sys/types.h>		/* quad_t */
- #include <sys/param.h>		/* BSD4_4 */
- #include <sys/stat.h>
- #include <sys/time.h>
- #include <sys/resource.h>
- #include <unistd.h>
--#include <stdlib.h>
--#include <ctype.h>
--#include <inttypes.h>
- 
- #include "error.h"
- #include "expand.h"
-@@ -151,8 +152,10 @@ readcmd(int argc, char **argv)
- 	goto start;
- 
- 	for (;;) {
-+		unsigned ml;
- 		int c;
- 
-+		CHECKSTRSPACE((MB_LEN_MAX > 16 ? MB_LEN_MAX : 16) + 4, p);
- 		c = pgetc();
- 		if (c == PEOF) {
- 			status = 1;
-@@ -160,9 +163,14 @@ readcmd(int argc, char **argv)
- 		}
- 		if (c == '\0')
- 			continue;
-+		ml = getmbc(c, p, 0);
-+		if (ml) {
-+			p += ml;
-+			goto record;
-+		}
- 		if (newloc >= startloc) {
- 			if (c == '\n')
--				goto resetbs;
-+				goto record;
- 			goto put;
- 		}
- 		if (!rflag && c == '\\') {
-@@ -172,13 +180,12 @@ readcmd(int argc, char **argv)
- 		if (c == '\n')
- 			break;
- put:
--		CHECKSTRSPACE(2, p);
- 		if (strchr(qchars, c))
- 			USTPUTC(CTLESC, p);
- 		USTPUTC(c, p);
- 
-+record:
- 		if (newloc >= startloc) {
--resetbs:
- 			recordregion(startloc, newloc, 0);
- start:
- 			startloc = p - (char *)stackblock();
-diff --git a/src/parser.c b/src/parser.c
-index 71d61f3..d368adc 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -883,7 +883,7 @@ static void synstack_pop(struct synstack **stack)
- 	*stack = (*stack)->next;
- }
- 
--static unsigned getmbc(int c, char *out, int mode)
-+unsigned getmbc(int c, char *out, int mode)
- {
- 	char *const start = out;
- 	mbstate_t mbst = {};
-diff --git a/src/parser.h b/src/parser.h
-index 14bfc4f..7a9605b 100644
---- a/src/parser.h
-+++ b/src/parser.h
-@@ -95,6 +95,7 @@ const char *getprompt(void *);
- const char *const *findkwd(const char *);
- char *endofname(const char *);
- const char *expandstr(const char *);
-+unsigned getmbc(int c, char *out, int mode);
- 
- static inline int
- goodname(const char *p)
+Herbert Xu (3):
+  input: Move newline loop into preadbuffer
+  input: Use lseek on stdin when possible
+  input: Use tee(2) for stdin pipe
+
+ configure.ac  |   2 +-
+ src/eval.c    |   3 +
+ src/init.h    |   1 +
+ src/input.c   | 208 +++++++++++++++++++++++++++++++++++++++-----------
+ src/input.h   |   4 +
+ src/jobs.c    |   3 +
+ src/mkinit.c  |   6 ++
+ src/options.c |   2 +-
+ src/redir.c   |  26 ++++---
+ src/system.h  |   7 ++
+ src/trap.c    |   1 +
+ 11 files changed, 205 insertions(+), 58 deletions(-)
+
 -- 
 2.39.2
 
