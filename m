@@ -1,29 +1,29 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BB833D5
-	for <dash@vger.kernel.org>; Sun, 19 May 2024 05:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7025A4437
+	for <dash@vger.kernel.org>; Sun, 19 May 2024 05:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716096022; cv=none; b=s6aVkEhit6WDem8EzoLThqbXuRdASD4Ibx6Nn2I9ki+xnwckOfJZd+zUcBbFPU2+504o1moJdlPBuXrSv/LVwOQ25cwTRMZ1KY/dkv2Xw/qkYPYLLehrgM1J3nF2e/4cWClLv+AEBu+CH42CH3LdH2LVTLaaQuXHKxGWtF86RqM=
+	t=1716096024; cv=none; b=a/spJhmwvAKU+hig6ga6ROKfaAY3i7dYAjcBCVgBVOOubns3/yduZWUKo06ty3iWC/Yhitpown7at1YXxQAkZxAYlGNsN0R3UbHS5Tp0+I0tXPvQlOO5cvsk4/kxiKoAslCEbzVzJHyptRbJ8LQDP/Lo9izIboxD84bbPfwPGAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716096022; c=relaxed/simple;
-	bh=E+I7Go8iQnJXch1LYhLVSAboUi+DR48eNENd6CcRDXc=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=f3KK53quZiwJauFPtAM2bONrCw0JDRjEIh23IEEl6ElCkKG32jysFWSUFgr6h1+3+c43fjKDNNCyaV/uoc0nmXdXkkcUtLOSp9W6ZyB6gKUHZG/hwNS0VhOue/i3eWLtZkyAouzgYXZ0b3Q6+aZaQ90c/bgs27zyWYtiagwOKLw=
+	s=arc-20240116; t=1716096024; c=relaxed/simple;
+	bh=nh5M77j97n58tWm+CMchhUBZZ/aiUXAvssszTTitQ9A=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=iF+aAxAi7+rYCOGmiS/rtZAYJ1xqCrfIWy9oh1z/GOf+1yZbzTgYPx3XFg412X2X0FeI+HBRmQ2uZJ8xghCGTaoHDt6m8IeWAHoSQpY/VwMBnIwk9H3I3obTGj+rNJdQc/L2dUKpiJLzJWCmVg7XDsX8i6PzLI2VPA4H2KKdNP0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s8Yxz-00HGAW-2R;
-	Sun, 19 May 2024 13:20:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 19 May 2024 13:20:17 +0800
-Date: Sun, 19 May 2024 13:20:17 +0800
-Message-Id: <e5bc6d6f403a8a43924d2c2e784fd56b013b3746.1716095868.git.herbert@gondor.apana.org.au>
+	id 1s8Yy2-00HGAh-09;
+	Sun, 19 May 2024 13:20:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 19 May 2024 13:20:19 +0800
+Date: Sun, 19 May 2024 13:20:19 +0800
+Message-Id: <34f30d88b665583154bd20b833d99efb40847815.1716095868.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1716095868.git.herbert@gondor.apana.org.au>
 References: <cover.1716095868.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v4 PATCH 04/13] expand: Process multi-byte characters in subevalvar
+Subject: [v4 PATCH 05/13] expand: Process multi-byte characters in expmeta
 To: DASH Mailing List <dash@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
@@ -31,388 +31,249 @@ List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 
-When trimming variables in subevalvar, process multi-byte characters
-as one unit instead of their constituent bytes.
+When glob(3) is not in use, make sure that expmeta processes
+multi-byte characters correctly.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- src/expand.c   | 196 ++++++++++++++++++++++++++++++++++---------------
- src/expand.h   |   1 +
- src/mystring.c |   2 +-
- src/parser.h   |   1 +
- 4 files changed, 138 insertions(+), 62 deletions(-)
+ src/expand.c | 109 ++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 72 insertions(+), 37 deletions(-)
 
 diff --git a/src/expand.c b/src/expand.c
-index 5260d16..b627c7a 100644
+index b627c7a..714eae9 100644
 --- a/src/expand.c
 +++ b/src/expand.c
-@@ -32,27 +32,27 @@
-  * SUCH DAMAGE.
-  */
+@@ -84,6 +84,7 @@
+ #define RMESCAPE_GLOB	0x2	/* Add backslashes for glob */
+ #define RMESCAPE_GROW	0x8	/* Grow strings instead of stalloc */
+ #define RMESCAPE_HEAP	0x10	/* Malloc strings instead of stalloc */
++#define RMESCAPE_EMETA	0x20	/* Remove backslashes too */
  
--#include <sys/types.h>
--#include <sys/time.h>
--#include <sys/stat.h>
-+#include <ctype.h>
- #include <dirent.h>
--#include <unistd.h>
--#ifdef HAVE_GETPWNAM
--#include <pwd.h>
--#endif
--#include <stdlib.h>
--#include <stdio.h>
--#include <inttypes.h>
--#include <limits.h>
--#include <string.h>
- #ifdef HAVE_FNMATCH
- #include <fnmatch.h>
- #endif
- #ifdef HAVE_GLOB
- #include <glob.h>
- #endif
--#include <ctype.h>
-+#include <inttypes.h>
-+#include <limits.h>
-+#ifdef HAVE_GETPWNAM
-+#include <pwd.h>
-+#endif
-+#include <string.h>
- #include <stdbool.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <sys/types.h>
-+#include <sys/time.h>
-+#include <sys/stat.h>
-+#include <unistd.h>
- #include <wchar.h>
+ /* Add CTLESC when necessary. */
+ #define QUOTES_ESC	(EXP_FULL | EXP_CASE)
+@@ -1387,15 +1388,13 @@ expandmeta(struct strlist *str)
+ 		savelastp = exparg.lastp;
+ 
+ 		INTOFF;
+-		p = preglob(str->text, RMESCAPE_ALLOC | RMESCAPE_HEAP);
++		p = str->text;
+ 		len = strlen(p);
+ 		expdir_max = len + PATH_MAX;
+ 		expdir = ckmalloc(expdir_max);
+ 
+ 		expmeta(p, len, 0);
+ 		ckfree(expdir);
+-		if (p != str->text)
+-			ckfree(p);
+ 		INTON;
+ 		if (exparg.lastp == savelastp) {
+ 			/*
+@@ -1416,6 +1415,40 @@ nometa:
+ 	}
+ }
+ 
++static void expmeta_rmescapes(char *enddir, char *name)
++{
++	preglob(strcpy(enddir, name), RMESCAPE_EMETA);
++}
++
++static unsigned mbcharlen(char *p)
++{
++	int esc = 0;
++
++	if (*++p == (char)CTLESC)
++		esc++;
++
++	return esc + 3 + (unsigned char)p[esc];
++}
++
++static size_t skipesc(char *p)
++{
++	size_t esc = 0;
++
++	if (p[esc] == (char)CTLMBCHAR)
++		esc += mbcharlen(p);
++	else if (p[esc] == (char)CTLESC)
++		esc++;
++	else if (p[esc] == '\\' && p[esc + 1]) {
++		while (p[++esc] == (char)CTLQUOTEMARK)
++			;
++		if (p[esc] == (char)CTLMBCHAR)
++			esc += mbcharlen(p + esc);
++		else if (p[esc] == (char)CTLESC)
++			esc++;
++	}
++
++	return esc;
++}
  
  /*
-@@ -543,8 +543,10 @@ static char *scanleft(char *startp, char *endp, char *rmesc, char *rmescend,
- 	loc = startp;
- 	loc2 = rmesc;
- 	do {
--		int match;
- 		const char *s = loc2;
-+		unsigned ml;
-+		int match;
-+
- 		c = *loc2;
- 		if (zero) {
- 			*loc2 = '\0';
-@@ -553,12 +555,26 @@ static char *scanleft(char *startp, char *endp, char *rmesc, char *rmescend,
- 		match = pmatch(str, s);
- 		*loc2 = c;
- 		if (match)
--			return loc;
--		if (quotes && *loc == (char)CTLESC)
-+			return quotes ? loc : loc2;
-+
-+		if (!c)
-+			break;
-+
-+		if (*loc != (char)CTLMBCHAR) {
-+			if (*loc == (char)CTLESC)
-+				loc++;
- 			loc++;
--		loc++;
--		loc2++;
--	} while (c);
-+			loc2++;
-+			continue;
-+		}
-+
-+		if (*++loc == (char)CTLESC)
-+			loc++;
-+
-+		ml = (unsigned char)*loc;
-+		loc += ml + 3;
-+		loc2 += ml;
-+	} while (1);
- 	return 0;
- }
+  * Do metacharacter (i.e. *, ?, [...]) expansion.
+@@ -1425,17 +1458,18 @@ STATIC void
+ expmeta(char *name, unsigned name_len, unsigned expdir_len)
+ {
+ 	char *enddir = expdir + expdir_len;
+-	char *p;
++	struct stat64 statb;
++	struct dirent64 *dp;
+ 	const char *cp;
+-	char *start;
+ 	char *endname;
+ 	int metaflag;
+-	struct stat64 statb;
+-	DIR *dirp;
+-	struct dirent64 *dp;
+-	int atend;
+ 	int matchdot;
++	char *start;
++	DIR *dirp;
++	char *pat;
++	char *p;
+ 	int esc;
++	int c;
  
-@@ -566,14 +582,16 @@ static char *scanleft(char *startp, char *endp, char *rmesc, char *rmescend,
- static char *scanright(char *startp, char *endp, char *rmesc, char *rmescend,
- 		       char *str, int quotes, int zero
- ) {
--	int esc = 0;
-+	size_t esc = 0;
- 	char *loc;
- 	char *loc2;
- 
- 	for (loc = endp, loc2 = rmescend; loc >= startp; loc2--) {
--		int match;
--		char c = *loc2;
- 		const char *s = loc2;
-+		char c = *loc2;
-+		unsigned ml;
-+		int match;
-+
- 		if (zero) {
- 			*loc2 = '\0';
- 			s = rmesc;
-@@ -581,17 +599,23 @@ static char *scanright(char *startp, char *endp, char *rmesc, char *rmescend,
- 		match = pmatch(str, s);
- 		*loc2 = c;
- 		if (match)
--			return loc;
-+			return quotes ? loc : loc2;
- 		loc--;
--		if (quotes) {
--			if (--esc < 0) {
--				esc = esclen(startp, loc);
--			}
--			if (esc % 2) {
--				esc--;
--				loc--;
--			}
-+		if (!esc--)
-+			esc = esclen(startp, loc);
-+		if (esc % 2) {
-+			esc--;
-+			loc--;
-+			continue;
- 		}
-+		if (*loc != (char)CTLMBCHAR)
-+			continue;
-+
-+		ml = (unsigned char)*--loc;
-+		loc -= ml + 2;
-+		if (*loc == (char)CTLESC)
-+			loc--;
-+		loc2 -= ml - 1;
+ 	metaflag = 0;
+ 	start = name;
+@@ -1444,11 +1478,8 @@ expmeta(char *name, unsigned name_len, unsigned expdir_len)
+ 			metaflag = 1;
+ 		else if (*p == '[') {
+ 			char *q = p + 1;
+-			if (*q == '!')
+-				q++;
+ 			for (;;) {
+-				if (*q == '\\')
+-					q++;
++				q += skipesc(q);
+ 				if (*q == '/' || *q == '\0')
+ 					break;
+ 				if (*++q == ']') {
+@@ -1457,8 +1488,7 @@ expmeta(char *name, unsigned name_len, unsigned expdir_len)
+ 				}
+ 			}
+ 		} else {
+-			if (*p == '\\' && p[1])
+-				esc++;
++			esc = skipesc(p);
+ 			if (p[esc] == '/') {
+ 				if (metaflag)
+ 					break;
+@@ -1469,24 +1499,18 @@ expmeta(char *name, unsigned name_len, unsigned expdir_len)
+ 	if (metaflag == 0) {	/* we've reached the end of the file name */
+ 		if (!expdir_len)
+ 			return;
+-		p = name;
+-		do {
+-			if (*p == '\\' && p[1])
+-				p++;
+-			*enddir++ = *p;
+-		} while (*p++);
++		expmeta_rmescapes(enddir, name);
+ 		if (lstat64(expdir, &statb) >= 0)
+ 			addfname(expdir);
+ 		return;
  	}
- 	return 0;
- }
-@@ -645,14 +669,11 @@ static char *subevalvar(char *start, char *str, int strloc, int startloc,
- 		nstrloc = str - (char *)stackblock();
+ 	endname = p;
+ 	if (name < start) {
+-		p = name;
+-		do {
+-			if (*p == '\\' && p[1])
+-				p++;
+-			*enddir++ = *p++;
+-		} while (p < start);
++		c = *start;
++		*start = 0;
++		expmeta_rmescapes(enddir, name);
++		*start = c;
++		enddir += strlen(enddir);
  	}
- 
--	rmesc = startp;
--	if (quotes) {
--		rmesc = _rmescapes(startp, RMESCAPE_ALLOC | RMESCAPE_GROW);
--		if (rmesc != startp)
--			rmescend = expdest;
--		startp = stackblock() + startloc;
--		str = stackblock() + nstrloc;
--	}
-+	rmesc = _rmescapes(startp, RMESCAPE_ALLOC | RMESCAPE_GROW);
-+	if (rmesc != startp)
-+		rmescend = expdest;
-+	startp = stackblock() + startloc;
-+	str = stackblock() + nstrloc;
- 	rmescend--;
- 
- 	/* zero = subtype == VSTRIMLEFT || subtype == VSTRIMLEFTMAX */
-@@ -662,16 +683,29 @@ static char *subevalvar(char *start, char *str, int strloc, int startloc,
- 
- 	endp = stackblock() + strloc - 1;
- 	loc = scan(startp, endp, rmesc, rmescend, str, quotes, zero);
--	if (loc) {
--		if (zero) {
--			memmove(startp, loc, endp - loc);
--			loc = startp + (endp - loc);
-+	if (!loc) {
-+		if (quotes) {
-+			rmesc = startp;
-+			rmescend = endp;
- 		}
--		*loc = '\0';
--	} else
--		loc = endp;
-+	} else if (!quotes) {
-+		if (zero)
-+			rmesc = loc;
-+		else
-+			rmescend = loc;
-+	} else if (zero) {
-+		rmesc = loc;
-+		rmescend = endp;
-+	} else {
-+		rmesc = startp;
-+		rmescend = loc;
-+	}
-+
-+	memmove(startp, rmesc, rmescend - rmesc);
-+	loc = startp + (rmescend - rmesc);
- 
- out:
-+	*loc = '\0';
- 	amount = loc - expdest;
- 	STADJUST(amount, expdest);
- 
-@@ -697,6 +731,7 @@ evalvar(char *p, int flag)
- 	ssize_t varlen;
- 	int discard;
- 	int quoted;
-+	int mbchar;
- 
- 	varflags = *p++ & ~VSBIT;
- 	subtype = varflags & VSTYPE;
-@@ -706,8 +741,18 @@ evalvar(char *p, int flag)
- 	startloc = expdest - (char *)stackblock();
- 	p = strchr(p, '=') + 1;
- 
-+	mbchar = 0;
-+	switch (subtype) {
-+	case VSTRIMLEFT:
-+	case VSTRIMLEFTMAX:
-+	case VSTRIMRIGHT:
-+	case VSTRIMRIGHTMAX:
-+		mbchar = EXP_MBCHAR;
-+		break;
-+	}
-+
- again:
--	varlen = varvalue(var, varflags, flag, quoted);
-+	varlen = varvalue(var, varflags, flag | mbchar, quoted);
- 	if (varflags & VSNUL)
- 		varlen--;
- 
-@@ -813,14 +858,31 @@ static struct mbpair mbtodest(const char *p, char *q, const char *syntax,
- 	size_t ml;
- 
- 	ml = mbrlen(--p, len, &mbs);
--	if (ml == -2 || ml == -1 || ml < 2)
-+	if (ml == -2 || ml == -1 || ml < 2) {
-+		q = chtodest((signed char)*p, syntax, q);
- 		ml = 1;
-+		goto out;
-+	}
- 
- 	len = ml;
- 	do {
- 		q = chtodest((signed char)*p++, syntax, q);
- 	} while (--len);
-+	goto out;
- 
-+	if (syntax[CTLMBCHAR] == CCTL) {
-+		USTPUTC(CTLMBCHAR, q);
-+		USTPUTC(ml, q);
-+	}
-+
-+	q = mempcpy(q, p, ml);
-+
-+	if (syntax[CTLMBCHAR] == CCTL) {
-+		USTPUTC(ml, q);
-+		USTPUTC(CTLMBCHAR, q);
-+	}
-+
-+out:
- 	mbp.ml = ml - 1;
- 	mbp.ql = q - q0;
- 	return mbp;
-@@ -839,12 +901,14 @@ static size_t memtodest(const char *p, size_t len, int flags)
- 	if (unlikely(!len))
- 		return 0;
- 
--	q = makestrspace(len * 2, expdest);
-+	/* CTLMBCHAR, 2, c, c, 2, CTLMBCHAR */
-+	q = makestrspace(len * 3, expdest);
- 
--#if QUOTES_ESC != 0x11 || EXP_QUOTED != 0x100
--#error QUOTES_ESC != 0x11 || EXP_QUOTED != 0x100
-+#if QUOTES_ESC != 0x11 || EXP_MBCHAR != 0x20 || EXP_QUOTED != 0x100
-+#error QUOTES_ESC != 0x11 || EXP_MBCHAR != 0x20 || EXP_QUOTED != 0x100
- #endif
--	if (likely(!(flags & (flags >> 4 | flags >> 8) & QUOTES_ESC))) {
-+	if (likely(!(flags & (flags >> 3 | flags >> 4 | flags >> 8) &
-+		     (QUOTES_ESC | EXP_MBCHAR)))) {
- 		while (len >= 8) {
- 			uint64_t x = *(uint64_t *)(p + count);
- 
-@@ -861,7 +925,8 @@ static size_t memtodest(const char *p, size_t len, int flags)
- 		q += count;
- 		p += count;
- 
--		syntax = flags & QUOTES_ESC ? BASESYNTAX : is_type;
-+		syntax = flags & (QUOTES_ESC | EXP_MBCHAR) ?
-+			 BASESYNTAX : is_type;
- 	} else
- 		syntax = SQSYNTAX;
- 
-@@ -1753,17 +1818,25 @@ _rmescapes(char *str, int flag)
- 	inquotes = 0;
- 	notescaped = globbing;
- 	while (*p) {
-+		unsigned ml;
-+		int newnesc = globbing;
-+
- 		if (*p == (char)CTLQUOTEMARK) {
- 			p++;
- 			inquotes ^= globbing;
+ 	*enddir = 0;
+ 	cp = expdir;
+@@ -1495,16 +1519,15 @@ expmeta(char *name, unsigned name_len, unsigned expdir_len)
+ 		cp = ".";
+ 	if ((dirp = opendir(cp)) == NULL)
+ 		return;
+-	if (*endname == 0) {
+-		atend = 1;
+-	} else {
+-		atend = 0;
++	c = *endname;
++	if (c) {
+ 		*endname = '\0';
+ 		endname += esc + 1;
+ 	}
+ 	name_len -= endname - name;
+ 	matchdot = 0;
+-	p = start;
++	pat = preglob(start, RMESCAPE_ALLOC | RMESCAPE_HEAP);
++	p = pat;
+ 	if (*p == '\\')
+ 		p++;
+ 	if (*p == '.')
+@@ -1512,8 +1535,8 @@ expmeta(char *name, unsigned name_len, unsigned expdir_len)
+ 	while (! int_pending() && (dp = readdir64(dirp)) != NULL) {
+ 		if (dp->d_name[0] == '.' && ! matchdot)
  			continue;
--		}
--		if (*p == '\\') {
-+		} else if (*p == '\\') {
- 			/* naked back slash */
--			notescaped ^= globbing;
--			goto copy;
--		}
--		if (*p == (char)CTLESC) {
-+			newnesc ^= notescaped;
-+		} else if (*p == (char)CTLMBCHAR) {
-+			if (*++p == (char)CTLESC)
-+				p++;
-+
-+			ml = (unsigned char)*p++;
-+			q = mempcpy(q, p, ml);
-+			p += ml + 2;
-+			goto setnesc;
-+		} else if (*p == (char)CTLESC) {
- 			p++;
- 			if (notescaped)
- 				*q++ = '\\';
-@@ -1772,9 +1845,10 @@ _rmescapes(char *str, int flag)
- 				*q++ = '\\';
+-		if (pmatch(start, dp->d_name)) {
+-			if (atend) {
++		if (pmatch(pat, dp->d_name)) {
++			if (!c) {
+ 				scopy(dp->d_name, enddir);
+ 				addfname(expdir);
+ 			} else {
+@@ -1536,9 +1559,11 @@ expmeta(char *name, unsigned name_len, unsigned expdir_len)
  			}
  		}
--		notescaped = globbing;
--copy:
-+
- 		*q++ = *p++;
-+setnesc:
-+		notescaped = newnesc;
  	}
- 	*q = '\0';
- 	if (flag & RMESCAPE_GROW) {
-diff --git a/src/expand.h b/src/expand.h
-index 49a18f9..a78564f 100644
---- a/src/expand.h
-+++ b/src/expand.h
-@@ -55,6 +55,7 @@ struct arglist {
- #define	EXP_VARTILDE	0x4	/* expand tildes in an assignment */
- #define	EXP_REDIR	0x8	/* file glob for a redirection (1 match only) */
- #define EXP_CASE	0x10	/* keeps quotes around for CASE pattern */
-+#define EXP_MBCHAR	0x20	/* mark multi-byte characters */
- #define EXP_VARTILDE2	0x40	/* expand tildes after colons only */
- #define EXP_WORD	0x80	/* expand word in parameter expansion */
- #define EXP_QUOTED	0x100	/* expand word in double quotes */
-diff --git a/src/mystring.c b/src/mystring.c
-index 978bbb5..afaa508 100644
---- a/src/mystring.c
-+++ b/src/mystring.c
-@@ -64,7 +64,7 @@ const char dolatstr[] = { CTLQUOTEMARK, CTLVAR, VSNORMAL | VSBIT, '@', '=',
- 			  CTLQUOTEMARK, '\0' };
- const char cqchars[] = {
- 	'\\',
--	CTLESC, CTLQUOTEMARK, 0
-+	CTLESC, CTLMBCHAR, CTLQUOTEMARK, 0
- };
- const char illnum[] = "Illegal number: %s";
- const char homestr[] = "HOME";
-diff --git a/src/parser.h b/src/parser.h
-index 433573d..14bfc4f 100644
---- a/src/parser.h
-+++ b/src/parser.h
-@@ -44,6 +44,7 @@ union node;
- #define CTLVAR -126		/* variable defn */
- #define CTLENDVAR -125
- #define CTLBACKQ -124
-+#define CTLMBCHAR -123
- #define	CTLARI -122		/* arithmetic expression */
- #define	CTLENDARI -121
- #define	CTLQUOTEMARK -120
++	if (pat != start)
++		ckfree(pat);
+ 	closedir(dirp);
+-	if (! atend)
+-		endname[-esc - 1] = esc ? '\\' : '/';
++	if (c)
++		endname[-esc - 1] = c;
+ }
+ 
+ 
+@@ -1781,6 +1806,7 @@ _rmescapes(char *str, int flag)
+ 	int notescaped;
+ 	int globbing;
+ 	int inquotes;
++	int expmeta;
+ 
+ 	p = strpbrk(str, cqchars);
+ 	if (!p) {
+@@ -1789,6 +1815,7 @@ _rmescapes(char *str, int flag)
+ 	q = p;
+ 	r = str;
+ 	globbing = flag & RMESCAPE_GLOB;
++	expmeta = (flag & RMESCAPE_EMETA) ? RMESCAPE_GLOB : 0;
+ 
+ 	if (flag & RMESCAPE_ALLOC) {
+ 		size_t len = p - str;
+@@ -1828,6 +1855,12 @@ _rmescapes(char *str, int flag)
+ 		} else if (*p == '\\') {
+ 			/* naked back slash */
+ 			newnesc ^= notescaped;
++			/* naked backslashes can only occur outside quotes */
++			inquotes = 0;
++			if (expmeta & ~newnesc) {
++				p++;
++				goto setnesc;
++			}
+ 		} else if (*p == (char)CTLMBCHAR) {
+ 			if (*++p == (char)CTLESC)
+ 				p++;
+@@ -1838,7 +1871,9 @@ _rmescapes(char *str, int flag)
+ 			goto setnesc;
+ 		} else if (*p == (char)CTLESC) {
+ 			p++;
+-			if (notescaped)
++			if (expmeta)
++				;
++			else if (notescaped)
+ 				*q++ = '\\';
+ 			else if (inquotes) {
+ 				*q++ = '\\';
 -- 
 2.39.2
 
