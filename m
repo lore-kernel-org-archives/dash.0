@@ -1,29 +1,29 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958914437
-	for <dash@vger.kernel.org>; Sun, 19 May 2024 05:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BB833D5
+	for <dash@vger.kernel.org>; Sun, 19 May 2024 05:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716096019; cv=none; b=QaqBVmr1GRQtVsHlraYdu1Bn3+Y5L57+N6ov84ATKO1+jkFZc30oTYs89p7CRurfnPAHiFZ51uiKHoY8q0erOdYpC4+o9xMvt9G0apl2T7DoQds+EMtoTMSkVfAkH0/XAznmqt4Y+vLh2x18wDcoWNb+cbOXEpm72+t76lsKz70=
+	t=1716096022; cv=none; b=s6aVkEhit6WDem8EzoLThqbXuRdASD4Ibx6Nn2I9ki+xnwckOfJZd+zUcBbFPU2+504o1moJdlPBuXrSv/LVwOQ25cwTRMZ1KY/dkv2Xw/qkYPYLLehrgM1J3nF2e/4cWClLv+AEBu+CH42CH3LdH2LVTLaaQuXHKxGWtF86RqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716096019; c=relaxed/simple;
-	bh=N7HmBoF6ebGEKvB6WOYYtSMbHYZ4y7BXPR9dum58Yk0=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=nPf1OyDI78E+utCzM2Mqki2zRFQVn8THRkq+dxoOC8IBGLsu7PLFP7+KED+AqiFx1RxOR6GxAicaNr6INBw/rM2pULzHw+j/0vviGrYtm3JVaLqDhg1KBPJu1SdhwH5/l8WUjKRNpK00uoKLskzbMjwKajQn7ziCFXPVfmCq6tA=
+	s=arc-20240116; t=1716096022; c=relaxed/simple;
+	bh=E+I7Go8iQnJXch1LYhLVSAboUi+DR48eNENd6CcRDXc=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=f3KK53quZiwJauFPtAM2bONrCw0JDRjEIh23IEEl6ElCkKG32jysFWSUFgr6h1+3+c43fjKDNNCyaV/uoc0nmXdXkkcUtLOSp9W6ZyB6gKUHZG/hwNS0VhOue/i3eWLtZkyAouzgYXZ0b3Q6+aZaQ90c/bgs27zyWYtiagwOKLw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1s8Yxx-00HGAL-1O;
-	Sun, 19 May 2024 13:20:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 19 May 2024 13:20:14 +0800
-Date: Sun, 19 May 2024 13:20:14 +0800
-Message-Id: <165ebdcfeeedf01a7f5894c8bea3ea4d002e3866.1716095868.git.herbert@gondor.apana.org.au>
+	id 1s8Yxz-00HGAW-2R;
+	Sun, 19 May 2024 13:20:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 19 May 2024 13:20:17 +0800
+Date: Sun, 19 May 2024 13:20:17 +0800
+Message-Id: <e5bc6d6f403a8a43924d2c2e784fd56b013b3746.1716095868.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1716095868.git.herbert@gondor.apana.org.au>
 References: <cover.1716095868.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v4 PATCH 03/13] expand: Count multi-byte characters for VSLENGTH
+Subject: [v4 PATCH 04/13] expand: Process multi-byte characters in subevalvar
 To: DASH Mailing List <dash@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
@@ -31,213 +31,388 @@ List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 
-Count multi-byte characters in variables and rather than bytes
-and return that as the length expansion.
+When trimming variables in subevalvar, process multi-byte characters
+as one unit instead of their constituent bytes.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- src/expand.c   | 105 ++++++++++++++++++++++++++++++++++++++++---------
- src/memalloc.h |  10 ++---
- 2 files changed, 92 insertions(+), 23 deletions(-)
+ src/expand.c   | 196 ++++++++++++++++++++++++++++++++++---------------
+ src/expand.h   |   1 +
+ src/mystring.c |   2 +-
+ src/parser.h   |   1 +
+ 4 files changed, 138 insertions(+), 62 deletions(-)
 
 diff --git a/src/expand.c b/src/expand.c
-index 38f8785..5260d16 100644
+index 5260d16..b627c7a 100644
 --- a/src/expand.c
 +++ b/src/expand.c
-@@ -53,6 +53,7 @@
+@@ -32,27 +32,27 @@
+  * SUCH DAMAGE.
+  */
+ 
+-#include <sys/types.h>
+-#include <sys/time.h>
+-#include <sys/stat.h>
++#include <ctype.h>
+ #include <dirent.h>
+-#include <unistd.h>
+-#ifdef HAVE_GETPWNAM
+-#include <pwd.h>
+-#endif
+-#include <stdlib.h>
+-#include <stdio.h>
+-#include <inttypes.h>
+-#include <limits.h>
+-#include <string.h>
+ #ifdef HAVE_FNMATCH
+ #include <fnmatch.h>
  #endif
- #include <ctype.h>
- #include <stdbool.h>
-+#include <wchar.h>
- 
- /*
-  * Routines to expand arguments to commands.  We have to deal with
-@@ -789,6 +790,41 @@ really_record:
- 	return p;
- }
- 
-+static char *chtodest(int c, const char *syntax, char *out)
-+{
-+	if (syntax[c] == CCTL)
-+		USTPUTC(CTLESC, out);
-+	USTPUTC(c, out);
-+
-+	return out;
-+}
-+
-+struct mbpair {
-+	unsigned ml;
-+	unsigned ql;
-+};
-+
-+static struct mbpair mbtodest(const char *p, char *q, const char *syntax,
-+			      size_t len)
-+{
-+	mbstate_t mbs = {};
-+	struct mbpair mbp;
-+	char *q0 = q;
-+	size_t ml;
-+
-+	ml = mbrlen(--p, len, &mbs);
-+	if (ml == -2 || ml == -1 || ml < 2)
-+		ml = 1;
-+
-+	len = ml;
-+	do {
-+		q = chtodest((signed char)*p++, syntax, q);
-+	} while (--len);
-+
-+	mbp.ml = ml - 1;
-+	mbp.ql = q - q0;
-+	return mbp;
-+}
- 
- /*
-  * Put a string on the stack.
-@@ -796,38 +832,70 @@ really_record:
- 
- static size_t memtodest(const char *p, size_t len, int flags)
- {
--	const char *syntax = flags & EXP_QUOTED ? DQSYNTAX : BASESYNTAX;
-+	const char *syntax;
-+	size_t count = 0;
- 	char *q;
--	char *s;
- 
- 	if (unlikely(!len))
- 		return 0;
- 
- 	q = makestrspace(len * 2, expdest);
--	s = q;
- 
--	do {
-+#if QUOTES_ESC != 0x11 || EXP_QUOTED != 0x100
-+#error QUOTES_ESC != 0x11 || EXP_QUOTED != 0x100
+ #ifdef HAVE_GLOB
+ #include <glob.h>
+ #endif
+-#include <ctype.h>
++#include <inttypes.h>
++#include <limits.h>
++#ifdef HAVE_GETPWNAM
++#include <pwd.h>
 +#endif
-+	if (likely(!(flags & (flags >> 4 | flags >> 8) & QUOTES_ESC))) {
-+		while (len >= 8) {
-+			uint64_t x = *(uint64_t *)(p + count);
++#include <string.h>
+ #include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <sys/types.h>
++#include <sys/time.h>
++#include <sys/stat.h>
++#include <unistd.h>
+ #include <wchar.h>
+ 
+ /*
+@@ -543,8 +543,10 @@ static char *scanleft(char *startp, char *endp, char *rmesc, char *rmescend,
+ 	loc = startp;
+ 	loc2 = rmesc;
+ 	do {
+-		int match;
+ 		const char *s = loc2;
++		unsigned ml;
++		int match;
 +
-+			if ((x | (x - 0x0101010101010101)) &
-+			    0x8080808080808080)
-+				break;
+ 		c = *loc2;
+ 		if (zero) {
+ 			*loc2 = '\0';
+@@ -553,12 +555,26 @@ static char *scanleft(char *startp, char *endp, char *rmesc, char *rmescend,
+ 		match = pmatch(str, s);
+ 		*loc2 = c;
+ 		if (match)
+-			return loc;
+-		if (quotes && *loc == (char)CTLESC)
++			return quotes ? loc : loc2;
 +
-+			*(uint64_t *)(q + count) = x;
++		if (!c)
++			break;
 +
-+			count += 8;
-+			len -= 8;
-+		}
-+
-+		q += count;
-+		p += count;
-+
-+		syntax = flags & QUOTES_ESC ? BASESYNTAX : is_type;
-+	} else
-+		syntax = SQSYNTAX;
-+
-+	for (; len; len--) {
- 		int c = (signed char)*p++;
--		if (c) {
--			if ((flags & QUOTES_ESC) &&
--			    ((syntax[c] == CCTL) ||
--			     (flags & EXP_QUOTED && syntax[c] == CBACK)))
--				USTPUTC(CTLESC, q);
--		} else if (!(flags & EXP_KEEPNUL))
-+
-+		if (unlikely(!c && !(flags & EXP_KEEPNUL)))
- 			continue;
--		USTPUTC(c, q);
--	} while (--len);
-+
-+		count++;
-+
-+		if (unlikely(c < 0)) {
-+			struct mbpair mbp = mbtodest(p, q, syntax, len);
-+			unsigned mlm;
-+
-+			q += mbp.ql;
-+			mlm = mbp.ml;
-+			p += mlm;
-+			len -= mlm;
++		if (*loc != (char)CTLMBCHAR) {
++			if (*loc == (char)CTLESC)
++				loc++;
+ 			loc++;
+-		loc++;
+-		loc2++;
+-	} while (c);
++			loc2++;
 +			continue;
 +		}
 +
-+		q = chtodest(c, syntax, q);
++		if (*++loc == (char)CTLESC)
++			loc++;
++
++		ml = (unsigned char)*loc;
++		loc += ml + 3;
++		loc2 += ml;
++	} while (1);
+ 	return 0;
+ }
+ 
+@@ -566,14 +582,16 @@ static char *scanleft(char *startp, char *endp, char *rmesc, char *rmescend,
+ static char *scanright(char *startp, char *endp, char *rmesc, char *rmescend,
+ 		       char *str, int quotes, int zero
+ ) {
+-	int esc = 0;
++	size_t esc = 0;
+ 	char *loc;
+ 	char *loc2;
+ 
+ 	for (loc = endp, loc2 = rmescend; loc >= startp; loc2--) {
+-		int match;
+-		char c = *loc2;
+ 		const char *s = loc2;
++		char c = *loc2;
++		unsigned ml;
++		int match;
++
+ 		if (zero) {
+ 			*loc2 = '\0';
+ 			s = rmesc;
+@@ -581,17 +599,23 @@ static char *scanright(char *startp, char *endp, char *rmesc, char *rmescend,
+ 		match = pmatch(str, s);
+ 		*loc2 = c;
+ 		if (match)
+-			return loc;
++			return quotes ? loc : loc2;
+ 		loc--;
+-		if (quotes) {
+-			if (--esc < 0) {
+-				esc = esclen(startp, loc);
+-			}
+-			if (esc % 2) {
+-				esc--;
+-				loc--;
+-			}
++		if (!esc--)
++			esc = esclen(startp, loc);
++		if (esc % 2) {
++			esc--;
++			loc--;
++			continue;
+ 		}
++		if (*loc != (char)CTLMBCHAR)
++			continue;
++
++		ml = (unsigned char)*--loc;
++		loc -= ml + 2;
++		if (*loc == (char)CTLESC)
++			loc--;
++		loc2 -= ml - 1;
+ 	}
+ 	return 0;
+ }
+@@ -645,14 +669,11 @@ static char *subevalvar(char *start, char *str, int strloc, int startloc,
+ 		nstrloc = str - (char *)stackblock();
+ 	}
+ 
+-	rmesc = startp;
+-	if (quotes) {
+-		rmesc = _rmescapes(startp, RMESCAPE_ALLOC | RMESCAPE_GROW);
+-		if (rmesc != startp)
+-			rmescend = expdest;
+-		startp = stackblock() + startloc;
+-		str = stackblock() + nstrloc;
+-	}
++	rmesc = _rmescapes(startp, RMESCAPE_ALLOC | RMESCAPE_GROW);
++	if (rmesc != startp)
++		rmescend = expdest;
++	startp = stackblock() + startloc;
++	str = stackblock() + nstrloc;
+ 	rmescend--;
+ 
+ 	/* zero = subtype == VSTRIMLEFT || subtype == VSTRIMLEFTMAX */
+@@ -662,16 +683,29 @@ static char *subevalvar(char *start, char *str, int strloc, int startloc,
+ 
+ 	endp = stackblock() + strloc - 1;
+ 	loc = scan(startp, endp, rmesc, rmescend, str, quotes, zero);
+-	if (loc) {
+-		if (zero) {
+-			memmove(startp, loc, endp - loc);
+-			loc = startp + (endp - loc);
++	if (!loc) {
++		if (quotes) {
++			rmesc = startp;
++			rmescend = endp;
+ 		}
+-		*loc = '\0';
+-	} else
+-		loc = endp;
++	} else if (!quotes) {
++		if (zero)
++			rmesc = loc;
++		else
++			rmescend = loc;
++	} else if (zero) {
++		rmesc = loc;
++		rmescend = endp;
++	} else {
++		rmesc = startp;
++		rmescend = loc;
++	}
++
++	memmove(startp, rmesc, rmescend - rmesc);
++	loc = startp + (rmescend - rmesc);
+ 
+ out:
++	*loc = '\0';
+ 	amount = loc - expdest;
+ 	STADJUST(amount, expdest);
+ 
+@@ -697,6 +731,7 @@ evalvar(char *p, int flag)
+ 	ssize_t varlen;
+ 	int discard;
+ 	int quoted;
++	int mbchar;
+ 
+ 	varflags = *p++ & ~VSBIT;
+ 	subtype = varflags & VSTYPE;
+@@ -706,8 +741,18 @@ evalvar(char *p, int flag)
+ 	startloc = expdest - (char *)stackblock();
+ 	p = strchr(p, '=') + 1;
+ 
++	mbchar = 0;
++	switch (subtype) {
++	case VSTRIMLEFT:
++	case VSTRIMLEFTMAX:
++	case VSTRIMRIGHT:
++	case VSTRIMRIGHTMAX:
++		mbchar = EXP_MBCHAR;
++		break;
++	}
++
+ again:
+-	varlen = varvalue(var, varflags, flag, quoted);
++	varlen = varvalue(var, varflags, flag | mbchar, quoted);
+ 	if (varflags & VSNUL)
+ 		varlen--;
+ 
+@@ -813,14 +858,31 @@ static struct mbpair mbtodest(const char *p, char *q, const char *syntax,
+ 	size_t ml;
+ 
+ 	ml = mbrlen(--p, len, &mbs);
+-	if (ml == -2 || ml == -1 || ml < 2)
++	if (ml == -2 || ml == -1 || ml < 2) {
++		q = chtodest((signed char)*p, syntax, q);
+ 		ml = 1;
++		goto out;
 +	}
  
- 	expdest = q;
--	return q - s;
-+	return count;
- }
+ 	len = ml;
+ 	do {
+ 		q = chtodest((signed char)*p++, syntax, q);
+ 	} while (--len);
++	goto out;
  
++	if (syntax[CTLMBCHAR] == CCTL) {
++		USTPUTC(CTLMBCHAR, q);
++		USTPUTC(ml, q);
++	}
++
++	q = mempcpy(q, p, ml);
++
++	if (syntax[CTLMBCHAR] == CCTL) {
++		USTPUTC(ml, q);
++		USTPUTC(CTLMBCHAR, q);
++	}
++
++out:
+ 	mbp.ml = ml - 1;
+ 	mbp.ql = q - q0;
+ 	return mbp;
+@@ -839,12 +901,14 @@ static size_t memtodest(const char *p, size_t len, int flags)
+ 	if (unlikely(!len))
+ 		return 0;
  
- static size_t strtodest(const char *p, int flags)
- {
- 	size_t len = strlen(p);
--	memtodest(p, len, flags);
--	return len;
-+	return memtodest(p, len, flags);
- }
+-	q = makestrspace(len * 2, expdest);
++	/* CTLMBCHAR, 2, c, c, 2, CTLMBCHAR */
++	q = makestrspace(len * 3, expdest);
  
+-#if QUOTES_ESC != 0x11 || EXP_QUOTED != 0x100
+-#error QUOTES_ESC != 0x11 || EXP_QUOTED != 0x100
++#if QUOTES_ESC != 0x11 || EXP_MBCHAR != 0x20 || EXP_QUOTED != 0x100
++#error QUOTES_ESC != 0x11 || EXP_MBCHAR != 0x20 || EXP_QUOTED != 0x100
+ #endif
+-	if (likely(!(flags & (flags >> 4 | flags >> 8) & QUOTES_ESC))) {
++	if (likely(!(flags & (flags >> 3 | flags >> 4 | flags >> 8) &
++		     (QUOTES_ESC | EXP_MBCHAR)))) {
+ 		while (len >= 8) {
+ 			uint64_t x = *(uint64_t *)(p + count);
  
-@@ -849,6 +917,7 @@ varvalue(char *name, int varflags, int flags, int quoted)
- 	int discard = (subtype == VSPLUS || subtype == VSLENGTH) |
- 		      (flags & EXP_DISCARD);
- 	ssize_t len = 0;
-+	size_t start;
- 	char c;
+@@ -861,7 +925,8 @@ static size_t memtodest(const char *p, size_t len, int flags)
+ 		q += count;
+ 		p += count;
  
- 	if (!subtype) {
-@@ -858,9 +927,9 @@ varvalue(char *name, int varflags, int flags, int quoted)
- 		sh_error("Bad substitution");
- 	}
+-		syntax = flags & QUOTES_ESC ? BASESYNTAX : is_type;
++		syntax = flags & (QUOTES_ESC | EXP_MBCHAR) ?
++			 BASESYNTAX : is_type;
+ 	} else
+ 		syntax = SQSYNTAX;
  
--	flags |= EXP_KEEPNUL;
- 	flags &= discard ? ~QUOTES_ESC : ~0;
- 	sep = (flags & EXP_FULL) << CHAR_BIT;
-+	start = expdest - (char *)stackblock();
- 
- 	switch (*name) {
- 	case '$':
-@@ -920,7 +989,7 @@ param:
- 
- 			if (*ap && sep) {
- 				len++;
--				memtodest(&sepc, 1, flags);
-+				memtodest(&sepc, 1, flags | EXP_KEEPNUL);
+@@ -1753,17 +1818,25 @@ _rmescapes(char *str, int flag)
+ 	inquotes = 0;
+ 	notescaped = globbing;
+ 	while (*p) {
++		unsigned ml;
++		int newnesc = globbing;
++
+ 		if (*p == (char)CTLQUOTEMARK) {
+ 			p++;
+ 			inquotes ^= globbing;
+ 			continue;
+-		}
+-		if (*p == '\\') {
++		} else if (*p == '\\') {
+ 			/* naked back slash */
+-			notescaped ^= globbing;
+-			goto copy;
+-		}
+-		if (*p == (char)CTLESC) {
++			newnesc ^= notescaped;
++		} else if (*p == (char)CTLMBCHAR) {
++			if (*++p == (char)CTLESC)
++				p++;
++
++			ml = (unsigned char)*p++;
++			q = mempcpy(q, p, ml);
++			p += ml + 2;
++			goto setnesc;
++		} else if (*p == (char)CTLESC) {
+ 			p++;
+ 			if (notescaped)
+ 				*q++ = '\\';
+@@ -1772,9 +1845,10 @@ _rmescapes(char *str, int flag)
+ 				*q++ = '\\';
  			}
  		}
- 		break;
-@@ -950,7 +1019,7 @@ value:
+-		notescaped = globbing;
+-copy:
++
+ 		*q++ = *p++;
++setnesc:
++		notescaped = newnesc;
  	}
- 
- 	if (discard)
--		STADJUST(-len, expdest);
-+		expdest = (char *)stackblock() + start;
- 
- 	return len;
- }
-diff --git a/src/memalloc.h b/src/memalloc.h
-index a7f7996..1895c1e 100644
---- a/src/memalloc.h
-+++ b/src/memalloc.h
-@@ -81,11 +81,11 @@ static inline char *_STPUTC(int c, char *p) {
- #define STPUTC(c, p) ((p) = _STPUTC((c), (p)))
- #define CHECKSTRSPACE(n, p) \
- 	({ \
--		char *q = (p); \
--		size_t l = (n); \
--		size_t m = sstrend - q; \
--		if (l > m) \
--			(p) = makestrspace(l, q); \
-+		char *_q = (p); \
-+		size_t _l = (n); \
-+		size_t _m = sstrend - _q; \
-+		if (_l > _m) \
-+			(p) = makestrspace(_l, _q); \
- 		0; \
- 	})
- #define USTPUTC(c, p)	(*p++ = (c))
+ 	*q = '\0';
+ 	if (flag & RMESCAPE_GROW) {
+diff --git a/src/expand.h b/src/expand.h
+index 49a18f9..a78564f 100644
+--- a/src/expand.h
++++ b/src/expand.h
+@@ -55,6 +55,7 @@ struct arglist {
+ #define	EXP_VARTILDE	0x4	/* expand tildes in an assignment */
+ #define	EXP_REDIR	0x8	/* file glob for a redirection (1 match only) */
+ #define EXP_CASE	0x10	/* keeps quotes around for CASE pattern */
++#define EXP_MBCHAR	0x20	/* mark multi-byte characters */
+ #define EXP_VARTILDE2	0x40	/* expand tildes after colons only */
+ #define EXP_WORD	0x80	/* expand word in parameter expansion */
+ #define EXP_QUOTED	0x100	/* expand word in double quotes */
+diff --git a/src/mystring.c b/src/mystring.c
+index 978bbb5..afaa508 100644
+--- a/src/mystring.c
++++ b/src/mystring.c
+@@ -64,7 +64,7 @@ const char dolatstr[] = { CTLQUOTEMARK, CTLVAR, VSNORMAL | VSBIT, '@', '=',
+ 			  CTLQUOTEMARK, '\0' };
+ const char cqchars[] = {
+ 	'\\',
+-	CTLESC, CTLQUOTEMARK, 0
++	CTLESC, CTLMBCHAR, CTLQUOTEMARK, 0
+ };
+ const char illnum[] = "Illegal number: %s";
+ const char homestr[] = "HOME";
+diff --git a/src/parser.h b/src/parser.h
+index 433573d..14bfc4f 100644
+--- a/src/parser.h
++++ b/src/parser.h
+@@ -44,6 +44,7 @@ union node;
+ #define CTLVAR -126		/* variable defn */
+ #define CTLENDVAR -125
+ #define CTLBACKQ -124
++#define CTLMBCHAR -123
+ #define	CTLARI -122		/* arithmetic expression */
+ #define	CTLENDARI -121
+ #define	CTLQUOTEMARK -120
 -- 
 2.39.2
 
