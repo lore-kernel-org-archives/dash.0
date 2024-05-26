@@ -1,29 +1,29 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CC68F4E
-	for <dash@vger.kernel.org>; Sun, 26 May 2024 10:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FE6522F
+	for <dash@vger.kernel.org>; Sun, 26 May 2024 10:42:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716720073; cv=none; b=Q+b3t70fSFcmdrVRHBH3+HW3BY/TnIw0H/S0+Tnpk4829O1XEKTnIn5ylXCDSpmbJZcJjFbUu0TJYbYmV/Wfip1eUdOSsUlFTpgzQ9hokphK7H6hcOGA7F/0OVriEHtReGFKzHgcSH/F6MW7gTe3UNE0RlWnlciW9pIQIDJQOyY=
+	t=1716720137; cv=none; b=aIiuM48c3Nyl3TUjOwcxEMEYxUwym7x7p3sGxB1ky2KlEF3xGEMg5LSvFtcbcjfXRp23QTM9IvxiJuM7UZ4BsbRZpoJru7qEKWFl3qpmeciPKSz+b+1XPCP84VO7xqWa5X/Lqt5o5lwvixIbMMDbsL4sReRZdLP5KXqzS2xGIbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716720073; c=relaxed/simple;
-	bh=mQ8BZ/yKGd8Go11/eEyT7jGrU/0vTG3emutl/8EWRsw=;
+	s=arc-20240116; t=1716720137; c=relaxed/simple;
+	bh=7nSvQoJtdfkGTUYfDSFR61/fu6FCGS9/pF1HUPmno3k=;
 	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZDkZ9Y9LL88GiZTGtmc+8eWFHwM+HdyIZpJ/7FJr8odhM/bgBw2iZ0ujhzUMOa9eeInE8F+Y8KV7m3XZYTPQaPmGln4lH9N1mt9fT8a3priOiw+F4ito5r1ukWBqmMskN7zKU9TR/tEr+qdPyK1ABzAodhqjUWPt5oBH4XZglZE=
+	 Content-Disposition; b=J0c/usIq+5LSzNIaMBshvbQum03yUaDWMRDk2wMgBa58sK/BnIhxA0Ssw/X6FBe0rpHqsrHKebCvAu3IsYQNHYO3Ppf5Mp5SJ0yjupgmsiz4XuNn9ejbWD2zyhp4cF4v9VW63LOeRiMfalVEIluc6k9R+1zdVY+SDcptritLx+s=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sBBJI-002DxO-3C;
-	Sun, 26 May 2024 18:41:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 26 May 2024 18:41:06 +0800
-Date: Sun, 26 May 2024 18:41:06 +0800
+	id 1sBBKJ-002Dxv-07;
+	Sun, 26 May 2024 18:42:08 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 26 May 2024 18:42:08 +0800
+Date: Sun, 26 May 2024 18:42:08 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: DASH Mailing List <dash@vger.kernel.org>
-Subject: [PATCH] mystring: Add dotdir
-Message-ID: <ZlMRwiyOhfrIz2mY@gondor.apana.org.au>
+Subject: [PATCH] memalloc: Force functions to be out-of-line
+Message-ID: <ZlMSAJdFkyBx4ZUN@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -33,80 +33,176 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Merge all occurrences of "." into dotdir.
+Force gcc to build library functions out-of-line, even if they
+happen to be in the same file.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- src/cd.c       | 2 +-
- src/expand.c   | 2 +-
- src/mystring.c | 1 +
- src/mystring.h | 1 +
- src/var.c      | 2 +-
- 5 files changed, 5 insertions(+), 3 deletions(-)
+ src/memalloc.c | 59 ++++++++++++++++++++++++++++----------------------
+ 1 file changed, 33 insertions(+), 26 deletions(-)
 
-diff --git a/src/cd.c b/src/cd.c
-index 1ef1dc5..bcd1484 100644
---- a/src/cd.c
-+++ b/src/cd.c
-@@ -126,7 +126,7 @@ dotdot:
- 		}
+diff --git a/src/memalloc.c b/src/memalloc.c
+index 7aa8c58..3275e51 100644
+--- a/src/memalloc.c
++++ b/src/memalloc.c
+@@ -43,18 +43,28 @@
+ #include "mystring.h"
+ #include "system.h"
+ 
++static __attribute__((__always_inline__)) inline void outofspace(void)
++{
++	sh_error("Out of space");
++}
++
++static void *checknull(void *p)
++{
++	if (!p)
++		outofspace();
++	return p;
++}
++
+ /*
+  * Like malloc, but returns an error when out of space.
+  */
+ 
+-void *ckmalloc(size_t nbytes)
++__attribute__((__noinline__)) void *ckmalloc(size_t nbytes)
+ {
+ 	void *p;
+ 
+ 	p = malloc(nbytes);
+-	if (p == NULL)
+-		sh_error("Out of space");
+-	return p;
++	return checknull(p);
+ }
+ 
+ 
+@@ -62,12 +72,10 @@ void *ckmalloc(size_t nbytes)
+  * Same for realloc.
+  */
+ 
+-void *ckrealloc(void *p, size_t nbytes)
++__attribute__((__noinline__)) void *ckrealloc(void *p, size_t nbytes)
+ {
+ 	p = realloc(p, nbytes);
+-	if (p == NULL)
+-		sh_error("Out of space");
+-	return p;
++	return checknull(p);
+ }
+ 
+ 
+@@ -78,10 +86,7 @@ void *ckrealloc(void *p, size_t nbytes)
+ char *
+ savestr(const char *s)
+ {
+-	char *p = strdup(s);
+-	if (!p)
+-		sh_error("Out of space");
+-	return p;
++	return checknull(strdup(s));
+ }
+ 
+ 
+@@ -124,7 +129,7 @@ void *stalloc(size_t nbytes)
+ 			blocksize = MINSIZE;
+ 		len = sizeof(struct stack_block) - MINSIZE + blocksize;
+ 		if (len < blocksize)
+-			sh_error("Out of space");
++			outofspace();
+ 		INTOFF;
+ 		sp = ckmalloc(len);
+ 		sp->prev = stackp;
+@@ -155,7 +160,8 @@ void stunalloc(void *p)
+ 
+ 
+ 
+-void pushstackmark(struct stackmark *mark, size_t len)
++__attribute__((__noinline__)) void pushstackmark(struct stackmark *mark,
++						 size_t len)
+ {
+ 	mark->stackp = stackp;
+ 	mark->stacknxt = stacknxt;
+@@ -197,13 +203,14 @@ popstackmark(struct stackmark *mark)
+  * part of the block that has been used.
+  */
+ 
+-static void growstackblock(size_t min)
++static char *growstackblock(size_t min)
+ {
+ 	size_t newlen;
++	char *p;
+ 
+ 	newlen = stacknleft * 2;
+ 	if (newlen < stacknleft)
+-		sh_error("Out of space");
++		outofspace();
+ 	min = SHELL_ALIGN(min | 128);
+ 	if (newlen < min)
+ 		newlen += min;
+@@ -220,19 +227,22 @@ static void growstackblock(size_t min)
+ 		sp = ckrealloc(sp, grosslen);
+ 		sp->prev = prevstackp;
+ 		stackp = sp;
+-		stacknxt = sp->space;
++		p = stacknxt = sp->space;
+ 		stacknleft = newlen;
+ 		sstrend = sp->space + newlen;
+ 		INTON;
+ 	} else {
+ 		char *oldspace = stacknxt;
+ 		int oldlen = stacknleft;
+-		char *p = stalloc(newlen);
++
++		p = stalloc(newlen);
+ 
+ 		/* free the space we just allocated */
+ 		stacknxt = memcpy(p, oldspace, oldlen);
+ 		stacknleft += newlen;
  	}
- 	if (!*dest)
--		dest = ".";
-+		dest = dotdir;
- 	path = bltinlookup("CDPATH");
- 	while (p = path, (len = padvance_magic(&path, dest, 0)) >= 0) {
- 		c = *p;
-diff --git a/src/expand.c b/src/expand.c
-index d8b354c..e7e8ce0 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -1358,7 +1358,7 @@ expmeta(char *name, unsigned name_len, unsigned expdir_len)
- 	cp = expdir;
- 	expdir_len = enddir - cp;
- 	if (!expdir_len)
--		cp = ".";
-+		cp = dotdir;
- 	if ((dirp = opendir(cp)) == NULL)
- 		return;
- 	if (*endname == 0) {
-diff --git a/src/mystring.c b/src/mystring.c
-index 978bbb5..7bf61e3 100644
---- a/src/mystring.c
-+++ b/src/mystring.c
-@@ -68,6 +68,7 @@ const char cqchars[] = {
- };
- const char illnum[] = "Illegal number: %s";
- const char homestr[] = "HOME";
-+const char dotdir[] = ".";
++
++	return p;
+ }
  
  /*
-  * equal - #defined in mystring.h
-diff --git a/src/mystring.h b/src/mystring.h
-index d178990..0857c32 100644
---- a/src/mystring.h
-+++ b/src/mystring.h
-@@ -57,6 +57,7 @@ extern const char cqchars[];
- #define qchars (cqchars + 1)
- extern const char illnum[];
- extern const char homestr[];
-+extern const char dotdir[];
+@@ -258,14 +268,13 @@ growstackstr(void)
+ {
+ 	size_t len = stackblocksize();
  
- #if 0
- void scopyn(const char *, char *, int);
-diff --git a/src/var.c b/src/var.c
-index bb5420a..e2102c3 100644
---- a/src/var.c
-+++ b/src/var.c
-@@ -143,7 +143,7 @@ INIT {
+-	growstackblock(0);
+-	return stackblock() + len;
++	return growstackblock(0) + len;
+ }
  
- 	p = lookupvar("PWD");
- 	if (p)
--		if (*p != '/' || stat64(p, &st1) || stat64(".", &st2) ||
-+		if (*p != '/' || stat64(p, &st1) || stat64(dotdir, &st2) ||
- 		    st1.st_dev != st2.st_dev || st1.st_ino != st2.st_ino)
- 			p = 0;
- 	setpwd(p, 0);
+-char *growstackto(size_t len)
++__attribute__((__noinline__)) char *growstackto(size_t len)
+ {
+ 	if (stackblocksize() < len)
+-		growstackblock(len);
++		return growstackblock(len);
+ 	return stackblock();
+ }
+ 
+@@ -273,16 +282,14 @@ char *growstackto(size_t len)
+  * Called from CHECKSTRSPACE.
+  */
+ 
+-char *
+-makestrspace(size_t newlen, char *p)
++__attribute__((__noinline__)) char *makestrspace(size_t newlen, char *p)
+ {
+ 	size_t len = p - stacknxt;
+ 
+ 	return growstackto(len + newlen) + len;
+ }
+ 
+-char *
+-stnputs(const char *s, size_t n, char *p)
++__attribute__((__noinline__)) char *stnputs(const char *s, size_t n, char *p)
+ {
+ 	p = makestrspace(n, p);
+ 	p = mempcpy(p, s, n);
 -- 
 2.39.2
 
