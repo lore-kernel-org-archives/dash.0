@@ -1,27 +1,29 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488E7370
-	for <dash@vger.kernel.org>; Sun,  2 Jun 2024 01:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74ED1EDF
+	for <dash@vger.kernel.org>; Sun,  2 Jun 2024 01:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717291894; cv=none; b=tynnpTPqdr8Rv8aratUEAW+zhboAx2e0MYIgqkRFIGUUrZDqHOhTln4PO7dYv/ZZrfsxwETOv9k8voQagsLBzZTlVuCkBXB5Gt7aD5y1XqKpZfEM5rCFkWlcV3yt0/GSik/SQRbbX8Miwb65tiAAm+tDnD2n6NWmxCjkJXMByh8=
+	t=1717291897; cv=none; b=jr2xy7KpdzzQ4DhFE+y2Pm44RES9vI1GtUwVA0CZ+gbeh2fZaDe+wetGkEuKz5ZmzbCFaWuiET9QVPc9XBaggOI9B/H8qnSRwiH7R8dKewTOJcoIVX0Z/XIhOoiLxmZuaBTIRJWLU8l7Fn213xeRKIOAbNZ1NHU52rNiZDx4ees=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717291894; c=relaxed/simple;
-	bh=45VUf93VIPwa+YpbajKzxXh+ZLQE98U896ujsEOsJN8=;
-	h=Date:Message-Id:From:Subject:To; b=NcfH28clMWUxM12ybZUl28+nqQpa3O1iaqegk/bSqPFswumlWPX5fXaD6m2BsBYQHV3A+uFTIksJ6N6Gs+j5EyYFGBPQGWTfv1l2EqzPSAX99OUYhY7O0HXWx65gNdT7xXKtD96MkniLw432EoVk/KOhXZpc0RKIfckKzLTjUsk=
+	s=arc-20240116; t=1717291897; c=relaxed/simple;
+	bh=mBDOtTPhf7fEd0BmhtV5H0CoWd8o9TVHNaJ8pLRp7LM=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=etMspv7akpb0tskUb0XRSmx414bFGNo56PWfhDEPSow8Rkb6AwyOnUNZNOGxnA0+4CB1MQrrt+ofeI+3AP2oqCdslAEq5Dc3XmFud647DvjOFlp6ZrN6Kyx4mvVmxr+CqzgwWFrbH30bT0hwn0ChL0VwiMIqVyovTShTVE23R0Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sDa4G-004iZF-16;
-	Sun, 02 Jun 2024 09:31:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 02 Jun 2024 09:31:30 +0800
-Date: Sun, 02 Jun 2024 09:31:30 +0800
-Message-Id: <cover.1717291846.git.herbert@gondor.apana.org.au>
+	id 1sDa4I-004iZN-2B;
+	Sun, 02 Jun 2024 09:31:31 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 02 Jun 2024 09:31:32 +0800
+Date: Sun, 02 Jun 2024 09:31:32 +0800
+Message-Id: <c8f0bfa3ff05e34a6a3cbf980aef5159d2105421.1717291846.git.herbert@gondor.apana.org.au>
+In-Reply-To: <cover.1717291846.git.herbert@gondor.apana.org.au>
+References: <cover.1717291846.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 0/3] Improve performance when reading stdin
+Subject: [v3 PATCH 1/3] input: Move newline loop into preadbuffer
 To: DASH Mailing List <dash@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
@@ -29,30 +31,144 @@ List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 
-v3 rebases on multibyte patch-set v5.
+As it stands preadfd tries to fetch a whole line when we're reading
+one byte at a time.  However, this is wrong because how many bytes
+we're trying to read has nothing to do with whether we get a whole
+line or not.
 
-The performance when reading stdin has regressed after we started
-reading one byte at a time.  This patch series uses lseek(2) and
-tee(2) to recover performance where possible.
+Move the loop into preadbuffer alongside the other history support
+code.
 
-Herbert Xu (3):
-  input: Move newline loop into preadbuffer
-  input: Use lseek on stdin when possible
-  input: Use tee(2) for stdin pipe
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ src/input.c | 47 +++++++++++++++++++++++++++++++----------------
+ 1 file changed, 31 insertions(+), 16 deletions(-)
 
- configure.ac  |   2 +-
- src/eval.c    |   3 +
- src/init.h    |   1 +
- src/input.c   | 208 +++++++++++++++++++++++++++++++++++++++-----------
- src/input.h   |   4 +
- src/jobs.c    |   3 +
- src/mkinit.c  |   6 ++
- src/options.c |   2 +-
- src/redir.c   |  26 ++++---
- src/system.h  |   7 ++
- src/trap.c    |   1 +
- 11 files changed, 205 insertions(+), 58 deletions(-)
-
+diff --git a/src/input.c b/src/input.c
+index 6779069..193235d 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -192,16 +192,27 @@ preadfd(void)
+ {
+ 	char *buf = parsefile->buf;
+ 	int unget;
++	int pnr;
+ 	int nr;
+ 
++	nr = input_get_lleft(parsefile);
++
+ 	unget = parsefile->nextc - buf;
+ 	if (unget > PUNGETC_MAX)
+ 		unget = PUNGETC_MAX;
+ 
+-	memmove(buf, parsefile->nextc - unget, unget);
+-	parsefile->nextc = buf += unget;
++	memmove(buf, parsefile->nextc - unget, unget + nr);
++	buf += unget;
++	parsefile->nextc = buf;
++	buf += nr;
+ 
++	nr = BUFSIZ - nr;
++	if (!IS_DEFINED_SMALL && !nr)
++		return nr;
++
++	pnr = nr;
+ retry:
++	nr = pnr;
+ #ifndef SMALL
+ 	if (parsefile->fd == 0 && el) {
+ 		static const char *rl_cp;
+@@ -216,9 +227,8 @@ retry:
+ 		if (rl_cp == NULL)
+ 			nr = 0;
+ 		else {
+-			nr = el_len;
+-			if (nr > BUFSIZ)
+-				nr = BUFSIZ;
++			if (nr > el_len)
++				nr = el_len;
+ 			memcpy(buf, rl_cp, nr);
+ 			if (nr != el_len) {
+ 				el_len -= nr;
+@@ -230,10 +240,8 @@ retry:
+ 	} else
+ #endif
+ 	if (parsefile->fd)
+-		nr = read(parsefile->fd, buf, BUFSIZ);
++		nr = read(parsefile->fd, buf, nr);
+ 	else {
+-		unsigned len = BUFSIZ;
+-
+ 		nr = 0;
+ 
+ 		do {
+@@ -255,7 +263,7 @@ retry:
+ 			}
+ 
+ 			nr++;
+-		} while (!IS_DEFINED_SMALL && *buf++ != '\n' && --len);
++		} while (0);
+ 	}
+ 
+ 	if (nr < 0) {
+@@ -290,19 +298,26 @@ static int preadbuffer(void)
+ 		return PEOF;
+ 	flushall();
+ 
++	q = parsefile->nextc;
++	something = !first;
++
+ 	more = input_get_lleft(parsefile);
+ 	if (more <= 0) {
++		int nr;
++
+ again:
+-		if ((more = preadfd()) <= 0) {
++		nr = q - parsefile->nextc;
++		more = preadfd();
++		q = parsefile->nextc + nr;
++		if (more <= 0) {
+ 			input_set_lleft(parsefile, parsefile->nleft = 0);
++			if (!IS_DEFINED_SMALL && nr > 0)
++				goto save;
+ 			return PEOF;
+ 		}
+ 	}
+ 
+-	q = parsefile->nextc;
+-
+ 	/* delete nul characters */
+-	something = !first;
+ 	for (;;) {
+ 		int c;
+ 
+@@ -321,7 +336,6 @@ again:
+ 
+ 		switch (c) {
+ 		case '\n':
+-			parsefile->nleft = q - parsefile->nextc - 1;
+ 			goto done;
+ 
+ 		default:
+@@ -335,8 +349,7 @@ again:
+ 
+ check:
+ 		if (more <= 0) {
+-			parsefile->nleft = q - parsefile->nextc - 1;
+-			if (parsefile->nleft < 0)
++			if (!IS_DEFINED_SMALL)
+ 				goto again;
+ 			break;
+ 		}
+@@ -344,6 +357,8 @@ check:
+ done:
+ 	input_set_lleft(parsefile, more);
+ 
++save:
++	parsefile->nleft = q - parsefile->nextc - 1;
+ 	if (!IS_DEFINED_SMALL)
+ 		savec = *q;
+ 	*q = '\0';
 -- 
 2.39.2
 
