@@ -1,141 +1,57 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BE32572
-	for <dash@vger.kernel.org>; Sun, 16 Jun 2024 01:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E19A48
+	for <dash@vger.kernel.org>; Sun, 16 Jun 2024 05:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718500095; cv=none; b=nivySFGjMShzisAVdx1pquUExThMagwLi/q/UrFqkOT+BUkXH1mc86v5CwHkGvkysR8D7v1R8nZChi+gXHmw3KjUR9cexNio/tH3Afr+gIASSIxFz9G9XTfAzCQRh/MkGUdwpoB3u+VUagsoxRzwpQccFsCkyYf3jT48W7UEIIk=
+	t=1718514848; cv=none; b=Pymg6171nmqq8d8l26jW8qhMTUK3GrszgOTtIHpbcBKFjCPFq/Gz+f2lTZ2gpS2tJF85kvi1drCbbWinN5R0peiihY317qi2i4633loi0rp3xRp0SMrM+jY29jkxWTozabVSBG/7P+yYVf7i7XNOCzFqdQBGodpcOAlCHU/Pzu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718500095; c=relaxed/simple;
-	bh=rpHagJMqCDOfHdJM9IOyvW3hNWvEobbI3kzpdCWP2/Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=GHH4hMlQ2RuHepwzlVFF0a87QRDlzU44E12CQJOO8gf4d7lHm9jyKUnLJAQuFipY9wep2tNjie1674Zox27f5u97x9lJKfoxzgntMY9nDoGJcwZt3EWz+BjzpID20c+G7VC+XWbyWd9N+B+uxhL7Zn0ex1JGxx6TR0+Lsfy4Hpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jetbrains.com; spf=pass smtp.mailfrom=jetbrains.com; dkim=pass (1024-bit key) header.d=jetbrains.com header.i=@jetbrains.com header.b=c/Z5qIBQ; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jetbrains.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jetbrains.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=jetbrains.com header.i=@jetbrains.com header.b="c/Z5qIBQ"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1f4a0050b9aso27935365ad.2
-        for <dash@vger.kernel.org>; Sat, 15 Jun 2024 18:08:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jetbrains.com; s=googleapps; t=1718500093; x=1719104893; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S1y5yz8Zzoo8WQNaW5DC/wI/Z3wNf3l9GuOaqvFS0mc=;
-        b=c/Z5qIBQq+OvMYutPQlSMovpR60ldoXTsRkUP6Cf3S/eYY1EN3CFI/ZiCdJxt/RNqJ
-         7+FC/ryvTzgo8i3UPp8jhsE/7Q7Iybfku8fwcx0wUQVaCjt2a4fP30KmDwJFAfewq48v
-         i99wvE5Ckir18Kl4tgx+C3tJWtItW0boeCt5k=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718500093; x=1719104893;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S1y5yz8Zzoo8WQNaW5DC/wI/Z3wNf3l9GuOaqvFS0mc=;
-        b=h2ljFfPTECAYzK3QUKI5hGoveCY8t9zi+A4/qrR6GL9fSwEs9i616587gWKFvkLJ/m
-         OCFN8Vll7dp2JgJfNZgioEnwwMKZgvacawTdBPMncK5hFY3lXQyYuX2m0icnf4j5dMRd
-         jZF9F02aN6l5P5rkaw95SWTXlirvE2ckrGjR16KPcMf8PjzXugnBT0RtqZyu9A4Cql/m
-         Nvr5EKs89exmran673+JpU1uaTKWkTI1jsUyqIJ42XUIEZ9XiPUlQYPSDzIm0bh8Fqnd
-         Jk27sVDWt8QUJlYr/DjLW2+YbDaKekATFLOcSY6l41FLc3MbSO2lWNVsP/3ShDkVaTUD
-         UIhw==
-X-Gm-Message-State: AOJu0YzCqXUHuIGMk5H4XtAqW6JrWRI3FrS1CJ+1oFJt6a0qzz5k85sJ
-	62Of5XAJ58A0yJvSInADghdV5JqGv6CBPbjQcAtx2n2BNDr7WGWegiMt5/hcs8jzanM3+8JUoqX
-	ekK8H+AMukXnN7KH/vDxUO9UemjqJi0OggIoddsqO6MDUlRGxug==
-X-Google-Smtp-Source: AGHT+IEqDti32X2b45MEHkFL2cAkEuzdH1R2Nks3t863yh4JvaBRCgPs3K06oItKd+7zVhFOGwdKoih3LrDrNx9hdI8=
-X-Received: by 2002:a17:902:ebc4:b0:1f6:62cb:7c22 with SMTP id
- d9443c01a7336-1f862a16ba4mr75101685ad.46.1718500093330; Sat, 15 Jun 2024
- 18:08:13 -0700 (PDT)
+	s=arc-20240116; t=1718514848; c=relaxed/simple;
+	bh=newdEBqwNCvMrMhj9VRnxtAa/GLAn911WWkKdqUOiqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=GDINKgNoA5sjzCRltxWzxRXAvcSxIlUbJw3nS59lILcedG9jX23f63qgykM4ocPLDV7iCrevwc2WBDD1jCL7pGB/15muhs1qNYdEpCYT8ikcFxGaxQRorYxSwkBP8Kg/GDDj6PIdK16yzCyXGsEq7Jtn0xulxiMwM1Gbti6v7QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sIi69-000a8C-1Z;
+	Sun, 16 Jun 2024 13:06:38 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 16 Jun 2024 13:06:37 +0800
+Date: Sun, 16 Jun 2024 13:06:37 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ilya Kazakevich <ilya.kazakevich@jetbrains.com>
+Cc: dash@vger.kernel.org
+Subject: Re: Subprocess doesn't get stdin sometimes.
+Message-ID: <Zm5y3du0C2MHdhSR@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMQsgbTFXNBrEixLSzAjgUBQyMWdFQF-ioKj1or5zUzom8HwRA@mail.gmail.com>
-In-Reply-To: <CAMQsgbTFXNBrEixLSzAjgUBQyMWdFQF-ioKj1or5zUzom8HwRA@mail.gmail.com>
-From: Ilya Kazakevich <ilya.kazakevich@jetbrains.com>
-Date: Sun, 16 Jun 2024 03:08:02 +0200
-Message-ID: <CAMQsgbSZnEac=ETYnR6a_ysnAysaHThwY03pnoDxC=p5FqtAag@mail.gmail.com>
-Subject: Subprocess doesn't get stdin sometimes.
-To: dash@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMQsgbSZnEac=ETYnR6a_ysnAysaHThwY03pnoDxC=p5FqtAag@mail.gmail.com>
+X-Newsgroups: apana.lists.os.linux.dash
 
-Hello,
+Ilya Kazakevich <ilya.kazakevich@jetbrains.com> wrote:
+> 
+> I am not sure if it is a `dash` bug or my scenario isn't correct (it
+> works with `bash`, however).
 
-I am not sure if it is a `dash` bug or my scenario isn't correct (it
-works with `bash`, however).
+Yes this is a known bug in dash 0.5.12 and prior.  It was fixed
+a while ago in the git tree by:
 
-I execute command that reads N bytes and send this bytes directly
-after execution, i.e `head -c 2 \n ab`
+commit 5f094d08c5bcee876191404a4f3dd2d075571215
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Jan 3 14:15:58 2023 +0800
 
-Here is a showcase: it forks shell , sends data and reads output
-```
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
+    input: Read standard input byte-wise
 
-
-static void child(int read_pipe, int write_pipe) {
-    dup2(write_pipe, STDOUT_FILENO);
-    dup2(read_pipe, STDIN_FILENO);
-    execlp("/bin/bash", "/bin/bash", NULL);
-}
-
-
-static void parent(int read_pipe, int write_pipe) {
-    char buf[] = "head -c 2\n";
-    write(write_pipe, buf, sizeof buf - 1);
-
-    char buf2[] = "ab\n";
-    write(write_pipe, buf2, sizeof buf2 - 1);
-
-
-    char answer[112] = {0};
-    read(read_pipe, answer, sizeof answer);
-    answer[sizeof answer - 1] = 0;
-    printf("%s", answer);
-}
-
-int main() {
-    int to_process[2];
-    pipe(to_process);
-    int to_process_read_pipe = to_process[0];
-    int to_process_write_pipe = to_process[1];
-
-    int from_process[2];
-    pipe(from_process);
-    int from_process_read_pipe = from_process[0];
-    int from_process_write_pipe = from_process[1];
-
-
-    if (fork() == 0) {
-        close(from_process_read_pipe);
-        close(to_process_write_pipe);
-        child(to_process_read_pipe, from_process_write_pipe);
-    } else {
-        close(to_process_read_pipe);
-        close(from_process_write_pipe);
-        parent(from_process_read_pipe, to_process_write_pipe);
-    }
-}
-```
-
-It works perfectly for `bash`.
-
-If I use `dash` -- it freezes. In `strace` I see that `dash` calls
-`vfork` followed by `execve`.
-`head` then calls `read` and waits forever.
-
-However: when I insert `sleep(1);` after the first `write(..."head..)` it works!
-
-It seems that we have a race condition here: I should have "waited"
-before stdin got connected to the new child. If I write data too
-early, it simply drops and never reaches the child.
-
-A couple of questions:
-1. Is it a bug or do I simply misuse shell? Should it work? I haven't
-found any POSIX statement that confirms so.
-2. I am curious: why use `vfork` nowadays? `bash` uses `close`.
-
-Thank you.
-
-Ilya.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
