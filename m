@@ -1,34 +1,32 @@
-Received: from freekahlil.inlv.org (freekahlil.inlv.org [46.19.33.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C22810E3
-	for <dash@vger.kernel.org>; Fri, 21 Jun 2024 01:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.19.33.18
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA300197
+	for <dash@vger.kernel.org>; Fri, 21 Jun 2024 03:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718933882; cv=none; b=jfN0FBOMNVBbB30ySk17EapsvwNcWqH6OB16nlOx6eyLC40ysykDphAoJ+BhDRHK20sgFSXlZ13f5tQKFpSzvCxCquLxoLSMJuTD4FmMQ5k7Wu4GMr8UGF5DzOomTtEXU+jjmv/ceoCqHUx1QeXz6B4bI1L9uumD1uznXDr5308=
+	t=1718939826; cv=none; b=HmwDhumbZsvmcCzor6XKAABL438j6fSSb0rrrJVD6LQkCLudQqjwEPuBHA/OZrKaAeg/I7cVbT1z1h5w1yzQfql/TjxPqU+QVm7BIB1eIPd4sLKCu7BP6vtjnTGI5gArwMgrTlQnhLl12dbzaGqb6O+o+aPkjUQy9zPTmUdieXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718933882; c=relaxed/simple;
-	bh=hXUqqsxH4mRqWujSq2Pr/CEyhZnQpuvQnt1gwJMKQLw=;
-	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=KQ/WBZs0Nbpj8c3EyxKtoiYbHuFLNOuARjScAOvDRXFZQUWTRTvut5J5dCxP4itA6AYh98djYGT+Nfq4s8lmsd2TV/fi5SDjd2Styd0ygsDJcN39yLKk6MU4/lWgXYLzLy91CvcyhQFMLlZvOT1PBSV4Lyb0wSLWawcA+/mzg9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inlv.org; spf=pass smtp.mailfrom=inlv.org; dkim=pass (1024-bit key) header.d=inlv.org header.i=@inlv.org header.b=mpQ9soVc; arc=none smtp.client-ip=46.19.33.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inlv.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inlv.org
+	s=arc-20240116; t=1718939826; c=relaxed/simple;
+	bh=m2BY5T1DdfzhReB6IrBi3kpq0NNivUTac2jFlT3Rvec=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=T0yw4b3TPwV3KyEH+8rLbqKhGboKekmft5JvxY2wMWvL4ZVZzjKIclK3BDhXaUmy8PkfNAL9s3UUlXzLg5OAhzYPmy6MZbH9frLv92PQYAy9Gbkr6fTPf1NlAgv91HGVulctPo7BLig7BNjAJchNCN3zt8OMQfM/6n4y3tywjM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=joa7Ve6g; arc=none smtp.client-ip=51.68.198.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inlv.org header.i=@inlv.org header.b="mpQ9soVc"
-Received: from [IPV6:2a00:23c6:5398:5e01:61a5:abe2:ca5b:4544] ([IPv6:2a00:23c6:5398:5e01:61a5:abe2:ca5b:4544])
-	(authenticated bits=0)
-	by freekahlil.inlv.org (8.16.1/8.16.1) with ESMTPSA id 45L1XMsL020162
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO)
-	for <dash@vger.kernel.org>; Fri, 21 Jun 2024 03:33:23 +0200 (CEST)
-	(envelope-from martijn@inlv.org)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=inlv.org; s=inlv;
-	t=1718933603; bh=hXUqqsxH4mRqWujSq2Pr/CEyhZnQpuvQnt1gwJMKQLw=;
-	h=From:From;
-	b=mpQ9soVcDjVMSmSZKGISPKMxCCxAePyF0l+Rea2+K/pl47SsfN0q3n3tSI/6M3DEV
-	 docpKYVNiZXIkScpBuoaeobm8viyTKTg12UpzamtEJqmga7KJ0fBFrqtbVGYrFOTLo
-	 UBopvJJDf1ynuAIFIT/cg3Cfu8T4GnC0CucAcfNA=
-Message-ID: <b19b7107-097e-4865-a0d9-26cdf316c1c4@inlv.org>
-Date: Fri, 21 Jun 2024 02:33:22 +0100
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="joa7Ve6g"
+Received: from [IPV6:2a02:8010:68a1:0:4c2e:bdb0:6f5a:892e] (unknown [IPv6:2a02:8010:68a1:0:4c2e:bdb0:6f5a:892e])
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id D63D951;
+	Fri, 21 Jun 2024 04:07:52 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl D63D951
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1718939272;
+	bh=Y8r86NNEMUJxCg1MVElcB7crjrUX2/6vMOrhMZclpR0=; l=657;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=joa7Ve6g7z2LMeJ/t6TcMEMfV9/W81iTViADoVlTqs/eXvYiRdJuJRXv3eaGqdxAx
+	 lXqzXH7gZGnyTbv7/aaZJ8aUNQDnpvisdd+/Zutzsd3XTRsT5CK/ww9NSvctjhShkU
+	 zPBwVhOkNQgOrk+VWCvsBbyEwVEUNnFCoO78qSAo=
+Message-ID: <49584a1b-3d12-4613-9bc4-e3a4dd291b4b@gigawatt.nl>
+Date: Fri, 21 Jun 2024 04:07:51 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -36,32 +34,32 @@ List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Martijn Dekker <martijn@inlv.org>
+Subject: Re: Field splitting regression on master branch
+To: Martijn Dekker <martijn@inlv.org>,
+ DASH shell mailing list <dash@vger.kernel.org>
+References: <b19b7107-097e-4865-a0d9-26cdf316c1c4@inlv.org>
 Content-Language: en-GB
-To: DASH shell mailing list <dash@vger.kernel.org>
-Subject: Field splitting regression on master branch
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <b19b7107-097e-4865-a0d9-26cdf316c1c4@inlv.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-As of commit c0674f487c7aec2a3bdf6795cea7e60c9530c360, field splitting is 
-broken. Minimal-ish reproducer:
+On 21/06/2024 02:33, Martijn Dekker wrote:
+> As of commit c0674f487c7aec2a3bdf6795cea7e60c9530c360, field splitting 
+> is broken. Minimal-ish reproducer:
+> 
+> $ dash -c 'IFS=:; v=" :: :: "; set $v; echo $#'
+> 5
+> 
+> Expected output: 2
 
-$ dash -c 'IFS=:; v=" :: :: "; set $v; echo $#'
-5
+This results in 5 in bash, ksh, older dash, yash, everything I can think 
+to test. Whitespace IFS characters is meant to be handled differently 
+from non-whitespace IFS characters, I think 5 is the correct result.
 
-Expected output: 2
+But with IFS=": " instead of IFS=:, the output was previously 4, is 
+supposed to be 4, and has changed to 2; I agree that it looks like dash 
+has introduced a bug here.
 
-FYI, this is a nice cross-platform script for testing for field splitting 
-regressions (on dash as well):
-
-http://web.archive.org/web/20051225040851/http://www.research.att.com/~gsf/public/ifs.sh
-
-Dash passes this prior to the referenced commit, and fails it after, in 
-informative ways.
-
--- 
-||	modernish -- harness the shell
-||	https://github.com/modernish/modernish
-||
-||	KornShell lives!
-||	https://github.com/ksh93/ksh
+Cheers,
+Harald van Dijk
