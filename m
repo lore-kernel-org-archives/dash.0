@@ -1,79 +1,67 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from freekahlil.inlv.org (freekahlil.inlv.org [46.19.33.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850F83A8CB
-	for <dash@vger.kernel.org>; Sun, 16 Jun 2024 10:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C22810E3
+	for <dash@vger.kernel.org>; Fri, 21 Jun 2024 01:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.19.33.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718534559; cv=none; b=BZYG3N9k8F4E5ESpUzcTh0bWcD+I0Bz6lhYat7LNmCTsT4eqhHLwHV3JRjBpbsWlpTeTgqlXeNTgjSPZ4miMqAyh/k0+bV8t7YODTZAbeY4fYrUbruGgz0xbaX5zD7Jc/6X85PefUL+J5rEXoihgV4v/iiqOwct2U8t5fJlx7Qs=
+	t=1718933882; cv=none; b=jfN0FBOMNVBbB30ySk17EapsvwNcWqH6OB16nlOx6eyLC40ysykDphAoJ+BhDRHK20sgFSXlZ13f5tQKFpSzvCxCquLxoLSMJuTD4FmMQ5k7Wu4GMr8UGF5DzOomTtEXU+jjmv/ceoCqHUx1QeXz6B4bI1L9uumD1uznXDr5308=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718534559; c=relaxed/simple;
-	bh=Idtf5xzpYjxSO29Y/+C1ti3mYJlfZgMcsIb4K978Fbw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=rvaTxRktXB7qfsAarey0SCd0pDz2HB4h9VDrQS+rAmKFdejyP1V/ZUNX4enJfggx6aqMeKw3ouqHL5ctw8MydWg7lGUOOLOX49NHdqD3aXmnBLTJZ2HlINlbmcpVU3rb7nbIwSLf2X1QJz5h5DXS3xL9FmtfeFV66x0qQjpxPXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jetbrains.com; spf=pass smtp.mailfrom=jetbrains.com; dkim=pass (1024-bit key) header.d=jetbrains.com header.i=@jetbrains.com header.b=bSK95zG/; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jetbrains.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jetbrains.com
+	s=arc-20240116; t=1718933882; c=relaxed/simple;
+	bh=hXUqqsxH4mRqWujSq2Pr/CEyhZnQpuvQnt1gwJMKQLw=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=KQ/WBZs0Nbpj8c3EyxKtoiYbHuFLNOuARjScAOvDRXFZQUWTRTvut5J5dCxP4itA6AYh98djYGT+Nfq4s8lmsd2TV/fi5SDjd2Styd0ygsDJcN39yLKk6MU4/lWgXYLzLy91CvcyhQFMLlZvOT1PBSV4Lyb0wSLWawcA+/mzg9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inlv.org; spf=pass smtp.mailfrom=inlv.org; dkim=pass (1024-bit key) header.d=inlv.org header.i=@inlv.org header.b=mpQ9soVc; arc=none smtp.client-ip=46.19.33.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inlv.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inlv.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=jetbrains.com header.i=@jetbrains.com header.b="bSK95zG/"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-6fd8506a0b2so2940397a12.3
-        for <dash@vger.kernel.org>; Sun, 16 Jun 2024 03:42:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jetbrains.com; s=googleapps; t=1718534557; x=1719139357; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aNDc6KQiPRNOfVuH/JnEe3gp8d/NmXSrFpKlAr8zfUw=;
-        b=bSK95zG/dEwcGxHs+lOqZI4cbbyYoed3ogIxpUkYC8qlmnAa5DIBQwtQgorxQVMnxw
-         Xc91QozvlgJOr+Zm1fUaO/tFu1N0usXRxwhtloJKoZNCx6OOMyIiZpc9jNadRT/Twbim
-         vv+D+VViM11K2TYecrNJ8tXjXhwAV80s+lmv4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718534557; x=1719139357;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aNDc6KQiPRNOfVuH/JnEe3gp8d/NmXSrFpKlAr8zfUw=;
-        b=uTHi+yNDNQviD7b9U3IUfgwOFDKsy3wxxYOpJhIq/ZViUO7EWhRpRP1ktx5MehD+W8
-         ZYRovmnGKvNSrnSxwe2rYpBrjeTpHVdJquHy3as5renXtzUZnS4uEiSGrSkEqqI7O2eF
-         q+C0dTBIxNqrHa9msd24h8dPO8x77aeo8CzPGIhWVyCxV8g/3/9w5LXCGcp59ZDT4HWA
-         +nivJs4g96//Rv3RfVaf9HMJ+FE/T5s+30CVYeg0BNnx69hGPqBZ37G3j76nUUKsWoAS
-         44KBlQwvBfcJ/nVAztKprfH7KWXcavWtWMibuNoQaB+4MI2Cf06JeU+An09+NFKlEs8i
-         fCvw==
-X-Gm-Message-State: AOJu0YxdzqtZhmUe4q2jfotBr9mKRYDRSSr1a6vtlInD9pEaEKPF+oHg
-	LaXwsGVdzDZ8rXiEHwuC1wU9n7UmhrcRffJ9V9nzvFlEKB+AyMtFFI9KMZdjfmiT8xazsUEybvC
-	LdN5I8OkInslH+zR8vXcYUoaBV+4KJVfYX+ncsxJyWRslZhpOZXJq
-X-Google-Smtp-Source: AGHT+IGta1EgxNJKSKKWkHQiR82pv1L4YmrNdgIu5dD+lwspSdrvcjR/VNAUKCmuVbq6o5+37SxPmxyeLl6JxBlBev4=
-X-Received: by 2002:a05:6a20:7489:b0:1b7:f59d:fd1e with SMTP id
- adf61e73a8af0-1bae802b39dmr9104100637.50.1718534557347; Sun, 16 Jun 2024
- 03:42:37 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=inlv.org header.i=@inlv.org header.b="mpQ9soVc"
+Received: from [IPV6:2a00:23c6:5398:5e01:61a5:abe2:ca5b:4544] ([IPv6:2a00:23c6:5398:5e01:61a5:abe2:ca5b:4544])
+	(authenticated bits=0)
+	by freekahlil.inlv.org (8.16.1/8.16.1) with ESMTPSA id 45L1XMsL020162
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO)
+	for <dash@vger.kernel.org>; Fri, 21 Jun 2024 03:33:23 +0200 (CEST)
+	(envelope-from martijn@inlv.org)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=inlv.org; s=inlv;
+	t=1718933603; bh=hXUqqsxH4mRqWujSq2Pr/CEyhZnQpuvQnt1gwJMKQLw=;
+	h=From:From;
+	b=mpQ9soVcDjVMSmSZKGISPKMxCCxAePyF0l+Rea2+K/pl47SsfN0q3n3tSI/6M3DEV
+	 docpKYVNiZXIkScpBuoaeobm8viyTKTg12UpzamtEJqmga7KJ0fBFrqtbVGYrFOTLo
+	 UBopvJJDf1ynuAIFIT/cg3Cfu8T4GnC0CucAcfNA=
+Message-ID: <b19b7107-097e-4865-a0d9-26cdf316c1c4@inlv.org>
+Date: Fri, 21 Jun 2024 02:33:22 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMQsgbSZnEac=ETYnR6a_ysnAysaHThwY03pnoDxC=p5FqtAag@mail.gmail.com>
- <Zm5y3du0C2MHdhSR@gondor.apana.org.au>
-In-Reply-To: <Zm5y3du0C2MHdhSR@gondor.apana.org.au>
-From: Ilya Kazakevich <ilya.kazakevich@jetbrains.com>
-Date: Sun, 16 Jun 2024 12:42:26 +0200
-Message-ID: <CAMQsgbQotWyBs+Hg9qACTjffnVcF0XHVb7EsdOdCLPzt6kMPAA@mail.gmail.com>
-Subject: Re: Subprocess doesn't get stdin sometimes.
-To: dash@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+From: Martijn Dekker <martijn@inlv.org>
+Content-Language: en-GB
+To: DASH shell mailing list <dash@vger.kernel.org>
+Subject: Field splitting regression on master branch
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> Yes this is a known bug in dash 0.5.12 and prior.  It was fixed
-> a while ago in the git tree by:
->
-> commit 5f094d08c5bcee876191404a4f3dd2d075571215
+As of commit c0674f487c7aec2a3bdf6795cea7e60c9530c360, field splitting is 
+broken. Minimal-ish reproducer:
 
+$ dash -c 'IFS=:; v=" :: :: "; set $v; echo $#'
+5
 
-Thank you Herbert,
+Expected output: 2
 
-I now see that 0.5.12 reads the whole line instead of bytes.
-``
-read(0, "head -c 2\nab\n", 8192) = 13
-```
+FYI, this is a nice cross-platform script for testing for field splitting 
+regressions (on dash as well):
 
-I can also confirm that this bug doesn't exist in the latest version
-built from git.
+http://web.archive.org/web/20051225040851/http://www.research.att.com/~gsf/public/ifs.sh
 
-Ilya.
+Dash passes this prior to the referenced commit, and fails it after, in 
+informative ways.
+
+-- 
+||	modernish -- harness the shell
+||	https://github.com/modernish/modernish
+||
+||	KornShell lives!
+||	https://github.com/ksh93/ksh
