@@ -1,40 +1,41 @@
 Received: from tarta.nabijaczleweli.xyz (tarta.nabijaczleweli.xyz [139.28.40.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4485E17084B
-	for <dash@vger.kernel.org>; Wed,  3 Jul 2024 13:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DAD1DA319
+	for <dash@vger.kernel.org>; Wed,  3 Jul 2024 15:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.28.40.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720014965; cv=none; b=DvvzjUkbPmzTaxW5e99LLYUNxBzwKXy8MgBuccNoXjbMMcP4mLT8aWRsrH1kRoZE1yMOX0fdq3FR1h35d0mQEZWT9lsfnIfYbq3Rlz//qV1YhBv6lJDa/PrJqIQg/7DK8l9YJGj8j9fwTY8uH+mJwU1vGeDpSRd5JyNjGZQ4hH0=
+	t=1720021613; cv=none; b=aAQJFyn91wEbcmCoQhZeSxKCgA3pNaVsO6LwBvNdKg801OpgUylAD9A+2qvBnGmLObspS+WR2qeH+QccsucXSzTGMv5+OgEa9Mod90fofg1SLi0pV4lwAeWMbU9M6MPI/FzVcoW42XtrL/xozLrjBH4PmO88l4QloAxWt8wKndo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720014965; c=relaxed/simple;
-	bh=IWCkDvh/77d0O2i2W4BZq/3IZYYzGZsuzdBnqxnpWzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=OrY97kswK1A17kf3BKam16UoF3qyiuryaCCYNWNyEPcNX5f0PDpQweuDRLAKckYSDztpFOHIL2EYa4XAT02yx17I9ZdnhzyqFQMKiQuXJKzDiwQSzvKalDhAEA51pjZHnUgXvKaIeu3F1lMwvavoTVhMFfdlibTefiUuyW4vdAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nabijaczleweli.xyz; spf=pass smtp.mailfrom=nabijaczleweli.xyz; dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b=RYRMA9bj; arc=none smtp.client-ip=139.28.40.42
+	s=arc-20240116; t=1720021613; c=relaxed/simple;
+	bh=hRGdNDVnguNOMLm4TBut1pGB4kLGmFXK0dG8hdcGric=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZALMrFUjYITCW4wSSsIqPXA173/cdC/90nbTfXtbILhbwJrNMAEG4Gol4lZFx+oPevAffp6lCo1DG015kCvMDcYFJ235EhG6XCThs/iCVeJTFh8Db2DdXv6kKId6h1gKnIF8RIsX81gLmUGuCbR0zVAzIrzK2IeqSWyMBlLl5kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nabijaczleweli.xyz; spf=pass smtp.mailfrom=nabijaczleweli.xyz; dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b=Zfh16ZmO; arc=none smtp.client-ip=139.28.40.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nabijaczleweli.xyz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabijaczleweli.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b="RYRMA9bj"
+	dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b="Zfh16ZmO"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-	s=202405; t=1720014950;
-	bh=IWCkDvh/77d0O2i2W4BZq/3IZYYzGZsuzdBnqxnpWzM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=RYRMA9bjyt69jQZCCenML2tn8kgS2ZUtenawGM0YnboHVGNliAwJ68CGRSSaMMhc8
-	 wpDwejOtMUYBTAqzbyPTgMPV6Cg1MO69sB0pmAMwmBHJIO4OEqUrlcEDd1ytPjf4wO
-	 1eJInLOpnZcS0Vd9PcWWOEERE+HF+47fqPZGP/hCYOKCeO99XtRzfgosi8wNa2DEiV
-	 wSV0I6XE2CleyThDyqsK30j3QLtXy7nbzeLhhd282AE6zLT3OYLVa8HIATVywpNSFQ
-	 EfvL3wpHgJqwzgBz3z/J6Z/t/a6nTZSl0URlBgBswfK+X5bKADSHbQli3ORv0U2IRs
-	 xd7K8GoKtHASA==
+	s=202405; t=1720021606;
+	bh=hRGdNDVnguNOMLm4TBut1pGB4kLGmFXK0dG8hdcGric=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Zfh16ZmOQ9df4uCdfRBwfMY26gcUGFnA1o24z25kmwg+C3gNTUB3JsQ5AW0RNLJd+
+	 wGjOMrlqRBc5eQCvWCv7zQmgUw8yRvg+rsFkJwsdpIrw0DPosj+XBdl+QK+EakQQET
+	 Je1cfVelNkbkKZMLstf7jnZx6fB+pt/Qe9Ljj1LYeSx9kTZEpOBiI0otzEmIjQQEij
+	 5NR2yKKOh2tbp9bzrpeL6bU6hnMkq8AKedUPvhxCD1TUTzP68Tu6OLrGDZVEEkf1Cs
+	 4S7qztNEYha5kz/7DJGT9DnfX+10cdfu3fpZeKdN8a8JEkzExzZO+iv2aSEJ5fNck2
+	 JpW3jjgVV1tCw==
 Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-	by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id D92C77FD8;
-	Wed,  3 Jul 2024 15:55:50 +0200 (CEST)
-Date: Wed, 3 Jul 2024 15:55:50 +0200
+	by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 3A94E7DD8;
+	Wed,  3 Jul 2024 17:46:46 +0200 (CEST)
+Date: Wed, 3 Jul 2024 17:46:45 +0200
 From: =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
-Subject: Broken: "parser: Add dollar single quote"
-Message-ID: <gsb54jm2ankqb3ckx5b2renl2ndjlmdep3r7l2ohe6wlvs7hwd@tarta.nabijaczleweli.xyz>
+Subject: Re: Broken: "parser: Add dollar single quote"
+Message-ID: <nitniac3dtrvhs6jno73bfmh6uqi6ep4yjnzrxvp5owy6cjwxv@tarta.nabijaczleweli.xyz>
+References: <gsb54jm2ankqb3ckx5b2renl2ndjlmdep3r7l2ohe6wlvs7hwd@tarta.nabijaczleweli.xyz>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -42,48 +43,62 @@ List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="xkkjxo2cziwivrex"
+	protocol="application/pgp-signature"; boundary="l4azl6ootdpxxkz6"
 Content-Disposition: inline
+In-Reply-To: <gsb54jm2ankqb3ckx5b2renl2ndjlmdep3r7l2ohe6wlvs7hwd@tarta.nabijaczleweli.xyz>
 User-Agent: NeoMutt/20231221-2-4202cf-dirty
 
 
---xkkjxo2cziwivrex
+--l4azl6ootdpxxkz6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Current HEAD of 776424a8f9158bfe9f53aa55f931af9f73437caf
-("parser: Add dollar single quote"):
-  $ printf '%s\n' $'\123'
-simply hangs.
+Compare also:
+-- >8 --
+$ a=$'a\0b'
 
-strace shows
-  read(0, printf '%s\n' $'\123'
-  "printf '%s\\n' $'\\123'\n", 8192) = 22
-  read(0,
 
-Bisecting this says that this is the first problematic commit.
 
-Actually writing around five bytes makes it write the S\n and continue
-(and interpret those five bytes as-if typed at the prompt).
 
---xkkjxo2cziwivrex
+
+$ $ $ $ $ $
+$ echo ${#a}
+1
+$ a=$'a\0b'asdasdasdasd
+$ echo ${#a}
+13
+$ printf '%s\n' "$a"
+aasdasdasdasd
+-- >8 --
+(the escaping behaviour is correct, the results are correct)
+
+The minimum that doesn't hang is
+  a=$'a\0b'aaaaa
+and the five as match up thusly length-wise:
+      a\0b'
+      aaaaa
+so, knowing nothing about the parser,
+i'm gonna assume Some cursor isn't being properly advanced
+while inside $'?
+
+--l4azl6ootdpxxkz6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmaFWGEACgkQvP0LAY0m
-WPEUyxAAqXihe2768jRfrWU5BPYc7PiODJdiovIpUz55Fm8esinvTjmqsFs+N38s
-K1Y4Z/1NIYZfSv+0HMreKXmwpmX27T9zEdZO9K0lUMky8fFrBC5wg2m00I8AcGur
-eMosAjc+9bmRkZ6W848b4xetM+fNUPm6op5AyJRVL/xgQLnAdaLwXc2yF352QRmV
-nLsEZkNP3VDWqgmHuOPxsuRRzJT/3GJvuOyI1W1+g9lp4LwiMBsVm7/VF8FIBD2m
-L8sShm110d3IGG9ayZUaBTD9jpyMq2YJhROfknheQ3aQ/wRlY62L4o4DTsFtC2Sj
-qhWDbx6TzFNAWyeqZgvQwjr+ZK8M/AAD0HaKbqqkWnTF03OqzrQOPjpCNs9nAT9X
-T2dStuDqlniDVBAbELKGP0qRBA5RXb5JG1oM6KUCo/NJ+cagmkdC9bDNwLFEqkvn
-Z48sCazL8GhEocqc/qx0HLOHYFFJO38Nv2nmlU9ocgbMArJoFrs7aRNielGFS8kK
-0BX2zrlhCA87+sTCKp0o29g90EKhl4L2jI358q6qkblPTKjGvQUD1WvfuaQxV9Tg
-lQBD8QMUK6nFDb9C75K2258s0GiPa1+BnBs7faoKTvGsZPkXZ6Fav+s8I1vVm4yR
-pxFQ8oSuZMctkWHmzohYZ1FDs23a/L+0d/Y3lD7rAMzrTiDCJiw=
-=PZV8
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmaFcmMACgkQvP0LAY0m
+WPEflRAAs3083U8EpHQ3W+Zvgl+uTjEOekF1rX6eGOW6jQeCEzKJV3jjZfECoW1z
+eAwWT4kGVDIwG9vcwHK0cmhyjSrye9dfyfcYztaM1HIUrr03WfdOMfJgeqNI72mq
+P16Q9TfExAXsBANlsDEuR+BICMPAuj4di1FBmwR66OkvSl30UieNmRxp6Ncm2q3r
+X3oUJiNLhNMD7yrKtrBLwf9IpMEF+4OAmmlWE2uQUv5hkFMj5ggNvb3OJbag7jbD
+AChlW/vIj9b976WWUXz6NTIDGlOsLYt77GaQJe664HaesaJrbYtfUw7pt38vRL6u
+MJ3mpBQmO9LOXzGKSUOxvzPhTVTvP1v46ngkrUhupTEhm0doH/M5lWhRT580hv94
+nK+732sv/bo+4GEtNZeBtkKN4vYp9nKy8ZiKaJAk1lQzNQxLpGIhuj6XhlNpf7ex
+wM5gjs/ei0HilY7bwiCB/t7Bj/dslLx1B51KErKBJCmNawlMZ9LWPgOnnCeS10oM
+Gq6q8GhiCN1UmAWBwjcDp0hFp5/DVjJwQyoDJNlXO+2BPBBYOPSpc/IjtTf8zCIC
+xBokvuf/GDWdPdI1MwSPZyd6/GBqh0DAtByxEu9lj6Xrj6fgg3vUq29CRZOBbjsf
+und7ThNzbc7yjiP6Ft0J/s8lW2hcrRL8T1fhmnt+qMFsyIOSxFA=
+=LdzN
 -----END PGP SIGNATURE-----
 
---xkkjxo2cziwivrex--
+--l4azl6ootdpxxkz6--
