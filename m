@@ -1,30 +1,32 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670C78494
-	for <dash@vger.kernel.org>; Sun, 28 Jul 2024 03:06:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1426E4A05
+	for <dash@vger.kernel.org>; Sun, 28 Jul 2024 03:08:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722136015; cv=none; b=clyNQ1VmUHTkgH/8o7JmsKFB3foZZdm0vDldz3hqILrn+83s91DX27SsIp9b5AXA70GusXsic8+bOuuYxPTMr25LRA1En7EuoTfpWykgHrE160EINRxOI0gklPoaV0YHFIlrU3diftI/06SwlRRgKDaWAYhlF3G6O8vqGBFMpRY=
+	t=1722136089; cv=none; b=d0FXZLAhIM94L7vZIIbGTje8eJcjDA1mz40yLJq4eINqAKPi7WUOZhvfPEui/2JLxKUSiSU9hAphkZJl03CLICzBD3nUUFDm2i5IBF6/VRp3qfK0UwboiTeb61o3Aa48oD0SNklcU6VamljAxRA/GFz9G6dy5fbG+oFEvxI2mz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722136015; c=relaxed/simple;
-	bh=brU/FftXo+vsunXX011NC0h/DPp1MAnzqfGfQmWUhA0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=cykLaPqdcy8Vye8tMxxRCRW00Hqi3hRQeoOX60aRjyuh5Yk5PpFQcrH09YSWqI4hl9MEJtaYD0H3qQBmUEMyC3bW75kA6w80L0LHTic2uO/BgiPWjwhhnDiaTYdBJXPejiWS8S5XUjSWNTR4NpYHPvAOv7Wl4qZ2YBkXCFMrmYc=
+	s=arc-20240116; t=1722136089; c=relaxed/simple;
+	bh=stwg+sbYacMpCFS5Z51Ug6mxFr/VSMsMTy5tusZSAds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bDhN+/0FVWd/jDJschCZ5Gi0vhXNYKCnkAehiJiWumyMNwaIiia1CvsElYyDZHW0L68LcwcgIiH+gpCGnPI9HPh95PEMzpbB1D+EPoxBiNI1T5erbB/ghKFYmK0XsI4wvwqg3EmneJ23EXCKLoEfib7ppujfBg5+0F6/DOctULk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sXu6k-000e1s-1T;
-	Sun, 28 Jul 2024 11:06:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 28 Jul 2024 11:06:47 +0800
-Date: Sun, 28 Jul 2024 11:06:47 +0800
+	id 1sXu7x-000e2T-0A;
+	Sun, 28 Jul 2024 11:08:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 28 Jul 2024 11:08:02 +0800
+Date: Sun, 28 Jul 2024 11:08:02 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
 Cc: dash@vger.kernel.org
-Subject: Re: [PATCH] bltin/test: = and != are strcmp, not strcoll
-Message-ID: <ZqW1xyfvsoI5F4IQ@gondor.apana.org.au>
+Subject: Re: [PATCH v2] bltin/test: align -nt and -ot with POSIX.1-2024
+Message-ID: <ZqW2EsFB5i5ZUz7n@gondor.apana.org.au>
+References: <ZqWuqe25h-VkDqnj@gondor.apana.org.au>
+ <cvvclqjh5f7lkvwzrcv4akogr3ko7bqdwqilrw5rslebgovdyh@tarta.nabijaczleweli.xyz>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -34,28 +36,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <t3tjfncwhu5shadny7kikk5ulsycsqk6in3ieuof3ibivekd5c@tarta.nabijaczleweli.xyz>
-X-Newsgroups: apana.lists.os.linux.dash
+In-Reply-To: <cvvclqjh5f7lkvwzrcv4akogr3ko7bqdwqilrw5rslebgovdyh@tarta.nabijaczleweli.xyz>
 
-наб <nabijaczleweli@nabijaczleweli.xyz> wrote:
-> [-- text/plain, encoding quoted-printable, charset: us-ascii, 38 lines --]
+On Sun, Jul 28, 2024 at 04:42:52AM +0200, наб wrote:
+> 117027  pathname1 −nt pathname2
+> 117028    True if pathname1 resolves to an existing file and pathname2 cannot be resolved, or if
+> 117029    both resolve to existing files and pathname1 is newer than pathname2 according to
+> 117030    their last data modification timestamps; otherwise, false.
+> 117031  pathname1 −ot pathname2
+> 117032    True if pathname2 resolves to an existing file and pathname1 cannot be resolved, or if
+> 117033    both resolve to existing files and pathname1 is older than pathname2 according to
+> 117034    their last data modification timestamps; otherwise, false.
 > 
-> 117067  s1 = s2  True if the strings s1 and s2 are identical; otherwise, false.
-> 117068  s1 != s2 True if the strings s1 and s2 are not identical; otherwise, false.
-> 117069  s1 > s2  True if s1 collates after s2 in the current locale; otherwise, false.
-> 117070  s1 < s2  True if s1 collates before s2 in the current locale; otherwise, false.
-> 
-> "identical" does not mean "collate equally";
-> this is the difference between sort | uniq and sort -u
+> The correct output is
+>   $ [ 2024 -nt 2023 ] && echo yes
+>   yes
+>   $ [ 2023 -nt 2024 ] && echo yes
+>   $ [ 2023 -nt ENOENT ] && echo yes
+>   yes
+>   $ [ ENOENT -nt 2024 ] && echo yes
+> and
+>   $ [ 2024 -ot 2023 ] && echo yes
+>   $ [ 2023 -ot 2024 ] && echo yes
+>   yes
+>   $ [ 2023 -ot ENOENT ] && echo yes
+>   $ [ ENOENT -ot 2024 ] && echo yes
+>   yes
+> but dash currently returned only the first yes out of both blocks.
 > ---
-> This bug violates every POSIX issue i can find.
-> 
-> The manual is already correct.
-> 
-> src/bltin/test.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+>  src/bltin/test.c | 31 +++++++++++++++++--------------
+>  src/dash.1       | 14 ++++++++++++--
+>  2 files changed, 29 insertions(+), 16 deletions(-)
 
-Patch applied.  Thanks.
+Patch applied with newerf/olderf changed to return bool, header
+sorting and some reformatting of the time comparisons.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
