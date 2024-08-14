@@ -1,78 +1,105 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from sdaoden.eu (sdaoden.eu [217.144.132.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1426E4A05
-	for <dash@vger.kernel.org>; Sun, 28 Jul 2024 03:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04FA259C
+	for <dash@vger.kernel.org>; Wed, 14 Aug 2024 00:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.144.132.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722136089; cv=none; b=d0FXZLAhIM94L7vZIIbGTje8eJcjDA1mz40yLJq4eINqAKPi7WUOZhvfPEui/2JLxKUSiSU9hAphkZJl03CLICzBD3nUUFDm2i5IBF6/VRp3qfK0UwboiTeb61o3Aa48oD0SNklcU6VamljAxRA/GFz9G6dy5fbG+oFEvxI2mz0=
+	t=1723596894; cv=none; b=hQSxJkGpsJRf46hZSU2CSmPoMywkHbELZR+pgvyZZ5I4qhTIcOnnDjJSsnAEvRtIubevwS9SIkgDP7vnP8X1RjKSI6lYuQpQbkwiFAfVtUI33Uq8lg/L8lediamGaleGYmMzHFfq6fSGChed4WZgOkNQJAlO9ZP/8rBk14KeHaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722136089; c=relaxed/simple;
-	bh=stwg+sbYacMpCFS5Z51Ug6mxFr/VSMsMTy5tusZSAds=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bDhN+/0FVWd/jDJschCZ5Gi0vhXNYKCnkAehiJiWumyMNwaIiia1CvsElYyDZHW0L68LcwcgIiH+gpCGnPI9HPh95PEMzpbB1D+EPoxBiNI1T5erbB/ghKFYmK0XsI4wvwqg3EmneJ23EXCKLoEfib7ppujfBg5+0F6/DOctULk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sXu7x-000e2T-0A;
-	Sun, 28 Jul 2024 11:08:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 28 Jul 2024 11:08:02 +0800
-Date: Sun, 28 Jul 2024 11:08:02 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
-Cc: dash@vger.kernel.org
-Subject: Re: [PATCH v2] bltin/test: align -nt and -ot with POSIX.1-2024
-Message-ID: <ZqW2EsFB5i5ZUz7n@gondor.apana.org.au>
-References: <ZqWuqe25h-VkDqnj@gondor.apana.org.au>
- <cvvclqjh5f7lkvwzrcv4akogr3ko7bqdwqilrw5rslebgovdyh@tarta.nabijaczleweli.xyz>
+	s=arc-20240116; t=1723596894; c=relaxed/simple;
+	bh=XDAwa3OBwUwHvjJTqV7P+jhb5+OqItcwHLbK3ak9mrM=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=YfG6Cb9eomu36je8cz3s4vMCC9d6NQnKASDI960obxAqJWNgop0JLOPYBaqT/Yz/8D6Ec2TTFj+CqLde/sXVSjHdSLFamnqkIy5jBjC/dUnu9fFmjuJuSCQkIKIEIgJBFF6FwxFbR848lvnB7TfRhfPfmI7/EVq5/oHs9rRFWoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu; spf=pass smtp.mailfrom=sdaoden.eu; dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=d/HCoC4H; dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=a9qL0wi+; arc=none smtp.client-ip=217.144.132.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sdaoden.eu
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="d/HCoC4H";
+	dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="a9qL0wi+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sdaoden.eu;
+ s=citron; t=1723596326; x=1724262992; h=date:author:from:to:cc:subject:
+  message-id:mail-followup-to:openpgp:blahblahblah:author:from:subject:date:
+  to:cc:resent-author:resent-date:resent-from:resent-sender:resent-to:
+  resent-cc:resent-reply-to:resent-message-id:in-reply-to:references:
+  mime-version:content-type:content-transfer-encoding:content-disposition:
+  content-id:content-description:message-id:mail-followup-to:openpgp:
+  blahblahblah; bh=T/aGdspKXFuKmFPjPNzbCEivAF9rf90dKyLVxvlaqaQ=;
+ b=d/HCoC4HzOZPlI4jYtCGzBbdAGWhUihRqk9bWwxVOAlkLlg/d6GiOdgV2sZ2S7P3NQ0NBQNt
+  dlu1a7UVsUUZqFRw22YVjbOxAD6kie0RIovNgWrRp4tYATtx+ZbXzyONR4j2kuhk6YQ92ndPCb
+  7K91fkVHb6e7NCTO7Rnf5q1/4MFBuMeJyg0M2zZDL5FU+Q+RAjQKfJr6ewmpb0SuMdXc6z5VWI
+  RYkaDxFE9jRo28TCN1mqeu9weieqqmsldgrdDMLf/EDH3Y8nkj5v50Ta9k5dHH1xD8xbQPB2aR
+  mdVUuRhMHnG4j4HzkzzN7p/Jm6Pzw5lz41yVvbgBvKrAmY5Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sdaoden.eu;
+ s=orange; t=1723596326; x=1724262992; h=date:author:from:to:cc:subject:
+  message-id:mail-followup-to:openpgp:blahblahblah:author:from:subject:date:
+  to:cc:resent-author:resent-date:resent-from:resent-sender:resent-to:
+  resent-cc:resent-reply-to:resent-message-id:in-reply-to:references:
+  mime-version:content-type:content-transfer-encoding:content-disposition:
+  content-id:content-description:message-id:mail-followup-to:openpgp:
+  blahblahblah; bh=T/aGdspKXFuKmFPjPNzbCEivAF9rf90dKyLVxvlaqaQ=;
+ b=a9qL0wi+SzqNV695OqF2nMmXkqp1GPCIksZXMf9/+YH0TnPkxrXIJt+WBstclLYnT9lvKBGd
+  i4mL3kFJkdz2Bw==
+Date: Wed, 14 Aug 2024 02:45:25 +0200
+Author: Steffen Nurpmeso <steffen@sdaoden.eu>
+From: Steffen Nurpmeso <steffen@sdaoden.eu>
+To: dash@vger.kernel.org, busybox@busybox.net, bug-bash@gnu.org
+Cc: Steffen Nurpmeso <steffen@sdaoden.eu>
+Subject: Question on $@ vs $@$@
+Message-ID: <20240814004525.A7mNIdWf@steffen%sdaoden.eu>
+Mail-Followup-To: dash@vger.kernel.org, busybox@busybox.net,
+ bug-bash@gnu.org, Steffen Nurpmeso <steffen@sdaoden.eu>
+User-Agent: s-nail v14.9.25-599-g5c75a327b2
+OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
+ url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
+BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
+ the world can make no bugs.
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cvvclqjh5f7lkvwzrcv4akogr3ko7bqdwqilrw5rslebgovdyh@tarta.nabijaczleweli.xyz>
 
-On Sun, Jul 28, 2024 at 04:42:52AM +0200, наб wrote:
-> 117027  pathname1 −nt pathname2
-> 117028    True if pathname1 resolves to an existing file and pathname2 cannot be resolved, or if
-> 117029    both resolve to existing files and pathname1 is newer than pathname2 according to
-> 117030    their last data modification timestamps; otherwise, false.
-> 117031  pathname1 −ot pathname2
-> 117032    True if pathname2 resolves to an existing file and pathname1 cannot be resolved, or if
-> 117033    both resolve to existing files and pathname1 is older than pathname2 according to
-> 117034    their last data modification timestamps; otherwise, false.
-> 
-> The correct output is
->   $ [ 2024 -nt 2023 ] && echo yes
->   yes
->   $ [ 2023 -nt 2024 ] && echo yes
->   $ [ 2023 -nt ENOENT ] && echo yes
->   yes
->   $ [ ENOENT -nt 2024 ] && echo yes
-> and
->   $ [ 2024 -ot 2023 ] && echo yes
->   $ [ 2023 -ot 2024 ] && echo yes
->   yes
->   $ [ 2023 -ot ENOENT ] && echo yes
->   $ [ ENOENT -ot 2024 ] && echo yes
->   yes
-> but dash currently returned only the first yes out of both blocks.
-> ---
->  src/bltin/test.c | 31 +++++++++++++++++--------------
->  src/dash.1       | 14 ++++++++++++--
->  2 files changed, 29 insertions(+), 16 deletions(-)
+Hello.
 
-Patch applied with newerf/olderf changed to return bool, header
-sorting and some reformatting of the time comparisons.
+I include bug-bash even though i think bash is correct, but there
+lots of people of expertise are listening, so, thus.
+Sorry for cross-posting, nonetheless.
+Given this snippet (twox() without argument it is)
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+  one() { echo "$# 1<$1>"; }
+  two() { one "$@"; }
+  twox() { one "$@$@"; }
+  two
+  two x
+  twox
+  twox x
+
+i get
+
+  $ dash shbug.sh
+  0 1<>
+  1 1<x>
+  1 1<>
+  1 1<xx>
+
+  #?0|kent:tmp$ busybox.static sh shbug.sh
+  0 1<>
+  1 1<x>
+  1 1<>
+  1 1<xx>
+
+  #?0|kent:tmp$ bash shbug.sh
+  0 1<>
+  1 1<x>
+  0 1<>
+  1 1<xx>
+
+(This is busybox with my arithmetic patch, built on April 20th.)
+Unfortunately my MUA is also bogus :(
+
+--steffen
+|
+|Der Kragenbaer,                The moon bear,
+|der holt sich munter           he cheerfully and one by one
+|einen nach dem anderen runter  wa.ks himself off
+|(By Robert Gernhardt)
