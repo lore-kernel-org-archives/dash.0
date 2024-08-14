@@ -1,100 +1,101 @@
-Received: from greg.wooledge.org (unknown [209.142.155.49])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 29E9E1BDD0
-	for <dash@vger.kernel.org>; Wed, 14 Aug 2024 02:23:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.142.155.49
+Received: from smtpout01-ext2.partage.renater.fr (smtpout01-ext2.partage.renater.fr [194.254.240.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9104D143879
+	for <dash@vger.kernel.org>; Wed, 14 Aug 2024 09:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.254.240.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723602230; cv=none; b=e+aCqjjFaYuSL4dnbaxVymbqB1QJmpbXN2Qlm/WaXq5ZsKq44fKkDRqi/Sy97v/63xBPxuA04OevHQxuRv0Cm/jQOyYUsOQBrcO3G0JuOPprFEHIJ8mx9UN6NjPYObQbAD0kwj06ZgG205tnlTEmzQOLk4SeTaZQVJ2+lTvHPbk=
+	t=1723626827; cv=none; b=KRP8Y3a81Op37YjbTL9DJXe+BMNJbYZqpDhnCAjZQCFXbz2YKcRSF5Qkv+L+j6D+sUht9GzudcwLykGppALe7L/dmO1eUZIffC4aTFWD36QUTiEnpEdNKE0xatLphFwGcZLuXamZWHK8mwyOiFZIwLQlkMHMyFBtGWsQneMTth0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723602230; c=relaxed/simple;
-	bh=9FsXy1Ea29QRXhJbrdGDw5G6iUC5sVq0xCt8UWfGsKA=;
+	s=arc-20240116; t=1723626827; c=relaxed/simple;
+	bh=+whugo8SilOt+yWhJc+AQGpqF7m19c+oYsqL3r10sOc=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EEblesGXdKfHPJU8+eBSe2VboXr7P77p6fSM5R403lh4NvWdTIe+SQf9Ty71kvndzOMKy2ZRgMePx9RjqCXLwgXPnPfEh3bpu2AbaUUT3afY4Gx5SGK7wtvJV3t3bZxskHVlTG4j7Xx6+R9zECwQOvdjc8fSu3krL2RN5wKLH9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wooledge.org; spf=pass smtp.mailfrom=wooledge.org; arc=none smtp.client-ip=209.142.155.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wooledge.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wooledge.org
-Received: (qmail 142986 invoked by uid 1000); 14 Aug 2024 02:17:00 -0000
-Date: Tue, 13 Aug 2024 22:17:00 -0400
-From: Greg Wooledge <greg@wooledge.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=elnrIU6XQd/Y4egKgS85jSNCImXfSYx61jmUPlCv4JM2Qz0R5oA6h5XPWzvhtb1WRsKwrqJh95K9PkXRP2TyctvNlhhKcHJTQr/y16FfOn5Fjusr04p0rW3Us35gf0cORvfzipERYeFT53tkC0eFaBvXX5rpydmzPwgFmBjU/Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=unistra.fr; spf=pass smtp.mailfrom=unistra.fr; dkim=pass (2048-bit key) header.d=unistra.fr header.i=@unistra.fr header.b=f+1iO4+Y; arc=none smtp.client-ip=194.254.240.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=unistra.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unistra.fr
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=unistra.fr header.i=@unistra.fr header.b="f+1iO4+Y"
+Received: from zmtaauth03.partage.renater.fr (zmtaauth03.partage.renater.fr [194.254.240.26])
+	by smtpout10.partage.renater.fr (Postfix) with ESMTP id 224A763D6B;
+	Wed, 14 Aug 2024 11:04:10 +0200 (CEST)
+Received: from zmtaauth03.partage.renater.fr (localhost [127.0.0.1])
+	by zmtaauth03.partage.renater.fr (Postfix) with ESMTPS id 173F88000B;
+	Wed, 14 Aug 2024 11:04:10 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by zmtaauth03.partage.renater.fr (Postfix) with ESMTP id 0652D800C4;
+	Wed, 14 Aug 2024 11:04:10 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmtaauth03.partage.renater.fr 0652D800C4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unistra.fr;
+	s=CF279DD4-6F58-4C59-BB33-73FDC6DFC1E3; t=1723626250;
+	bh=VGlTQhLaBBg0yg6SJAN1PWS7QeHjHSkcJuMyBC8kBC8=;
+	h=Date:From:To:Message-ID:MIME-Version;
+	b=f+1iO4+YVE670Cah/ccXB/uFr3u9KgeuZq42OTExY+sSeq3whTBZc3MnrcDL3It47
+	 LpSVZaXlvKKiMzg2TPsgJalh7Wq5g1gTOkh8KHklJig1IX/MDOXS3xtKcprGKpwnTJ
+	 5nbn7Z2/zCCyJqnOPLOPe6q6lRbt5qulSTiO40t27leFE17mmQg67/735UEp3N+8ry
+	 fgXsKQtStCYeRFBVkz1SLSmIUfk6bqk+oSwMIprGnB41Bzte8bfZiJ9Z73yRikKU7Y
+	 3U5N8sNeAptYlHQ+6n1O7QNV8R8e6zE2DCy0QJpSBPkEQ9wQ82Yyg3LwoE9YYePZyo
+	 RngfpKNzCjuPg==
+Received: from zmtaauth03.partage.renater.fr ([127.0.0.1])
+ by localhost (zmtaauth03.partage.renater.fr [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id syxI04OxmyQL; Wed, 14 Aug 2024 11:04:09 +0200 (CEST)
+Received: from 82.67.52.52 (unknown [194.254.241.251])
+	by zmtaauth03.partage.renater.fr (Postfix) with ESMTPA id CDF548000B;
+	Wed, 14 Aug 2024 11:04:09 +0200 (CEST)
+Date: Wed, 14 Aug 2024 11:04:08 +0200
+From: Marc Chantreux <mc@unistra.fr>
 To: dash@vger.kernel.org, busybox@busybox.net, bug-bash@gnu.org,
-  Steffen Nurpmeso <steffen@sdaoden.eu>
+	Steffen Nurpmeso <steffen@sdaoden.eu>
 Subject: Re: Question on $@ vs $@$@
-Message-ID: <ZrwTnBvk8_2mdQUS@wooledge.org>
-Mail-Followup-To: dash@vger.kernel.org, busybox@busybox.net,
-	bug-bash@gnu.org, Steffen Nurpmeso <steffen@sdaoden.eu>
+Message-ID: <ZrxzCOnZv-HffFuB@prometheus>
 References: <20240814004525.A7mNIdWf@steffen%sdaoden.eu>
+ <ZrwTnBvk8_2mdQUS@wooledge.org>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240814004525.A7mNIdWf@steffen%sdaoden.eu>
+In-Reply-To: <ZrwTnBvk8_2mdQUS@wooledge.org>
+X-Virus-Scanned: clamav-milter 0.103.8 at clamav02
+X-Virus-Status: Clean
+X-Renater-Ptge-SpamState: clean
+X-Renater-Ptge-SpamScore: -100
+X-Renater-Ptge-SpamCause: gggruggvucftvghtrhhoucdtuddrgeeftddruddtgedgudduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecutffgpfetvffgtfenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfhfgggtugfgjgesthekredttddtudenucfhrhhomhepofgrrhgtucevhhgrnhhtrhgvuhiguceomhgtsehunhhishhtrhgrrdhfrheqnecuggftrfgrthhtvghrnhepuedviedvvefflefhudeggfeuleegledtueeklefhfeejuddtvedvfeelffffuddunecukfhppeduleegrddvheegrddvgedurddvhedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepudelgedrvdehgedrvdeguddrvdehuddphhgvlhhopeekvddrieejrdehvddrhedvpdhmrghilhhfrhhomhepmhgtsehunhhishhtrhgrrdhfrhdpnhgspghrtghpthhtohepgedprhgtphhtthhopegurghshhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegsuhhshigsohigsegsuhhshigsohigrdhnvghtpdhrtghpthhtohepsghughdqsggrshhhsehgnhhurdhorhhgpdhrtghpthhtohepshhtvghffhgvnhesshgurghouggvnhdrvghu
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 14, 2024 at 02:45:25 +0200, Steffen Nurpmeso wrote:
-> I include bug-bash even though i think bash is correct, but there
-> lots of people of expertise are listening, so, thus.
-> Sorry for cross-posting, nonetheless.
-> Given this snippet (twox() without argument it is)
-> 
->   one() { echo "$# 1<$1>"; }
->   two() { one "$@"; }
->   twox() { one "$@$@"; }
->   two
->   two x
->   twox
->   twox x
+> We know what "$@" is supposed to do.  And something like "x${@}y" is
+> well-defined also -- you simply prefix "x" to the first word, and appen=
+d
+> "y" to the final word.
 
-So... what's the question?  You didn't actually ask anything.
+> But I don't know how "$@$@" is supposed to be interpreted.  I do not se=
+e
+> anything in the official wording that explains how it should work.
 
-As far as I can tell from the bash man page, "$@$@" does not appear to
-be well-defined.  From the man page:
+As the doc you just mention said: let's set A B C
 
-       @      Expands to the positional parameters,  starting  from  one.   In
-              contexts  where  word  splitting is performed, this expands each
-              positional parameter to a separate word; if  not  within  double
-              quotes,  these words are subject to word splitting.  In contexts
-              where word splitting is not performed, this expands to a  single
-              word  with each positional parameter separated by a space.  When
-              the expansion occurs within double quotes,  each  parameter  ex‐
-              pands  to  a separate word.  That is, "$@" is equivalent to "$1"
-              "$2" ...  If the double-quoted expansion occurs within  a  word,
-              the  expansion  of the first parameter is joined with the begin‐
-              ning part of the original word, and the expansion  of  the  last
-              parameter  is  joined  with  the last part of the original word.
-              When there are no positional parameters, "$@" and $@  expand  to
-              nothing (i.e., they are removed).
+     "x$@y"    yA" "B" "Cy"
 
-We know what "$@" is supposed to do.  And something like "x${@}y" is
-well-defined also -- you simply prefix "x" to the first word, and append
-"y" to the final word.
+So the only consistent behavior I see is
 
-But I don't know how "$@$@" is supposed to be interpreted.  I do not see
-anything in the official wording that explains how it should work.
+     "$@$@"    A" "B" "CA" "B" "C"
+                        ^-("$3$1")
 
-Therefore, *my* question is: what are you trying to do?
+     "$@ $@"    A" "B" "C A" "B" "C"
+                        ^-("$3 $1")
 
-Given a series of positional parameters, such as
+I'm really currious: do you see another one ?
 
-    set -- '' "two words" foobar
+regards
 
-what do you expect "$@$@" to expand to?  Bash 5.2 gives me
+--=20
+Marc Chantreux
+P=F4le CESAR (Calcul et services avanc=E9s =E0 la recherche)
+Universit=E9 de Strasbourg
+14 rue Ren=E9 Descartes,
+BP 80010, 67084 STRASBOURG CEDEX
+03.68.85.60.79
 
-    hobbit:~$ set -- '' "two words" foobar
-    hobbit:~$ printf '<%s> ' "$@$@"; echo
-    <> <two words> <foobar> <two words> <foobar> 
-
-which appears to concatenate the last word of the list and the first
-word of the list -- a reasonable output, I would say.  Here's a clearer
-look:
-
-    hobbit:~$ set -- a '' b
-    hobbit:~$ printf '<%s> ' "$@$@"; echo
-    <a> <> <ba> <> <b>
-
-I can't complain about this result.  But at the same time, I can't say
-"this is the best possible result".  Other interpretations seem equally
-valid.  I just wonder what your intent was, in using the "$@$@" expansion
-in the first place.
