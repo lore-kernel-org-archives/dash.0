@@ -1,87 +1,109 @@
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sdaoden.eu (sdaoden.eu [217.144.132.164])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759821386C6
-	for <dash@vger.kernel.org>; Sat, 17 Aug 2024 23:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F125EC5
+	for <dash@vger.kernel.org>; Thu, 22 Aug 2024 22:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.144.132.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723938379; cv=none; b=iKzr5MzI6exHGt1Vz1fQo/FGUhnJZcsGRx90uKZPXaSHyhsAow+UBU4BlHgTeX9lg71jRJbRAKtp75SjkiV3EoFi5m9VnyoLd9HC8i/+iHSGD6mziFqfX7T6kQYPg2i+EgnXNimiseTT6Yl8Pk/0P6LtSKfs+Y1VntWTjb22oiM=
+	t=1724365388; cv=none; b=c5dv5ZOoa7GNGiGl86ESYzPNM+ggzlxXqaR3xH1I6F8uJ1qZSDnsm6Or8Yny//tEBHfFG+yMii32P80OaJXafl4gQIeq15SwLZUYBZjYBrqD52V5JTnzf/Vb3Zlxg1an82WM8VHVoQAqaKnDsTaXcHPdGQ2VhjX1//xDqllZ/sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723938379; c=relaxed/simple;
-	bh=QKNRlgNi7oKQBytVPbbvwqIq+DXphOEl8NbRZ7Dwp1k=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=DLHxYi/e6DNMAbQ+9m4nQ2bmv7sz0ua6gV4+N/DBipXmmMSTYhavG5ONnOirr08itU7NnMjyIjbBD9aKLZbNw3nzAwD4TpDTtmUICKn5Ch63WQmpfEjzR0fqcrBX/5L/Rvz/1SSwe+wiZo34iCYiyTb3vmXNbcvsBi0FJG+Xpes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VLaea3Ci; arc=none smtp.client-ip=209.85.161.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724365388; c=relaxed/simple;
+	bh=tMET398meCWCSKP1d3ynKKzA8CboMjitHRQQufmq4yI=;
+	h=Date:From:To:Subject:Message-ID; b=XtnK6V6T1iSZPP5VX5dqmzxLRiBJjO9pdPUa7ySy9IpQ7xkemjgFaquG0F+tduArPLreEluYjXaC3eCJATkv8gOLTGss0GNtxqchrePbKuBfUIX3esx2NdlzE0vv7JwtXlQKfFkuQVriWqGaGLB+DI9Tci8u/BW44wlgdLfAdi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu; spf=pass smtp.mailfrom=sdaoden.eu; dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=kA00TNnm; dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=rQ+eNDtg; arc=none smtp.client-ip=217.144.132.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sdaoden.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VLaea3Ci"
-Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5d5aecbe0a9so1882580eaf.1
-        for <dash@vger.kernel.org>; Sat, 17 Aug 2024 16:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723938377; x=1724543177; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QKNRlgNi7oKQBytVPbbvwqIq+DXphOEl8NbRZ7Dwp1k=;
-        b=VLaea3CisckfUkVp5v2W6PoCcKiPQs+pxKf+XJ0m2+wTyMzG3PTkr7cjfLTk0ZdcOC
-         KN0EfOTTNU+jOFTWtBNE98iB+KsvhDnTa4VfExKIWL1OkWmjDyXMpgpLLj5R79f1B1a8
-         4Ll5PQ9QZH376nn+bhs3UyB4sDXe7OVLPwnzR9HVgJWadQS2tI8mopVd3Ex9O18WaQk2
-         /gwuYhKln0aWX+G/H2mxPepVs8Qg1XBZCwfdZ/CC3DEGiFQKvDctqPT96xPdMoZG+gm7
-         5z3Z++U4WwOA/4c8oT4FDUmnwtiZ33OWxI7Bp6q8XIVeeSmej3/lDQ3TDDRdGDKHBRjd
-         1KUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723938377; x=1724543177;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QKNRlgNi7oKQBytVPbbvwqIq+DXphOEl8NbRZ7Dwp1k=;
-        b=leTTb+ceD4QOExTlo0a5AQCJcvLux3NdsfPK8kd0r3sMwbsOp93pMcRltn0O1mtLtI
-         i0Z/w5drZAXirfDRmE2CHg6pThBiyPJGpfCWrrYsvJI3e95G1LB8YLW+dKpmTA2MPr9w
-         2ux1BXn6OvRFDmFi86IW+oO2cSqtOVMnP+38RLaNua7031R0iEqKYvv7mnAC3yuW2Zbk
-         OBO1tHhhAxmcrWuxsCTlWolMUm+Cc2eofS/1Rf6YxC/5kURl+x9D5KB0nKduy/K7t5nB
-         LucuI3Vztp1Lf7Gk5jthb2ZAKOGeArBbHqAlaA4a+wGcjqIX1BrL22DEQoKJ6U4jytxP
-         G34Q==
-X-Gm-Message-State: AOJu0YzS858dNGi+IiI/WtaA3atbxowcrseuptJ+ydDrqU2cRgmR76ar
-	MurdhUjm6TEhhx1cFF+0UTKQTk6TF7Xka5fpaf5sl1bgMfbHpeAh6LuPNNwr5jjwIbpbRujbUfC
-	1f1NUAA44W8Orcs//tB+10mbNm5eYDKuk
-X-Google-Smtp-Source: AGHT+IHkDk3j2EKI0S70K+CXkTaiWGYDI4Sk7u1iz5v9N7ycmvhMFFw6Ix8Hi38YaYsHrOGwxX4P9IlzNbcrXdWIWHQ=
-X-Received: by 2002:a05:6830:6189:b0:708:8c07:c646 with SMTP id
- 46e09a7af769-70cac8ddf50mr8494748a34.33.1723938377281; Sat, 17 Aug 2024
- 16:46:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="kA00TNnm";
+	dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="rQ+eNDtg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sdaoden.eu;
+ s=citron; t=1724365376; x=1725032042; h=date:author:from:to:subject:
+  message-id:openpgp:blahblahblah:author:from:subject:date:to:cc:
+  resent-author:resent-date:resent-from:resent-sender:resent-to:resent-cc:
+  resent-reply-to:resent-message-id:in-reply-to:references:mime-version:
+  content-type:content-transfer-encoding:content-disposition:content-id:
+  content-description:message-id:mail-followup-to:openpgp:blahblahblah;
+ bh=afPqFFZtyam5rGUFR62TIl2HYcj+6S0lIVLB1euWUPE=;
+ b=kA00TNnm/0AMt3GQMOTG0jocH3cgXbJzhJsVXDfksG1K+R8xM2rtzLZ1S3w+FhE1dTadxPXG
+  47LqknRcNMmQ9IzXoSlu2gEuQeXxuNzNjlTj+s23qEgYnhLgiRHklenR71oYfCXp05q5D2LAJH
+  zoKEF9P657VS3fehcGRW3V/aE9JIIhHAizrAgOD6wALtH4u/coed52pmJNjTLhOBnZE+78/KJx
+  RRF+/mCbVjX533EtWutk+nSrAEDxKA2W8jvCmd2WQiSjrTQoK1cQG6/3sEtN2wjeteJbwPiPrf
+  8i+7758V4AufG0dwXRJs8ykCzrlSfe6/yBkyyFKcDHC/UHsg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sdaoden.eu;
+ s=orange; t=1724365376; x=1725032042; h=date:author:from:to:subject:
+  message-id:openpgp:blahblahblah:author:from:subject:date:to:cc:
+  resent-author:resent-date:resent-from:resent-sender:resent-to:resent-cc:
+  resent-reply-to:resent-message-id:in-reply-to:references:mime-version:
+  content-type:content-transfer-encoding:content-disposition:content-id:
+  content-description:message-id:mail-followup-to:openpgp:blahblahblah;
+ bh=afPqFFZtyam5rGUFR62TIl2HYcj+6S0lIVLB1euWUPE=;
+ b=rQ+eNDtgDsq/ZSHQ60kmTaOs9kA5btbwx6TT9Fisss1T8pr5/aP2Ty+Aztat/vJjrCRELOGj
+  wK3MUq4oo5VKAg==
+Date: Fri, 23 Aug 2024 00:21:19 +0200
+Author: Steffen Nurpmeso <steffen@sdaoden.eu>
+From: Steffen Nurpmeso <steffen@sdaoden.eu>
+To: dash@vger.kernel.org
+Subject: IFS bug (maybe)
+Message-ID: <20240822222119.ijDODf_7@steffen%sdaoden.eu>
+User-Agent: s-nail v14.9.25-599-g5c75a327b2
+OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
+ url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
+BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
+ the world can make no bugs.
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Sebastien Peterson-Boudreau <sebastien.peterson.boudreau@gmail.com>
-Date: Sat, 17 Aug 2024 20:46:06 -0300
-Message-ID: <CAGPRubTtcy+XPNrd3koy1Jp9to1Sg5afSG-pnu7KNoCULMAciw@mail.gmail.com>
-Subject: ANSI escape sequences not being respected in PS1 environment variable
- when vi or emacs options are enabled
-To: dash@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-In my `.profile` I have the following:
+Hello.
 
-> export ENV=$HOME/.rc
+I still stick to that $IFS stuff, and see another difference for
+dash (0.5.12) compared to bash and busybox sh:
 
-and then in `.rc` I have:
+  a() {
+    echo $#,1=$1,2=$2,"$*",$*,
+  }
+  echo ,"$*"$* $*,
+  set -- a b c
+  echo ,"$*"$* $*,
+  IFS=:;echo ,"$*"$* $*,;unset IFS
+  echo 1
+  echo "$*"$*; a $* "$*"
+  echo 2
+  IFS=:; echo "$*"$*; a $* "$*";
+  echo 3
+  IFS=; echo "$*"$*; a $* "$*";
+  echo 4
+  IFS= ; echo "$*"$*; a $* "$*";
+  echo 5
+  IFS="	"; echo "$*"$*; a $* "$*";
+  echo 6
+  IFS='
+  '; echo "$*"$*; a $* "$*";
+  echo 7
+  IFS="\011"; echo "$*"$*; a $* "$*";
+  echo 8
+  IFS="\012"; echo "$*"$*; a $* "$*";
 
-> export PS1='\033[36$ \033[m'
+and that is
 
-These escape sequences are interpreted by my terminal to colour the
-text, and do so correctly when executing dash normally.
+  @@ -27,8 +27,5 @@ a
+   b
+   c,a b c a b c,
+   7
+  -a\b\ca b c
+  -4,1=a,2=b,a\b\c\a\b\c,a b c a b c,
+  -8
+  -a\b\ca b c
+  -4,1=a,2=b,a\b\c\a\b\c,a b c a b c,
+  +4,1=a,2=b,8
+  +4,1=a,2=b,a
+  \ No newline at end of file
 
->dash $ dash
->$
-
-However, when vi or emacs options are enabled (either through command
-line option or with `set -o`) these escape sequences are interpreted
-as literal text.
-
->dash $ dash -V
->[36m$ [mset +o vi
->$ set -o emacs
->[36m$ [mset +o emacs
->$
-
-Thanks for any help :)
+--steffen
+|
+|Der Kragenbaer,                The moon bear,
+|der holt sich munter           he cheerfully and one by one
+|einen nach dem anderen runter  wa.ks himself off
+|(By Robert Gernhardt)
