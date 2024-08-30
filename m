@@ -1,32 +1,32 @@
 Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9DA1BE24B
-	for <dash@vger.kernel.org>; Fri, 30 Aug 2024 20:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64560EEC3
+	for <dash@vger.kernel.org>; Fri, 30 Aug 2024 20:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725049067; cv=none; b=TffAP619YcyT3SmbUOCx2gz46HeeZOyLnFR7yFLM4xU32Kcz/2ndALUU8bomxknhUTHi8bEfsIyTfN5kCXVX64qvxIowl+hp9ZnmCpo72RUppx9B59q/N15bRXIgsddy0LDDQlr3UPN4qru0+mrUk+EKvYblmevcb+r5UcY/+pM=
+	t=1725049482; cv=none; b=ciXcXkHA9oJT/utMVK3576RABjiatu6PXMI4mRoIQTPkm3bQSxp4slX3ShI1VeuHyAtFse0wLyAT10RuWVk8v7y6vThDm0AEnbrEQmLd08sH1ky7r+VbvRJnIFe9myWATJgNbp43eyf9+b36BZbSi6u1N6DOxCfHA8d1KDoV7ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725049067; c=relaxed/simple;
-	bh=zkIjc68gQ0WOxWgcY57GWHYmh1y4xG6JaOjCYQkMzo4=;
+	s=arc-20240116; t=1725049482; c=relaxed/simple;
+	bh=PlYuMlI2jKzuLHeeXlHvMk624MmwkAyh9puG2wjeC+s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ale49ZXRtUutwor0FpCjGlwPnHDpeFRf3UNHngPVv/2/ulXvwqnZEd/IugpYxc0WfjjA4/aiJAxvIChnysvJrs4RxcLOsVDhWq27ibD2ND9KruoCUeqh2Jb0OAiSazSV09xlGDvAaAFLaH4J1kTiBsFsDBjWr/3ZVQL9vFKr6h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=ORWln+xO; arc=none smtp.client-ip=51.68.198.76
+	 In-Reply-To:Content-Type; b=RtsNo2rGn5t/G8sMlcuYLOFupdOIXyhQ6cjtiYpuOOcUZJzB7DFsbfUBGpenE9yNMjn0s2iZOmnZn8oNOiIfiIzPNiFYsh5QfTvddliPv83hG58JTxdwePge2hHtIJzL/tRuIYJrMveJDmZyP5pdJ1dDvut/HjsjlurhpXxhp4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=A714O1/Z; arc=none smtp.client-ip=51.68.198.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="ORWln+xO"
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="A714O1/Z"
 Received: from [IPV6:2a02:8010:68a1:0:aa8:4aa0:420a:466c] (unknown [IPv6:2a02:8010:68a1:0:aa8:4aa0:420a:466c])
-	by mail.gigawatt.nl (Postfix) with ESMTPSA id 53EC951;
-	Fri, 30 Aug 2024 21:11:03 +0100 (BST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 53EC951
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id E680A512;
+	Fri, 30 Aug 2024 21:24:37 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl E680A512
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1725048663;
-	bh=XsB+XI64X+RbB3AqvhyFvu/zg4m/DohDiGYve1dMjdc=; l=1412;
+	s=default; t=1725049478;
+	bh=4nw5mGNe1lVQ3u35iOMCCV/HfeGct9Mw+Kir5zBjyaY=; l=914;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=ORWln+xO/fhMdG6aQbJ0bDmjDBPQQjYadc76q/zAshcaSLfpUjOXBeiAAZs6Eh8iQ
-	 0dSeLS51ltOSExHA8oEDfGMken6paRgLschdxW1FWWYk03s0zrBLZU4maBy5H/L9+G
-	 TTMOhqhJ5mre/YnEjsK39IQLvs8qVelCqO8ZpyMk=
-Message-ID: <58645737-6af4-493e-8674-378c574fa78c@gigawatt.nl>
-Date: Fri, 30 Aug 2024 21:11:00 +0100
+	b=A714O1/ZeZ7qajFyqfZZhxeWEvMpRpkqrehGfa4tYDZZ+8b7yBrZoitzK4rbDP0j1
+	 /Bvm3+K9yNkFOu3iHooEAOAjJcB0Bf7jaIGRutq7IWPyuQtGZSeTfU8AaeHk8rxu90
+	 MQG/42m2uZQAuNxUDX0eShTZP0/WMCwY/ZzUgG1A=
+Message-ID: <63da0ea4-61a5-4095-9aaf-036e3faed245@gigawatt.nl>
+Date: Fri, 30 Aug 2024 21:24:37 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -39,49 +39,30 @@ Subject: Re: Why does the command builtin not circumvent invocation of
 To: =?UTF-8?Q?Anselm_Sch=C3=BCler?= <mail@anselmschueler.com>,
  dash@vger.kernel.org
 References: <9098f57c-66f1-40fc-a714-b73d208c81d6@anselmschueler.com>
+ <58645737-6af4-493e-8674-378c574fa78c@gigawatt.nl>
+ <74ff2a7c-e973-443c-8006-07a6c17dbec7@anselmschueler.com>
 Content-Language: en-US
 From: Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <9098f57c-66f1-40fc-a714-b73d208c81d6@anselmschueler.com>
+In-Reply-To: <74ff2a7c-e973-443c-8006-07a6c17dbec7@anselmschueler.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi,
-
-On 30/08/2024 19:28, Anselm Schüler wrote:
-> The dash(1) manpage reads:
+On 30/08/2024 21:17, Anselm Schüler wrote:
+> I see that I have misinterpreted the text. Thank you.
 > 
-> command [-p] [-v] [-V] command [arg ...]
->         Execute the specified command but ignore shell functions when 
-> searching for it. (This is useful when you have a shell function with 
-> the same name as a builtin command.)
+> You wrote “This also matches how "command" works in other shells as 
+> well.”. I wanted to note that this is not how it works in Fish, where 
+> e.g. command cd will try to execute a binary named cd from $PATH. I 
+> believe this is where my incorrect understanding may have stemmed from. 
 
-This implies that it does not ignore builtin commands, because otherwise 
-it would not be useful for this purpose.
+Ah, thanks for that information! I should have said "in other 
+POSIX-compatible shells": fish does not try to be compatible with other 
+shells, it tries to be its own better thing (and I generally like what 
+it does), and there are going to be other confusing differences as well 
+when trying to move from fish to more standard shells.
 
-> Because of this, I expected commands like command . or PATH= command 
-> true to fail. They don’t.
-
-. and true are builtin commands, not shell functions (at least not by 
-default), so they are found.
-
-This is how it is meant to work. The parenthesised comment is there to 
-highlight that you can do things such as
-
-   echo() {                  # shell function
-     command echo "$@" >>log # builtin command
-     command echo "$@"       # builtin command
-   }
-   echo hello # call shell function to print both to log and to stdout
-
-(Mind you, this is an intentionally silly example that nobody should 
-write this way, it just demonstrates the concept.)
-
-Here, it is important for "command echo" to find the builtin command, 
-not the shell function. If it found the shell function, this would 
-recurse infinitely. If it did not find the builtin command, this would 
-not necessarily print anything.
-
-This also matches how "command" works in other shells as well.
+Other POSIX-compatible shells that are useful to compare to to determine 
+whether behaviour is likely to be intentional include bash, ksh, yash.
 
 Cheers,
 Harald van Dijk
