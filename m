@@ -1,121 +1,79 @@
-Received: from sdaoden.eu (sdaoden.eu [217.144.132.164])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4727F4405
-	for <dash@vger.kernel.org>; Wed, 18 Sep 2024 01:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.144.132.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CDE4D8CE
+	for <dash@vger.kernel.org>; Wed, 18 Sep 2024 05:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726622876; cv=none; b=F5x9pIY4GOb9gIwYNgttMNkrOpOxzzAtWzZvgmOphHpEweU9YV7Mnbmg1uLWJQCGEcv1aVye0LGtqKMfEC6fe34IgQyDVMYxtuTIkdzvST6cZuA9PJrfplfGK+83ATrF5iqLWO1cUS2ipfd6mQBqUMwFOlZeVfkWuU179dSefro=
+	t=1726635898; cv=none; b=XR5IsJ+gkhKvd5jVgdlqOGH25tqLhQUFo/obBacN9lTGDpF6eEEyUW01YISgWBoH09CCBL2wuBvpr43twOC4Y3H2DmpqmymmTosRDvAjlSRst6OBRbYvnhS2R2O5JxRQV7taVvj/hGU3YTodr1BMOST/Ya+9MuA9hgFoBP3oUrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726622876; c=relaxed/simple;
-	bh=aw5BeoNYPRwtmKzMTyQHQ7iqMoFYcO0u1BRd9Nl8/rw=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=GEsX0KrySAMNqQSgqhEqoJFuuHebbiBZ5JKZwsHgEHZAxk+h4K5rKLVL5fmrsKdQHoEJYVYmKzgIBQ2LYpjo2OXDFIT6AAi/uViP1VMCnK33Dv3E1CFba3P/9AoGbyIpU4bMOg9mD5N+aTmQHJgLLT3ekm0TlIOIeAWiQdN4RSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu; spf=pass smtp.mailfrom=sdaoden.eu; dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=EtkY1sDg; dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=thOsWluk; arc=none smtp.client-ip=217.144.132.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sdaoden.eu
+	s=arc-20240116; t=1726635898; c=relaxed/simple;
+	bh=FUKlHY80j90ZjYEv+6XsJ9N90T0DJ01wXC6dYQyIsPE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=trH1R77sGYR8BVLc8wg3j+QD3iVJfF8KCxMNMph0mg4YPWfCcvL0/M/l41WT85BcZh5luMfT16yqyh1Y0/ioPqSW1z0phs5YaIcJZ1aLLXaqGDILeMWPPWR1w9f54Kj87Th14upxvLWkzy3PkCXcQraX/p/3SZTHYJKiJnTOSZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H0ZZyvMz; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="EtkY1sDg";
-	dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="thOsWluk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sdaoden.eu;
- s=citron; t=1726622322; x=1727288988; h=date:author:from:to:cc:subject:
-  message-id:mail-followup-to:openpgp:blahblahblah:author:from:subject:date:
-  to:cc:resent-author:resent-date:resent-from:resent-sender:resent-to:
-  resent-cc:resent-reply-to:resent-message-id:in-reply-to:references:
-  mime-version:content-type:content-transfer-encoding:content-disposition:
-  content-id:content-description:message-id:mail-followup-to:openpgp:
-  blahblahblah; bh=htF+rDwY3DxUmwNSMU3FGPfu+pTEklXfUHtIWHkRXDY=;
- b=EtkY1sDg4um1ewV4ntMVKeuRqt/ISiHlSklXC/Vox64t7M7u1cFW0YhtWqbaPWcEXZ1ApuHQ
-  By44uoJ1fzm/29RcnHaJaxxwTcFuIEbdc4RB6BmDBbQHe75SQR1bNZ2pMylNqC6deDOVrWe4Bn
-  U4Wt3qqw/AfcEj697ma5NfgotWxeaPsfSYAyBnKUsY3/nTg9MivG1KILywg0/Ao1u0Pn9upazv
-  oJ+Vfabv5drfydELdoKPQKz3EgF0GNWux1DTArP/PVdMW4bCHsCAg5R0IbHjUgcPRUvH1H1mSD
-  N5z4bqY33IWgPxlE1jskkUF7c8tc3W3Sogr9TpUqdQFNeo9Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sdaoden.eu;
- s=orange; t=1726622322; x=1727288988; h=date:author:from:to:cc:subject:
-  message-id:mail-followup-to:openpgp:blahblahblah:author:from:subject:date:
-  to:cc:resent-author:resent-date:resent-from:resent-sender:resent-to:
-  resent-cc:resent-reply-to:resent-message-id:in-reply-to:references:
-  mime-version:content-type:content-transfer-encoding:content-disposition:
-  content-id:content-description:message-id:mail-followup-to:openpgp:
-  blahblahblah; bh=htF+rDwY3DxUmwNSMU3FGPfu+pTEklXfUHtIWHkRXDY=;
- b=thOsWlukTWN4sNiP3tvDnqeTEFQTzGZLIYbXLMmYbai588aItFoPuKVUMGAX++1CJaUbRMPa
-  0gs+Hh6ILnYKBA==
-Date: Wed, 18 Sep 2024 03:14:43 +0200
-Author: Steffen Nurpmeso <steffen@sdaoden.eu>
-From: Steffen Nurpmeso <steffen@sdaoden.eu>
-To: dash@vger.kernel.org, busybox@busybox.net, bug-bash@gnu.org
-Cc: Steffen Nurpmeso <steffen@sdaoden.eu>
-Subject: Question on $IFS related differences (Was: Question on $@ vs
- $@$@)
-Message-ID: <20240918011443.AVR6sOQ3@steffen%sdaoden.eu>
-Mail-Followup-To: dash@vger.kernel.org, busybox@busybox.net,
- bug-bash@gnu.org, Steffen Nurpmeso <steffen@sdaoden.eu>
-User-Agent: s-nail v14.9.25-608-ge479530e8d
-OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
- url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
-BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
- the world can make no bugs.
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0ZZyvMz"
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3a0b5973fe0so5151465ab.3
+        for <dash@vger.kernel.org>; Tue, 17 Sep 2024 22:04:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726635896; x=1727240696; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sfoukLViKTEKyVuQAAn/2FIzBnBpwZVQgeZcGaoqyrw=;
+        b=H0ZZyvMzPn0P7wC8PxLuZgz+ewYpJBChtVjwIUJeK+IeQQKNFMhyVGMWbYvkM+uELL
+         KQaxwafI0JRIevhhz1edME8KoIA7KhOcYbkM1sVWd0SUYSE2MXNCA6iWOVkffstFWsor
+         1vExew7tZIVQ9rUmOAUbqQoJoj7sVDnKDQJfNKQwyAVnMqx9+25/8ksffPZolzmw8fpQ
+         i0m2w1z04VirlylYTVfWUN9sHVbtSn/sDz70MQ0/s+AIlt9lsLJX9RFEdGoSJL5gwv5o
+         9pjc/9+5pa/v1ocegxPTR6HK6rihe+CNY/D1n6P4Ah/vl9gNWkmvPHSS9ggYf7FYTvo2
+         ZxSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726635896; x=1727240696;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sfoukLViKTEKyVuQAAn/2FIzBnBpwZVQgeZcGaoqyrw=;
+        b=q64OuwCi0QiRa8H3JqNQISGphOxWJBChlqTTy/V5Przo8pt/uATcEfMykqtB+ECteF
+         K07fTph+bU5iBwlZF1GEoQLIb4A86p7LqnLzVn3IUJbF/PXthIGH+wpObUmfAEVGMNoc
+         oj332S76jLTRmjxIgl7lM9Ojt7/600ioKYEeWotGUOaIcC8P2NAj2nBlqm6fgWibRhq9
+         z0y6PLi15O5nvBjHvmZllT6fE5x/DHsNK20Y7QTfEPNAkpKfgAhrO9XRYa/J25ijyqzw
+         qsdEfCl+Q/sSNtKC9zkwufCPawY/90K2ZVVEdDF4ftkEpKRWfOsaP39DAaOXPrQvgOjr
+         SjyA==
+X-Gm-Message-State: AOJu0YyANnRBV0OCfZT9ws9GXvyTokePxtJDAKsoHrATl0yfn1hgpPAr
+	nWBjGMJIqhVo7AEKutE71NS4HXpcfmTVxp+FF0vhanm4hdubfISNy12osliAnzUIxYAJSGLJYy5
+	zwLJW3abHVOkq6V+uxwnRIveOTAz8MXL3
+X-Google-Smtp-Source: AGHT+IFk3XGCRpqKbPiKw0EmqIePFmT4Zd0j7S9+YBYPrOkkZs0K/HEuCr4CoWhNWjDnqU3SQpJp3oGrbt6zARK2oF4=
+X-Received: by 2002:a05:6e02:1489:b0:3a0:8edc:d133 with SMTP id
+ e9e14a558f8ab-3a08edcd3abmr142176575ab.9.1726635896280; Tue, 17 Sep 2024
+ 22:04:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240918011443.AVR6sOQ3@steffen%sdaoden.eu>
+In-Reply-To: <20240918011443.AVR6sOQ3@steffen%sdaoden.eu>
+From: =?UTF-8?B?T8SfdXo=?= <oguzismailuysal@gmail.com>
+Date: Wed, 18 Sep 2024 08:05:10 +0300
+Message-ID: <CAH7i3Lq9xQnnkAO7cd5XZEsV4jY+Va6uWqjw3yaMi=A3mdh83g@mail.gmail.com>
+Subject: Re: Question on $IFS related differences (Was: Question on $@ vs $@$@)
+To: dash@vger.kernel.org, busybox@busybox.net, bug-bash@gnu.org, 
+	Steffen Nurpmeso <steffen@sdaoden.eu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello.
+On Wed, Sep 18, 2024 at 4:19=E2=80=AFAM Steffen Nurpmeso <steffen@sdaoden.e=
+u> wrote:
+>
 
-I am terribly sorry to be here once again; i already mentioned on
-bug-bash@ the problem with IFS being reverse solidus that dash
-(and myself) has (have).
-I came back to this for my one again, and i stumble over one
-additional difference in behaviour in between (myself and) bash,
-dash and busybox sh.
+It boils down to this:
 
-We are still here, and this snippet gives identical results for
-all, my MUA included,
+  f(){ echo $#;}; set "" "" ""; IFS=3Dx; f $*
 
-  a() {
-    echo $#,1=$1,2=$2,3=$3,4=$4,5=$5,6=$6,"$*",$*,
-  }
-  set -- '' '' ''
-  IFS=' '; echo "$*"$* $*; a "$*"$* $*;unset IFS
-
-ie, via "cat -vet":
-
-    $
-  1,1= ,2=,3=,4=,5=,6=,  , ,$
-
-*However*, if we change IFS to : in the above:
-
-  a() {
-    echo $#,1=$1,2=$2,3=$3,4=$4,5=$5,6=$6,"$*",$*,
-  }
-  set -- '' '' ''
-  IFS=':'; echo "$*"$* $*; a "$*"$* $*;unset IFS
-
-then we get different behaviour for bash on the one side, dash and
-busybox sh on the next, and myself on the third.  bash 5.2.32 says
-
-  ::   $
-  4,1=  ,2=,3=,4=,5=,6=,:::::,     ,$
-
-whereas the ashs say
-
-  ::$
-  1,1=  ,2=,3=,4=,5=,6=,::,  ,$
-
-and i say the same as for SPC except that : is in place of SPC:
-
-  ::$
-  1,1= ,2=,3=,4=,5=,6=,::, ,$
-
-I really would like to finally get a nice mind map on what is
-going on everywhere.
-
-Thank you very much in advance,
-Ciao (and good night),
-
---steffen
-|
-|Der Kragenbaer,                The moon bear,
-|der holt sich munter           he cheerfully and one by one
-|einen nach dem anderen runter  wa.ks himself off
-|(By Robert Gernhardt)
+bash, NetBSD and FreeBSD sh, and ksh88 all agree and print 2. pdksh
+prints 3 but mksh and oksh print 1. dash, ksh93, yash, and zsh print
+0.
