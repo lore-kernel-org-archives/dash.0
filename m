@@ -1,91 +1,104 @@
-Received: from sdaoden.eu (sdaoden.eu [217.144.132.164])
+Received: from relay01b.gzo.com (relay01b.gzo.com [96.31.72.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B793C6BA
-	for <dash@vger.kernel.org>; Fri, 27 Sep 2024 23:37:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.144.132.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEE54D8CB
+	for <dash@vger.kernel.org>; Sun,  6 Oct 2024 17:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.31.72.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727480252; cv=none; b=ns0EVglpuqIyhHPuACSezuvRxQBSWSDoCnhKkYVPNN6GthC6CyfwoUhV9eyoRwbwxhB7sU1TXsfyc1F0LE/XWdff/uDrDMC6nnnGDPqeKpcLwEcP4q0klc7G6eZNZfFglHArIgbnjDcjJhUskRQPNEUAm3b8iF3FNBcd69dlyZ4=
+	t=1728236234; cv=none; b=VpseaxtRhF4BOxiq3qaEa0GqOpzKuNxrO/NX2vpdzx67/raH5o30nRQFLgpTs0F6eoY0kgURbGvGHBYtorn5XBga6bdD4TWoF2kWX01dGVI+rRlc0h8dpFxBKk15qkyh5jISduWp+q9rixhMbIkA+CTj51BwYi3qG5hzb//5hGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727480252; c=relaxed/simple;
-	bh=tKVQIBwWU2ZvV+fyzSkdXUBWLFMGKGxhG8gRGIJkW0c=;
-	h=Date:From:To:Subject:Message-ID; b=rEDIgEC3baCQ4f6oOV8Gz2TMgriCkRvKXga5Ho+55tzCe75JQotjTBR0xbFzrEk8dI22yQPXoIWKRy6B+k+TfB4IcdhRzIK1JeDWBdJJ55b8CvkHXCJc4o8x+04htJ45z4jy/iKdPXsL6UUlACz+x0WcG+NCb6wO7Vlg1ktl1iY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu; spf=pass smtp.mailfrom=sdaoden.eu; dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=Qp6kqrIe; dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b=DMNaWM/V; arc=none smtp.client-ip=217.144.132.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sdaoden.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sdaoden.eu
+	s=arc-20240116; t=1728236234; c=relaxed/simple;
+	bh=H6Ar0OaC0UDAbyCx41B5lGtBrzGk+ssSqDfQjSUDWX8=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To; b=fn7duiQBTaR9LMM5kbtiH8DGS1UBXcU1Z9tsG6BkdmGLR57WTOoHROmQv7VE1seEmFk8Tgv9UsqMjM6DdmiHJQ7JVFskThcnGK5G3bX7WWhO7tPkzTuau5BTvT4pgtUD6vHsMOzxWCputm1Dbch2xcWwkh0NZbMdbfV6c8mDP78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shurup.com; spf=pass smtp.mailfrom=shurup.com; dkim=pass (2048-bit key) header.d=shurup.com header.i=@shurup.com header.b=18Hc7U8j; arc=none smtp.client-ip=96.31.72.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shurup.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shurup.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="Qp6kqrIe";
-	dkim=permerror (0-bit key) header.d=sdaoden.eu header.i=@sdaoden.eu header.b="DMNaWM/V"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sdaoden.eu;
- s=citron; t=1727479791; x=1728146457; h=date:author:from:to:subject:
-  message-id:openpgp:blahblahblah:author:from:subject:date:to:cc:
-  resent-author:resent-date:resent-from:resent-sender:resent-to:resent-cc:
-  resent-reply-to:resent-message-id:in-reply-to:references:mime-version:
-  content-type:content-transfer-encoding:content-disposition:content-id:
-  content-description:message-id:mail-followup-to:openpgp:blahblahblah;
- bh=mtjVTe2tyOabvBhOWaGww+CffSvtHDs4KGp13o6Mk8c=;
- b=Qp6kqrIeEFU51JP9JHQtTCrmpVYSP6qzACCt/Xn5qcuTVOM5SsczgJ8ubP+IkmmKrD0q7+nu
-  VBOsV/7xQT1z9VB3920gkxD0jMzeR/IfxyreslArhhc8XieWrbvq+hWXKoATn/bv6NWjXcde9H
-  rLdhk/OnQT/A3443eFIxBqqOUu63MeQ8o9a2YlootdcqFrGHHtglKs8yHAcg0Uiu97dzP/S7Yo
-  YUnvVcUiqB7UM1iKkC8sAnImxaV/oG2N15HSb0m3tJCw4QiU9FR1E8rI4ryOXsIS8yfKpKADm0
-  VKQ0Exr4GSU5dzb12HEIQJnwargVcj7zsWskvMNmZTpYeVhg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sdaoden.eu;
- s=orange; t=1727479791; x=1728146457; h=date:author:from:to:subject:
-  message-id:openpgp:blahblahblah:author:from:subject:date:to:cc:
-  resent-author:resent-date:resent-from:resent-sender:resent-to:resent-cc:
-  resent-reply-to:resent-message-id:in-reply-to:references:mime-version:
-  content-type:content-transfer-encoding:content-disposition:content-id:
-  content-description:message-id:mail-followup-to:openpgp:blahblahblah;
- bh=mtjVTe2tyOabvBhOWaGww+CffSvtHDs4KGp13o6Mk8c=;
- b=DMNaWM/V1X1Hkj01uE0HQgFS8X9WuEIw/K/klTFr5BMEdaSKOHmefo4AgSNJneT52v5Q6S/1
-  NacvvTLPGHOhBg==
-Date: Sat, 28 Sep 2024 01:26:52 +0200
-Author: Steffen Nurpmeso <steffen@sdaoden.eu>
-From: Steffen Nurpmeso <steffen@sdaoden.eu>
-To: dash@vger.kernel.org
-Subject: procargs(): interactivity falsely detected (acc. to POSIX)
-Message-ID: <20240927232652.bpLrmgJb@steffen%sdaoden.eu>
-User-Agent: s-nail v14.9.25-608-ge479530e8d
-OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
- url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
-BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
- the world can make no bugs.
+	dkim=pass (2048-bit key) header.d=shurup.com header.i=@shurup.com header.b="18Hc7U8j"
+Received: from cpanel84.gzo.com ([96.31.72.74]:39210)
+	by relay02.gzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <yury@shurup.com>)
+	id 1sxUjS-0000000DC7q-2Iaq
+	for dash@vger.kernel.org;
+	Sun, 06 Oct 2024 12:07:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=shurup.com;
+	s=default; h=To:Date:Message-Id:Subject:Mime-Version:
+	Content-Transfer-Encoding:Content-Type:From:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=H6Ar0OaC0UDAbyCx41B5lGtBrzGk+ssSqDfQjSUDWX8=; b=18Hc7U8j0ZadYVtBkq16Zv4nG9
+	FJNkJ0zVoMHNq6UeWFrYliP9dsC1MUIOgOtLDVadA16JHxEqyVn3FRNFKJLHY/eiVfrZLr5QYiCQV
+	G/kCxrFb5PMhPgK6tf5AMqAqOnO2aX2+IznJZVG+od2JEFpwWrvjYQF96hpMWfizgkHUDJ324UvJg
+	PwwejXWBbd5X4mCpB1E/NimGHenOYbunCdmpSV85fLnvB+qXWEtR4quVr4LiF8GbjTDD2E5uNezsU
+	D4qWVKg/Qb+VlUeuilXAdlwMeqRhNUBIyeCIz+fzFunO2SOx2z2xFbS8EXAoDfA0FxwPjEzrgPLZ+
+	wTZ3WGCA==;
+Received: from [178.202.191.217] (port=48412 helo=smtpclient.apple)
+	by cpanel84.gzo.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <yury@shurup.com>)
+	id 1sxUjS-00000002H5G-1BCJ
+	for dash@vger.kernel.org;
+	Sun, 06 Oct 2024 12:07:46 -0500
+From: "Yury V. Zaytsev" <yury@shurup.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
+Subject: Support for bash-like HISTCONTROL or zsh-like HIST_IGNORE_SPACE
+Message-Id: <36590CFE-D82B-4A0D-A3A3-57434BADF6A7@shurup.com>
+Date: Sun, 6 Oct 2024 19:07:14 +0200
+To: dash@vger.kernel.org
+X-Mailer: Apple Mail (2.3776.700.51.11.1)
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cpanel84.gzo.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - shurup.com
+X-Get-Message-Sender-Via: cpanel84.gzo.com: authenticated_id: yury+shurup.com/only user confirmed/virtual account not confirmed
+X-Authenticated-Sender: cpanel84.gzo.com: yury@shurup.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-GZO-MailScanner-Information: Please contact the ISP for more information
+X-GZO-MailScanner-ID: 1sxUjS-0000000DC7q-2Iaq
+X-GZO-MailScanner: Found to be clean
+X-GZO-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
+	score=-2.099, required 6, autolearn=not spam, BAYES_00 -1.90,
+	DKIM_SIGNED 0.10, DKIM_VALID -0.10, DKIM_VALID_AU -0.10,
+	DKIM_VALID_EF -0.10, RCVD_IN_VALIDITY_RPBL_BLOCKED 0.00,
+	RCVD_IN_VALIDITY_SAFE_BLOCKED 0.00, SPF_HELO_PASS -0.00,
+	SPF_PASS -0.00, URIBL_BLOCKED 0.00)
+X-GZO-MailScanner-From: yury@shurup.com
 
-Hello.
+Hello,
 
-In an email communication with kre@ on NetBSD's tech-userlevel we
-came over
+I would like to ask if there is any interest as far as dash maintainers =
+are concerned in adding a way to prevent individual commands from being =
+stored in the shell history?
 
-  commit a373e69a196cd8d45f2806d805e548fa65a982ba
-  Author:     kre <kre@NetBSD.org>
-  AuthorDate: 2017-07-24 12:35:37 +0000
-  Commit:     kre <kre@NetBSD.org>
-  CommitDate: 2017-07-24 12:35:37 +0000
+I'm the maintainer of Midnight Commander, and both the shells we provide =
+first-class support for (bash, zsh) and some others (fish) allow you to =
+exclude individual commands from being added to the shell history. =
+Unfortunately, when we added support for ash & dash, we could only do so =
+in a way that clobbers the user's history with our internal shell =
+communication, because we don't know of a way to make sure that the =
+commands we send to the shell are not recorded.
 
-      PR standards/52406
+I've sent a PoC patch to implement basic support for HISTCONTROL to the =
+BusyBox maintainers, but haven't heard back from them yet. I was =
+wondering what your position would be on this?
 
-      Absent other information, the shell should be interactive if reading
-      from stdin, and stdin and stderr are ttys, not stdin and stdout.
+P.S. Please keep me on CC, I'm not subscribed to the list. Many thanks!
 
-and i had in mind that dash changed this already (i thought i saw
-a patch flying by on the ML?), but looking at procargs() there is
+--=20
+Sincerely yours,
+Yury V. Zaytsev
 
-        if (iflag == 2 && sflag == 1 && stdin_istty && isatty(1))
-                iflag = 1;
 
-where that would require
-
-        if (iflag == 2 && sflag == 1 && stdin_istty && isatty(2))
-                iflag = 1;
-
---steffen
-|
-|Der Kragenbaer,                The moon bear,
-|der holt sich munter           he cheerfully and one by one
-|einen nach dem anderen runter  wa.ks himself off
-|(By Robert Gernhardt)
