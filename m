@@ -1,103 +1,108 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from toucan.tulip.relay.mailchannels.net (toucan.tulip.relay.mailchannels.net [23.83.218.254])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9B078C9C
-	for <dash@vger.kernel.org>; Wed, 23 Oct 2024 19:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729712820; cv=none; b=g/IsQggP1eUnr3VCwkpn1O0moFiSE69jnb6Gk8n/nWtdJYojHw1nJAqvQ/r5QOquiyyJeowUM3FobO/0x87vNLb6+BFo0fkbt1WaWY0jN6ccL12pCElhGQNKu/cOjSvv/bpi/msW6Jsmg7dJmPzBo64izmko31jbbLhhzzRT00o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729712820; c=relaxed/simple;
-	bh=NNVSlv9eIRrDfruleSNawWu05bX1MKB9YS+G+wc86dY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hT8sOHd3NuYsTsieGiDO1xrKt2l+wKmSuyN+JE2MN/L9i6rUgtJgFOAyXW4+FZ+Dnz2vNAUvMjqqXvNiZRGrOKsxQPIcH31VzaRQQaraHs0y+OQlOFnxL6nIoaHlhAIHrykxTL/QaUEmvA2VEjB8LmhO+Z28q4pjDstj+J6Wpyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HwPC4Cmt; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HwPC4Cmt"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2e2e6a1042dso170927a91.2
-        for <dash@vger.kernel.org>; Wed, 23 Oct 2024 12:46:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729712818; x=1730317618; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NNVSlv9eIRrDfruleSNawWu05bX1MKB9YS+G+wc86dY=;
-        b=HwPC4CmtJzqmAFkVfl6NqB9k6M2P4HMsY7rhZz1B/6WuJ//K/vgRAT2yk2skV1oFyj
-         GVET8iLX3VTZ1PM4PCq4Ts5vPBxdQsKEaEWCktUxlO1X66AuFvbmYe5pxpy8KPahqwIk
-         mS02eMcKM9etOzM2w7MJc8U6RoZtAOBsvHg1Oo/jbw6/9xG6NqE48AR35F7i95bnTnuU
-         Kl7QhueXeywd7wSXXmpyHElhvXyu2aS4/4dOkP3vZK/tya26E4Otvvj3zl1ubharxnC6
-         RVZ97wFAYiVTOtqeObbckz8rsm4KuMtun1tg80D/5cqg2Fh7yJ5x3v/DZEj30VRtK/7e
-         J/FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729712818; x=1730317618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NNVSlv9eIRrDfruleSNawWu05bX1MKB9YS+G+wc86dY=;
-        b=TBnlEw2M2eR/PeyRD/fbHzH9AGDZg/NJW9y5d8CMiNaDsgJqZftCIL13G9nAYU0v2X
-         P+IaBt2SySFh7avTaUEvQj81UOyCYvcjLUchWqmmsRlmb/AlPQiHQSaRRiY2D26WDCVw
-         U20ZTfFSmrUYFJil793UHqw5g/GRAcYbVOQj1sAliw5HXM4iDsp4tC+dd5HyTtl+DDkr
-         S72W0N+clx7WCTneVOajRYf9XYga0S1eXJ2v7SvVWTXUz6Wk6nYhNvbt1B8oUJcZyz1r
-         5s3MIltphIUgTNHVIfoI+E7EbkV8XJlHkbU0VDQZuRmq7n3yxuWmF1DgphIdIBRj2R4f
-         sPSw==
-X-Gm-Message-State: AOJu0Yyh1+k9mhDOUFm21yfaEkemRdI0rd9gAQtgIxRQYJx++GBYXlnp
-	5EjwuoVR9JaAvqCftUm+0RMt58RE6KvN7R2xMWesGn+pn71d0eD3RM11AmcwFD4GwmEXg6DA0fx
-	UcYm2JtHkuDGzq0eLT2Rix8ocKg0=
-X-Google-Smtp-Source: AGHT+IFVR2Lbm+5XHSkvCswV0UBCWs2mNJhlIXiqWfyOSh6i2YcTnrnZglRnaUu2qOQjX4YeerYRWklrZREwGHxMZsI=
-X-Received: by 2002:a17:90b:4b85:b0:2e2:a029:3b4b with SMTP id
- 98e67ed59e1d1-2e76b6d0054mr4274227a91.28.1729712818328; Wed, 23 Oct 2024
- 12:46:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DD71DE2AE
+	for <dash@vger.kernel.org>; Wed, 23 Oct 2024 19:56:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.254
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729713397; cv=pass; b=Ww57kUNY42Yt6tlTYcyvs/r63fajpyS73Pg0gOpWnPxNBkxpJKojMtA4wdbtu3jDVQeLj0xNG7HF8EQtd1BSR0hkiHWkEC1vUqJn8ofKMEHqRe8stueTILnAdv5vpgni6C0RiYDHS5bAg9CHAQb46Pr9XapPPj5dhIgFCW+iuIY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729713397; c=relaxed/simple;
+	bh=2+iBwHZEpbKMDrIzV4MdsN6FZkkZ/OQsu6+2NGbt6nA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=im2JumWUDCiGmfnHX06G28rqIrjIguks6lPPiDp/PVSRaMFRMRiG0U6dmM+tmD2vaBqXBWqFDRwl0iBJ0/XXBnslzauQ8AWyAiJSWnzZZCDvmHBO6Y9qDnCBvTOJGKbgxWEWo8z5enUnrM6aUB5uRLdQ/vIS9UDwQFB+7eTWTnA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.218.254
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 56B601A5C6D
+	for <dash@vger.kernel.org>; Wed, 23 Oct 2024 19:56:29 +0000 (UTC)
+Received: from cpanel-007-fra.hostingww.com (trex-6.trex.outbound.svc.cluster.local [100.103.23.198])
+	(Authenticated sender: instrampxe0y3a)
+	by relay.mailchannels.net (Postfix) with ESMTPA id C11881A11B9
+	for <dash@vger.kernel.org>; Wed, 23 Oct 2024 19:56:28 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1729713389; a=rsa-sha256;
+	cv=none;
+	b=MZJVEsNeRQIrcmq1zwevscxxRW+S47ximnGzyEj8FQvIG09yzW29PvENf5vHW35/VWh5h0
+	fcm4Fgql+pveUwHwlu+lf8iDVWEbrxRiZ2DMibGAOUDXvr7Lko3vulJAmBWZaJtU1CyC8X
+	2dWkheuII30bIscicEQIi/d5WOdcRio343nZIL61Gu1Vu8lrzHJgJjKMWsEiJ+CeThZBbi
+	X9Q6ZxCwAHuW/XP/D74PtvScZxha9TUT0Y2ZqiUtPwFTjZRJ0DDOdSgL4C8dcjn+oMlf2x
+	mISRalgtUI8asGLKiWPczA3YpeED3pdOIG4888YNJIjhqu72YzbCCtJVKeMLDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1729713389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2+iBwHZEpbKMDrIzV4MdsN6FZkkZ/OQsu6+2NGbt6nA=;
+	b=aFMkqH/zVyXO4nJXnXRW6o0aBxZpCpapq4bM3zMAMf5ClnDjcNGiR32ESYQUEbYOo4hAHv
+	32P/At0gLdKOg4krBlf9CckRh5Nzyg3gxrB3nvWZbriUfjLnem8tOqD+QgpTLiVTyjeNo0
+	1lKzeW3rTG1SeVxNTHZgVqI7QQW97YEX4hxVR9lAVGbkMunGnHiRT2gfYtuVP1/2hsFgXo
+	AYGdl6sYdf204zjdL3Os8OUMZw9tubQmrkakPKyA5DplVdUWL9oMKJwHM1WqJXWn9Y9NP0
+	ECp0VRXF4u1pCEvtgEZ9J31EcMEnbUdCEipZk5mYT47DAGEFCougmhd3PupL7g==
+ARC-Authentication-Results: i=1;
+	rspamd-9bc7b7997-f22dl;
+	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MailChannels-Auth-Id: instrampxe0y3a
+X-Bored-Eight: 44b9aba36ea48e5b_1729713389260_508412577
+X-MC-Loop-Signature: 1729713389260:1568417968
+X-MC-Ingress-Time: 1729713389259
+Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
+ [3.69.87.180])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.103.23.198 (trex/7.0.2);
+	Wed, 23 Oct 2024 19:56:29 +0000
+Received: from p5b0ed864.dip0.t-ipconnect.de ([91.14.216.100]:61565 helo=heisenberg.scientia.org)
+	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <calestyo@scientia.org>)
+	id 1t3hT0-000000013cT-37yy
+	for dash@vger.kernel.org;
+	Wed, 23 Oct 2024 19:56:27 +0000
+Received: by heisenberg.scientia.org (Postfix, from userid 1000)
+	id 098C627D7EA8; Wed, 23 Oct 2024 21:56:25 +0200 (CEST)
+From: Christoph Anton Mitterer <calestyo@scientia.org>
+To: dash@vger.kernel.org
+Subject: [PATCH 0/1] man: Clarify the `trap` condition `EXIT`
+Date: Wed, 23 Oct 2024 21:55:44 +0200
+Message-ID: <20241023195623.148722-1-calestyo@scientia.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <273c031d242d7610e4da37ceb9413c876f0168e0.camel@scientia.org>
-In-Reply-To: <273c031d242d7610e4da37ceb9413c876f0168e0.camel@scientia.org>
-From: Mike Squire <mike.squire@gmail.com>
-Date: Wed, 23 Oct 2024 20:46:46 +0100
-Message-ID: <CAOn5hp+HSuut67JqqNXn9opCei4=aL-m+nrtFgRv7r8SjZqg-Q@mail.gmail.com>
-Subject: Re: `jobs` within command substitution doesn't work
-To: Christoph Anton Mitterer <calestyo@scientia.org>
-Cc: dash@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-AuthUser: calestyo@scientia.org
 
-On Wed, 23 Oct 2024 at 20:04, Christoph Anton Mitterer
-<calestyo@scientia.org> wrote:
+Hey.
 
-> but in dash:
-> $ sleep 60 &
-> $ jobs -p
-> 140049
-> $ echo $(jobs -p)
->
-> $
->
->
-> Not really sure whether that=E2=80=99s behaviour which POSIX would allow,=
- but
-> at least it makes it more or less impossible to easily get the PIDs of
-> and jobs within scripts.
+It seems that in dash the meaning of the EXIT condition of trap is only for
+"normal" exits from the shell, but not e.g. on SIGINT and the likes.
+Unlike e.g. bash, which also executes that trap on such signals (other than
+SIGKILL of course).
 
-$! will give you the PID of the most recently backgrounded process and
-is part of the POSIX specification. So, using your example:
 
-$ sleep 60 &
-$ echo $!
-1429004
-$ jobs -p
-1429004
+POSIX allows this https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_29:
+The EXIT condition shall occur when the shell terminates normally (exits), and
+may occur when the shell terminates abnormally as a result of delivery of a
+signal (other than SIGKILL) whose trap action is the default.
 
-I have often seen code like "some_command & pid=3D$!" to background a
-task and get its PID. It also has the advantage that it only gives you
-the PID of the most recently backgrounded task, not a list of all
-currently backgrounded tasks (which "jobs -p" does).
+But I think it would make sense to have it documented, especially as even on
+SIGINT/etc. the shell does "exit" in the plain meaning of the word.
 
-HTH
---=20
-Mike Squire
-mike.squire@gmail.com
+[If Chet reads along, it might also make sense to document the opposite in
+bash.]
+
+
+Could be as simple as the following patch.
+
+
+Cheers,
+Chris.
+
+
