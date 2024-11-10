@@ -1,124 +1,126 @@
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7D34594D
-	for <dash@vger.kernel.org>; Sun, 10 Nov 2024 17:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731258420; cv=none; b=sMnj8jLGEq15ppGsG1s7/k59Yq1Ux6WnfIsVtxlCF4Xo518xM5DNTtJhfv7bGYXvCQ+pSxwPo4WojS645ojmr86Tymi8WvDU8g9lsRCy9KR3YrOF6tJIr5xzkWWZRIawQrKqodQ3OsnvqDRBZMgtCAI+tM+wy+AZLC9F9ineHYk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731258420; c=relaxed/simple;
-	bh=pN89rY4I3z8cO9gbZvKw5yjFsms2V2cCYTpPYrbbqog=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cCt926+UxJjEtGjwF3irq/w4i63nI3m9EQWoTf3vlSmVxiS1F+eV2XvltgJc1sNDdAcO2NOlArZ3z36ekKpDK8yqaYA7+wyTfRGGmsDJy1aQ+dd14zK9wZ/Vu8Y5PKqSllWzIw7GnSbJ4BDAl/Vyn5daaxa4NuHLd4Q0/jQD7sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=V2e+w8H6; arc=none smtp.client-ip=51.68.198.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="V2e+w8H6"
-Received: from [IPV6:2a02:8010:68a1:0:c3eb:cbfe:ac4b:964a] (unknown [IPv6:2a02:8010:68a1:0:c3eb:cbfe:ac4b:964a])
-	by mail.gigawatt.nl (Postfix) with ESMTPSA id 8DC6532;
-	Sun, 10 Nov 2024 17:06:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 8DC6532
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1731258413;
-	bh=OzMpBXjSIAd8WOz93z2p6cqmdSL4/HJpg+So3UxJAaQ=; l=2984;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=V2e+w8H60syKDKovUTxUR2akW4Fmdp9uFjNeQHvPC6oZIoLUAQBoY67POnjWxGBBH
-	 OoYON0Ah4zs+HrzXsVeE35EV5bJ635cMwycvnGcskkhY798OlmmRAgyBLIEooR2Jic
-	 B0qYR686dAWTNby7ImUBWiMoyVhk3Zrv3T2jzjbw=
-Message-ID: <65b72665-6d65-446f-b32b-968c6116ef1e@gigawatt.nl>
-Date: Sun, 10 Nov 2024 17:06:52 +0000
+Received: from slateblue.cherry.relay.mailchannels.net (slateblue.cherry.relay.mailchannels.net [23.83.223.168])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD3A4B5AE
+	for <dash@vger.kernel.org>; Sun, 10 Nov 2024 17:16:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.223.168
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731258993; cv=pass; b=I4FRThYkKCy0oTTv6g8uXBbAPwrLB07x7zluMebYpEx6312zKw/T//RkLQmSQF139XiaAc6QlHOF7yM/gX3Sy+snNV6jdszMgsUqTdvCRe2ayqe6J93W2XSUxAstuZAUZHBKLz0a2KYWStLfl3u7dCCC/MSMG/iy7cZmY02EfJc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731258993; c=relaxed/simple;
+	bh=wS9KqqtYoqsXpKfBp5hF4UNRRX4R3IZhPSxYUic45HA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jvvfh51Fw4hRiAPTLl6r26A2HGxfy+1K4mZr5hP6FEpA7L4BUzqs40SA3DHyoLkfISbMnfEMSoZMl6UmKkr8lKu7a4yPF7e1cx9Dl2Sp6L+K3+PIzQjk4hsjSw8z5KtWEv3h4E1Z6cytPCt6Hrt1vaFw5OgpxvmGtrrak+pQVIw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.223.168
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 9559F8A43B4;
+	Sun, 10 Nov 2024 16:40:26 +0000 (UTC)
+Received: from cpanel-007-fra.hostingww.com (trex-4.trex.outbound.svc.cluster.local [100.111.109.20])
+	(Authenticated sender: instrampxe0y3a)
+	by relay.mailchannels.net (Postfix) with ESMTPA id CD48D8A3D88;
+	Sun, 10 Nov 2024 16:40:25 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1731256826; a=rsa-sha256;
+	cv=none;
+	b=d4Pcq6yP8zEVpiHGHcS/8x/0Qss+Cafk2Q+YW68Z1TNPM9qq568/qrl+Ax4bPIZXlG5S13
+	KAcEfU9MZVNkkU5S6+W0ylQzh4BD64kSViJKVjYd8tdIQOjtdvB7k+JL9wSBUa6OydW3Dj
+	uy80jlro/K+vebBHJSJFJOzQO0PXB/Mg6EUdoo6PoVjuPGjer3Y16CjvSQ3bVwBCq587Oz
+	hdIdo0xkIWnTFtgtHEg1pFJmzLucjvBiO7VKdIWfWKjsTtGjGJWHuV//oUraGqD+MGuykY
+	ipO+c3AacyQ+NIkLr/W3t6VzoTNY339t6fDY5hrNSRzvl35wfZNsiVaC+spg3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1731256826;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+X5oz6K9ZX2sy02f12lhQFVBuaw8D9tCBavX3G3OlP0=;
+	b=805K3EC0Ta3CIH601q/oZkc7upS984bbTt1w/kXcSXPt3HG6bozwuhMP/rvZvpOCTRJxVL
+	9zQypZPRyE4rEeoXGuhhI/AEYmeMljgzLEoYaBIi1aRxNL04Z24ONEch8HH/8oh8aucaZM
+	LkvCFHQEFchJy4s6G6I3X4fJHlm79spNI+y2lXXJ6zvPnmeJ0Jr/W8nGc2eUN1HBMZmmAW
+	+xXPZT226pf5v+gqPPOnhJo/od2IDnwl/KEfy3cDoES6W7nz7pTL/zqRPGCopxYGdeJfB8
+	ldTn4DDWv8PHXtlqYGXaES0A9+8qWO9MkIFI76PFhANxBDeeC52ifPd76LlZhA==
+ARC-Authentication-Results: i=1;
+	rspamd-5b688f746d-t68jp;
+	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MailChannels-Auth-Id: instrampxe0y3a
+X-Inform-Irritate: 7952b6270b11af78_1731256826468_425063415
+X-MC-Loop-Signature: 1731256826468:69576100
+X-MC-Ingress-Time: 1731256826467
+Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
+ [3.69.87.180])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.111.109.20 (trex/7.0.2);
+	Sun, 10 Nov 2024 16:40:26 +0000
+Received: from p5b0ed864.dip0.t-ipconnect.de ([91.14.216.100]:62522 helo=heisenberg.fritz.box)
+	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <calestyo@scientia.org>)
+	id 1tAAzA-00000005evN-05Oo;
+	Sun, 10 Nov 2024 16:40:24 +0000
+Message-ID: <343abc303a3ba27fa373c63542f411f282a12b87.camel@scientia.org>
+Subject: Re: set -e not ignored in AND-OR list
+From: Christoph Anton Mitterer <calestyo@scientia.org>
+To: Lawrence =?ISO-8859-1?Q?Vel=E1zquez?= <vq@larryv.me>
+Cc: dash@vger.kernel.org
+Date: Sun, 10 Nov 2024 17:40:23 +0100
+In-Reply-To: <437c27e2-4877-4c9c-9cfb-5167423a8b44@app.fastmail.com>
+References: <ZzAyYf1ZWcSuPVJZ@gondor.apana.org.au>
+	 <b16286957f9b3d6409423b3b9b54c84c1c64fcb2.camel@scientia.org>
+	 <437c27e2-4877-4c9c-9cfb-5167423a8b44@app.fastmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.1-1 
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: set -e not ignored in AND-OR list
-To: Christoph Anton Mitterer <calestyo@scientia.org>,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
-References: <ZzAyYf1ZWcSuPVJZ@gondor.apana.org.au>
- <b16286957f9b3d6409423b3b9b54c84c1c64fcb2.camel@scientia.org>
- <6496f8a6-bf07-4c4c-bbb6-3ce42dc378bd@gigawatt.nl>
- <85df2488f78032cfb64acc98ec2c483bc1fb03e5.camel@scientia.org>
-Content-Language: en-US
-From: Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <85df2488f78032cfb64acc98ec2c483bc1fb03e5.camel@scientia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-AuthUser: calestyo@scientia.org
 
-On 10/11/2024 16:52, Christoph Anton Mitterer wrote:
-> Hey Harald.
-> 
-> On Sun, 2024-11-10 at 10:04 +0000, Harald van Dijk wrote:
->> I think you're right that POSIX specifies the behaviour.
-> 
-> Herbert still said it (I presume the ignoring of set -e) would not
-> apply to command substitution subshells, though I haven't found
-> anything yet, which would mandate this.
+On Sun, 2024-11-10 at 02:38 -0500, Lawrence Vel=C3=A1zquez wrote:
+> On Sun, Nov 10, 2024, at 1:08 AM, Christoph Anton Mitterer wrote:
+> > I know that bash ignores set -e per default in the standard (which
+> > I
+> > think is however NOT POSIX compliant either), e.g.
+> >=20
+> > bash without --posix:
+> > $ set -e=20
+> > $ echo "$(echo a; false; echo b)"
+> > a
+> > b
+> > $
+>=20
+> Bash does NOT ignore "set -e" here; it just sets "set +e" in the
+> command substitution subshell.
 
-To be clear, I'm agreeing with your understanding of what POSIX says.
+My wording was bad,... with "ignore" at that point (in the non --posix
+example) I mean what you said, i.e. that it clears the flag again as
+also described in its manpage.
 
->> The reason why bash by default behaves contrary to what POSIX
->> specifies
->> is that what POSIX specifies is not useful. In command substitutions,
->> ignoring set -e in the way that you are asking for is even less
->> useful.
-> 
-> You mean now with respect to "inheriting" -e, right? Not with respect
-> to ignoring -e (because there it seems to behave as POSIX says).
+My examples were bad, too, as I forgot to add the "ignoring" context,
+as you already did with your second example.
 
-Yes.
+But even without explicitly re-setting -e inside the command
+substitution, though in --posix mode:
 
-Basically, my view is that the way 'set -e' is specified to work is only 
-useful for the most simple basic cases. The way it is specified to work 
-is not really useful for anything more complicated. The way it works 
-differently in bash, in non-POSIX mode, is to make it useful in more 
-cases, but still not all.
+bash --posix
+bash-5.2$ set -e
+bash-5.2$  echo "$(echo $-; false; echo b)" || :
+ehimBHs
+b
+$
 
-> Actually, there's IMO no case were it makes much sense to ignore set -e
-> ... not even in the first command list of an if/etc. ... because if
-> that e.g. calls a function, the function may depend on it exiting in a
-> set -e case, and no just keep going.
+So it keeps -e (in --posix) AND ignores it (because of the || : ), as
+IMO mandated by POSIX.
 
-I agree.
-
->>   Is there a real use case that would be helped by making this
->> change? If there is, I am not seeing it.
-> 
-> If Herbert is right and POSIX allows for this, it should IMO still
-> explicitly be documented in the manpage (probably at both, set -e and
-> command substitution documntation ).
-
-Sure, that I do agree with. In dash, the effect of 'set -e' in a command 
-substitution is that a command is never considered "tested", unless that 
-testing happens inside the command substitution, and it would be useful 
-for that to be documented.
-
-> If POSIX would forbid it, but dash would still keep it, it should
-> perhaps additionally be documented in some POSIX-incompatibilites
-> section?
-> 
-> Reasons for changing the behaviour could be:
-> - breaking software that already depend on the behaviour ;-)
-> - being in line (and thus especially *portable*) with what POSIX says
->    (which is might also be used as kind of a documentation an thus
->    people could blindly assume the behaviour).
-> - behaving more similar to bash (which is of course no must, but surely
->    not bad either).
-> 
-> 
-> If it's however long standing behaviour of dash (and perhaps others),
-> maybe POSIX should instead be revised.
-
-Yes, that would be my preference. This is already something scripts 
-cannot rely on, because widely used shells (bash and dash) are not in 
-agreement. And I see at least mksh appears to behave the same way as dash:
-
-   $ mksh -ec 'echo $(false; echo 123) || :'
-
-The output is a blank line, like in dash.
 
 Cheers,
-Harald van Dijk
+Chris
+
