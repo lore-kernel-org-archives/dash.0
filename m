@@ -1,157 +1,159 @@
-Received: from tiger.tulip.relay.mailchannels.net (tiger.tulip.relay.mailchannels.net [23.83.218.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8ADD13B59A
-	for <dash@vger.kernel.org>; Sun, 10 Nov 2024 18:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.248
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731265110; cv=pass; b=e2am5La55xWip9d0PXTpK6QwHuqq8QGkVydT5IkTTzv1ick2UfGC/C52cb9ukx9X5lxxzzvEO4CmDKwJ7D/EcPcZGIafOlSQQrl7G4vh76XStuRs7boM+9IE8FILPMbl8IUKBEkQN7z6tNuhjv6LiD2vIhglye6SBf3o6amuSaQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731265110; c=relaxed/simple;
-	bh=KKrq66Dn0DyS1k+2BfvVzy6ER2tpUJo8u7QkJAzczQA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LzKYa2/cKGRJUWi5E5mX5hvoTfWO4nHVyaBIrzl3NYGOSpuch7mb8gPQSjeAnJRRBs/3hBGtUtHljRUFGHCeHgFaTWxRTSQ40M1IWOXpvp0VXUJNOjEVhDFgrFEhrCFZ8iFJCwVZ/2wZKmp1DMf0psT+jd+VGphM/CVs+80Zino=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.218.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 8F14882376C;
-	Sun, 10 Nov 2024 18:58:22 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (100-112-47-183.trex-nlb.outbound.svc.cluster.local [100.112.47.183])
-	(Authenticated sender: instrampxe0y3a)
-	by relay.mailchannels.net (Postfix) with ESMTPA id A185D823579;
-	Sun, 10 Nov 2024 18:58:21 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1731265102; a=rsa-sha256;
-	cv=none;
-	b=g3ES7QNwLpa9xcGa1WmOZsXKVTATnc5WnsYmY9Lb0VbIwkTa7+2ndOZd3F0VZ34H6jk2Et
-	haJUz4HS15zlo7a/1c1/YengiFSlc8fwvMB42djAee1hkYrhLGUp2rakzEJKcT1Pv2e1f3
-	UlagDLAk+o6AAfeAq4qxZQs2RGGZV2v3XgDr+WStB/b5DRi2x4gskyyMwYsfUU/AyhudxW
-	NJ8/seKqFZzDXDUqMcop+MpdvdBRx6jdEIAS1XI9EScOOarD8gdUsw+L7eYJBazeR77lDO
-	hOQB2cF1NgC/fDVbo6gYNYlcHM4RP+5jYdXHGQ2fVq2wTub+6WB7IUl4NtBngA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1731265102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=riWoW1Mje54X8KT1BoGyAejJBI0v5/KmZl6qexW4FxA=;
-	b=qLzT0cxVYQ7+q2EZB0gg2wNrSTRm2MqI+dixOzOMjpAo8fwz53zqyA9qZaSocqLUuLuhi0
-	z0VQ4FseieGocinlkcZaKlwQTzTN7QjNqWcmCjFimcWPTx7APHmTNgPqGK7anJlvaZSTLr
-	kI+1G4GhpHgAObpAxKY2JZPvzHTWZBL/KLQNZmaIYaQfjxSstGjA99sPG77yH54VchoDs4
-	p8U5lLBBT//RAI0et2pl/OysPdcVllrD9FqEl6pHBZ8dGEjl+lq62UsuwQq1mjVQ0aidvX
-	jDu6X8oDR+fTYpqED18XwpRto7+VwUcnYNqsZBq9Z3AiZIeVHzpTElSC94HTFg==
-ARC-Authentication-Results: i=1;
-	rspamd-56654dd69b-qcw2j;
-	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Reign-Robust: 4c7d701d5d6fbc2c_1731265102463_181758588
-X-MC-Loop-Signature: 1731265102463:2100724652
-X-MC-Ingress-Time: 1731265102463
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.112.47.183 (trex/7.0.2);
-	Sun, 10 Nov 2024 18:58:22 +0000
-Received: from p5b0ed864.dip0.t-ipconnect.de ([91.14.216.100]:61886 helo=heisenberg.fritz.box)
-	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <calestyo@scientia.org>)
-	id 1tAD8d-00000006ALk-2yM9;
-	Sun, 10 Nov 2024 18:58:20 +0000
-Message-ID: <20715fc311f5d3655e2d6d9dc1a911e8cfbccc3f.camel@scientia.org>
-Subject: Re: set -e not ignored in AND-OR list
-From: Christoph Anton Mitterer <calestyo@scientia.org>
-To: Harald van Dijk <harald@gigawatt.nl>, Herbert Xu
-	 <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
-Date: Sun, 10 Nov 2024 19:58:18 +0100
-In-Reply-To: <65b72665-6d65-446f-b32b-968c6116ef1e@gigawatt.nl>
-References: <ZzAyYf1ZWcSuPVJZ@gondor.apana.org.au>
-	 <b16286957f9b3d6409423b3b9b54c84c1c64fcb2.camel@scientia.org>
-	 <6496f8a6-bf07-4c4c-bbb6-3ce42dc378bd@gigawatt.nl>
-	 <85df2488f78032cfb64acc98ec2c483bc1fb03e5.camel@scientia.org>
-	 <65b72665-6d65-446f-b32b-968c6116ef1e@gigawatt.nl>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.1-1 
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5096450EE
+	for <dash@vger.kernel.org>; Sun, 10 Nov 2024 20:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731269347; cv=none; b=OEBCUvxbEY1JM9hXNQaNnYpdqgRsrrADlonI1GtY5Fb9lKnixOswlBM5Lw5zB9xJrP15Q97ClGkRxkH+1a+MggB/LOvbXlIIUSN/0ncBIKzmwyUrNIjYumZHiIPj73j2HDSiM4QNJ/iZuq19fglbClbWcPBdubzZ5D8PQJ0f1xM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731269347; c=relaxed/simple;
+	bh=5DqxgeMO4nigUWZJYeUa+iPdc8i6X6QRhthJ3Sc1wuk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FI4S0MkntIb6YJvYlNU4A5fdWX6VIyUfe4Ps3vVkC5KBR/Asb2EEv0UH1Oj+XXDbY0kNZKJB1Vh9ZU+BOOVE8DjrJPmqSCheMGSAa7GYlj8AL4uh4H2ss75lW+QJQLKZBqwACFJ8jHhTFcjK1fyOJZIJkPuaZgIiZrBCiNhXiKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=O/3eRl9A; arc=none smtp.client-ip=51.68.198.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="O/3eRl9A"
+Received: from [IPV6:2a02:8010:68a1:0:c3eb:cbfe:ac4b:964a] (unknown [IPv6:2a02:8010:68a1:0:c3eb:cbfe:ac4b:964a])
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id B476D32;
+	Sun, 10 Nov 2024 20:09:00 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl B476D32
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1731269340;
+	bh=bgwzr/CbEw3PPmgTuQcpTwOltMSaDQsI6r/EiFTHGYI=; l=4320;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=O/3eRl9A/xOJyjID3jBEUue5vszYoGvllIOwUlH/exjnuNDJ6qRiGAJ8tvfAO909n
+	 QegAuAXQIHzLoroJ8tXoKthTEH5i5Df9+HkjS0wb4IXmS8VQYuIsd3gkmE3pjiE3s9
+	 wO4Fc96FHn2WULueZeWN1huXhuY+SsodKhBZjBe4=
+Message-ID: <be8c2692-ab69-46f2-a487-2f99452a0c2f@gigawatt.nl>
+Date: Sun, 10 Nov 2024 20:08:59 +0000
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AuthUser: calestyo@scientia.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: set -e not ignored in AND-OR list
+To: Christoph Anton Mitterer <calestyo@scientia.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org
+References: <ZzAyYf1ZWcSuPVJZ@gondor.apana.org.au>
+ <b16286957f9b3d6409423b3b9b54c84c1c64fcb2.camel@scientia.org>
+ <6496f8a6-bf07-4c4c-bbb6-3ce42dc378bd@gigawatt.nl>
+ <85df2488f78032cfb64acc98ec2c483bc1fb03e5.camel@scientia.org>
+ <65b72665-6d65-446f-b32b-968c6116ef1e@gigawatt.nl>
+ <20715fc311f5d3655e2d6d9dc1a911e8cfbccc3f.camel@scientia.org>
+Content-Language: en-US
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <20715fc311f5d3655e2d6d9dc1a911e8cfbccc3f.camel@scientia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, 2024-11-10 at 17:06 +0000, Harald van Dijk wrote:
-> > Herbert still said it (I presume the ignoring of set -e) would not
-> > apply to command substitution subshells, though I haven't found
-> > anything yet, which would mandate this.
->=20
-> To be clear, I'm agreeing with your understanding of what POSIX says.
+On 10/11/2024 18:58, Christoph Anton Mitterer wrote:
+> On Sun, 2024-11-10 at 17:06 +0000, Harald van Dijk wrote:
+>> In dash, the effect of 'set -e' in a
+>> command
+>> substitution is that a command is never considered "tested", unless
+>> that
+>> testing happens inside the command substitution, and it would be
+>> useful
+>> for that to be documented.
+> 
+> The way set -e is currently documented (with "tested" vs. "untested")
+> in the manpage is IMO already a bit strange.
 
-Yes, I've understood it that way :-)
+The way that 'set -e' is currently documented would be useful, but does 
+not match what is implemented.
 
+Basically: what the current documentation is saying is that every 
+command gets an implicit "|| exit $?" added to it, unless there is more 
+specific error handling in the script.
 
-> Basically, my view is that the way 'set -e' is specified to work is
-> only=20
-> useful for the most simple basic cases. The way it is specified to
-> work=20
-> is not really useful for anything more complicated. The way it works=20
-> differently in bash, in non-POSIX mode, is to make it useful in more=20
-> cases, but still not all.
+But that is not what POSIX specifies, and what dash implements is closer 
+to what POSIX specifies, but not exactly what POSIX specifies. The 
+manpage suggests that
 
-Yes. The more complicated the program gets the more "unpredictable" it
-seems.
->=20
+   $ dash -c '(set -e; false; echo 123) && echo 456'
 
-> In dash, the effect of 'set -e' in a
-> command=20
-> substitution is that a command is never considered "tested", unless
-> that=20
-> testing happens inside the command substitution, and it would be
-> useful=20
-> for that to be documented.
+would output nothing. Of course, what happens instead, in all shells 
+that I know of, is that this prints "123" followed by "456".
 
-The way set -e is currently documented (with "tested" vs. "untested")
-in the manpage is IMO already a bit strange.
+By POSIX's wording, that's right: "The -e setting shall be ignored when 
+executing [...] any command of an AND-OR list other than the last." and 
+there is no denying that that subshell is executing.
 
-But your text makes it rather even more complicated O:-D
+By dash's wording that's wrong: the "false" command is not the left hand 
+operand of an "&&" operator, it's only *part of* the left hand operand 
+of an "&&" operator.
 
-What about something like:
- The exit status of a command
-+(excluding any commands within command substitutions therein)
- is considered to be explicitly tested if the
- command is  used to control an if, elif
+My personal first preference, which I realise will not and should not be 
+implemented because it disregards POSIX, would be to leave the 
+documentation as it is, and adjust dash's behaviour to match the 
+documentation.
 
-or so...?!
+Adjusting the documentation to match the current implementation would be 
+my personal second choice.
 
-I mean AFAIU set -e is NOT ignored only for the commands IN the command
-substitution, but IS still ignored for the overall result of the
-command substitution (as part of an if, while, etc.).
+> But your text makes it rather even more complicated O:-D
+> 
+> What about something like:
+>   The exit status of a command
+> +(excluding any commands within command substitutions therein)
+>   is considered to be explicitly tested if the
+>   command is  used to control an if, elif
+> 
+> or so...?!
 
+I think the current behaviour would be covered by:
 
->=20
-> > If it's however long standing behaviour of dash (and perhaps
-> > others),
-> > maybe POSIX should instead be revised.
->=20
-> Yes, that would be my preference.
+   The exit status of a command is considered to be explicitly tested if 
+the command is used to control an if, elif, while, or until; or if the 
+command is the left hand operand of an "&&" or "||" operator; or if the 
+command is part of a list of which the exit status is tested.
 
-Another "downside" of allowing command substitutions to ignore the
-ignoring of set -e is however that things get even more complicated.
+> I mean AFAIU set -e is NOT ignored only for the commands IN the command
+> substitution, but IS still ignored for the overall result of the
+> command substitution (as part of an if, while, etc.).
 
-I mean it's already crazy enough that for pipelines only the ! negated
-ones and for AND-OR lists only all but the last elements are affected
-by the set -e ignoring.
-Generally excluding command substitutions from all these cases would
-make it even more complex to understand and easy to forget while
-coding.
+Correct, 'set -e' is in full effect during command substitutions.
 
+  $ dash -ec 'var=$(false; echo foo) || echo foo; var=$(false; echo 
+bar); echo bar'
+  foo
+
+Here, the list 'false; echo foo' is (arguably contrary to POSIX) not 
+considered the LHS of an "||" operator, therefore 'false' causes the 
+whole subshell to exit, the 'var=$(false; echo foo)' command is 
+considered to fail, but that command has its exit status tested so 
+execution continues.
+
+Likewise, the 'var=$(false; echo bar)' command is considered to fail, 
+that command does not have its exit status tested, so execution stops.
+
+>>> If it's however long standing behaviour of dash (and perhaps
+>>> others),
+>>> maybe POSIX should instead be revised.
+>>
+>> Yes, that would be my preference.
+> 
+> Another "downside" of allowing command substitutions to ignore the
+> ignoring of set -e is however that things get even more complicated.
+> 
+> I mean it's already crazy enough that for pipelines only the ! negated
+> ones and for AND-OR lists only all but the last elements are affected
+> by the set -e ignoring.
+> Generally excluding command substitutions from all these cases would
+> make it even more complex to understand and easy to forget while
+> coding.
+
+IMHO, what dash's manpage currently states is clear and useful, and if 
+that were actually implemented, the fact that it does not affect 
+subshells would be a natural consequence, not a special exception.
+
+The difference between treatment of subshells in command substitutions 
+and subshells outside of command substitutions does make it more 
+complicated to understand though.
 
 Cheers,
-Chris.
+Harald van Dijk
