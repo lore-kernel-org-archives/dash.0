@@ -1,157 +1,66 @@
-Received: from seagreen.cherry.relay.mailchannels.net (seagreen.cherry.relay.mailchannels.net [23.83.223.160])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845031D90A5
-	for <dash@vger.kernel.org>; Tue,  5 Nov 2024 13:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.223.160
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730814772; cv=pass; b=jfqxEricSHkTN6dIHH2mYRDndFJffx6BH0giwYQU3mFR+loM9EYrNUik9cYXiU6rmuFjpKJ2oHrfqxUNIcSAeGBjS8rm3j7qzZEQjL78WA7JkdDBNHYe5TdsHKX05985+WNtydCcHck+DUy1LLn1FCaQ1ZVk8lykO8nVfyqguZI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730814772; c=relaxed/simple;
-	bh=Ma1AHubh0mMIN8ZJ7zvn8Run43gTjksmOPXJcpwE2iU=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fwJCt3soM30OL/k52IiczT8ErI/zIVo0tf7Ys1pRu8VYpKgsqY1y0CEeiJj3czmOkZR+T+JkZ3bODyB/jG6b42Ol0rYgsjuwdDRfIri/cMzuR/iZ6Nc4UfLmCsUTDSyfmCtTgVpOl5P3szvFGWArFpPyNial/Zg9OM80GsLOjDA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.223.160
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 241309453A6
-	for <dash@vger.kernel.org>; Tue,  5 Nov 2024 13:36:48 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (trex-9.trex.outbound.svc.cluster.local [100.103.140.206])
-	(Authenticated sender: instrampxe0y3a)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 702C794548B
-	for <dash@vger.kernel.org>; Tue,  5 Nov 2024 13:36:47 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1730813807; a=rsa-sha256;
-	cv=none;
-	b=ZLyX5PrqM4vPIMZaMrovrdGTq/J/inYFcf4B1/GhDcmWziODAkWoURLXh5aY2YP7YAvS4+
-	4j5YiBvFKjLlGYzdo+dXYVhv+K5g5LECSTC/vc8qNEK3SxEXlkH3Kwu4bLYPyYTas76k0+
-	Jf3VSBs7+9q2Y5EdtQSR6eExz/sB43LnElPN+9OWTzUt2TMvG5BNLm2L3c1/qLpX36qx55
-	FH/NR8+aYEOB1f/fEOgWsFaCsyhL6IusrKFzYErSrza5yj9t7WHqn7yPe94bd4QBLoG+g6
-	R5mSXLFFSDHEKgdCh3rOmFpQJ+MxTA5rFDfIzJwn3lsAHb5WQ+oHxQDkY9fxAg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1730813807;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ma1AHubh0mMIN8ZJ7zvn8Run43gTjksmOPXJcpwE2iU=;
-	b=8OOsQAv4X6eN/Ob5d/GSgwB5BhY1efjZT82BzvE9shaWXM2hRfiYzh7qLPDCRn8axkVS9M
-	4v+RkClxar04qC6Xv3Z2hx6Inoos1oGG4/I4sI7pa4gRbYjrjuLDNAQeD0ASyXAbqgpwqX
-	K1c5t39Q5aoutbN1fR8MzVhjex0tT8Nqc/DzOggfOkxU1AKIPf5CRZUtHV/iP1S/uFMLrs
-	GlZ4gKkH5nN4C71JXV8I5tFF2hn7NUy7Cqgz2UvKyjYL3xm5AlQkcJ1r5PqjJzNQ0r80kz
-	PAHm1cYTqdKsLR5SMsry/i42hzDlN+BlLsgJEquvVvwcibjLxrDnZK3NEcSCYQ==
-ARC-Authentication-Results: i=1;
-	rspamd-696f47875-b9njq;
-	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Towering-Sponge: 6fbcb4ca3ca31ec6_1730813807962_3214968630
-X-MC-Loop-Signature: 1730813807962:143974630
-X-MC-Ingress-Time: 1730813807962
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.103.140.206 (trex/7.0.2);
-	Tue, 05 Nov 2024 13:36:47 +0000
-Received: from p5b0ed864.dip0.t-ipconnect.de ([91.14.216.100]:64403 helo=heisenberg.fritz.box)
-	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <calestyo@scientia.org>)
-	id 1t8Jjh-000000095yh-3MR9
-	for dash@vger.kernel.org;
-	Tue, 05 Nov 2024 13:36:45 +0000
-Message-ID: <0868f8f36cfd700b07b63f264caacdd129e3d4cb.camel@scientia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B6B233D62
+	for <dash@vger.kernel.org>; Sun, 10 Nov 2024 04:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731211880; cv=none; b=dZc/VaSM+HiZDtFsBSXUlMyCnGkQ8Po0iAgBOArBGvXWdsdsy5tyKvahuD4hS9M/3hcwXLNeCFsojOWIPnTgz5Vj6onnc+lIsAGF19Zrw20wU4LiWMXrdY+wnu7OJs8NHM9ijuALH218HrBS3RtJO7aTTQmFZJNnEN8WGqqsbEI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731211880; c=relaxed/simple;
+	bh=HhfIrhJrdK2ZjzGvHIs5MO78scRC9mP4aY91AjzFx90=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=IZcNhfwqInl3nNXC0/sVohSXjtJu3WATF1f9kP1IG24EtguXf6hW7X5pAUwhPoRnKxW2n9wFsfqWIDStmCBxUr1cZk5ie2Nv2TknbUK2uVOdQYDQ2g/IZaPGJRuWYw8zPv8QMF8tMQAQBSBuTBJEpvZzSsDLb6bB4feXHk3BHCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=GFVe90Ji; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="GFVe90Ji"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2086ytCq3QF/uv3iD7zm/7OjZEQwVcfJt1fI+/b5OQs=; b=GFVe90Ji0uKuoOMOzy74JwjFG2
+	1NZd763fjY+pJRxDLKFvpDNEDDBOLx8k+FSL6Wawjlz6XAY0OmdQcbNAUEopsym11ocO3NudJWjmf
+	LRtA7bZHUyuwsitFYNqs3A/OnztZACVSPyScw74eQ1dnTPmqeOToWaSHw7J994s+uDTE9jnZTqKG/
+	V+zjBNkkVHfVGwfOjm36LXBaMJH4gNEWIs7uonAWJyQbuu28Cmr6ZGf1T/tdtC2QaJka6aeKPeQ1u
+	5zBm6XMy4xxx3HeEz0K/2JTdYC5hJmftlzQ6v278Sle1gB7x355YpV4a0ItEzG9/z7+tehOzUebc+
+	6k4xaXSw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1t9zI9-00FkMm-1G;
+	Sun, 10 Nov 2024 12:11:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 10 Nov 2024 12:11:13 +0800
+Date: Sun, 10 Nov 2024 12:11:13 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Christoph Anton Mitterer <calestyo@scientia.org>
+Cc: dash@vger.kernel.org
 Subject: Re: set -e not ignored in AND-OR list
-From: Christoph Anton Mitterer <calestyo@scientia.org>
-To: dash@vger.kernel.org
-Date: Tue, 05 Nov 2024 14:36:44 +0100
-In-Reply-To: <9c85323dbcf182c50cad4063742f4245d94daca8.camel@scientia.org>
-References: <9c85323dbcf182c50cad4063742f4245d94daca8.camel@scientia.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.54.1-1 
+Message-ID: <ZzAyYf1ZWcSuPVJZ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AuthUser: calestyo@scientia.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9c85323dbcf182c50cad4063742f4245d94daca8.camel@scientia.org>
+X-Newsgroups: apana.lists.os.linux.dash
 
-VGhlIGZvbGxvd2luZyBpcyBwcm9iYWJseSBqdXN0IGFub3RoZXIgY2FzZSBvZiB0aGVzZTogLi4u
-CgpPbiBUdWUsIDIwMjQtMTEtMDUgYXQgMDM6MDQgKzAxMDAsIENocmlzdG9waCBBbnRvbiBNaXR0
-ZXJlciB3cm90ZToKPiAkICQoZm9vKSB8fCB0cnVlCj4gYQo+ICQgJChmb28pICYmIHRydWUKPiBh
-Cj4gCj4gPT4gdGhlc2UgSSBkb24ndCB1bmRlcnN0YW5kCj4gwqDCoCBpdCdzIGFuZCBBTkQtT1Ig
-bGlzdCwgbm90IHRoZSBsYXN0IGVsZW1lbnQsIHNvIC1lIHNob3VsZCBiZQo+IGlnbm9yZWQsCj4g
-wqDCoCB5ZXQgaXQga2lja3MgaW4gYXQgdGhlIGZhbHNlCgoKLi4uIGJ1dCBJJ20gbm90IDEwMCUg
-c3VyZSwgc28gcGVyaGFwcyBzb21lIGV4cGVydCBjYW4gY29uZmlybS4KCkkgaGFkIHRoaXMgZnVu
-Y3Rpb24sIHdoaWNoIHdhcyBjaGVja2luZyB3aGV0aGVyIHNvbWUgZmlsZSBjb250YWluZWQKc29t
-ZSBieXRlOgppc19maWxlX2NvbnRhaW5pbmdfYnl0ZXMoKQp7CsKgwqDCoMKgwqDCoMKgIGxvY2Fs
-IGZpbGU9IiQxIgrCoMKgwqDCoMKgwqDCoCBsb2NhbCBvY3RhbF9ieXRlcz0iJDIiCsKgwqDCoMKg
-wqDCoMKgIArCoMKgwqDCoMKgwqDCoCAKwqDCoMKgwqDCoMKgwqAgbG9jYWwgbnVtYmVyX29mX21h
-dGNoaW5nX2J5dGVzPScnCsKgwqDCoMKgwqDCoMKgIGxvY2FsIGV4aXRfc3RhdHVzPTAKwqDCoMKg
-wqDCoMKgwqAgbnVtYmVyX29mX21hdGNoaW5nX2J5dGVzPSIkKArCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgZXhwb3J0IExDX0FMTD1DCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBleGVjIDQ+JjEKwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIGV4aXRzdGF0dXNfY29tbWFuZDE9IiQoCsKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB7CsKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAKewrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-CsKgwqDCoMKgwqDCoMKgwqAgY2F0ICIke2ZpbGV9IiAyPi9kZXYvbnVsbCAzPiYtCsKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAKwqDCoMKgwqDCoMKgwqDCoCBwcmludGYgIiQ/IiA+JjMKZWNo
-byAiREVCVUciID4mMgrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgCn0gND4mLcKgIHwgXArC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgCnsgdHIgLWQgLWMgIiR7b2N0YWxfYnl0ZXN9IsKg
-IHzCoCB3YyAtYzsgfSA+JjQgMz4mLSA0PiYtCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9IDM+JjEKwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCApIiA0
-PiYxCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBleGVjIDQ+Ji0KwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGlmIFsgIiR7ZXhpdHN0YXR1c19jb21tYW5kMX0iCiE9ICcwJyBdOyB0aGVuCsKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZXhpdCAxCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBm
-aQrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgICkiwqAgfHzCoCBleGl0X3N0YXR1cz0iJD8iCsKgwqDCoMKg
-wqDCoMKgIGlmIFsgIiR7ZXhpdF9zdGF0dXN9IiAtbmUgMCBdOyB0aGVuCsKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gMgrCoMKgwqDCoMKgwqDCoCBmaQrCoMKgwqDCoMKgwqDC
-oCAKwqDCoMKgwqDCoMKgwqAgaWYgWyAiJHtudW1iZXJfb2ZfbWF0Y2hpbmdfYnl0ZXN9IiAhPSAn
-MCcgXTsgdGhlbgrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIDAKwqDCoMKg
-wqDCoMKgwqAgZWxzZQrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIDEKwqDC
-oMKgwqDCoMKgwqAgZmkKfQoKVGhhdCB3YXMgZnJvbSBiYWNrIHdoZW4gdGhlcmUgd2FzIG5vIHBv
-cnRhYmxlIHNldCAtbyBwaXBlZmFpbCBhbmQgSQp3YW50ZWQgdG8gYWxzbyBjYXRjaCBhbnkgZXJy
-b3IgaW4gY2F0IChlLmcuIHdoZW4gZmlsZSBub3QgZm91bmQpIGFuZApsZXQgdGhyb3VnaCBhbnl0
-aGluZyBvbiBzdGRlcnIuCgpBZ2Fpbiwgc2V0IC1lIGluIHBsYWNlLCBJIGRvOgppc19maWxlX2Nv
-bnRhaW5pbmdfYnl0ZXMgbm9uLWV4aXN0ZW50ICdcMDAwJwoKVGhlIGNhdC9wcmludGYgYXJlIGlu
-IGEgcGlwZSBidXQgd2l0aG91dCBhIGxlYWRpbmcgISwgc28gd2hlbiBjYXQgZXJyb3IKYmVjYXVz
-ZSBvZiB0aGUgZmlsZSBub3QgZm91bmQsIHNldCAtZSBzaG91bGQga2ljayBpbiBhbmQgREVCVUcg
-bm90CnByaW50ZWQuClRoZSBmdW5jdGlvbiB3b3JrcyBuZXZlcnRoZWxlc3MsIGJlY2F1c2UgMCBp
-c24ndCBjYXB0dXJlZCBpbgpleGl0c3RhdHVzX2NvbW1hbmQxIGVpdGhlci4KCkhvd2V2ZXIsIGJh
-Y2sgdGhlbiBJIG92ZXJzYXcsIHRoYXQgdGhlIHdob2xlIHRoaW5nIGlzIGFnYWluIGJlaGluZCBh
-IHx8CmFuZCB0aGF0IGluIHR1cm4gc2hvdWxkIGFnYWluIGNhdXNlIHNldCAtZSB0byBiZSBpZ25v
-cmVkLCBzbwpleGl0c3RhdHVzX2NvbW1hbmQxIHNob3VsZCBhY3R1YWxseSBjYXB0dXJlIHRoZSAx
-IGZyb20gY2F0IChhbmQgdGhlCmZ1bmN0aW9uIHByb3Blcmx5IGZhaWwgYmVjYXVzZSBvZiB0aGF0
-KSBhbmQgc2hvdWxkIGFsc28gcHJpbnQgdGhlCkRFQlVHLCBiZWNhdXNlIHNldCAtZSBpcyBpZ25v
-cmVkLgoKQnV0IGluIGRhc2gsIGl0IGRvZXNuJ3QuCgpQcm9iYWJseSBpdCdzIHRoZSBzYW1lIGNh
-c2UgdGhhbiBhYm92ZSwgYnV0IGl0IGZlbHQgYSBiaXQgY29udm9sdXRlZCwKYmVjYXVzZSB0aGUg
-cGlwZSBub3QgaWdub3JpbmcgdGhlIHNldCAtZSBidXQgdGhlIG91dGVyIEFORC1PUiBsaXN0CnNo
-b3VsZCBpZ25vcmUgaXQuCgoKQ2hlZXJzLApDaHJpcy4KCgo=
+Christoph Anton Mitterer <calestyo@scientia.org> wrote:
+>
+> $ $(foo) || true
+> a
 
+This is simply undefined behaviour.  Some shells will ignore set -e
+within the command substitution subshell as a result of the ||, some
+won't.  Dash does the latter.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
