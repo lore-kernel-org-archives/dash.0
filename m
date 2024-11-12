@@ -1,32 +1,32 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4756421A4D2
-	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23059219C9E
+	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 23:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731452341; cv=none; b=c0yjqleKEjrWvIqlqx77Em9N2Nql6HNv9Gz8FzFxaIybbey+morW6p7hn6d+OqJk07oZ9TCABuHNmwzikZZVZQdhvqRlyV3VE0byY7QDuj+F6MrIRCZugjGZHSSK+Z5uk3olAJOrUNm6X+FuLqvRapZeNwlvW5QFHiZ3AGJR4ds=
+	t=1731452431; cv=none; b=sdlKw2mZl4nMBaWS6xUTX+CaqyuVUs46usIyu3LiT0ubXGxzTKh01Kl7fuA4MarXP6WS6LeoP4tyfQvP/AM2Rm9GWfKQv4/s9W85Z2i3Q4L4moz9ysHlAEL62M21B1LgCTf3yXvfLMiHLg0EFBRCO2J/qsOQ2tz0D0TgTqBzk+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731452341; c=relaxed/simple;
-	bh=QI57qWtOdyB2lrpwcmDWFYHXN6uV3Y8c1Jz2/+p4hIQ=;
+	s=arc-20240116; t=1731452431; c=relaxed/simple;
+	bh=pV3wP6rrKbh2Mvzfs0zVZJdlzGtQapUUY9ETnh+hUwc=;
 	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=hbILR4a8v/TZDt9lOEHAYD5YX7pdDaU8F5jLRAyn3y7iry/gHil0YxFBhdMAFjq4O2bJ1HvNtGZlo3Yj27bvYx0YAuUjLAfXBYIqhT2ZVCLnlgriMciXJGW4WxFnnVzLCkjt47o3oEYH8PsMgjTfw+H+90+h+yR8bKFsxIPvfBk=
+	 References:From:In-Reply-To; b=KB/RdvlDChPEY94jnYapNdJcZSboaxzGe/Hm/jQ131DXCh2+MHjFLaK8waow7eQh1uJmdWsW1/hhcYtySYFC4YQGTk1EIP7xKcK1ubKm59Ud556yLYse/Pnfo//wiHv5YfhX9xroKDyGkY6xtA2VlY9iEQmRnOTxMHgWOX/xI24=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMvl6d4067931
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMxJfo4068041
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 23:57:48 +0100
+	Tue, 12 Nov 2024 23:59:20 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMvjp9078370
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMxE0V078435
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 12 Nov 2024 23:57:47 +0100
-Content-Type: multipart/mixed; boundary="------------Jz31v2Ugb8Gq8cORXXAhbPL0"
-Message-ID: <108e62e8-28d8-4e04-9ac8-363d52df10ef@knaff.lu>
-Date: Tue, 12 Nov 2024 23:57:45 +0100
+	Tue, 12 Nov 2024 23:59:17 +0100
+Content-Type: multipart/mixed; boundary="------------lcQNv0RqaowrTi50J14MphP3"
+Message-ID: <112e9546-ccea-4407-9f8f-1c237f6ac919@knaff.lu>
+Date: Tue, 12 Nov 2024 23:59:14 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 17-monitor-mode
+ PC : 18-glibc-stdio
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
@@ -70,40 +70,86 @@ Autocrypt: addr=alain@knaff.lu; keydata=
 In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 
 This is a multi-part message in MIME format.
---------------Jz31v2Ugb8Gq8cORXXAhbPL0
+--------------lcQNv0RqaowrTi50J14MphP3
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-Monitor mode is the feature that makes the shell display the status of
-any exited children when pressing return at the shell prompt.
+This fixed USE_GLIBC_STDIO mode.
 
-It can be enabled/disabled using set -m/set +m. It is enabled by
-default in interactive shells, and disabled in non-interactive shells
-(such as those running a script)
+This also concludes this patch series for UnixPC support.
 
-Normally monitor mode doesn't need any advanced job control features
-to work, but for some reason dash only makes it available if job
-control is available. This patch changes this by directly probing
-mflag rather than jobctl.
+Thanks for reading.
 
 Regards,
 
 Alain
---------------Jz31v2Ugb8Gq8cORXXAhbPL0
+--------------lcQNv0RqaowrTi50J14MphP3
 Content-Type: text/x-patch; charset=UTF-8;
- name="dash-0.5.12+17-monitor-mode.diff"
-Content-Disposition: attachment; filename="dash-0.5.12+17-monitor-mode.diff"
+ name="dash-0.5.12+18-glibc-stdio.diff"
+Content-Disposition: attachment; filename="dash-0.5.12+18-glibc-stdio.diff"
 Content-Transfer-Encoding: base64
 
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzE1LXJlYWxsb2MtbnVs
-bC9zcmMvbWFpbi5jIGRhc2gtMC41LjEyKzE2LW1vbml0b3ItbW9kZS9zcmMvbWFpbi5jCi0t
-LSBkYXNoLTAuNS4xMisxNS1yZWFsbG9jLW51bGwvc3JjL21haW4uYwkyMDI0LTEwLTIxIDEw
-OjQ0OjEyLjczMjUzMzEzMyArMDAwMAorKysgZGFzaC0wLjUuMTIrMTYtbW9uaXRvci1tb2Rl
-L3NyYy9tYWluLmMJMjAyNC0xMS0wMSAyMToyMDowNy44MTQ5MjAxMzMgKzAwMDAKQEAgLTIw
-OSw3ICsyMDksNyBAQAogCQlpbnQgc2tpcDsKIAogCQlzZXRzdGFja21hcmsoJnNtYXJrKTsK
-LQkJaWYgKGpvYmN0bCkKKwkJaWYgKG1mbGFnKQogCQkJc2hvd2pvYnMob3V0MiwgU0hPV19D
-SEFOR0VEKTsKIAkJaW50ZXIgPSAwOwogCQlpZiAoaWZsYWcgJiYgdG9wKSB7Cg==
+ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzE3LXNpZ25lZC1zaXpl
+LXQvc3JjL2V2YWwuYyBkYXNoLTAuNS4xMisxOC1nbGliYy1zdGRpby9zcmMvZXZhbC5jCi0t
+LSBkYXNoLTAuNS4xMisxNy1zaWduZWQtc2l6ZS10L3NyYy9ldmFsLmMJMjAyNC0xMC0yMCAw
+ODozNzo1NS44MDI2ODMwMzIgKzAwMDAKKysrIGRhc2gtMC41LjEyKzE4LWdsaWJjLXN0ZGlv
+L3NyYy9ldmFsLmMJMjAyNC0wOS0wMSAwNzowNDowNi45NjA5ODg1ODAgKzAwMDAKQEAgLTgz
+Myw3ICs4MzMsMTEgQEAKIAlpZiAoaWZsYWcgJiYgZnVuY2xpbmUgPT0gMCAmJiBhcmdjID4g
+MCkKIAkJbGFzdGFyZyA9IG5hcmd2Wy0xXTsKIAorI2lmZGVmIFVTRV9HTElCQ19TVERJTwor
+CXByZXZlcnJvdXQuc3RyZWFtID0gc3RkZXJyOworI2Vsc2UKIAlwcmV2ZXJyb3V0LmZkID0g
+MjsKKyNlbmRpZgogCWV4cHJlZGlyKGNtZC0+bmNtZC5yZWRpcmVjdCk7CiAJcmVkaXJfc3Rv
+cCA9IHB1c2hyZWRpcihjbWQtPm5jbWQucmVkaXJlY3QpOwogCXN0YXR1cyA9IHJlZGlyZWN0
+c2FmZShjbWQtPm5jbWQucmVkaXJlY3QsIFJFRElSX1BVU0h8UkVESVJfU0FWRUZEMik7CmRp
+ZmYgLVggLi4vZXhjbHVkZS50eHQgLXVyTiBkYXNoLTAuNS4xMisxNy1zaWduZWQtc2l6ZS10
+L3NyYy9vdXRwdXQuYyBkYXNoLTAuNS4xMisxOC1nbGliYy1zdGRpby9zcmMvb3V0cHV0LmMK
+LS0tIGRhc2gtMC41LjEyKzE3LXNpZ25lZC1zaXplLXQvc3JjL291dHB1dC5jCTIwMjQtMTAt
+MjAgMDg6Mzc6NTUuODE0NjgzMzE1ICswMDAwCisrKyBkYXNoLTAuNS4xMisxOC1nbGliYy1z
+dGRpby9zcmMvb3V0cHV0LmMJMjAyNC0wOS0wMSAwNzowNDowNi45NjA5ODg1ODAgKzAwMDAK
+QEAgLTc3LDcgKzc3LDcgQEAKIH07CiBzdHJ1Y3Qgb3V0cHV0IGVycm91dCA9IHsKIAkuc3Ry
+ZWFtID0gMCwgLm5leHRjID0gMCwgLmVuZCA9IDAsIC5idWYgPSAwLCAuYnVmc2l6ZSA9IDAs
+IC5mZCA9IDIsIC5mbGFncyA9IDAKLX0KK307CiAjaWZkZWYgbm90eWV0CiBzdHJ1Y3Qgb3V0
+cHV0IG1lbW91dCA9IHsKIAkuc3RyZWFtID0gMCwgLm5leHRjID0gMCwgLmVuZCA9IDAsIC5i
+dWYgPSAwLCAuYnVmc2l6ZSA9IDAsIC5mZCA9IE1FTV9PVVQsIC5mbGFncyA9IDAKQEAgLTkw
+LDEzICs5MCwxMyBAQAogc3RydWN0IG91dHB1dCBlcnJvdXQgPSB7CiAJLm5leHRjID0gMCwg
+LmVuZCA9IDAsIC5idWYgPSAwLCAuYnVmc2l6ZSA9IDAsIC5mZCA9IDIsIC5mbGFncyA9IDAK
+IH07Ci1zdHJ1Y3Qgb3V0cHV0IHByZXZlcnJvdXQ7CiAjaWZkZWYgbm90eWV0CiBzdHJ1Y3Qg
+b3V0cHV0IG1lbW91dCA9IHsKIAkubmV4dGMgPSAwLCAuZW5kID0gMCwgLmJ1ZiA9IDAsIC5i
+dWZzaXplID0gMCwgLmZkID0gTUVNX09VVCwgLmZsYWdzID0gMAogfTsKICNlbmRpZgogI2Vu
+ZGlmCitzdHJ1Y3Qgb3V0cHV0IHByZXZlcnJvdXQ7CiBzdHJ1Y3Qgb3V0cHV0ICpvdXQxID0g
+Jm91dHB1dDsKIHN0cnVjdCBvdXRwdXQgKm91dDIgPSAmZXJyb3V0OwogCkBAIC0yMTUsNyAr
+MjE1LDYgQEAKIH0KIAogCi0jaWZuZGVmIFVTRV9HTElCQ19TVERJTwogCiAKIHZvaWQKQEAg
+LTIyNCw3ICsyMjMsNiBAQAogCWNoYXIgYnVmID0gYzsKIAlvdXRtZW0oJmJ1ZiwgMSwgZGVz
+dCk7CiB9Ci0jZW5kaWYKIAogCiB2b2lkCkBAIC0zNzgsNyArMzc2LDYgQEAKIH0KIAogCi0j
+aWZkZWYgbm90eWV0CiAjaWZkZWYgVVNFX0dMSUJDX1NURElPCiB2b2lkIGluaXRzdHJlYW1z
+KCkgewogCW91dHB1dC5zdHJlYW0gPSBzdGRvdXQ7CkBAIC0zODYsNiArMzgzLDcgQEAKIH0K
+IAogCisjaWZkZWYgbm90eWV0CiB2b2lkCiBvcGVubWVtb3V0KHZvaWQpIHsKIAlJTlRPRkY7
+CmRpZmYgLVggLi4vZXhjbHVkZS50eHQgLXVyTiBkYXNoLTAuNS4xMisxNy1zaWduZWQtc2l6
+ZS10L3NyYy9vdXRwdXQuaCBkYXNoLTAuNS4xMisxOC1nbGliYy1zdGRpby9zcmMvb3V0cHV0
+LmgKLS0tIGRhc2gtMC41LjEyKzE3LXNpZ25lZC1zaXplLXQvc3JjL291dHB1dC5oCTIwMjQt
+MTAtMTkgMjI6MTY6NDEuNjI0MjQ3Njk1ICswMDAwCisrKyBkYXNoLTAuNS4xMisxOC1nbGli
+Yy1zdGRpby9zcmMvb3V0cHV0LmgJMjAyNC0xMS0xMCAyMTo1NTo0OC43ODEwNTkxNTYgKzAw
+MDAKQEAgLTY1LDkgKzY1LDcgQEAKIAogdm9pZCBvdXRtZW0oY29uc3QgY2hhciAqLCBzaXpl
+X3QsIHN0cnVjdCBvdXRwdXQgKik7CiB2b2lkIG91dHN0cihjb25zdCBjaGFyICosIHN0cnVj
+dCBvdXRwdXQgKik7Ci0jaWZuZGVmIFVTRV9HTElCQ19TVERJTwogdm9pZCBvdXRjc2xvdyhp
+bnQsIHN0cnVjdCBvdXRwdXQgKik7Ci0jZW5kaWYKIHZvaWQgZmx1c2hhbGwodm9pZCk7CiB2
+b2lkIGZsdXNob3V0KHN0cnVjdCBvdXRwdXQgKik7CiB2b2lkIG91dGZtdChzdHJ1Y3Qgb3V0
+cHV0ICosIGNvbnN0IGNoYXIgKiwgLi4uKQpAQCAtODEsMTMgKzc5LDExIEBACiB2b2lkIGRv
+Zm9ybWF0KHN0cnVjdCBvdXRwdXQgKiwgY29uc3QgY2hhciAqLCB2YV9saXN0KTsKICNlbmRp
+ZgogaW50IHh3cml0ZShpbnQsIGNvbnN0IHZvaWQgKiwgc2l6ZV90KTsKLSNpZmRlZiBub3R5
+ZXQKICNpZmRlZiBVU0VfR0xJQkNfU1RESU8KIHZvaWQgaW5pdHN0cmVhbXModm9pZCk7CiB2
+b2lkIG9wZW5tZW1vdXQodm9pZCk7CiBpbnQgX19jbG9zZW1lbW91dCh2b2lkKTsKICNlbmRp
+ZgotI2VuZGlmCiAKIHN0YXRpYyBpbmxpbmUgdm9pZAogZnJlZXN0ZG91dCgpCmRpZmYgLVgg
+Li4vZXhjbHVkZS50eHQgLXVyTiBkYXNoLTAuNS4xMisxNy1zaWduZWQtc2l6ZS10L3NyYy9y
+ZWRpci5jIGRhc2gtMC41LjEyKzE4LWdsaWJjLXN0ZGlvL3NyYy9yZWRpci5jCi0tLSBkYXNo
+LTAuNS4xMisxNy1zaWduZWQtc2l6ZS10L3NyYy9yZWRpci5jCTIwMjQtMTAtMjEgMTA6NDQ6
+MTIuNzMyNTMzMTMzICswMDAwCisrKyBkYXNoLTAuNS4xMisxOC1nbGliYy1zdGRpby9zcmMv
+cmVkaXIuYwkyMDI0LTEwLTIwIDIyOjA3OjM1LjM5MDA1NTg0MCArMDAwMApAQCAtMTgwLDcg
+KzE4MCwxMSBAQAogCQlvdXQyID0gJm1lbW91dDsKICNlbmRpZgogCWlmIChmbGFncyAmIFJF
+RElSX1NBVkVGRDIgJiYgc3YtPnJlbmFtZWRbMl0gPj0gMCkKKyNpZmRlZiBVU0VfR0xJQkNf
+U1RESU8KKwkJcHJldmVycm91dC5zdHJlYW0gPSBmZG9wZW4oc3YtPnJlbmFtZWRbMl0sImEi
+KTsKKyNlbHNlCiAJCXByZXZlcnJvdXQuZmQgPSBzdi0+cmVuYW1lZFsyXTsKKyNlbmRpZgog
+fQogCiAK
 
---------------Jz31v2Ugb8Gq8cORXXAhbPL0--
+--------------lcQNv0RqaowrTi50J14MphP3--
