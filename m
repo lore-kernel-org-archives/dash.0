@@ -1,32 +1,32 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8397421A4D2
-	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66C0218956
+	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731451534; cv=none; b=gyd9hUtHIHZrXkZ60vXuZNzZACXNdOz2Sr6JeCw7QFk3NiFg2CVyJSSGtUXtTY/HPW0qbwUoMEYB6pSrJSsiztw2rgCa03t0dcvokVIBSFVxb5Kft9HzSaEDNU2i5ecrYvhcd2lFpIzWHV3A6JAhgmJzjgNBHG9u4KxLyTTTPdk=
+	t=1731451579; cv=none; b=NMJrZnchXMsg9RRoVGBbNiWD0Sv6Tj3rZyMMepDhvHZoiic5ETQD2zRiNQzBqyhzRJ4n0bDwuV31w4yYVDTRXnxqSUq36ks7+376u9pn1z9G3Pp4teoauFArNxgshZgkeugnzIOitCNAXDBYawQWcj0AGDVKib4k7kT9Gq7/tPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731451534; c=relaxed/simple;
-	bh=imQhFFT0qKLI1JqJgBZ+4TBr7tyxQcMfrGvWf/O4+tM=;
+	s=arc-20240116; t=1731451579; c=relaxed/simple;
+	bh=S3Wmg86TuBLvxTQDS13se+FA4wnT9QmujpIVd0lBAmA=;
 	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=t+3uuFVY3fDPS0o6nd1lkr1JnbpkofPOjoYf4PeZHR23j/+hEKP4x/oFp8OoAEkhyxAbuK8/AoqcwTch9O9tuF04VPPyacHiPLDFYXnWcjxycVGfduRrBKIK7DoVcHbTSNQT3lRY0txW99FN4hPvsQrgFuFb4c4dAekI6DY+jqA=
+	 References:From:In-Reply-To; b=cvhimf7MySiool6Myo+11u08FDNCED3n9bdrQQWI97g7zL55dbkz6lOCcobGHgG5JB7ySTyjsM2lDDB3s9OvwuOWADx8JguCowvSnc34QRbwEa/BtuyiEIGlyyh68OW2kO+DLC6rAvksrCcTSr00hXe634mgVfTCctRxAeL19/U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMiEno4067049
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMj8qO4067111
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 23:44:15 +0100
+	Tue, 12 Nov 2024 23:45:10 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMiCpx077789
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMj7gI077884
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 12 Nov 2024 23:44:14 +0100
-Content-Type: multipart/mixed; boundary="------------d70HRFEWoZsnNugDCNnBPJbP"
-Message-ID: <2c7200c8-c356-4a13-9314-e97989c4c148@knaff.lu>
-Date: Tue, 12 Nov 2024 23:44:12 +0100
+	Tue, 12 Nov 2024 23:45:08 +0100
+Content-Type: multipart/mixed; boundary="------------qpFlvwHOq9TISH7QDkuDa2v9"
+Message-ID: <2e4212b9-a8cf-465d-b925-77d7ab93fbcd@knaff.lu>
+Date: Tue, 12 Nov 2024 23:45:07 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 11-simplify-wait-loop
+ PC : 12-sigaction
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
@@ -70,53 +70,90 @@ Autocrypt: addr=alain@knaff.lu; keydata=
 In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 
 This is a multi-part message in MIME format.
---------------d70HRFEWoZsnNugDCNnBPJbP
+--------------qpFlvwHOq9TISH7QDkuDa2v9
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-Currently, the "wait" shell builtin is implemented by calling wait3
-non-blockingly, and relying on a subsequent sigsuspend to do the
-actual waiting.
+The 12th patch tests for availability of sigaction, and uses signal
+instead if not available.
 
-This is needlessly complex, wait3 can do the job just fine on its
-own. Wait_cmd can still be interrupted by a ctrl-c signal. Indeed,
-that's what EINTR is for... just test for !pending_sig, like done
-elsewhere in dash.
-
-Return of 0 for DOWAIT_WAITCMD is now done using an explicit test
-before return of the function.
+Without sigaction, signals have to be re-activated once triggered,
+because signal does an implicit SA_RESETHAND on SYSV platforms.
 
 Regards,
 
 Alain
---------------d70HRFEWoZsnNugDCNnBPJbP
+--------------qpFlvwHOq9TISH7QDkuDa2v9
 Content-Type: text/x-patch; charset=UTF-8;
- name="dash-0.5.12+11-simplify-wait-loop.diff"
-Content-Disposition: attachment;
- filename="dash-0.5.12+11-simplify-wait-loop.diff"
+ name="dash-0.5.12+12-sigaction.diff"
+Content-Disposition: attachment; filename="dash-0.5.12+12-sigaction.diff"
 Content-Transfer-Encoding: base64
 
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzEwLWN0eXBlL3NyYy9q
-b2JzLmMgZGFzaC0wLjUuMTIrMTEtc2ltcGxpZnktd2FpdC1sb29wL3NyYy9qb2JzLmMKLS0t
-IGRhc2gtMC41LjEyKzEwLWN0eXBlL3NyYy9qb2JzLmMJMjAyNC0xMC0yNyAyMDoxMTo0NC41
-NzA1MDk0NDYgKzAwMDAKKysrIGRhc2gtMC41LjEyKzExLXNpbXBsaWZ5LXdhaXQtbG9vcC9z
-cmMvam9icy5jCTIwMjQtMTAtMjcgMjA6MTE6NTguMDI2ODMwNzUyICswMDAwCkBAIC0xMTcz
-LDggKzExNzMsNyBAQAogU1RBVElDIGludAogd2FpdHByb2MoaW50IGJsb2NrLCBpbnQgKnN0
-YXR1cykKIHsKLQlzaWdzZXRfdCBvbGRtYXNrOwotCWludCBmbGFncyA9IGJsb2NrID09IERP
-V0FJVF9CTE9DSyA/IDAgOiBXTk9IQU5HOworCWludCBmbGFncyA9IGJsb2NrICE9IERPV0FJ
-VF9OT05CTE9DSyA/IDAgOiBXTk9IQU5HOwogCWludCBlcnI7CiAKICNpZiBKT0JTCkBAIC0x
-MTg2LDE5ICsxMTg1LDE5IEBACiAJCWdvdHNpZ2NobGQgPSAwOwogCQlkbwogCQkJZXJyID0g
-d2FpdDMoc3RhdHVzLCBmbGFncywgTlVMTCk7Ci0JCXdoaWxlIChlcnIgPCAwICYmIGVycm5v
-ID09IEVJTlRSKTsKKwkJd2hpbGUgKGVyciA8IDAgJiYgZXJybm8gPT0gRUlOVFIgJiYgIXBl
-bmRpbmdfc2lnKTsKIAogCQlpZiAoZXJyIHx8IChlcnIgPSAtIWJsb2NrKSkKIAkJCWJyZWFr
-OwogCi0JCXNpZ2Jsb2NrYWxsKCZvbGRtYXNrKTsKLQotCQl3aGlsZSAoIWdvdHNpZ2NobGQg
-JiYgIXBlbmRpbmdfc2lnKQotCQkJc2lnc3VzcGVuZCgmb2xkbWFzayk7Ci0KLQkJc2lnY2xl
-YXJtYXNrKCk7CiAJfSB3aGlsZSAoZ290c2lnY2hsZCk7CiAKKwlpZihibG9jayA9PSBET1dB
-SVRfV0FJVENNRCAmJiAKKwkgICBlcnIgPCAwICYmIGVycm5vID09IEVJTlRSICYmIHBlbmRp
-bmdfc2lnKQorCQkvKiBJZiBibG9jayBpcyBET1dBSVRfV0FJVENNRCwgd2UgcmV0dXJuIDAg
-d2hlbiBhIHNpZ25hbAorCQkgKiBvdGhlciB0aGFuIFNJR0NITEQgaW50ZXJydXB0ZWQgdGhl
-IHdhaXQuICovCisJCXJldHVybiAwOworCiAJcmV0dXJuIGVycjsKIH0KIAo=
+ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzExLXNpbXBsaWZ5LXdh
+aXQtbG9vcC9jb25maWd1cmUuYWMgZGFzaC0wLjUuMTIrMTItc2lnYWN0aW9uL2NvbmZpZ3Vy
+ZS5hYwotLS0gZGFzaC0wLjUuMTIrMTEtc2ltcGxpZnktd2FpdC1sb29wL2NvbmZpZ3VyZS5h
+YwkyMDI0LTExLTEwIDE3OjA2OjUwLjMwMTM0MTI1MSArMDAwMAorKysgZGFzaC0wLjUuMTIr
+MTItc2lnYWN0aW9uL2NvbmZpZ3VyZS5hYwkyMDI0LTExLTEwIDE3OjA4OjAxLjE1NTAyNTg4
+OCArMDAwMApAQCAtNzMsNiArNzMsMTcgQEAKIEFDX1RZUEVfU1NJWkVfVAogQUNfVFlQRV9V
+SU5UMzJfVAogCitBQ19DSEVDS19UWVBFKFtzaWdfYXRvbWljX3RdLCxBQ19ERUZJTkVfVU5R
+VU9URUQoW3NpZ19hdG9taWNfdF0saW50LFtEZWZpbmUgYXRvbWljIHNpZ25hbCB0eXBlXSks
+WworQUNfSU5DTFVERVNfREVGQVVMVAorI2luY2x1ZGUgPHNpZ25hbC5oPgorXSkKKworQUNf
+Q0hFQ0tfVFlQRShbc2lnc2V0X3RdLCxBQ19ERUZJTkVfVU5RVU9URUQoW3NpZ3NldF90XSxp
+bnQsW0RlZmluZSB0eXBlIGZvciBzaWduYWwgbWFzaywgbWF5IGJlIGludCB3aGVyZSBzaWdu
+YWwgYmxvY2tpbmcgaXMgbm90IHN1cHBvcnRlZCBhdCBhbGxdKSxbCitBQ19JTkNMVURFU19E
+RUZBVUxUCisjaW5jbHVkZSA8c2lnbmFsLmg+CitdKQorCisKIEFDX0NIRUNLX1RZUEUoW2lu
+dG1heF90XSwsQUNfREVGSU5FX1VOUVVPVEVEKFtpbnRtYXhfdF0sbG9uZyxbRGVmaW5lIGlu
+dG1heF90IHR5cGUsIG11c3QgYWxzbyBiZSBzdXBwb3J0ZWQgYnkgcHJpbnRmXSkpCiAKIEFD
+X0NIRUNLX1RZUEUoW3VpbnRtYXhfdF0sLEFDX0RFRklORV9VTlFVT1RFRChbdWludG1heF90
+XSx1bnNpZ25lZCBsb25nLFtEZWZpbmUgdWludG1heF90IHR5cGUsIG11c3QgYWxzbyBiZSBz
+dXBwb3J0ZWQgYnkgcHJpbnRmXSkpCkBAIC0xMDYsNyArMTE3LDcgQEAKIAkgICAgICAgbWVt
+cGNweSBtZW1tb3ZlIFwKIAkgICAgICAgc2lnc2V0bWFzayBzdHBjcHkgc3RyY2hybnVsIHN0
+cnNpZ25hbCBzdHJ0b2Qgc3RydG9pbWF4IFwKIAkgICAgICAgc3RydG91bWF4IHN5c2NvbmYg
+XAotCSAgICAgICB2Zm9yayBsc3RhdCBkdXAyIGdldGdyb3VwcyBcCisJICAgICAgIHZmb3Jr
+IHNpZ2FjdGlvbiBzaWdwcm9jbWFzayBsc3RhdCBkdXAyIGdldGdyb3VwcyBcCiAJICAgICAg
+IHN0cnN0ciBzdHBuY3B5IHN0cmNhc2VjbXAgc3RyZXJyb3Igc3RyZHVwIHN0cnRvdWwgdnNu
+cHJpbnRmIFwKIAkgICAgICAgcmVhZGRpcikKIApkaWZmIC1YIC4uL2V4Y2x1ZGUudHh0IC11
+ck4gZGFzaC0wLjUuMTIrMTEtc2ltcGxpZnktd2FpdC1sb29wL3NyYy9zeXN0ZW0uaCBkYXNo
+LTAuNS4xMisxMi1zaWdhY3Rpb24vc3JjL3N5c3RlbS5oCi0tLSBkYXNoLTAuNS4xMisxMS1z
+aW1wbGlmeS13YWl0LWxvb3Avc3JjL3N5c3RlbS5oCTIwMjQtMTEtMTAgMTY6MjY6NDguNzIw
+MTk2OTQ2ICswMDAwCisrKyBkYXNoLTAuNS4xMisxMi1zaWdhY3Rpb24vc3JjL3N5c3RlbS5o
+CTIwMjQtMTEtMTAgMTY6MjY6NDcuNDY0MTY2OTk5ICswMDAwCkBAIC00OCw5ICs0OCwxMSBA
+QAogI3ByYWdtYSBHQ0MgZGlhZ25vc3RpYyBwb3AKICNlbmRpZgogI2Vsc2UKKyMgaWZkZWYg
+SEFWRV9TSUdQUk9DTUFTSwogCXNpZ3NldF90IHNldDsKIAlzaWdlbXB0eXNldCgmc2V0KTsK
+IAlzaWdwcm9jbWFzayhTSUdfU0VUTUFTSywgJnNldCwgMCk7CisjIGVuZGlmCiAjZW5kaWYK
+IH0KIApkaWZmIC1YIC4uL2V4Y2x1ZGUudHh0IC11ck4gZGFzaC0wLjUuMTIrMTEtc2ltcGxp
+Znktd2FpdC1sb29wL3NyYy90cmFwLmMgZGFzaC0wLjUuMTIrMTItc2lnYWN0aW9uL3NyYy90
+cmFwLmMKLS0tIGRhc2gtMC41LjEyKzExLXNpbXBsaWZ5LXdhaXQtbG9vcC9zcmMvdHJhcC5j
+CTIwMjQtMTEtMTAgMTQ6NTk6MTIuNTgzMjIzNTEyICswMDAwCisrKyBkYXNoLTAuNS4xMisx
+Mi1zaWdhY3Rpb24vc3JjL3RyYXAuYwkyMDI0LTExLTEwIDIwOjI2OjQ0LjIyMjA3MTE1OCAr
+MDAwMApAQCAtMTgxLDcgKzE4MSwxNiBAQAogCWludCBhY3Rpb247CiAJaW50IGx2Zm9ya2Vk
+OwogCWNoYXIgKnQsIHRzaWc7CisjaWZkZWYgSEFWRV9TSUdBQ1RJT04KIAlzdHJ1Y3Qgc2ln
+YWN0aW9uIGFjdDsKKyNkZWZpbmUgU0lHTkFMKHNpZ25vKSBzaWdhY3Rpb24oc2lnbm8sICZh
+Y3QsMCkKKyNkZWZpbmUgSERMUiBhY3Quc2FfaGFuZGxlcgorI2Vsc2UKKwl0eXBlZGVmIHZv
+aWQgKCpzaWdoYW5kbGVyX3QpKGludCk7CisJc2lnaGFuZGxlcl90IGhkbHI7CisjZGVmaW5l
+IFNJR05BTChzaWdubykgc2lnbmFsKHNpZ25vLCBoZGxyKQkKKyNkZWZpbmUgSERMUiBoZGxy
+CisjZW5kaWYKIAogCWx2Zm9ya2VkID0gdmZvcmtlZDsKIApAQCAtMjIyLDYgKzIzMSw3IEBA
+CiAKIAl0ID0gJnNpZ21vZGVbc2lnbm8gLSAxXTsKIAl0c2lnID0gKnQ7CisjaWZkZWYgSEFW
+RV9TSUdBQ1RJT04KIAlpZiAodHNpZyA9PSAwKSB7CiAJCS8qCiAJCSAqIGN1cnJlbnQgc2V0
+dGluZyB1bmtub3duCkBAIC0yNDQsMjMgKzI1NCwyOCBAQAogCQkJdHNpZyA9IFNfUkVTRVQ7
+CS8qIGZvcmNlIHRvIGJlIHNldCAqLwogCQl9CiAJfQotCWlmICh0c2lnID09IFNfSEFSRF9J
+R04gfHwgdHNpZyA9PSBhY3Rpb24pCisJaWYgKHRzaWcgPT0gYWN0aW9uKQorCQlyZXR1cm47
+CisjZW5kaWYKKwlpZiAodHNpZyA9PSBTX0hBUkRfSUdOKQogCQlyZXR1cm47CiAJc3dpdGNo
+IChhY3Rpb24pIHsKIAljYXNlIFNfQ0FUQ0g6Ci0JCWFjdC5zYV9oYW5kbGVyID0gb25zaWc7
+CisJCUhETFIgPSBvbnNpZzsKIAkJYnJlYWs7CiAJY2FzZSBTX0lHTjoKLQkJYWN0LnNhX2hh
+bmRsZXIgPSBTSUdfSUdOOworCQlIRExSID0gU0lHX0lHTjsKIAkJYnJlYWs7CiAJZGVmYXVs
+dDoKLQkJYWN0LnNhX2hhbmRsZXIgPSBTSUdfREZMOworCQlIRExSID0gU0lHX0RGTDsKIAl9
+CiAJaWYgKCFsdmZvcmtlZCkKIAkJKnQgPSBhY3Rpb247CisjaWZkZWYgSEFWRV9TSUdBQ1RJ
+T04KIAlhY3Quc2FfZmxhZ3MgPSAwOwogCXNpZ2ZpbGxzZXQoJmFjdC5zYV9tYXNrKTsKLQlz
+aWdhY3Rpb24oc2lnbm8sICZhY3QsIDApOworI2VuZGlmCisJU0lHTkFMKHNpZ25vKTsKIH0K
+IAogLyoKQEAgLTI4Niw2ICszMDEsOSBAQAogdm9pZAogb25zaWcoaW50IHNpZ25vKQogewor
+I2lmbmRlZiBIQVZFX1NJR0FDVElPTgorCXNpZ25hbChzaWdubywgb25zaWcpOworI2VuZGlm
+CiAJaWYgKHZmb3JrZWQpCiAJCXJldHVybjsKIApAQCAtNDQxLDggKzQ1OSwxMyBAQAogCiB2
+b2lkIHNpZ2Jsb2NrYWxsKHNpZ3NldF90ICpvbGRtYXNrKQogeworI2lmZGVmIEhBVkVfU0lH
+UFJPQ01BU0sKIAlzaWdzZXRfdCBtYXNrOwogCiAJc2lnZmlsbHNldCgmbWFzayk7CiAJc2ln
+cHJvY21hc2soU0lHX1NFVE1BU0ssICZtYXNrLCBvbGRtYXNrKTsKKyNlbHNlCisJaWYob2xk
+bWFzaykKKwkJKm9sZG1hc2sgPSAwOworI2VuZGlmCiB9Cg==
 
---------------d70HRFEWoZsnNugDCNnBPJbP--
+--------------qpFlvwHOq9TISH7QDkuDa2v9--
