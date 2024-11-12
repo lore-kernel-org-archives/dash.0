@@ -1,32 +1,32 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4D221A717
-	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4756421A4D2
+	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731452205; cv=none; b=A0HNM2q/BSELNc1bFYqGE0X35v3zJjRlknNrExYoQHZRuMGORPrsRC/5l7qLHeSNwu8RKSUFOhTk2Ybtudy3kvZQJmjucRrotYRKByMsvnUJNBh0vaRA6U5C3RfZsHPFDYWtgf6fB+s6DlJNxhvqv8esJboIPVNmDMCBqYR28w0=
+	t=1731452341; cv=none; b=c0yjqleKEjrWvIqlqx77Em9N2Nql6HNv9Gz8FzFxaIybbey+morW6p7hn6d+OqJk07oZ9TCABuHNmwzikZZVZQdhvqRlyV3VE0byY7QDuj+F6MrIRCZugjGZHSSK+Z5uk3olAJOrUNm6X+FuLqvRapZeNwlvW5QFHiZ3AGJR4ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731452205; c=relaxed/simple;
-	bh=n2kFsPmDSLyy3+cy1DKgdWGA2joPhRBbLuts5Ji0dkE=;
+	s=arc-20240116; t=1731452341; c=relaxed/simple;
+	bh=QI57qWtOdyB2lrpwcmDWFYHXN6uV3Y8c1Jz2/+p4hIQ=;
 	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=MkHVaUSrOQhtdKQPcfoZsNSsQWFjwE3ZUsuWjuRM5bXj1KWZmOi946x5gBxAfHnkRYL1WKfPxTqv1olTTjzHszK2lKdNrpgi2cus9jJvKLj9V1dGL5/3ujoUhINjdzddX28PH3aNtyB/o3/w3rEeYdlIgdU2sOEvQCgnPe+QGEg=
+	 References:From:In-Reply-To; b=hbILR4a8v/TZDt9lOEHAYD5YX7pdDaU8F5jLRAyn3y7iry/gHil0YxFBhdMAFjq4O2bJ1HvNtGZlo3Yj27bvYx0YAuUjLAfXBYIqhT2ZVCLnlgriMciXJGW4WxFnnVzLCkjt47o3oEYH8PsMgjTfw+H+90+h+yR8bKFsxIPvfBk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMtXC54067774
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMvl6d4067931
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 23:55:35 +0100
+	Tue, 12 Nov 2024 23:57:48 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMtWp6078301
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMvjp9078370
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 12 Nov 2024 23:55:33 +0100
-Content-Type: multipart/mixed; boundary="------------gmXEJhhH0mMWNaGOFCmYuyyy"
-Message-ID: <71a800ed-33b3-4158-b1ea-f75f80e3d892@knaff.lu>
-Date: Tue, 12 Nov 2024 23:55:31 +0100
+	Tue, 12 Nov 2024 23:57:47 +0100
+Content-Type: multipart/mixed; boundary="------------Jz31v2Ugb8Gq8cORXXAhbPL0"
+Message-ID: <108e62e8-28d8-4e04-9ac8-363d52df10ef@knaff.lu>
+Date: Tue, 12 Nov 2024 23:57:45 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 16-signed-size-t
+ PC : 17-monitor-mode
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
@@ -70,42 +70,40 @@ Autocrypt: addr=alain@knaff.lu; keydata=
 In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 
 This is a multi-part message in MIME format.
---------------gmXEJhhH0mMWNaGOFCmYuyyy
+--------------Jz31v2Ugb8Gq8cORXXAhbPL0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-On UnixPC, size_t is a *signed* type, unlike on all other platforms.
+Monitor mode is the feature that makes the shell display the status of
+any exited children when pressing return at the shell prompt.
 
-Thus the SSIZE_MAX macro doesn't work on UnixPC as on other platforms
-(because right-shift of signed quantities pad with value of leftmost
-bit, rather than always shifting a zero in)
+It can be enabled/disabled using set -m/set +m. It is enabled by
+default in interactive shells, and disabled in non-interactive shells
+(such as those running a script)
 
-This replacement works ok (and obviously works for unsigned size_t
-too)
-
-After having applied this one, dash should work on UnixPC for basic
-tasks, the next 2 are optional features.
+Normally monitor mode doesn't need any advanced job control features
+to work, but for some reason dash only makes it available if job
+control is available. This patch changes this by directly probing
+mflag rather than jobctl.
 
 Regards,
 
 Alain
---------------gmXEJhhH0mMWNaGOFCmYuyyy
+--------------Jz31v2Ugb8Gq8cORXXAhbPL0
 Content-Type: text/x-patch; charset=UTF-8;
- name="dash-0.5.12+16-signed-size-t.diff"
-Content-Disposition: attachment; filename="dash-0.5.12+16-signed-size-t.diff"
+ name="dash-0.5.12+17-monitor-mode.diff"
+Content-Disposition: attachment; filename="dash-0.5.12+17-monitor-mode.diff"
 Content-Transfer-Encoding: base64
 
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzE2LW1vbml0b3ItbW9k
-ZS9zcmMvc3lzdGVtLmggZGFzaC0wLjUuMTIrMTctc2lnbmVkLXNpemUtdC9zcmMvc3lzdGVt
-LmgKLS0tIGRhc2gtMC41LjEyKzE2LW1vbml0b3ItbW9kZS9zcmMvc3lzdGVtLmgJMjAyNC0x
-MS0xMCAxNDo1MzowOC40Mzg2MTg1NjIgKzAwMDAKKysrIGRhc2gtMC41LjEyKzE3LXNpZ25l
-ZC1zaXplLXQvc3JjL3N5c3RlbS5oCTIwMjQtMTEtMTAgMTQ6NTM6MDguNDQ2NjE4NzUxICsw
-MDAwCkBAIC0zMSw3ICszMSw3IEBACiAjaW5jbHVkZSA8c3lzL3R5cGVzLmg+CiAKICNpZm5k
-ZWYgU1NJWkVfTUFYCi0jZGVmaW5lIFNTSVpFX01BWCAoKHNzaXplX3QpKChzaXplX3QpLTEg
-Pj4gMSkpCisjZGVmaW5lIFNTSVpFX01BWCAoKCgoMUwgPDwgKHNpemVvZihzc2l6ZV90KSo4
-LTIpKS0xKTw8MSkrMSkKICNlbmRpZgogCiBzdGF0aWMgaW5saW5lIHZvaWQgc2lnY2xlYXJt
-YXNrKHZvaWQpCg==
+ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzE1LXJlYWxsb2MtbnVs
+bC9zcmMvbWFpbi5jIGRhc2gtMC41LjEyKzE2LW1vbml0b3ItbW9kZS9zcmMvbWFpbi5jCi0t
+LSBkYXNoLTAuNS4xMisxNS1yZWFsbG9jLW51bGwvc3JjL21haW4uYwkyMDI0LTEwLTIxIDEw
+OjQ0OjEyLjczMjUzMzEzMyArMDAwMAorKysgZGFzaC0wLjUuMTIrMTYtbW9uaXRvci1tb2Rl
+L3NyYy9tYWluLmMJMjAyNC0xMS0wMSAyMToyMDowNy44MTQ5MjAxMzMgKzAwMDAKQEAgLTIw
+OSw3ICsyMDksNyBAQAogCQlpbnQgc2tpcDsKIAogCQlzZXRzdGFja21hcmsoJnNtYXJrKTsK
+LQkJaWYgKGpvYmN0bCkKKwkJaWYgKG1mbGFnKQogCQkJc2hvd2pvYnMob3V0MiwgU0hPV19D
+SEFOR0VEKTsKIAkJaW50ZXIgPSAwOwogCQlpZiAoaWZsYWcgJiYgdG9wKSB7Cg==
 
---------------gmXEJhhH0mMWNaGOFCmYuyyy--
+--------------Jz31v2Ugb8Gq8cORXXAhbPL0--
