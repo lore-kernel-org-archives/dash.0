@@ -1,32 +1,32 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF3E1FEFD9
-	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32ECB481AF
+	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:35:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731450846; cv=none; b=FeduE8cNYnFSin4VN2sufm5iMJ/gh3XQmeaaB0zavApcr4yhHtAMwfUasnchhtwo65Es+M/cVfHmsYWwJNq0tZf0C/x7XLBpzAsLnMzy6fdxIPmErU9PY3lF6OOVyKaYoPQM7/Whp7xLwwG91+yyQmmWmt7yyDP8Njl7CuvTdEk=
+	t=1731450946; cv=none; b=OR1gxezvnpJpGRP0ziM3OE6Iujnme1+M3wsmb9CSyLi/BleryPYd7nBtmKu2MIFPwMLCGxDbcRZvoX/tew8ht5oZ21eJp+ozKF/Nnbk4/M3A4CsyGVj8o9lkbJabslLHdyvilZeloBaxvoev9+6YtunQ/nL9vLCvL4UMwYrH/lQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731450846; c=relaxed/simple;
-	bh=FoXstaGsJ1a8kpPv5J9+NZeFfy4ZobsP1J3G74tWPaU=;
+	s=arc-20240116; t=1731450946; c=relaxed/simple;
+	bh=Dl1emBavciX4XQ/aEnKHPJmMgb5b+ZZI2NbdPkdzDU0=;
 	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=FFj9K0pfgssZyzMk8wcd72G8nBZTxHg6U/O9iDbwm3S9dHMOGLzR3/H3pyylT5P6eWQbjDThycJBJMNyMWHQid6ejpegw401b/nQraUJxf6v+me9MFe9BJPXgzyRDSTYvWAxe1M/fvPszpay3boOroYaH6pT8nLo1wJ/FNxqgDM=
+	 References:From:In-Reply-To; b=oAYeTyNjV392T9Ls92xvEDn/P2rfthUoRxQXEdDLpPBvQosaSt+w9rflYxT5U9rk4yiFnGhgoXcsBUeH+im8ykRdydRf1+jpCEJJ0IYUZQy5kzUXzMCv781QY/RnUz6VFv4DfiULoRD/6ZQHyhnemVqufxIvS5pWJOZ69h+cHYs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMWna34066269
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMYV4H4066395
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 23:32:50 +0100
+	Tue, 12 Nov 2024 23:34:32 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMWm8i077128
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMYTCY077185
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 12 Nov 2024 23:32:49 +0100
-Content-Type: multipart/mixed; boundary="------------SoYVfvAKc12GM6aHpUnUi836"
-Message-ID: <327cf9fa-b1b0-4740-b4a5-5f7fdb34da23@knaff.lu>
-Date: Tue, 12 Nov 2024 23:32:47 +0100
+	Tue, 12 Nov 2024 23:34:30 +0100
+Content-Type: multipart/mixed; boundary="------------AghwTlFjbW0J249nGbaK9VYD"
+Message-ID: <e97066c0-2838-411c-91b6-d91cc732cc43@knaff.lu>
+Date: Tue, 12 Nov 2024 23:34:29 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 02-stat64
+ PC : 03-name-max
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
@@ -70,85 +70,43 @@ Autocrypt: addr=alain@knaff.lu; keydata=
 In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 
 This is a multi-part message in MIME format.
---------------SoYVfvAKc12GM6aHpUnUi836
+--------------AghwTlFjbW0J249nGbaK9VYD
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-The second element of the patch set fixes the stat64 redefinition so
-that it can compile on Solaris.
+The third part of the patch set supplies a definition of NAME_MAX
+where one is lacking.
 
-Indeed, rather than supplying stat64 etc. as a normal library
-function, Solaris uses a #define, which means that AC_CHECK_FUNCTION
-won't detect it, resulting in a compilation where struct stat and
-struct stat64 conflict with each other.
+This is the case not only on UnixPC, but also on the Solaris platforms.
 
-This patch replaces the AC_CHECK_FUNCTION calls with AC_CHECK_DECL,
-and adds includes where needed.
+When supplying NAME_MAX, we may err towards values which are too
+large, because NAME_MAX is used to ensure that a buffer used to hold
+filenames while globbing is large enough. Hence I use PATH_MAX.
 
-Checking for declarations rather than functions would miss a
-hypothetical situation where a library function stat64 would exists
-which lacks a prototype declaration. However, this is very unlikely to
-happen in practice, because general availability of prototypes of
-system function predates availability of 64 bit file offset by years.
-
-This patch is not strictly needed for UnixPC compatibility, and may be
-skipped if it causes problems elsewhere.
-
-All this being said, while studying what happens on Solaris, I
-wondered about three alternative solutions:
- 1. the problem happens because the #define statements for stat64
-    happen in config.h *before* inclusion of system includes such as
-    sys/stat.h
-    If the #define happened *after* inclusion of system includes, the
-    problem would result in a mere warning when it happens. So why not
-    move those defines to system.h?
-
- 2. similarly, rather than defining stat64, why not make up a new name,
-    such as statw, and #define statw to be stat or stat64 depending on
-    what is available?
-
- 3. and finally, is the whole shebang actually needed if we use
-    AC_SYS_LARGEFILE? This autoconf directive adds an appropriate
-    #define before inclusion of system files to instruct them to make
-    the relevant system calls "64-bit clean". That way we wouldn't need
-    to mess around with redefining stat64 our-self.
+After having applied the 3 patches so far, the program should compile
+on Solaris 11.
 
 Regards,
 
 Alain
---------------SoYVfvAKc12GM6aHpUnUi836
-Content-Type: text/x-patch; charset=UTF-8; name="dash-0.5.12+02-stat64.diff"
-Content-Disposition: attachment; filename="dash-0.5.12+02-stat64.diff"
+--------------AghwTlFjbW0J249nGbaK9VYD
+Content-Type: text/x-patch; charset=UTF-8; name="dash-0.5.12+03-name-max.diff"
+Content-Disposition: attachment; filename="dash-0.5.12+03-name-max.diff"
 Content-Transfer-Encoding: base64
 
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzAxLXJlbW92ZS1leHRy
-YW5lb3VzL2NvbmZpZ3VyZS5hYyBkYXNoLTAuNS4xMiswMi1zdGF0NjQvY29uZmlndXJlLmFj
-Ci0tLSBkYXNoLTAuNS4xMiswMS1yZW1vdmUtZXh0cmFuZW91cy9jb25maWd1cmUuYWMJMjAy
-NC0xMS0xMCAxMDoxNDo0MS42MDgzMDUxMDYgKzAwMDAKKysrIGRhc2gtMC41LjEyKzAyLXN0
-YXQ2NC9jb25maWd1cmUuYWMJMjAyNC0xMS0xMCAxNjowNDo0Mi43OTI1ODcwMzIgKzAwMDAK
-QEAgLTE0MCwyOCArMTQwLDI5IEBACiBmaQogCiBkbmwgQ2hlY2sgZm9yIHN0YXQ2NCAoZGll
-dGxpYmMva2xpYmMpLgotQUNfQ0hFQ0tfREVDTChzdGF0NjQsIEFDX0NIRUNLX0ZVTkMoc3Rh
-dDY0KSkKLWlmIHRlc3QgIiRhY19jdl9mdW5jX3N0YXQ2NCIgIT0geWVzOyB0aGVuCitBQ19D
-SEVDS19ERUNMKHN0YXQ2NCwsIFsKIAlBQ19ERUZJTkUoZnN0YXQ2NCwgZnN0YXQsIFs2NC1i
-aXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMgMzItYml0XSkKIAlBQ19ERUZJTkUobHN0
-YXQ2NCwgbHN0YXQsIFs2NC1iaXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMgMzItYml0
-XSkKIAlBQ19ERUZJTkUoc3RhdDY0LCBzdGF0LCBbNjQtYml0IG9wZXJhdGlvbnMgYXJlIHRo
-ZSBzYW1lIGFzIDMyLWJpdF0pCi1maQorXSkKIAotQUNfQ0hFQ0tfRlVOQyhnbG9iNjQsLCBb
-CitBQ19DSEVDS19ERUNMKGdsb2I2NCwsIFsKIAlBQ19ERUZJTkUoZ2xvYjY0X3QsIGdsb2Jf
-dCwgWzY0LWJpdCBvcGVyYXRpb25zIGFyZSB0aGUgc2FtZSBhcyAzMi1iaXRdKQogCUFDX0RF
-RklORShnbG9iNjQsIGdsb2IsIFs2NC1iaXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMg
-MzItYml0XSkKIAlBQ19ERUZJTkUoZ2xvYmZyZWU2NCwgZ2xvYmZyZWUsCiAJCSAgWzY0LWJp
-dCBvcGVyYXRpb25zIGFyZSB0aGUgc2FtZSBhcyAzMi1iaXRdKQotXSkKK10sWyNpZmRlZiBI
-QVZFX0dMT0IKKyNpbmNsdWRlIDxnbG9iLmg+CisjZW5kaWZdKQogCiBkbmwgT1MgWCBhcHBh
-cmVudGx5IGhhcyBzdGF0NjQgYnV0IG5vdCBvcGVuNjQuCi1BQ19DSEVDS19GVU5DKG9wZW42
-NCwsIFsKK0FDX0NIRUNLX0RFQ0wob3BlbjY0LCwgWwogCUFDX0RFRklORShvcGVuNjQsIG9w
-ZW4sIFs2NC1iaXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMgMzItYml0XSkKIAlBQ19E
-RUZJTkUocmVhZGRpcjY0LCByZWFkZGlyLAogCQkgIFs2NC1iaXQgb3BlcmF0aW9ucyBhcmUg
-dGhlIHNhbWUgYXMgMzItYml0XSkKIAlBQ19ERUZJTkUoZGlyZW50NjQsIGRpcmVudCwKIAkJ
-ICBbNjQtYml0IG9wZXJhdGlvbnMgYXJlIHRoZSBzYW1lIGFzIDMyLWJpdF0pCi1dKQorXSxb
-I2luY2x1ZGUgPGZjbnRsLmg+XSkKIAogZG5sIENoZWNrIGlmIHN0cnVjdCBzdGF0IGhhcyBz
-dF9tdGltLgogQUNfTVNHX0NIRUNLSU5HKGZvciBzdGF0OjpzdF9tdGltKQo=
+ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzAyLXN0YXQ2NC9zcmMv
+c3lzdGVtLmggZGFzaC0wLjUuMTIrMDMtbmFtZS1tYXgvc3JjL3N5c3RlbS5oCi0tLSBkYXNo
+LTAuNS4xMiswMi1zdGF0NjQvc3JjL3N5c3RlbS5oCTIwMjAtMDYtMDMgMDI6MjM6MjQuMDAw
+MDAwMDAwICswMDAwCisrKyBkYXNoLTAuNS4xMiswMy1uYW1lLW1heC9zcmMvc3lzdGVtLmgJ
+MjAyNC0xMS0xMCAxNDo1MjoyOC44MDU2ODE5NTQgKzAwMDAKQEAgLTExNiwzICsxMTYsMTEg
+QEAKICAqIGNvZGUKICAqLwogI2RlZmluZSB1bmluaXRpYWxpemVkX3Zhcih4KSB4ID0geAor
+CisjaWZuZGVmIE5BTUVfTUFYCisvKiBOQU1FX01BWCBpcyBvbmx5IHVzZWQgaW4gZXhwYW5k
+LmMgdG8gbWFrZSBzdXJlIHRoYXQgd2UgaGF2ZSBhCisgICBidWZmZXIgYmlnIGVub3VnaCB0
+byBhcHBlbmQgdGhlIG5leHQgbG9jYWwgZmlsZSBwYXJ0IGludG8gZHVyaW5nCisgICBnbG9i
+YmluZy4gU28sIGluIGNhc2Ugb2YgZG91YnQsIHdlIG5lZWQgTkFNRV9NQVggdG8gYmUgYmln
+Z2VyCisgICByYXRoZXIgdGhhbiBzbWFsbGVyLCBpbiBvcmRlciB0byBwcmV2ZW50IGJ1ZmZl
+ciBvdmVyZmxvdyAqLworIyBkZWZpbmUgTkFNRV9NQVggUEFUSF9NQVgKKyNlbmRpZgo=
 
---------------SoYVfvAKc12GM6aHpUnUi836--
+--------------AghwTlFjbW0J249nGbaK9VYD--
