@@ -1,32 +1,32 @@
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5096450EE
-	for <dash@vger.kernel.org>; Sun, 10 Nov 2024 20:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
+Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB882185AD
+	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731269347; cv=none; b=OEBCUvxbEY1JM9hXNQaNnYpdqgRsrrADlonI1GtY5Fb9lKnixOswlBM5Lw5zB9xJrP15Q97ClGkRxkH+1a+MggB/LOvbXlIIUSN/0ncBIKzmwyUrNIjYumZHiIPj73j2HDSiM4QNJ/iZuq19fglbClbWcPBdubzZ5D8PQJ0f1xM=
+	t=1731450594; cv=none; b=ZFeHWbIvZ8KiYUMPXUjx5dHSxzj6wse/bIxIvUkJUl8hpIdWYlOy3KZGLqpZbDBxa3O/EQPsiEUg8Lge5nDQBfJ9dd1dY+KGOURAZEXHzYEDJnJiA/xTtI9K75PwRA5AWkY5j9MS5J17wAQuWq75yPlegRqpPkNFz5kGZzc97uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731269347; c=relaxed/simple;
-	bh=5DqxgeMO4nigUWZJYeUa+iPdc8i6X6QRhthJ3Sc1wuk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FI4S0MkntIb6YJvYlNU4A5fdWX6VIyUfe4Ps3vVkC5KBR/Asb2EEv0UH1Oj+XXDbY0kNZKJB1Vh9ZU+BOOVE8DjrJPmqSCheMGSAa7GYlj8AL4uh4H2ss75lW+QJQLKZBqwACFJ8jHhTFcjK1fyOJZIJkPuaZgIiZrBCiNhXiKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=O/3eRl9A; arc=none smtp.client-ip=51.68.198.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="O/3eRl9A"
-Received: from [IPV6:2a02:8010:68a1:0:c3eb:cbfe:ac4b:964a] (unknown [IPv6:2a02:8010:68a1:0:c3eb:cbfe:ac4b:964a])
-	by mail.gigawatt.nl (Postfix) with ESMTPSA id B476D32;
-	Sun, 10 Nov 2024 20:09:00 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl B476D32
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1731269340;
-	bh=bgwzr/CbEw3PPmgTuQcpTwOltMSaDQsI6r/EiFTHGYI=; l=4320;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=O/3eRl9A/xOJyjID3jBEUue5vszYoGvllIOwUlH/exjnuNDJ6qRiGAJ8tvfAO909n
-	 QegAuAXQIHzLoroJ8tXoKthTEH5i5Df9+HkjS0wb4IXmS8VQYuIsd3gkmE3pjiE3s9
-	 wO4Fc96FHn2WULueZeWN1huXhuY+SsodKhBZjBe4=
-Message-ID: <be8c2692-ab69-46f2-a487-2f99452a0c2f@gigawatt.nl>
-Date: Sun, 10 Nov 2024 20:08:59 +0000
+	s=arc-20240116; t=1731450594; c=relaxed/simple;
+	bh=fgB3DeZnsPR7nMJ5hTD949UV7lJDDoIU2Yh1boE+8G0=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:References:
+	 From:Cc:In-Reply-To; b=hThHSSqAsRrMJyPTkOe0V67TW588KQpqDCTzJamQwkTnXuPA6OwtFMXCUbu9zwHDp3/lwcBBdKl5OCPnQivmSRxpZ8xQJmip3/sSqJCGHGzKWM+Rk8lT873GDoFUqC1rNUgcJyDb7FIHos56JQZCZ2yV2UuPWRlLbiwx2z2VPjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
+Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMQPMo4065890
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Tue, 12 Nov 2024 23:26:26 +0100
+X-Envelope-To: dash@vger.kernel.org
+Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
+	(authenticated bits=0)
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMQNS1076800
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
+	Tue, 12 Nov 2024 23:26:24 +0100
+Content-Type: multipart/mixed; boundary="------------fVwHqv0YjKWPFSh2ILr3hh0E"
+Message-ID: <73d307f8-7769-4a73-b4d0-467800010252@knaff.lu>
+Date: Tue, 12 Nov 2024 23:26:23 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -34,126 +34,108 @@ List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: set -e not ignored in AND-OR list
-To: Christoph Anton Mitterer <calestyo@scientia.org>,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
-References: <ZzAyYf1ZWcSuPVJZ@gondor.apana.org.au>
- <b16286957f9b3d6409423b3b9b54c84c1c64fcb2.camel@scientia.org>
- <6496f8a6-bf07-4c4c-bbb6-3ce42dc378bd@gigawatt.nl>
- <85df2488f78032cfb64acc98ec2c483bc1fb03e5.camel@scientia.org>
- <65b72665-6d65-446f-b32b-968c6116ef1e@gigawatt.nl>
- <20715fc311f5d3655e2d6d9dc1a911e8cfbccc3f.camel@scientia.org>
+Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
+ PC : 01-remove-extraneous
+To: Herbert Xu <herbert@gondor.apana.org.au>
+References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
+ <6ea7da38-204f-54bf-7156-085a1589c40b@knaff.lu>
+ <6cacf608-326e-211a-7d37-164041710980@knaff.lu>
+ <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
+From: Alain Knaff <alain@knaff.lu>
 Content-Language: en-US
-From: Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <20715fc311f5d3655e2d6d9dc1a911e8cfbccc3f.camel@scientia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Cc: dash@vger.kernel.org
+Autocrypt: addr=alain@knaff.lu; keydata=
+ xsDiBEk9qFcRBADO4trPtib39qvAEBlkAIcBGnZ137EmmNLU1pFZC5acLyJ4wYhVdcol97lC
+ 4ZkD0DJek6DVidQfz4hA7JbZy2W8l6O/o2k/Ja2bWkb8qtrcUNVDJzdJjNqXmmxdsyLd5QVt
+ uCHgi3Zz0kq9aJnRCVuAyfrjMdaUsOThi07u1EyEywCgjxVKODAifumqfdjVxS5NoV7x7TkD
+ /0k2F3/5/NYchgLz6Qu3As5MVtPs7NkJ0Mpal4Gy8CaKefHcynY+zCziM/oBw0+PIFxyFud0
+ uT9HRIdEp1DlaTTUYlt95HeDYmCUh0Wt1PwNNRWcm+vTUuK7tOxzYadUqbzO+F6C+WN8msxA
+ hcxzUgsL/YyXVilvL8XqB+RlS5bBA/9OxXc2mJs01nWu5khvVFNwUCDS8FRYyoHeodVZFGLC
+ UG1PrV9nHva5vYJk1QlZP3qEotnK+6l4708X9yhdw2+UCtxvseTQ6JWBtIdJyo+Qv7apSQA3
+ kkau6Om7SOyW1i/2LcCZU84SC923uBH7VNeUzCnzelVFubk6eRwzjNvrj80cQUxBSU4gS05B
+ RkYgPGFsYWluQGtuYWZmLmx1PsJgBBMRAgAgBQJJPahXAhsDBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQyAYxsm9DGWFEsgCeOSavzyOp8Bj3nOP8hC6XeCX/3k4Anj0KegsyeIVxuj5X
+ TUnh535vXfZvzsFNBEk9qFoQCACt2vctXYAr+ndRbaeR4ygJ8rKH8ARu68nDuQuxOKCasaQr
+ xm8+/RxvmTfriP00tYZAca2tmCjwntKVsK4eNSivvo6c7BwziCnQx/vW+kJK4ctckMHSZPqe
+ 4a1HWYURg5oxaqGo4f06YAn9O0yDo6xdGGNUMpYHv2O1/jsAEgAM/c/US+gNctzsNKQ4lVwp
+ HH4NEabev+zlisnTO3V39iXijZbe9AYlD4qZH/0nFBDCCt9EDTe+/6IFfvIrnVx7o367U9XL
+ SCLVQt4k7xqCIow7RP5BlOYLDV50yMva8c62yhWpDYKSyJsQGn/nGiiv6P4Ye/monfkQD+PC
+ nKPXDYCjAAMFB/9D2FSYHyikvOoXXMTfjGHUyIQK6FCtKINTFfBPuwlWOWCukrQrzH0BmTVC
+ /WuMOrrmxl0IFHGtOV2Zp+bdsjhlzgZ4kXAmqw1Qiphb/YLD6VY5TQ59Tkl7+nCQ0wjcRim1
+ Sg6OzmoNttHpTt9eAvLZMz7yi9Nq40yKXh+zXZtzHIgdsXG+tO9+LEWojdbXgIdZin2yUKYt
+ KxbpwyM0qCN9oGtKTAi0GX+tuHdAqWwYEgVnd27LcBGLTs6QJPsjQKHiAtYJwu6MWiF7bvCr
+ iBNyVG3yU3inZcQvIdYxO0VUN3wVSEIbRHcNzG2u1UD6ZuF+3bv39dh54m1CQzbzzRepwkkE
+ GBECAAkFAkk9qFoCGwwACgkQyAYxsm9DGWHNLwCfWr4DLrBZMktv9RTGbcIZ+/NgTswAn3aG
+ LBuTFPDEO0bfA+7PlpCctCJT
+In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
+
+This is a multi-part message in MIME format.
+--------------fVwHqv0YjKWPFSh2ILr3hh0E
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/11/2024 18:58, Christoph Anton Mitterer wrote:
-> On Sun, 2024-11-10 at 17:06 +0000, Harald van Dijk wrote:
->> In dash, the effect of 'set -e' in a
->> command
->> substitution is that a command is never considered "tested", unless
->> that
->> testing happens inside the command substitution, and it would be
->> useful
->> for that to be documented.
-> 
-> The way set -e is currently documented (with "tested" vs. "untested")
-> in the manpage is IMO already a bit strange.
+Hi,
 
-The way that 'set -e' is currently documented would be useful, but does 
-not match what is implemented.
+On 06/04/2024 08:25, Herbert Xu wrote:
+[...]
+> Thanks but this needs to be split up into smaller patches so
+> that each patch fixes just one problem.
 
-Basically: what the current documentation is saying is that every 
-command gets an implicit "|| exit $?" added to it, unless there is more 
-specific error handling in the script.
+I've now split up the patch into parts. In addition to just the
+splitting, the patch set contains the following changes/improvements:
+ - adapted it to dash 0.5.12 which has been released in the meantime,
+ - some cleanup,
+ - it now also compiles & works on Solaris 10 & 11
 
-But that is not what POSIX specifies, and what dash implements is closer 
-to what POSIX specifies, but not exactly what POSIX specifies. The 
-manpage suggests that
+The patches only list the changes to the primary sources (such as
+Makefile.am) Derived files, such as Makefile.in are not included, even
+though they would be part of the source tarball.
 
-   $ dash -c '(set -e; false; echo 123) && echo 456'
+For simplicity, I attached the patches as text files rather than
+pasting them into the mail. Indeed, I no longer trust thunderbird not
+to munge them if pasted. I hope this is ok.
 
-would output nothing. Of course, what happens instead, in all shells 
-that I know of, is that this prints "123" followed by "456".
+Here comes the first part: 01-remove-extraneous
 
-By POSIX's wording, that's right: "The -e setting shall be ignored when 
-executing [...] any command of an AND-OR list other than the last." and 
-there is no denying that that subshell is executing.
+This simply removes declarations from dash that are not used anyways,
+and that might needlessly clash with system definitions later on.
 
-By dash's wording that's wrong: the "false" command is not the left hand 
-operand of an "&&" operator, it's only *part of* the left hand operand 
-of an "&&" operator.
+Regards,
 
-My personal first preference, which I realise will not and should not be 
-implemented because it disregards POSIX, would be to leave the 
-documentation as it is, and adjust dash's behaviour to match the 
-documentation.
+Alain
+--------------fVwHqv0YjKWPFSh2ILr3hh0E
+Content-Type: text/x-patch; charset=UTF-8;
+ name="dash-0.5.12+01-remove-extraneous.diff"
+Content-Disposition: attachment;
+ filename="dash-0.5.12+01-remove-extraneous.diff"
+Content-Transfer-Encoding: base64
 
-Adjusting the documentation to match the current implementation would be 
-my personal second choice.
+ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyL3NyYy9ibHRpbi9ibHRp
+bi5oIGRhc2gtMC41LjEyKzAxLXJlbW92ZS1leHRyYW5lb3VzL3NyYy9ibHRpbi9ibHRpbi5o
+Ci0tLSBkYXNoLTAuNS4xMi9zcmMvYmx0aW4vYmx0aW4uaAkyMDIwLTA2LTAzIDAxOjE5OjIz
+LjAwMDAwMDAwMCArMDAwMAorKysgZGFzaC0wLjUuMTIrMDEtcmVtb3ZlLWV4dHJhbmVvdXMv
+c3JjL2JsdGluL2JsdGluLmgJMjAyNC0xMC0yMCAxODoyNjo0Ni45NjA1OTg2MzggKzAwMDAK
+QEAgLTYzLDcgKzYzLDYgQEAKICNkZWZpbmUgZnB1dHMgb3V0c3RyCiAjZGVmaW5lIGZmbHVz
+aCBmbHVzaG91dAogI2RlZmluZSBmaWxlbm8oZikgKChmKS0+ZmQpCi0jZGVmaW5lIGZlcnJv
+ciBvdXRlcnIKICNlbmRpZgogI2RlZmluZSBJTklUQVJHUyhhcmd2KQogI2RlZmluZQllcnJv
+ciBzaF9lcnJvcgpkaWZmIC1YIC4uL2V4Y2x1ZGUudHh0IC11ck4gZGFzaC0wLjUuMTIvc3Jj
+L2pvYnMuYyBkYXNoLTAuNS4xMiswMS1yZW1vdmUtZXh0cmFuZW91cy9zcmMvam9icy5jCi0t
+LSBkYXNoLTAuNS4xMi9zcmMvam9icy5jCTIwMjItMDEtMjAgMDU6NTQ6MTMuMDAwMDAwMDAw
+ICswMDAwCisrKyBkYXNoLTAuNS4xMiswMS1yZW1vdmUtZXh0cmFuZW91cy9zcmMvam9icy5j
+CTIwMjQtMTAtMjcgMTk6NTM6NDIuOTEyNjc1NjExICswMDAwCkBAIC0xMTIsOSArMTEyLDYg
+QEAKIFNUQVRJQyB2b2lkIGZvcmtjaGlsZChzdHJ1Y3Qgam9iICosIHVuaW9uIG5vZGUgKiwg
+aW50KTsKIFNUQVRJQyB2b2lkIGZvcmtwYXJlbnQoc3RydWN0IGpvYiAqLCB1bmlvbiBub2Rl
+ICosIGludCwgcGlkX3QpOwogU1RBVElDIGludCBkb3dhaXQoaW50LCBzdHJ1Y3Qgam9iICop
+OwotI2lmZGVmIFNZU1YKLVNUQVRJQyBpbnQgb25zaWdjaGlsZCh2b2lkKTsKLSNlbmRpZgog
+U1RBVElDIGludCB3YWl0cHJvYyhpbnQsIGludCAqKTsKIFNUQVRJQyBjaGFyICpjb21tYW5k
+dGV4dCh1bmlvbiBub2RlICopOwogU1RBVElDIHZvaWQgY21kdHh0KHVuaW9uIG5vZGUgKik7
+CmRpZmYgLVggLi4vZXhjbHVkZS50eHQgLXVyTiBkYXNoLTAuNS4xMi9zcmMvbXlzdHJpbmcu
+YyBkYXNoLTAuNS4xMiswMS1yZW1vdmUtZXh0cmFuZW91cy9zcmMvbXlzdHJpbmcuYwotLS0g
+ZGFzaC0wLjUuMTIvc3JjL215c3RyaW5nLmMJMjAyMi0xMi0xMSAwNjoyOToyMS4wMDAwMDAw
+MDAgKzAwMDAKKysrIGRhc2gtMC41LjEyKzAxLXJlbW92ZS1leHRyYW5lb3VzL3NyYy9teXN0
+cmluZy5jCTIwMjQtMTAtMjAgMTg6Mjc6NTYuNjM0MjQ1NDk5ICswMDAwCkBAIC00Niw3ICs0
+Niw2IEBACiAjaW5jbHVkZSA8ZXJybm8uaD4KICNpbmNsdWRlIDxpbnR0eXBlcy5oPgogI2lu
+Y2x1ZGUgPGxpbWl0cy5oPgotI2luY2x1ZGUgPGludHR5cGVzLmg+CiAjaW5jbHVkZSA8c3Rk
+bGliLmg+CiAjaW5jbHVkZSAic2hlbGwuaCIKICNpbmNsdWRlICJzeW50YXguaCIK
 
-> But your text makes it rather even more complicated O:-D
-> 
-> What about something like:
->   The exit status of a command
-> +(excluding any commands within command substitutions therein)
->   is considered to be explicitly tested if the
->   command is  used to control an if, elif
-> 
-> or so...?!
-
-I think the current behaviour would be covered by:
-
-   The exit status of a command is considered to be explicitly tested if 
-the command is used to control an if, elif, while, or until; or if the 
-command is the left hand operand of an "&&" or "||" operator; or if the 
-command is part of a list of which the exit status is tested.
-
-> I mean AFAIU set -e is NOT ignored only for the commands IN the command
-> substitution, but IS still ignored for the overall result of the
-> command substitution (as part of an if, while, etc.).
-
-Correct, 'set -e' is in full effect during command substitutions.
-
-  $ dash -ec 'var=$(false; echo foo) || echo foo; var=$(false; echo 
-bar); echo bar'
-  foo
-
-Here, the list 'false; echo foo' is (arguably contrary to POSIX) not 
-considered the LHS of an "||" operator, therefore 'false' causes the 
-whole subshell to exit, the 'var=$(false; echo foo)' command is 
-considered to fail, but that command has its exit status tested so 
-execution continues.
-
-Likewise, the 'var=$(false; echo bar)' command is considered to fail, 
-that command does not have its exit status tested, so execution stops.
-
->>> If it's however long standing behaviour of dash (and perhaps
->>> others),
->>> maybe POSIX should instead be revised.
->>
->> Yes, that would be my preference.
-> 
-> Another "downside" of allowing command substitutions to ignore the
-> ignoring of set -e is however that things get even more complicated.
-> 
-> I mean it's already crazy enough that for pipelines only the ! negated
-> ones and for AND-OR lists only all but the last elements are affected
-> by the set -e ignoring.
-> Generally excluding command substitutions from all these cases would
-> make it even more complex to understand and easy to forget while
-> coding.
-
-IMHO, what dash's manpage currently states is clear and useful, and if 
-that were actually implemented, the fact that it does not affect 
-subshells would be a natural consequence, not a special exception.
-
-The difference between treatment of subshells in command substitutions 
-and subshells outside of command substitutions does make it more 
-complicated to understand though.
-
-Cheers,
-Harald van Dijk
+--------------fVwHqv0YjKWPFSh2ILr3hh0E--
