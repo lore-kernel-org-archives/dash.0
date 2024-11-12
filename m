@@ -1,32 +1,32 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63615193092
-	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8823C205AD9
+	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731451318; cv=none; b=D5hrNev1FsSocv7igy6BbUYBd/8FKEd0LDsoqclTb+KjLTXSIUQv1X+mvuWqQkmBNYg/EAaudiLqomQHkaDTsaJ62yPNnt6x7QiLljQ+72i+0mav3d3Wqeg08b04ThLu2/uAWA2JX/igbv8OfmbV6Sh2BfnNXTD1YyiA7aJfigY=
+	t=1731451383; cv=none; b=nyhzvCPyK2kdX+IOMAm9v0MBYr0st9IV91lRn8iLQckipZOpAcjDohgFi/rQIsXOIyIdAf1v4NrMLnUliek2EwFOYsl1XGAWJ9Q/L11qSZyKqfMpdq5QggCAFda7F27H10yuEomXm6anryybIdWnq3S5n/PsSX36HoiEW8Ju0aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731451318; c=relaxed/simple;
-	bh=IB60Y/RImESDUb23rsUC1oBhi8lr46cHSJkGkh2RAtI=;
+	s=arc-20240116; t=1731451383; c=relaxed/simple;
+	bh=XXSKuJaA/B7mU4VGZ+F2esntUIWPgrzJrcpzYl4p1tY=;
 	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=ZsP5L0CWNbx8NF2FESxz10pIQK/GubP+0ZFQjXM7gfjZ90gq3COuy5LS2oIaf//6Zc2YzATFgB0IZqeq1gJzxTOI6Cv0Lub8e3n60fxk7dtuwIoeSVZsX0GiqlX8DRvKqzzNR3LO9jzUrwdXbX77LC5vhd7Mo/y6nsl2VdhvsXM=
+	 References:From:In-Reply-To; b=DA9tKYllHTT0a5Nwabxht7NA2rMBSJzBuPE0AhKvC78yMuP/zvi6wQ9nES9k2XSW8NIAaUZdnKjL2A0wxe2Y7Uzh5NxGE5+fGFuDR54u7OeW/uxTtXrHrCbKmXilWLIbmUgkgT09paED7SIRPor6I7OJpxtMR1rSCrudl97UoSE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMei9i4066856
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMfoqx4066904
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 23:40:46 +0100
+	Tue, 12 Nov 2024 23:41:52 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMehpa077681
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMfnXN077711
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 12 Nov 2024 23:40:44 +0100
-Content-Type: multipart/mixed; boundary="------------TPUtG8eK8Xp1jERkZrgH0ZdF"
-Message-ID: <a8fb350a-54c9-47eb-b7e7-756763de93b6@knaff.lu>
-Date: Tue, 12 Nov 2024 23:40:43 +0100
+	Tue, 12 Nov 2024 23:41:50 +0100
+Content-Type: multipart/mixed; boundary="------------xllulzX5z0zEUYj84ijQPNMw"
+Message-ID: <6984fb0c-5b02-4016-8052-778d19cbc3af@knaff.lu>
+Date: Tue, 12 Nov 2024 23:41:49 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 08-vsnprintf
+ PC : 09-type-sizes
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
@@ -70,64 +70,46 @@ Autocrypt: addr=alain@knaff.lu; keydata=
 In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 
 This is a multi-part message in MIME format.
---------------TPUtG8eK8Xp1jERkZrgH0ZdF
+--------------xllulzX5z0zEUYj84ijQPNMw
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-The 8th patch supplies a replacement "defintion" for vsnprintf.
-
-As vsnprintf is rather complex to re-implement fully, a stripped down
-version which does not verify available size is supplied.
-
-Most calls to vsnprintf have predictable size needs, so this is
-ok. Except one, in showvars, for which an alternative method is
-supplied that doesn't rely on vsnprintf for its variable size part.
+The 9th patch supplies auto-detection of size of various integer and
+other types
 
 Regards,
 
 Alain
---------------TPUtG8eK8Xp1jERkZrgH0ZdF
+--------------xllulzX5z0zEUYj84ijQPNMw
 Content-Type: text/x-patch; charset=UTF-8;
- name="dash-0.5.12+08-vsnprintf.diff"
-Content-Disposition: attachment; filename="dash-0.5.12+08-vsnprintf.diff"
+ name="dash-0.5.12+09-type-sizes.diff"
+Content-Disposition: attachment; filename="dash-0.5.12+09-type-sizes.diff"
 Content-Transfer-Encoding: base64
 
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzA3LXN5cy1mdW5jdGlv
-bnMvY29uZmlndXJlLmFjIGRhc2gtMC41LjEyKzA4LXZzbnByaW50Zi9jb25maWd1cmUuYWMK
-LS0tIGRhc2gtMC41LjEyKzA3LXN5cy1mdW5jdGlvbnMvY29uZmlndXJlLmFjCTIwMjQtMTEt
-MTAgMTc6Mjk6MTIuMDczMjM1MzAwICswMDAwCisrKyBkYXNoLTAuNS4xMiswOC12c25wcmlu
-dGYvY29uZmlndXJlLmFjCTIwMjQtMTEtMTAgMTc6Mjk6MDQuNTIxMDU1NjMxICswMDAwCkBA
-IC05NCw3ICs5NCw3IEBACiAJICAgICAgIHNpZ3NldG1hc2sgc3RwY3B5IHN0cmNocm51bCBz
-dHJzaWduYWwgc3RydG9kIHN0cnRvaW1heCBcCiAJICAgICAgIHN0cnRvdW1heCBzeXNjb25m
-IFwKIAkgICAgICAgdmZvcmsgbHN0YXQgZHVwMiBnZXRncm91cHMgXAotCSAgICAgICBzdHJz
-dHIgc3RwbmNweSBzdHJjYXNlY21wIHN0cmVycm9yIHN0cmR1cCBzdHJ0b3VsIFwKKwkgICAg
-ICAgc3Ryc3RyIHN0cG5jcHkgc3RyY2FzZWNtcCBzdHJlcnJvciBzdHJkdXAgc3RydG91bCB2
-c25wcmludGYgXAogCSAgICAgICByZWFkZGlyKQogCiBkbmwgQ2hlY2tzIGZvciBwcm90b3R5
-cGVzCmRpZmYgLVggLi4vZXhjbHVkZS50eHQgLXVyTiBkYXNoLTAuNS4xMiswNy1zeXMtZnVu
-Y3Rpb25zL3NyYy9zeXN0ZW0uYyBkYXNoLTAuNS4xMiswOC12c25wcmludGYvc3JjL3N5c3Rl
-bS5jCi0tLSBkYXNoLTAuNS4xMiswNy1zeXMtZnVuY3Rpb25zL3NyYy9zeXN0ZW0uYwkyMDI0
-LTExLTEwIDE2OjU0OjUwLjUyODIyNTI5MiArMDAwMAorKysgZGFzaC0wLjUuMTIrMDgtdnNu
-cHJpbnRmL3NyYy9zeXN0ZW0uYwkyMDI0LTExLTEwIDE2OjU0OjUwLjUzNjIyNTQ4MiArMDAw
-MApAQCAtMzEzLDYgKzMxMywyMiBAQAogfQogI2VuZGlmCiAKKyNpZm5kZWYgSEFWRV9WU05Q
-UklOVEYKK2ludCB2c25wcmludGYoY2hhciAqc3RyLCBzaXplX3Qgc2l6ZSwgY29uc3QgY2hh
-ciAqZm9ybWF0LCB2YV9saXN0IGFwKQoreworCWNoYXIgYnVmZmVyWzQwOTZdOworCWludCBy
-ZXQ7CisJaW50IG47CisJcmV0ID0gdnNwcmludGYoYnVmZmVyLCBmb3JtYXQsIGFwKTsKKwlp
-ZihyZXQgPCAwIHx8IHNpemUgPT0gMCkKKwkJcmV0dXJuIHJldDsKKwluID0gKHJldCA+PSBz
-aXplKSA/IHNpemUgLSAxIDogcmV0OworCXN0cm5jcHkoc3RyLCBidWZmZXIsIG4pOworCXN0
-cltuXT0nXDAnOworCXJldHVybiByZXQ7Cit9CisjZW5kaWYKKwogI2lmbmRlZiBIQVZFX01F
-TU1PVkUKIC8qIG1lbW1vdmUuYyAtLSBjb3B5IG1lbW9yeS4KICAgIFRoaXMgc25pcHBldCBp
-cyBpbiB0aGUgcHVibGljIGRvbWFpbi4gICovCmRpZmYgLVggLi4vZXhjbHVkZS50eHQgLXVy
-TiBkYXNoLTAuNS4xMiswNy1zeXMtZnVuY3Rpb25zL3NyYy92YXIuYyBkYXNoLTAuNS4xMisw
-OC12c25wcmludGYvc3JjL3Zhci5jCi0tLSBkYXNoLTAuNS4xMiswNy1zeXMtZnVuY3Rpb25z
-L3NyYy92YXIuYwkyMDI0LTEwLTIwIDA4OjM3OjU1LjgxODY4MzQwOSArMDAwMAorKysgZGFz
-aC0wLjUuMTIrMDgtdnNucHJpbnRmL3NyYy92YXIuYwkyMDI0LTEwLTIxIDEwOjQ0OjU1Ljkw
-OTU2MDI1NCArMDAwMApAQCAtMzkyLDcgKzM5MiwxMyBAQAogCQlpZiAoKnApCiAJCQlxID0g
-c2luZ2xlX3F1b3RlKCsrcCk7CiAKKyNpZmRlZiBIQVZFX1ZTTlBSSU5URgogCQlvdXQxZm10
-KCIlcyVzJS4qcyVzXG4iLCBwcmVmaXgsIHNlcCwgKGludCkocCAtICplcCksICplcCwgcSk7
-CisjZWxzZQorCQlvdXQxZm10KCIlcyVzJS4qcyIsIHByZWZpeCwgc2VwLCAoaW50KShwIC0g
-KmVwKSwgKmVwKTsKKwkJb3V0c3RyKHEsIG91dDEpOworCQlvdXRjc2xvdygnXG4nLCBvdXQx
-KTsKKyNlbmRpZgogCX0KIAogCXJldHVybiAwOwo=
+ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzA4LXZzbnByaW50Zi9j
+b25maWd1cmUuYWMgZGFzaC0wLjUuMTIrMDktdHlwZS1zaXplcy9jb25maWd1cmUuYWMKLS0t
+IGRhc2gtMC41LjEyKzA4LXZzbnByaW50Zi9jb25maWd1cmUuYWMJMjAyNC0xMS0xMCAxNzoy
+OTowNC41MjEwNTU2MzEgKzAwMDAKKysrIGRhc2gtMC41LjEyKzA5LXR5cGUtc2l6ZXMvY29u
+ZmlndXJlLmFjCTIwMjQtMTEtMTAgMTc6MDY6MzcuMTUzMDI4NjI5ICswMDAwCkBAIC02OCwx
+NyArNjgsMzAgQEAKIEFDX0NIRUNLX0RFQ0xTKFtpc2JsYW5rXSwsLFsjaW5jbHVkZSA8Y3R5
+cGUuaD5dKQogCiBBQ19ERUNMX1NZU19TSUdMSVNUCitBQ19UWVBFX1BJRF9UCitBQ19UWVBF
+X1VJRF9UCitBQ19UWVBFX1NTSVpFX1QKK0FDX1RZUEVfVUlOVDMyX1QKKworQUNfQ0hFQ0tf
+VFlQRShbaW50bWF4X3RdLCxBQ19ERUZJTkVfVU5RVU9URUQoW2ludG1heF90XSxsb25nLFtE
+ZWZpbmUgaW50bWF4X3QgdHlwZSwgbXVzdCBhbHNvIGJlIHN1cHBvcnRlZCBieSBwcmludGZd
+KSkKKworQUNfQ0hFQ0tfVFlQRShbdWludG1heF90XSwsQUNfREVGSU5FX1VOUVVPVEVEKFt1
+aW50bWF4X3RdLHVuc2lnbmVkIGxvbmcsW0RlZmluZSB1aW50bWF4X3QgdHlwZSwgbXVzdCBh
+bHNvIGJlIHN1cHBvcnRlZCBieSBwcmludGZdKSkKIAogZG5sIENoZWNrIGZvciBzaXplcyBv
+ZiB0eXBlcworQUNfU1lTX0xBUkdFRklMRQogQUNfQ0hFQ0tfU0laRU9GKFtpbnRtYXhfdF0p
+CiBBQ19DSEVDS19TSVpFT0YoW2xvbmcgbG9uZyBpbnRdKQorQUNfQ0hFQ0tfU0laRU9GKFts
+b25nIGludF0pCiAKIGRubCBTZWxlY3QgYSBmYWxsYmFjayBmb3JtYXQgc3RyaW5nIGZvciBp
+bnRtYXhfdCBpbiBjYXNlIHdlIGRvbid0IGZpbmQgUFJJZE1BWAogaWYgdGVzdCAieCRhY19j
+dl9zaXplb2ZfaW50bWF4X3QiID0gIngkYWNfY3Zfc2l6ZW9mX2xvbmdfbG9uZ19pbnQiOyB0
+aGVuCiAgIGludG1heF9mc3RyPSJsbGQiCitlbHNlIGlmIHRlc3QgIngkYWNfY3Zfc2l6ZW9m
+X2ludG1heF90IiA9ICJ4JGFjX2N2X3NpemVvZl9sb25nX2ludCI7IHRoZW4KKyAgaW50bWF4
+X2ZzdHI9ImxkIgogZWxzZQogICBpbnRtYXhfZnN0cj0iamQiCiBmaQorZmkKIAogZG5sIENo
+ZWNrIGZvciBQUklkTUFYIGFuZCBkZWZpbmUgaXQgdG8gYSBmYWxsYmFjayBpZiBub3QgZm91
+bmQKIEFDX0NIRUNLX0RFQ0woW1BSSWRNQVhdLCwK
 
---------------TPUtG8eK8Xp1jERkZrgH0ZdF--
+--------------xllulzX5z0zEUYj84ijQPNMw--
