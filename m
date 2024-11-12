@@ -1,32 +1,32 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB882185AD
-	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF3E1FEFD9
+	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731450594; cv=none; b=ZFeHWbIvZ8KiYUMPXUjx5dHSxzj6wse/bIxIvUkJUl8hpIdWYlOy3KZGLqpZbDBxa3O/EQPsiEUg8Lge5nDQBfJ9dd1dY+KGOURAZEXHzYEDJnJiA/xTtI9K75PwRA5AWkY5j9MS5J17wAQuWq75yPlegRqpPkNFz5kGZzc97uc=
+	t=1731450846; cv=none; b=FeduE8cNYnFSin4VN2sufm5iMJ/gh3XQmeaaB0zavApcr4yhHtAMwfUasnchhtwo65Es+M/cVfHmsYWwJNq0tZf0C/x7XLBpzAsLnMzy6fdxIPmErU9PY3lF6OOVyKaYoPQM7/Whp7xLwwG91+yyQmmWmt7yyDP8Njl7CuvTdEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731450594; c=relaxed/simple;
-	bh=fgB3DeZnsPR7nMJ5hTD949UV7lJDDoIU2Yh1boE+8G0=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:References:
-	 From:Cc:In-Reply-To; b=hThHSSqAsRrMJyPTkOe0V67TW588KQpqDCTzJamQwkTnXuPA6OwtFMXCUbu9zwHDp3/lwcBBdKl5OCPnQivmSRxpZ8xQJmip3/sSqJCGHGzKWM+Rk8lT873GDoFUqC1rNUgcJyDb7FIHos56JQZCZ2yV2UuPWRlLbiwx2z2VPjs=
+	s=arc-20240116; t=1731450846; c=relaxed/simple;
+	bh=FoXstaGsJ1a8kpPv5J9+NZeFfy4ZobsP1J3G74tWPaU=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To; b=FFj9K0pfgssZyzMk8wcd72G8nBZTxHg6U/O9iDbwm3S9dHMOGLzR3/H3pyylT5P6eWQbjDThycJBJMNyMWHQid6ejpegw401b/nQraUJxf6v+me9MFe9BJPXgzyRDSTYvWAxe1M/fvPszpay3boOroYaH6pT8nLo1wJ/FNxqgDM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMQPMo4065890
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMWna34066269
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 23:26:26 +0100
+	Tue, 12 Nov 2024 23:32:50 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMQNS1076800
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMWm8i077128
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 12 Nov 2024 23:26:24 +0100
-Content-Type: multipart/mixed; boundary="------------fVwHqv0YjKWPFSh2ILr3hh0E"
-Message-ID: <73d307f8-7769-4a73-b4d0-467800010252@knaff.lu>
-Date: Tue, 12 Nov 2024 23:26:23 +0100
+	Tue, 12 Nov 2024 23:32:49 +0100
+Content-Type: multipart/mixed; boundary="------------SoYVfvAKc12GM6aHpUnUi836"
+Message-ID: <327cf9fa-b1b0-4740-b4a5-5f7fdb34da23@knaff.lu>
+Date: Tue, 12 Nov 2024 23:32:47 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -35,15 +35,15 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 01-remove-extraneous
+ PC : 02-stat64
 To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
  <6ea7da38-204f-54bf-7156-085a1589c40b@knaff.lu>
  <6cacf608-326e-211a-7d37-164041710980@knaff.lu>
  <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
-From: Alain Knaff <alain@knaff.lu>
 Content-Language: en-US
-Cc: dash@vger.kernel.org
+From: Alain Knaff <alain@knaff.lu>
 Autocrypt: addr=alain@knaff.lu; keydata=
  xsDiBEk9qFcRBADO4trPtib39qvAEBlkAIcBGnZ137EmmNLU1pFZC5acLyJ4wYhVdcol97lC
  4ZkD0DJek6DVidQfz4hA7JbZy2W8l6O/o2k/Ja2bWkb8qtrcUNVDJzdJjNqXmmxdsyLd5QVt
@@ -70,72 +70,85 @@ Autocrypt: addr=alain@knaff.lu; keydata=
 In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 
 This is a multi-part message in MIME format.
---------------fVwHqv0YjKWPFSh2ILr3hh0E
+--------------SoYVfvAKc12GM6aHpUnUi836
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-On 06/04/2024 08:25, Herbert Xu wrote:
-[...]
-> Thanks but this needs to be split up into smaller patches so
-> that each patch fixes just one problem.
+The second element of the patch set fixes the stat64 redefinition so
+that it can compile on Solaris.
 
-I've now split up the patch into parts. In addition to just the
-splitting, the patch set contains the following changes/improvements:
- - adapted it to dash 0.5.12 which has been released in the meantime,
- - some cleanup,
- - it now also compiles & works on Solaris 10 & 11
+Indeed, rather than supplying stat64 etc. as a normal library
+function, Solaris uses a #define, which means that AC_CHECK_FUNCTION
+won't detect it, resulting in a compilation where struct stat and
+struct stat64 conflict with each other.
 
-The patches only list the changes to the primary sources (such as
-Makefile.am) Derived files, such as Makefile.in are not included, even
-though they would be part of the source tarball.
+This patch replaces the AC_CHECK_FUNCTION calls with AC_CHECK_DECL,
+and adds includes where needed.
 
-For simplicity, I attached the patches as text files rather than
-pasting them into the mail. Indeed, I no longer trust thunderbird not
-to munge them if pasted. I hope this is ok.
+Checking for declarations rather than functions would miss a
+hypothetical situation where a library function stat64 would exists
+which lacks a prototype declaration. However, this is very unlikely to
+happen in practice, because general availability of prototypes of
+system function predates availability of 64 bit file offset by years.
 
-Here comes the first part: 01-remove-extraneous
+This patch is not strictly needed for UnixPC compatibility, and may be
+skipped if it causes problems elsewhere.
 
-This simply removes declarations from dash that are not used anyways,
-and that might needlessly clash with system definitions later on.
+All this being said, while studying what happens on Solaris, I
+wondered about three alternative solutions:
+ 1. the problem happens because the #define statements for stat64
+    happen in config.h *before* inclusion of system includes such as
+    sys/stat.h
+    If the #define happened *after* inclusion of system includes, the
+    problem would result in a mere warning when it happens. So why not
+    move those defines to system.h?
+
+ 2. similarly, rather than defining stat64, why not make up a new name,
+    such as statw, and #define statw to be stat or stat64 depending on
+    what is available?
+
+ 3. and finally, is the whole shebang actually needed if we use
+    AC_SYS_LARGEFILE? This autoconf directive adds an appropriate
+    #define before inclusion of system files to instruct them to make
+    the relevant system calls "64-bit clean". That way we wouldn't need
+    to mess around with redefining stat64 our-self.
 
 Regards,
 
 Alain
---------------fVwHqv0YjKWPFSh2ILr3hh0E
-Content-Type: text/x-patch; charset=UTF-8;
- name="dash-0.5.12+01-remove-extraneous.diff"
-Content-Disposition: attachment;
- filename="dash-0.5.12+01-remove-extraneous.diff"
+--------------SoYVfvAKc12GM6aHpUnUi836
+Content-Type: text/x-patch; charset=UTF-8; name="dash-0.5.12+02-stat64.diff"
+Content-Disposition: attachment; filename="dash-0.5.12+02-stat64.diff"
 Content-Transfer-Encoding: base64
 
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyL3NyYy9ibHRpbi9ibHRp
-bi5oIGRhc2gtMC41LjEyKzAxLXJlbW92ZS1leHRyYW5lb3VzL3NyYy9ibHRpbi9ibHRpbi5o
-Ci0tLSBkYXNoLTAuNS4xMi9zcmMvYmx0aW4vYmx0aW4uaAkyMDIwLTA2LTAzIDAxOjE5OjIz
-LjAwMDAwMDAwMCArMDAwMAorKysgZGFzaC0wLjUuMTIrMDEtcmVtb3ZlLWV4dHJhbmVvdXMv
-c3JjL2JsdGluL2JsdGluLmgJMjAyNC0xMC0yMCAxODoyNjo0Ni45NjA1OTg2MzggKzAwMDAK
-QEAgLTYzLDcgKzYzLDYgQEAKICNkZWZpbmUgZnB1dHMgb3V0c3RyCiAjZGVmaW5lIGZmbHVz
-aCBmbHVzaG91dAogI2RlZmluZSBmaWxlbm8oZikgKChmKS0+ZmQpCi0jZGVmaW5lIGZlcnJv
-ciBvdXRlcnIKICNlbmRpZgogI2RlZmluZSBJTklUQVJHUyhhcmd2KQogI2RlZmluZQllcnJv
-ciBzaF9lcnJvcgpkaWZmIC1YIC4uL2V4Y2x1ZGUudHh0IC11ck4gZGFzaC0wLjUuMTIvc3Jj
-L2pvYnMuYyBkYXNoLTAuNS4xMiswMS1yZW1vdmUtZXh0cmFuZW91cy9zcmMvam9icy5jCi0t
-LSBkYXNoLTAuNS4xMi9zcmMvam9icy5jCTIwMjItMDEtMjAgMDU6NTQ6MTMuMDAwMDAwMDAw
-ICswMDAwCisrKyBkYXNoLTAuNS4xMiswMS1yZW1vdmUtZXh0cmFuZW91cy9zcmMvam9icy5j
-CTIwMjQtMTAtMjcgMTk6NTM6NDIuOTEyNjc1NjExICswMDAwCkBAIC0xMTIsOSArMTEyLDYg
-QEAKIFNUQVRJQyB2b2lkIGZvcmtjaGlsZChzdHJ1Y3Qgam9iICosIHVuaW9uIG5vZGUgKiwg
-aW50KTsKIFNUQVRJQyB2b2lkIGZvcmtwYXJlbnQoc3RydWN0IGpvYiAqLCB1bmlvbiBub2Rl
-ICosIGludCwgcGlkX3QpOwogU1RBVElDIGludCBkb3dhaXQoaW50LCBzdHJ1Y3Qgam9iICop
-OwotI2lmZGVmIFNZU1YKLVNUQVRJQyBpbnQgb25zaWdjaGlsZCh2b2lkKTsKLSNlbmRpZgog
-U1RBVElDIGludCB3YWl0cHJvYyhpbnQsIGludCAqKTsKIFNUQVRJQyBjaGFyICpjb21tYW5k
-dGV4dCh1bmlvbiBub2RlICopOwogU1RBVElDIHZvaWQgY21kdHh0KHVuaW9uIG5vZGUgKik7
-CmRpZmYgLVggLi4vZXhjbHVkZS50eHQgLXVyTiBkYXNoLTAuNS4xMi9zcmMvbXlzdHJpbmcu
-YyBkYXNoLTAuNS4xMiswMS1yZW1vdmUtZXh0cmFuZW91cy9zcmMvbXlzdHJpbmcuYwotLS0g
-ZGFzaC0wLjUuMTIvc3JjL215c3RyaW5nLmMJMjAyMi0xMi0xMSAwNjoyOToyMS4wMDAwMDAw
-MDAgKzAwMDAKKysrIGRhc2gtMC41LjEyKzAxLXJlbW92ZS1leHRyYW5lb3VzL3NyYy9teXN0
-cmluZy5jCTIwMjQtMTAtMjAgMTg6Mjc6NTYuNjM0MjQ1NDk5ICswMDAwCkBAIC00Niw3ICs0
-Niw2IEBACiAjaW5jbHVkZSA8ZXJybm8uaD4KICNpbmNsdWRlIDxpbnR0eXBlcy5oPgogI2lu
-Y2x1ZGUgPGxpbWl0cy5oPgotI2luY2x1ZGUgPGludHR5cGVzLmg+CiAjaW5jbHVkZSA8c3Rk
-bGliLmg+CiAjaW5jbHVkZSAic2hlbGwuaCIKICNpbmNsdWRlICJzeW50YXguaCIK
+ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzAxLXJlbW92ZS1leHRy
+YW5lb3VzL2NvbmZpZ3VyZS5hYyBkYXNoLTAuNS4xMiswMi1zdGF0NjQvY29uZmlndXJlLmFj
+Ci0tLSBkYXNoLTAuNS4xMiswMS1yZW1vdmUtZXh0cmFuZW91cy9jb25maWd1cmUuYWMJMjAy
+NC0xMS0xMCAxMDoxNDo0MS42MDgzMDUxMDYgKzAwMDAKKysrIGRhc2gtMC41LjEyKzAyLXN0
+YXQ2NC9jb25maWd1cmUuYWMJMjAyNC0xMS0xMCAxNjowNDo0Mi43OTI1ODcwMzIgKzAwMDAK
+QEAgLTE0MCwyOCArMTQwLDI5IEBACiBmaQogCiBkbmwgQ2hlY2sgZm9yIHN0YXQ2NCAoZGll
+dGxpYmMva2xpYmMpLgotQUNfQ0hFQ0tfREVDTChzdGF0NjQsIEFDX0NIRUNLX0ZVTkMoc3Rh
+dDY0KSkKLWlmIHRlc3QgIiRhY19jdl9mdW5jX3N0YXQ2NCIgIT0geWVzOyB0aGVuCitBQ19D
+SEVDS19ERUNMKHN0YXQ2NCwsIFsKIAlBQ19ERUZJTkUoZnN0YXQ2NCwgZnN0YXQsIFs2NC1i
+aXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMgMzItYml0XSkKIAlBQ19ERUZJTkUobHN0
+YXQ2NCwgbHN0YXQsIFs2NC1iaXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMgMzItYml0
+XSkKIAlBQ19ERUZJTkUoc3RhdDY0LCBzdGF0LCBbNjQtYml0IG9wZXJhdGlvbnMgYXJlIHRo
+ZSBzYW1lIGFzIDMyLWJpdF0pCi1maQorXSkKIAotQUNfQ0hFQ0tfRlVOQyhnbG9iNjQsLCBb
+CitBQ19DSEVDS19ERUNMKGdsb2I2NCwsIFsKIAlBQ19ERUZJTkUoZ2xvYjY0X3QsIGdsb2Jf
+dCwgWzY0LWJpdCBvcGVyYXRpb25zIGFyZSB0aGUgc2FtZSBhcyAzMi1iaXRdKQogCUFDX0RF
+RklORShnbG9iNjQsIGdsb2IsIFs2NC1iaXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMg
+MzItYml0XSkKIAlBQ19ERUZJTkUoZ2xvYmZyZWU2NCwgZ2xvYmZyZWUsCiAJCSAgWzY0LWJp
+dCBvcGVyYXRpb25zIGFyZSB0aGUgc2FtZSBhcyAzMi1iaXRdKQotXSkKK10sWyNpZmRlZiBI
+QVZFX0dMT0IKKyNpbmNsdWRlIDxnbG9iLmg+CisjZW5kaWZdKQogCiBkbmwgT1MgWCBhcHBh
+cmVudGx5IGhhcyBzdGF0NjQgYnV0IG5vdCBvcGVuNjQuCi1BQ19DSEVDS19GVU5DKG9wZW42
+NCwsIFsKK0FDX0NIRUNLX0RFQ0wob3BlbjY0LCwgWwogCUFDX0RFRklORShvcGVuNjQsIG9w
+ZW4sIFs2NC1iaXQgb3BlcmF0aW9ucyBhcmUgdGhlIHNhbWUgYXMgMzItYml0XSkKIAlBQ19E
+RUZJTkUocmVhZGRpcjY0LCByZWFkZGlyLAogCQkgIFs2NC1iaXQgb3BlcmF0aW9ucyBhcmUg
+dGhlIHNhbWUgYXMgMzItYml0XSkKIAlBQ19ERUZJTkUoZGlyZW50NjQsIGRpcmVudCwKIAkJ
+ICBbNjQtYml0IG9wZXJhdGlvbnMgYXJlIHRoZSBzYW1lIGFzIDMyLWJpdF0pCi1dKQorXSxb
+I2luY2x1ZGUgPGZjbnRsLmg+XSkKIAogZG5sIENoZWNrIGlmIHN0cnVjdCBzdGF0IGhhcyBz
+dF9tdGltLgogQUNfTVNHX0NIRUNLSU5HKGZvciBzdGF0OjpzdF9tdGltKQo=
 
---------------fVwHqv0YjKWPFSh2ILr3hh0E--
+--------------SoYVfvAKc12GM6aHpUnUi836--
