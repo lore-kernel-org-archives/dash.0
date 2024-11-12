@@ -1,32 +1,32 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F512219E5C
-	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACA621B436
+	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731451954; cv=none; b=mMVgrLtr0Z6fkx6Lwqe7eZacMJo4COUyz8tzxmXkCw9/S/YqLFr4z/b0AlsyeKUEvuTzpwRd+Iy11aLU+vu6z5Iw6tGeefFI/LXphoV83IQv3d+OjPPU4to4hfwC46fag2L/jSsYG+8bX4tfwlH5yQIt3M6rqY4f/GJe52CmgHk=
+	t=1731452022; cv=none; b=t6xErby0WcgIdhFrzyLTfVzRP5KRZLCR6WTMKt1SnEB61UP00n/sBOPTL7mydDq3FxxIGdrVLvpTZLjvnhHloJrtU8IyiC/SS0tkODA5UMc9HajiCR9TdqyyTSkpZuilg63DpyxS4XlUFY+s+Na6VZdsRJlH7OyVHtIAcc4XXg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731451954; c=relaxed/simple;
-	bh=cpc+Q0youS4GGpbu0cNh0jdT2HkE4WVTC2LlWrdEzJc=;
+	s=arc-20240116; t=1731452022; c=relaxed/simple;
+	bh=317pTbj2DOh/yPC3MpFSo+jndyt8UvYceojGvnxIM4I=;
 	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=aQXJNXfBhJtALuStY8WgKhJkve+zwidBYzZZWdyHXeyeVqTUBaxSjbK4cFG85uRPyBB4xTYvNoPC2aYjc6TdsMNIgEYl2DFdvcaU3fqW23v1FLpHUF5t02ckBV9VZlVGWz+oElWX3lYhhYGqnpWqh0aUXlM+5Z0bdEXVwDrBt9I=
+	 References:From:In-Reply-To; b=dFmcPXf4A+owAt2yx+7wKAlD7tlDMJGmimqmPXNvF7jHMloiaBZlLrM0RuMD8SE4FJZu0GFunsvMZtcvFFe6IipDqwZj7+YJewIYETayaAysoJOzV9AC8BLUo7guJon2IykJzXqhc3cnTwfTJejoO4Hrh4VYmxOsAfEam7Nb5dU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMpLjd4067500
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMqVks4067585
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 23:51:22 +0100
+	Tue, 12 Nov 2024 23:52:32 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMpKYi078134
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMqTBo078165
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 12 Nov 2024 23:51:21 +0100
-Content-Type: multipart/mixed; boundary="------------fi3kMBGP0wmoz2zPw1S0zTX9"
-Message-ID: <a2adfde2-f470-4486-9938-230a21b057e5@knaff.lu>
-Date: Tue, 12 Nov 2024 23:51:20 +0100
+	Tue, 12 Nov 2024 23:52:31 +0100
+Content-Type: multipart/mixed; boundary="------------sMBYWJtD7b9fcM2ds5yTkjdg"
+Message-ID: <78fb291e-8b79-42fb-ac08-5642dd8883ab@knaff.lu>
+Date: Tue, 12 Nov 2024 23:52:29 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 14-broken-wait-h
+ PC : 15-realloc-null
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
@@ -70,57 +70,35 @@ Autocrypt: addr=alain@knaff.lu; keydata=
 In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 
 This is a multi-part message in MIME format.
---------------fi3kMBGP0wmoz2zPw1S0zTX9
+--------------sMBYWJtD7b9fcM2ds5yTkjdg
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-UnixPC ships with a wait.h for the wrong endianness.
+On UnixPC, realloc of a NULL pointer returns NULL, whereas on most
+today's architectures it behaves the same way as malloc.
 
-This patch provides a local replacement (triggered by absence
-WEXITSTATUS flag)
-
-After having applied the patches until and including this one, it should
-compile for UnixPC, but not yet work. The next couple of patches address
-issues that only become apparent at runtime or optional features.
+So we just wrap it.
 
 Regards,
 
 Alain
---------------fi3kMBGP0wmoz2zPw1S0zTX9
+--------------sMBYWJtD7b9fcM2ds5yTkjdg
 Content-Type: text/x-patch; charset=UTF-8;
- name="dash-0.5.12+14-broken-wait-h.diff"
-Content-Disposition: attachment; filename="dash-0.5.12+14-broken-wait-h.diff"
+ name="dash-0.5.12+15-realloc-null.diff"
+Content-Disposition: attachment; filename="dash-0.5.12+15-realloc-null.diff"
 Content-Transfer-Encoding: base64
 
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzEzLXdhaXQzLXJlcGxh
-Y2VtZW50L3NyYy9zeXN0ZW0uaCBkYXNoLTAuNS4xMisxNC1icm9rZW4td2FpdC1oL3NyYy9z
-eXN0ZW0uaAotLS0gZGFzaC0wLjUuMTIrMTMtd2FpdDMtcmVwbGFjZW1lbnQvc3JjL3N5c3Rl
-bS5oCTIwMjQtMTEtMTAgMTQ6NTM6MDguNDE4NjE4MDkwICswMDAwCisrKyBkYXNoLTAuNS4x
-MisxNC1icm9rZW4td2FpdC1oL3NyYy9zeXN0ZW0uaAkyMDI0LTExLTEwIDE0OjUzOjA4LjQy
-MjYxODE4MyArMDAwMApAQCAtMTY3LDYgKzE2Nyw0MiBAQAogIyBkZWZpbmUgRkRfQ0xPRVhF
-QyAxCiAjZW5kaWYKIAorI2lmbmRlZiBXRVhJVFNUQVRVUworCisvKiBJZiBXSUZFWElURUQo
-U1RBVFVTKSwgdGhlIGxvdy1vcmRlciA4IGJpdHMgb2YgdGhlIHN0YXR1cy4gICovCisjdW5k
-ZWYgV0VYSVRTVEFUVVMKKyNkZWZpbmUJV0VYSVRTVEFUVVMoc3RhdHVzKQkoKChzdGF0dXMp
-ICYgMHhmZjAwKSA+PiA4KQorCisvKiBJZiBXSUZTSUdOQUxFRChTVEFUVVMpLCB0aGUgdGVy
-bWluYXRpbmcgc2lnbmFsLiAgKi8KKyN1bmRlZiBXVEVSTVNJRworI2RlZmluZQlXVEVSTVNJ
-RyhzdGF0dXMpCSgoc3RhdHVzKSAmIDB4N2YpCisKKy8qIElmIFdJRlNUT1BQRUQoU1RBVFVT
-KSwgdGhlIHNpZ25hbCB0aGF0IHN0b3BwZWQgdGhlIGNoaWxkLiAgKi8KKyN1bmRlZiBXU1RP
-UFNJRworI2RlZmluZQlXU1RPUFNJRyhzdGF0dXMpCVdFWElUU1RBVFVTKHN0YXR1cykKKwor
-LyogTm9uemVybyBpZiBTVEFUVVMgaW5kaWNhdGVzIG5vcm1hbCB0ZXJtaW5hdGlvbi4gICov
-CisjdW5kZWYgV0lGRVhJVEVECisjZGVmaW5lCVdJRkVYSVRFRChzdGF0dXMpCShXVEVSTVNJ
-RyhzdGF0dXMpID09IDApCisKKy8qIE5vbnplcm8gaWYgU1RBVFVTIGluZGljYXRlcyB0ZXJt
-aW5hdGlvbiBieSBhIHNpZ25hbC4gICovCisjdW5kZWYgV0lGU0lHTkFMRUQKKyNkZWZpbmUg
-V0lGU0lHTkFMRUQoc3RhdHVzKSBcCisgICgoKHNpZ25lZCBjaGFyKSAoKChzdGF0dXMpICYg
-MHg3ZikgKyAxKSA+PiAxKSA+IDApCisKKy8qIE5vbnplcm8gaWYgU1RBVFVTIGluZGljYXRl
-cyB0aGUgY2hpbGQgaXMgc3RvcHBlZC4gICovCisjdW5kZWYgV0lGU1RPUFBFRAorI2RlZmlu
-ZQlXSUZTVE9QUEVEKHN0YXR1cykJKCgoc3RhdHVzKSAmIDB4ZmYpID09IDB4N2YpCisKKy8q
-IE5vbnplcm8gaWYgU1RBVFVTIGluZGljYXRlcyB0aGUgY2hpbGQgZHVtcGVkIGNvcmUuICAq
-LworI3VuZGVmIFdDT1JFRFVNUAorI2lmbmRlZiBXQ09SRUZMQUcKKyMgZGVmaW5lCVdDT1JF
-RkxBRwkJMHg4MAorI2VuZGlmCisjZGVmaW5lCVdDT1JFRFVNUChzdGF0dXMpCSgoc3RhdHVz
-KSAmIFdDT1JFRkxBRykKKworI2VuZGlmCisKICNpZm5kZWYgSEFWRV9TVFJTVFIKIGV4dGVy
-biBjaGFyICogc3Ryc3RyIChjb25zdCBjaGFyKiBoYXlzdGFjaywgY29uc3QgY2hhciAqbmVl
-ZGxlKTsKICNlbmRpZgo=
+ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzE0LWJyb2tlbi13YWl0
+LWgvc3JjL21lbWFsbG9jLmMgZGFzaC0wLjUuMTIrMTUtcmVhbGxvYy1udWxsL3NyYy9tZW1h
+bGxvYy5jCi0tLSBkYXNoLTAuNS4xMisxNC1icm9rZW4td2FpdC1oL3NyYy9tZW1hbGxvYy5j
+CTIwMjQtMTAtMjcgMjA6MzI6NTQuNjA0ODMzODc2ICswMDAwCisrKyBkYXNoLTAuNS4xMisx
+NS1yZWFsbG9jLW51bGwvc3JjL21lbWFsbG9jLmMJMjAyNC0xMC0yNyAyMDozMjo0NC43MDA1
+OTc0MDUgKzAwMDAKQEAgLTY4LDcgKzY4LDEwIEBACiBwb2ludGVyCiBja3JlYWxsb2MocG9p
+bnRlciBwLCBzaXplX3QgbmJ5dGVzKQogewotCXAgPSByZWFsbG9jKHAsIG5ieXRlcyk7CisJ
+aWYocCA9PSBOVUxMKQorCQlwID0gbWFsbG9jKG5ieXRlcyk7CisJZWxzZQorCQlwID0gcmVh
+bGxvYyhwLCBuYnl0ZXMpOwogCWlmIChwID09IE5VTEwpCiAJCXNoX2Vycm9yKCJPdXQgb2Yg
+c3BhY2UiKTsKIAlyZXR1cm4gcDsK
 
---------------fi3kMBGP0wmoz2zPw1S0zTX9--
+--------------sMBYWJtD7b9fcM2ds5yTkjdg--
