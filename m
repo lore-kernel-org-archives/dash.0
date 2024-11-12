@@ -1,32 +1,32 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242382185AD
-	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F512219E5C
+	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 22:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731451727; cv=none; b=mczOtdq3qHV8TboAp9dHzkK/uYnfCv031RtL4p4CuemcYYwPc9noYSManNkPmvqNjnH3A5aw0hW0CIg64TZkde3i7WKHF7QSthXsGnMM7jrt+HY3kZvc3ve6axoVbBeF6rsu+9KjV/FOpmPPNcajFaXvbDLSojUpJVPBGYMUWT8=
+	t=1731451954; cv=none; b=mMVgrLtr0Z6fkx6Lwqe7eZacMJo4COUyz8tzxmXkCw9/S/YqLFr4z/b0AlsyeKUEvuTzpwRd+Iy11aLU+vu6z5Iw6tGeefFI/LXphoV83IQv3d+OjPPU4to4hfwC46fag2L/jSsYG+8bX4tfwlH5yQIt3M6rqY4f/GJe52CmgHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731451727; c=relaxed/simple;
-	bh=4G4j6tKLfB5qYwVY1gERoxKVAMz/A4HaSa8Sg97+Oo4=;
+	s=arc-20240116; t=1731451954; c=relaxed/simple;
+	bh=cpc+Q0youS4GGpbu0cNh0jdT2HkE4WVTC2LlWrdEzJc=;
 	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=hqvRA4/f6VTGvLN+MOydUqO2ccFSdG2e+81lcegvB1xc/qnzZVachnNCWy/M5W/DqV/aJ+2s4nU8nPWv4MQs1hFiVSR5MBYjPrXrDbJU0mq2uqlkAVJESX5PZ+s4s59eOyL65u7FBqrzfBfbzdKYfo/H801sEcPBdIJu7M8swhc=
+	 References:From:In-Reply-To; b=aQXJNXfBhJtALuStY8WgKhJkve+zwidBYzZZWdyHXeyeVqTUBaxSjbK4cFG85uRPyBB4xTYvNoPC2aYjc6TdsMNIgEYl2DFdvcaU3fqW23v1FLpHUF5t02ckBV9VZlVGWz+oElWX3lYhhYGqnpWqh0aUXlM+5Z0bdEXVwDrBt9I=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMlXTG4067260
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMpLjd4067500
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 23:47:34 +0100
+	Tue, 12 Nov 2024 23:51:22 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMlVDu077954
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMpKYi078134
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 12 Nov 2024 23:47:33 +0100
-Content-Type: multipart/mixed; boundary="------------kV8WXf69grzWeORqBruJxtDF"
-Message-ID: <a8796158-3bf1-4a48-87ca-a01628307f3e@knaff.lu>
-Date: Tue, 12 Nov 2024 23:47:31 +0100
+	Tue, 12 Nov 2024 23:51:21 +0100
+Content-Type: multipart/mixed; boundary="------------fi3kMBGP0wmoz2zPw1S0zTX9"
+Message-ID: <a2adfde2-f470-4486-9938-230a21b057e5@knaff.lu>
+Date: Tue, 12 Nov 2024 23:51:20 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 13-wait3-replacement
+ PC : 14-broken-wait-h
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
@@ -70,141 +70,57 @@ Autocrypt: addr=alain@knaff.lu; keydata=
 In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 
 This is a multi-part message in MIME format.
---------------kV8WXf69grzWeORqBruJxtDF
+--------------fi3kMBGP0wmoz2zPw1S0zTX9
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-The 13th patch caters to unavailability of wait3() system call on older
-SYSV systems such as UnixPC.
+UnixPC ships with a wait.h for the wrong endianness.
 
-On these systems, only an always blocking wait() is available. In
-order to get non-blocking wait, you have to use a SIGCLD handler (not
-a typo, child signal handling on SYSV was subtly different from what
-we are used to now). This handler sets a flag (gotsigchld) when a
-child dies.
+This patch provides a local replacement (triggered by absence
+WEXITSTATUS flag)
 
-When upper layers request a non-blocking wait, we test for this
-flag. If the gotsigchld flag is set, we can wait(), confident in the
-knowledge that this call will return right away. Then clear the flag,
-and re-instore SIGCLD handler.
-If the gotsigchld flag is not set, we return right away with 0 ("process
-does have children, but none have exited so far")
-
-
-The "subtle difference" between SIGCLD and SIGCHLD is that SIGCLD is
-"level triggered": i.e. the system continues raising the signal as long
-as there is a terminated child around on which the parent has not yet
-waited. Thus, SIGCLD should not be re-enabled in the handler, but only
-after wait()
-
-https://pubs.opengroup.org/onlinepubs/9699919799/xrat/V4_xsh_chap02.html
-
-"Some implementations (System V, for example) will deliver a SIGCLD
-signal immediately when a process establishes a signal-catching
-function for SIGCLD when that process has a child that has already
-terminated. Other implementations, such as 4.3 BSD, do not generate a
-new SIGCHLD signal in this way. In general, a process should not
-attempt to alter the signal action for the SIGCHLD signal while it has
-any outstanding children. However, it is not always possible for a
-process to avoid this; for example, shells sometimes start up
-processes in pipelines with other processes from the pipeline as
-children. Processes that cannot ensure that they have no children when
-altering the signal action for SIGCHLD thus need to be prepared for,
-but not depend on, generation of an immediate SIGCHLD signal."
-
-Actually, in a way we do "depend on" this peculiarity to implement
-non-blocking wait(). However, if it is not available, the only thing
-that breaks is "monitor mode" (notification of terminated children
-when pressing return in an interactive shell).
+After having applied the patches until and including this one, it should
+compile for UnixPC, but not yet work. The next couple of patches address
+issues that only become apparent at runtime or optional features.
 
 Regards,
 
 Alain
---------------kV8WXf69grzWeORqBruJxtDF
+--------------fi3kMBGP0wmoz2zPw1S0zTX9
 Content-Type: text/x-patch; charset=UTF-8;
- name="dash-0.5.12+13-wait3-replacement.diff"
-Content-Disposition: attachment;
- filename="dash-0.5.12+13-wait3-replacement.diff"
+ name="dash-0.5.12+14-broken-wait-h.diff"
+Content-Disposition: attachment; filename="dash-0.5.12+14-broken-wait-h.diff"
 Content-Transfer-Encoding: base64
 
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzEyLXNpZ2FjdGlvbi9j
-b25maWd1cmUuYWMgZGFzaC0wLjUuMTIrMTMtd2FpdDMtcmVwbGFjZW1lbnQvY29uZmlndXJl
-LmFjCi0tLSBkYXNoLTAuNS4xMisxMi1zaWdhY3Rpb24vY29uZmlndXJlLmFjCTIwMjQtMTEt
-MTAgMTc6MDg6MDEuMTU1MDI1ODg4ICswMDAwCisrKyBkYXNoLTAuNS4xMisxMy13YWl0My1y
-ZXBsYWNlbWVudC9jb25maWd1cmUuYWMJMjAyNC0xMS0xMCAyMDoyNjoxOS4xMDU0NzQyMTUg
-KzAwMDAKQEAgLTExNyw3ICsxMTcsNyBAQAogCSAgICAgICBtZW1wY3B5IG1lbW1vdmUgXAog
-CSAgICAgICBzaWdzZXRtYXNrIHN0cGNweSBzdHJjaHJudWwgc3Ryc2lnbmFsIHN0cnRvZCBz
-dHJ0b2ltYXggXAogCSAgICAgICBzdHJ0b3VtYXggc3lzY29uZiBcCi0JICAgICAgIHZmb3Jr
-IHNpZ2FjdGlvbiBzaWdwcm9jbWFzayBsc3RhdCBkdXAyIGdldGdyb3VwcyBcCisJICAgICAg
-IHZmb3JrIHdhaXQzIHNpZ2FjdGlvbiBzaWdwcm9jbWFzayBsc3RhdCBkdXAyIGdldGdyb3Vw
-cyBcCiAJICAgICAgIHN0cnN0ciBzdHBuY3B5IHN0cmNhc2VjbXAgc3RyZXJyb3Igc3RyZHVw
-IHN0cnRvdWwgdnNucHJpbnRmIFwKIAkgICAgICAgcmVhZGRpcikKIApkaWZmIC1YIC4uL2V4
-Y2x1ZGUudHh0IC11ck4gZGFzaC0wLjUuMTIrMTItc2lnYWN0aW9uL3NyYy9qb2JzLmMgZGFz
-aC0wLjUuMTIrMTMtd2FpdDMtcmVwbGFjZW1lbnQvc3JjL2pvYnMuYwotLS0gZGFzaC0wLjUu
-MTIrMTItc2lnYWN0aW9uL3NyYy9qb2JzLmMJMjAyNC0xMC0yNyAyMDoxOToxMy42MjUyMzE1
-ODAgKzAwMDAKKysrIGRhc2gtMC41LjEyKzEzLXdhaXQzLXJlcGxhY2VtZW50L3NyYy9qb2Jz
-LmMJMjAyNC0xMS0xMCAyMTo1MTo1NS45MTE1MTk2OTYgKzAwMDAKQEAgLTExNTQsNiArMTE1
-NCw1MCBAQAogCXJldHVybiBycGlkOwogfQogCisjaWZuZGVmIEhBVkVfV0FJVDMKKworIyBp
-Zm5kZWYgV05PSEFORworIyAgZGVmaW5lIFdOT0hBTkcgMQorIyBlbmRpZgorCisvKiBSZXBs
-YWNlbWVudCB3YWl0MyAqLworU1RBVElDIGlubGluZSBwaWRfdAord2FpdDMoaW50ICp3c3Rh
-dHVzLCBpbnQgb3B0aW9ucywgdm9pZCAqIHJ1c2FnZSkKK3sKKwlwaWRfdCBwaWQ7CisKKwkv
-KiBpZiB3ZSBhcmUgY2FsbGVkIGFzIG5vbi1ibG9ja2luZywgYW5kIGhhdmUgbm8gU0lHQ0xE
-CisJICAgcGVuZGluZywgcmV0dXJuICovCisJaWYoKG9wdGlvbnMgJiBXTk9IQU5HKSAmJiAh
-Z290c2lnY2hsZCkKKwkJcmV0dXJuIDA7IC8qIDAgaXMgcmV0dXJuZWQgYnkgd2FpdDMgaWYg
-dGhlIHByb2Nlc3MgZG9lcyBoYXZlCisJCQkgICAqIGNoaWxkcmVuLCBidXQgbm9uZSBoYXZl
-IGV4aXRlZCBzbyBmYXIgKi8KKwlwaWQgPSB3YWl0KHdzdGF0dXMpOworCWlmKHBpZCA8PSAw
-KQorCQkvKiBubyBwcm9jZXNzIHJlYXBlZCwgb3IgZXJyb3IgKi8KKwkJcmV0dXJuIHBpZDsK
-KworCQorCS8qIGlmIHdlIGNvbWUgaGVyZSwgd2UgZGlkIGluZGVlZCByZWFwIGEgcHJvY2Vz
-cy4gID0+CisJICogY2xlYXIgZ290c2lnY2hsZCwgYW5kIHJlLWluc3RvcmUgU0lHQ0xEIGhh
-bmRsZXIuCisJICoKKwkgKiBPbiBvbGQgU1lTViBzeXN0ZW1zIHdoZXJlIHRoZXJlIGlzIG5v
-IHdhaXQzIGNhbGwsCisJICogc2lnbmFsKFNJR0NMRCkgaXMgbGV2ZWwtdHJpZ2dlcmVkLCBh
-bmQgd2lsbCB0cmlnZ2VyIGFzCisJICogbG9uZyBhcyB0aGVyZSBhcmUgc3RpbGwgdW53YWl0
-ZWQtZm9yIGNoaWxkcmVuCisJICogYXJvdW5kLiBIb3dldmVyLCBpdCBpcywgbGlrZSBhbGwg
-b3RoZXIgc2lnbmFscywgZGlzYWJsZWQgYXMKKwkgKiBzb29uIGFzIGl0cyBzaWduYWwgaGFu
-ZGxlciBpcyBpbnZva2VkLCB3aGljaCBwcmV2ZW50cyBzdG9ybQorCSAqIDotKS4gU28gd2Ug
-bmVlZCB0byByZS1lbmFibGUgaXQgYWZ0ZXIgd2FpdCgpLCBpbiBvcmRlciB0bworCSAqIGJl
-IG5vdGlmaWVkIG9mIGZ1cnRoZXIgY2hpbGRyZW4gZHlpbmcuCisJICoKKwkgKiBJZiBtb3Jl
-IHRoYW4gb25lIGNoaWxkIGhhZCBkaWVkIHNpbmNlIGxhc3QgcmVzZXQgb2YKKwkgKiBnb3Rz
-aWdjaGxkLCBhIHNpZ25hbCB3aWxsIGJlIGRlbGl2ZXJlZCBpbW1lZGlhdGVseSBhZnRlcgor
-CSAqIHJlLWFjdGl2YXRpb24gb2YgdGhlIHNpZ25hbCwgYmVjYXVzZSBpdCBpcyBsZXZlbC10
-cmlnZ2VyZWQuCisJICovCisJZ290c2lnY2hsZCA9IDA7CisJc2V0c2lnbmFsKFNJR0NMRCk7
-CisJcmV0dXJuIHBpZDsKK30KKyNlbmRpZgorCiAvKgogICogRG8gYSB3YWl0IHN5c3RlbSBj
-YWxsLiAgSWYgYmxvY2sgaXMgemVybywgd2UgcmV0dXJuIC0xIHJhdGhlciB0aGFuCiAgKiBi
-bG9ja2luZy4gIElmIGJsb2NrIGlzIERPV0FJVF9XQUlUQ01ELCB3ZSByZXR1cm4gMCB3aGVu
-IGEgc2lnbmFsCkBAIC0xMTgyLDcgKzEyMjYsMTUgQEAKICNlbmRpZgogCiAJZG8geworI2lm
-ZGVmIEhBVkVfV0FJVDMKKwkJLyogcmVzZXQgZ290c2lnY2hsZCAqb25seSogaWYgd2UgYXJl
-IG5vdCB1c2luZyBhCisJCSAqIHJlcGxhY2VtZW50IHdhaXQzKCkuIEluZGVlZCwgdGhlIHJl
-cGxhY2VtZW50CisJCSAqIHdhaXQzKCkgbmVlZHMgb3JpZ2luYWwgdmFsdWUgb2YgZ290c2ln
-Y2hsZCBpbiBvcmRlcgorCQkgKiB0byBkZWNpZGUgd2hldGhlciBpdCBkb2VzIGluZGVlZCBu
-ZWVkIHRvCisJCSAqIHdhaXQuIFJlcGxhY2VtZW50IHdhaXQzIHdpbGwgdGhlbiByZXNldCBn
-b3RzaWdjaGxkCisJCSAqIHdoZW4gZG9uZSB3aXRoIGl0ICovCiAJCWdvdHNpZ2NobGQgPSAw
-OworI2VuZGlmCiAJCWRvCiAJCQllcnIgPSB3YWl0MyhzdGF0dXMsIGZsYWdzLCBOVUxMKTsK
-IAkJd2hpbGUgKGVyciA8IDAgJiYgZXJybm8gPT0gRUlOVFIgJiYgIXBlbmRpbmdfc2lnKTsK
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzEyLXNpZ2FjdGlvbi9z
-cmMvc3lzdGVtLmggZGFzaC0wLjUuMTIrMTMtd2FpdDMtcmVwbGFjZW1lbnQvc3JjL3N5c3Rl
-bS5oCi0tLSBkYXNoLTAuNS4xMisxMi1zaWdhY3Rpb24vc3JjL3N5c3RlbS5oCTIwMjQtMTEt
-MTAgMTY6MjY6NDcuNDY0MTY2OTk5ICswMDAwCisrKyBkYXNoLTAuNS4xMisxMy13YWl0My1y
-ZXBsYWNlbWVudC9zcmMvc3lzdGVtLmgJMjAyNC0xMS0xMCAxNDo1MzowOC40MTg2MTgwOTAg
-KzAwMDAKQEAgLTE1OSw2ICsxNTksMTAgQEAKICMgZGVmaW5lIE9fTk9OQkxPQ0sgT19OREVM
-QVkKICNlbmRpZgogCisjaWYgIWRlZmluZWQgU0lHQ0hMRCAmJiBkZWZpbmVkIFNJR0NMRAor
-IyBkZWZpbmUgU0lHQ0hMRCBTSUdDTEQKKyNlbmRpZgorCiAjaWZuZGVmIEZEX0NMT0VYRUMK
-ICMgZGVmaW5lIEZEX0NMT0VYRUMgMQogI2VuZGlmCmRpZmYgLVggLi4vZXhjbHVkZS50eHQg
-LXVyTiBkYXNoLTAuNS4xMisxMi1zaWdhY3Rpb24vc3JjL3RyYXAuYyBkYXNoLTAuNS4xMisx
-My13YWl0My1yZXBsYWNlbWVudC9zcmMvdHJhcC5jCi0tLSBkYXNoLTAuNS4xMisxMi1zaWdh
-Y3Rpb24vc3JjL3RyYXAuYwkyMDI0LTExLTEwIDIwOjI2OjQ0LjIyMjA3MTE1OCArMDAwMAor
-KysgZGFzaC0wLjUuMTIrMTMtd2FpdDMtcmVwbGFjZW1lbnQvc3JjL3RyYXAuYwkyMDI0LTEx
-LTEwIDIwOjI3OjQxLjA1NTQyMTkwMyArMDAwMApAQCAtNTMsNiArNTMsNyBAQAogI2luY2x1
-ZGUgImVycm9yLmgiCiAjaW5jbHVkZSAidHJhcC5oIgogI2luY2x1ZGUgIm15c3RyaW5nLmgi
-CisjaW5jbHVkZSAic3lzdGVtLmgiCiAKIC8qCiAgKiBTaWdtb2RlIHJlY29yZHMgdGhlIGN1
-cnJlbnQgdmFsdWUgb2YgdGhlIHNpZ25hbCBoYW5kbGVycyBmb3IgdGhlIHZhcmlvdXMKQEAg
-LTg3LDYgKzg4LDcgQEAKICNpZmRlZiBta2luaXQKIElOQ0xVREUgIm1lbWFsbG9jLmgiCiBJ
-TkNMVURFICJ0cmFwLmgiCitJTkNMVURFICJzeXN0ZW0uaCIKIAogSU5JVCB7CiAJc2lnbW9k
-ZVtTSUdDSExEIC0gMV0gPSBTX0RGTDsKQEAgLTMwMiw3ICszMDQsMTAgQEAKIG9uc2lnKGlu
-dCBzaWdubykKIHsKICNpZm5kZWYgSEFWRV9TSUdBQ1RJT04KLQlzaWduYWwoc2lnbm8sIG9u
-c2lnKTsKKyNpZmRlZiBTSUdDTEQKKwlpZihzaWdubyAhPSBTSUdDTEQpCisjZW5kaWYKKwkJ
-c2lnbmFsKHNpZ25vLCBvbnNpZyk7CiAjZW5kaWYKIAlpZiAodmZvcmtlZCkKIAkJcmV0dXJu
-Owo=
+ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzEzLXdhaXQzLXJlcGxh
+Y2VtZW50L3NyYy9zeXN0ZW0uaCBkYXNoLTAuNS4xMisxNC1icm9rZW4td2FpdC1oL3NyYy9z
+eXN0ZW0uaAotLS0gZGFzaC0wLjUuMTIrMTMtd2FpdDMtcmVwbGFjZW1lbnQvc3JjL3N5c3Rl
+bS5oCTIwMjQtMTEtMTAgMTQ6NTM6MDguNDE4NjE4MDkwICswMDAwCisrKyBkYXNoLTAuNS4x
+MisxNC1icm9rZW4td2FpdC1oL3NyYy9zeXN0ZW0uaAkyMDI0LTExLTEwIDE0OjUzOjA4LjQy
+MjYxODE4MyArMDAwMApAQCAtMTY3LDYgKzE2Nyw0MiBAQAogIyBkZWZpbmUgRkRfQ0xPRVhF
+QyAxCiAjZW5kaWYKIAorI2lmbmRlZiBXRVhJVFNUQVRVUworCisvKiBJZiBXSUZFWElURUQo
+U1RBVFVTKSwgdGhlIGxvdy1vcmRlciA4IGJpdHMgb2YgdGhlIHN0YXR1cy4gICovCisjdW5k
+ZWYgV0VYSVRTVEFUVVMKKyNkZWZpbmUJV0VYSVRTVEFUVVMoc3RhdHVzKQkoKChzdGF0dXMp
+ICYgMHhmZjAwKSA+PiA4KQorCisvKiBJZiBXSUZTSUdOQUxFRChTVEFUVVMpLCB0aGUgdGVy
+bWluYXRpbmcgc2lnbmFsLiAgKi8KKyN1bmRlZiBXVEVSTVNJRworI2RlZmluZQlXVEVSTVNJ
+RyhzdGF0dXMpCSgoc3RhdHVzKSAmIDB4N2YpCisKKy8qIElmIFdJRlNUT1BQRUQoU1RBVFVT
+KSwgdGhlIHNpZ25hbCB0aGF0IHN0b3BwZWQgdGhlIGNoaWxkLiAgKi8KKyN1bmRlZiBXU1RP
+UFNJRworI2RlZmluZQlXU1RPUFNJRyhzdGF0dXMpCVdFWElUU1RBVFVTKHN0YXR1cykKKwor
+LyogTm9uemVybyBpZiBTVEFUVVMgaW5kaWNhdGVzIG5vcm1hbCB0ZXJtaW5hdGlvbi4gICov
+CisjdW5kZWYgV0lGRVhJVEVECisjZGVmaW5lCVdJRkVYSVRFRChzdGF0dXMpCShXVEVSTVNJ
+RyhzdGF0dXMpID09IDApCisKKy8qIE5vbnplcm8gaWYgU1RBVFVTIGluZGljYXRlcyB0ZXJt
+aW5hdGlvbiBieSBhIHNpZ25hbC4gICovCisjdW5kZWYgV0lGU0lHTkFMRUQKKyNkZWZpbmUg
+V0lGU0lHTkFMRUQoc3RhdHVzKSBcCisgICgoKHNpZ25lZCBjaGFyKSAoKChzdGF0dXMpICYg
+MHg3ZikgKyAxKSA+PiAxKSA+IDApCisKKy8qIE5vbnplcm8gaWYgU1RBVFVTIGluZGljYXRl
+cyB0aGUgY2hpbGQgaXMgc3RvcHBlZC4gICovCisjdW5kZWYgV0lGU1RPUFBFRAorI2RlZmlu
+ZQlXSUZTVE9QUEVEKHN0YXR1cykJKCgoc3RhdHVzKSAmIDB4ZmYpID09IDB4N2YpCisKKy8q
+IE5vbnplcm8gaWYgU1RBVFVTIGluZGljYXRlcyB0aGUgY2hpbGQgZHVtcGVkIGNvcmUuICAq
+LworI3VuZGVmIFdDT1JFRFVNUAorI2lmbmRlZiBXQ09SRUZMQUcKKyMgZGVmaW5lCVdDT1JF
+RkxBRwkJMHg4MAorI2VuZGlmCisjZGVmaW5lCVdDT1JFRFVNUChzdGF0dXMpCSgoc3RhdHVz
+KSAmIFdDT1JFRkxBRykKKworI2VuZGlmCisKICNpZm5kZWYgSEFWRV9TVFJTVFIKIGV4dGVy
+biBjaGFyICogc3Ryc3RyIChjb25zdCBjaGFyKiBoYXlzdGFjaywgY29uc3QgY2hhciAqbmVl
+ZGxlKTsKICNlbmRpZgo=
 
---------------kV8WXf69grzWeORqBruJxtDF--
+--------------fi3kMBGP0wmoz2zPw1S0zTX9--
