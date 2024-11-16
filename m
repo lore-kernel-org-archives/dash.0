@@ -1,155 +1,134 @@
-Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23059219C9E
-	for <dash@vger.kernel.org>; Tue, 12 Nov 2024 23:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2C72F29
+	for <dash@vger.kernel.org>; Sat, 16 Nov 2024 11:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731452431; cv=none; b=sdlKw2mZl4nMBaWS6xUTX+CaqyuVUs46usIyu3LiT0ubXGxzTKh01Kl7fuA4MarXP6WS6LeoP4tyfQvP/AM2Rm9GWfKQv4/s9W85Z2i3Q4L4moz9ysHlAEL62M21B1LgCTf3yXvfLMiHLg0EFBRCO2J/qsOQ2tz0D0TgTqBzk+Q=
+	t=1731756114; cv=none; b=qj0307SySbH1JwHBeHQ+CRq70wERhyugG7qjWxcRzsjVqUW+27ovb8BD9xZUtSCMeyQCYRQURDt1qyo+X42x2IlKlewyjcNc0AQs3KwVa2aylwPNDDf6YUnhMRpPgUYcjxZN6iat3uIqr+yNW1kZLhO2Cby3oHOLo2kSPtWy7xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731452431; c=relaxed/simple;
-	bh=pV3wP6rrKbh2Mvzfs0zVZJdlzGtQapUUY9ETnh+hUwc=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=KB/RdvlDChPEY94jnYapNdJcZSboaxzGe/Hm/jQ131DXCh2+MHjFLaK8waow7eQh1uJmdWsW1/hhcYtySYFC4YQGTk1EIP7xKcK1ubKm59Ud556yLYse/Pnfo//wiHv5YfhX9xroKDyGkY6xtA2VlY9iEQmRnOTxMHgWOX/xI24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
-Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4ACMxJfo4068041
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Tue, 12 Nov 2024 23:59:20 +0100
-X-Envelope-To: dash@vger.kernel.org
-Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
-	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4ACMxE0V078435
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 12 Nov 2024 23:59:17 +0100
-Content-Type: multipart/mixed; boundary="------------lcQNv0RqaowrTi50J14MphP3"
-Message-ID: <112e9546-ccea-4407-9f8f-1c237f6ac919@knaff.lu>
-Date: Tue, 12 Nov 2024 23:59:14 +0100
+	s=arc-20240116; t=1731756114; c=relaxed/simple;
+	bh=GHLOPdunf7zD+TKvhFPF4rd5zxd88lUZqq4florMznU=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rREKj4pn6CP+H34IQWMp8u0bvMRvGLFlBVsTQpQw3nk81m+k7m/X0hIaP+b544ZM6qqMwUDNTyjP2ILmS+DsAxGAHkVe3RSTwWDkWLVhigTjz/9964GPxhz+f1T+Ac24OpIWxSWw0MxG2pjTXT0ZWSigxIQ89+98gjMShEqzoXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=cPAbxwLT; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="cPAbxwLT"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=0PA/Xnx+vbxKk5Hy3wZ/tcJRYsOAm2MUZjESjoSHPZY=; b=cPAbxwLTK1bQk45eciTSdb2P+L
+	OJtKRvxAUeNPF3pG+EPN/qgdpIQZXXaIQH5CBou6OcuqkCOXF0Vh09mtVTZ4jKZPZ0yYasjslcMsy
+	u72OkKaR3n5iQTeBnODoakb5ZaladAt5wUWOF4Om4Jw3VkOEoUZ91yhFQuUgNIUp7w9JMltPV3RlB
+	qkSF8+BitL9k1HvknqbYLXNjRGeVdJxDPbAQwyeZy9xFTAty4KuZcIgM7L8GPPzNqROGoL+ZVpoc4
+	Kx0tGhPd5gKT4hfsC2kevkarUZXw6DjkVLe1RVOwuZFel9sULXx3KZtl6HXyqgUhOch69uED6e2OH
+	lsf+aBfg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tCGs6-00HGRJ-1x;
+	Sat, 16 Nov 2024 19:21:47 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 16 Nov 2024 19:21:46 +0800
+Date: Sat, 16 Nov 2024 19:21:46 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: DASH Mailing List <dash@vger.kernel.org>
+Subject: [PATCH] builtin: Reduce size of conv_escape
+Message-ID: <ZziAShiLhciUX_FJ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 18-glibc-stdio
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
-References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
- <6ea7da38-204f-54bf-7156-085a1589c40b@knaff.lu>
- <6cacf608-326e-211a-7d37-164041710980@knaff.lu>
- <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
-Content-Language: en-US
-From: Alain Knaff <alain@knaff.lu>
-Autocrypt: addr=alain@knaff.lu; keydata=
- xsDiBEk9qFcRBADO4trPtib39qvAEBlkAIcBGnZ137EmmNLU1pFZC5acLyJ4wYhVdcol97lC
- 4ZkD0DJek6DVidQfz4hA7JbZy2W8l6O/o2k/Ja2bWkb8qtrcUNVDJzdJjNqXmmxdsyLd5QVt
- uCHgi3Zz0kq9aJnRCVuAyfrjMdaUsOThi07u1EyEywCgjxVKODAifumqfdjVxS5NoV7x7TkD
- /0k2F3/5/NYchgLz6Qu3As5MVtPs7NkJ0Mpal4Gy8CaKefHcynY+zCziM/oBw0+PIFxyFud0
- uT9HRIdEp1DlaTTUYlt95HeDYmCUh0Wt1PwNNRWcm+vTUuK7tOxzYadUqbzO+F6C+WN8msxA
- hcxzUgsL/YyXVilvL8XqB+RlS5bBA/9OxXc2mJs01nWu5khvVFNwUCDS8FRYyoHeodVZFGLC
- UG1PrV9nHva5vYJk1QlZP3qEotnK+6l4708X9yhdw2+UCtxvseTQ6JWBtIdJyo+Qv7apSQA3
- kkau6Om7SOyW1i/2LcCZU84SC923uBH7VNeUzCnzelVFubk6eRwzjNvrj80cQUxBSU4gS05B
- RkYgPGFsYWluQGtuYWZmLmx1PsJgBBMRAgAgBQJJPahXAhsDBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQyAYxsm9DGWFEsgCeOSavzyOp8Bj3nOP8hC6XeCX/3k4Anj0KegsyeIVxuj5X
- TUnh535vXfZvzsFNBEk9qFoQCACt2vctXYAr+ndRbaeR4ygJ8rKH8ARu68nDuQuxOKCasaQr
- xm8+/RxvmTfriP00tYZAca2tmCjwntKVsK4eNSivvo6c7BwziCnQx/vW+kJK4ctckMHSZPqe
- 4a1HWYURg5oxaqGo4f06YAn9O0yDo6xdGGNUMpYHv2O1/jsAEgAM/c/US+gNctzsNKQ4lVwp
- HH4NEabev+zlisnTO3V39iXijZbe9AYlD4qZH/0nFBDCCt9EDTe+/6IFfvIrnVx7o367U9XL
- SCLVQt4k7xqCIow7RP5BlOYLDV50yMva8c62yhWpDYKSyJsQGn/nGiiv6P4Ye/monfkQD+PC
- nKPXDYCjAAMFB/9D2FSYHyikvOoXXMTfjGHUyIQK6FCtKINTFfBPuwlWOWCukrQrzH0BmTVC
- /WuMOrrmxl0IFHGtOV2Zp+bdsjhlzgZ4kXAmqw1Qiphb/YLD6VY5TQ59Tkl7+nCQ0wjcRim1
- Sg6OzmoNttHpTt9eAvLZMz7yi9Nq40yKXh+zXZtzHIgdsXG+tO9+LEWojdbXgIdZin2yUKYt
- KxbpwyM0qCN9oGtKTAi0GX+tuHdAqWwYEgVnd27LcBGLTs6QJPsjQKHiAtYJwu6MWiF7bvCr
- iBNyVG3yU3inZcQvIdYxO0VUN3wVSEIbRHcNzG2u1UD6ZuF+3bv39dh54m1CQzbzzRepwkkE
- GBECAAkFAkk9qFoCGwwACgkQyAYxsm9DGWHNLwCfWr4DLrBZMktv9RTGbcIZ+/NgTswAn3aG
- LBuTFPDEO0bfA+7PlpCctCJT
-In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-This is a multi-part message in MIME format.
---------------lcQNv0RqaowrTi50J14MphP3
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+The jump table is unnecessarily large for a function that is
+not performance-critical.  Move some of the cases out of the
+switch statement to reduce its size.
 
-Hi,
+Move the value = ch assignment to the common path.
 
-This fixed USE_GLIBC_STDIO mode.
+Merge the code for '\a', '\b' and '\f'.
 
-This also concludes this patch series for UnixPC support.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Thanks for reading.
-
-Regards,
-
-Alain
---------------lcQNv0RqaowrTi50J14MphP3
-Content-Type: text/x-patch; charset=UTF-8;
- name="dash-0.5.12+18-glibc-stdio.diff"
-Content-Disposition: attachment; filename="dash-0.5.12+18-glibc-stdio.diff"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtWCAuLi9leGNsdWRlLnR4dCAtdXJOIGRhc2gtMC41LjEyKzE3LXNpZ25lZC1zaXpl
-LXQvc3JjL2V2YWwuYyBkYXNoLTAuNS4xMisxOC1nbGliYy1zdGRpby9zcmMvZXZhbC5jCi0t
-LSBkYXNoLTAuNS4xMisxNy1zaWduZWQtc2l6ZS10L3NyYy9ldmFsLmMJMjAyNC0xMC0yMCAw
-ODozNzo1NS44MDI2ODMwMzIgKzAwMDAKKysrIGRhc2gtMC41LjEyKzE4LWdsaWJjLXN0ZGlv
-L3NyYy9ldmFsLmMJMjAyNC0wOS0wMSAwNzowNDowNi45NjA5ODg1ODAgKzAwMDAKQEAgLTgz
-Myw3ICs4MzMsMTEgQEAKIAlpZiAoaWZsYWcgJiYgZnVuY2xpbmUgPT0gMCAmJiBhcmdjID4g
-MCkKIAkJbGFzdGFyZyA9IG5hcmd2Wy0xXTsKIAorI2lmZGVmIFVTRV9HTElCQ19TVERJTwor
-CXByZXZlcnJvdXQuc3RyZWFtID0gc3RkZXJyOworI2Vsc2UKIAlwcmV2ZXJyb3V0LmZkID0g
-MjsKKyNlbmRpZgogCWV4cHJlZGlyKGNtZC0+bmNtZC5yZWRpcmVjdCk7CiAJcmVkaXJfc3Rv
-cCA9IHB1c2hyZWRpcihjbWQtPm5jbWQucmVkaXJlY3QpOwogCXN0YXR1cyA9IHJlZGlyZWN0
-c2FmZShjbWQtPm5jbWQucmVkaXJlY3QsIFJFRElSX1BVU0h8UkVESVJfU0FWRUZEMik7CmRp
-ZmYgLVggLi4vZXhjbHVkZS50eHQgLXVyTiBkYXNoLTAuNS4xMisxNy1zaWduZWQtc2l6ZS10
-L3NyYy9vdXRwdXQuYyBkYXNoLTAuNS4xMisxOC1nbGliYy1zdGRpby9zcmMvb3V0cHV0LmMK
-LS0tIGRhc2gtMC41LjEyKzE3LXNpZ25lZC1zaXplLXQvc3JjL291dHB1dC5jCTIwMjQtMTAt
-MjAgMDg6Mzc6NTUuODE0NjgzMzE1ICswMDAwCisrKyBkYXNoLTAuNS4xMisxOC1nbGliYy1z
-dGRpby9zcmMvb3V0cHV0LmMJMjAyNC0wOS0wMSAwNzowNDowNi45NjA5ODg1ODAgKzAwMDAK
-QEAgLTc3LDcgKzc3LDcgQEAKIH07CiBzdHJ1Y3Qgb3V0cHV0IGVycm91dCA9IHsKIAkuc3Ry
-ZWFtID0gMCwgLm5leHRjID0gMCwgLmVuZCA9IDAsIC5idWYgPSAwLCAuYnVmc2l6ZSA9IDAs
-IC5mZCA9IDIsIC5mbGFncyA9IDAKLX0KK307CiAjaWZkZWYgbm90eWV0CiBzdHJ1Y3Qgb3V0
-cHV0IG1lbW91dCA9IHsKIAkuc3RyZWFtID0gMCwgLm5leHRjID0gMCwgLmVuZCA9IDAsIC5i
-dWYgPSAwLCAuYnVmc2l6ZSA9IDAsIC5mZCA9IE1FTV9PVVQsIC5mbGFncyA9IDAKQEAgLTkw
-LDEzICs5MCwxMyBAQAogc3RydWN0IG91dHB1dCBlcnJvdXQgPSB7CiAJLm5leHRjID0gMCwg
-LmVuZCA9IDAsIC5idWYgPSAwLCAuYnVmc2l6ZSA9IDAsIC5mZCA9IDIsIC5mbGFncyA9IDAK
-IH07Ci1zdHJ1Y3Qgb3V0cHV0IHByZXZlcnJvdXQ7CiAjaWZkZWYgbm90eWV0CiBzdHJ1Y3Qg
-b3V0cHV0IG1lbW91dCA9IHsKIAkubmV4dGMgPSAwLCAuZW5kID0gMCwgLmJ1ZiA9IDAsIC5i
-dWZzaXplID0gMCwgLmZkID0gTUVNX09VVCwgLmZsYWdzID0gMAogfTsKICNlbmRpZgogI2Vu
-ZGlmCitzdHJ1Y3Qgb3V0cHV0IHByZXZlcnJvdXQ7CiBzdHJ1Y3Qgb3V0cHV0ICpvdXQxID0g
-Jm91dHB1dDsKIHN0cnVjdCBvdXRwdXQgKm91dDIgPSAmZXJyb3V0OwogCkBAIC0yMTUsNyAr
-MjE1LDYgQEAKIH0KIAogCi0jaWZuZGVmIFVTRV9HTElCQ19TVERJTwogCiAKIHZvaWQKQEAg
-LTIyNCw3ICsyMjMsNiBAQAogCWNoYXIgYnVmID0gYzsKIAlvdXRtZW0oJmJ1ZiwgMSwgZGVz
-dCk7CiB9Ci0jZW5kaWYKIAogCiB2b2lkCkBAIC0zNzgsNyArMzc2LDYgQEAKIH0KIAogCi0j
-aWZkZWYgbm90eWV0CiAjaWZkZWYgVVNFX0dMSUJDX1NURElPCiB2b2lkIGluaXRzdHJlYW1z
-KCkgewogCW91dHB1dC5zdHJlYW0gPSBzdGRvdXQ7CkBAIC0zODYsNiArMzgzLDcgQEAKIH0K
-IAogCisjaWZkZWYgbm90eWV0CiB2b2lkCiBvcGVubWVtb3V0KHZvaWQpIHsKIAlJTlRPRkY7
-CmRpZmYgLVggLi4vZXhjbHVkZS50eHQgLXVyTiBkYXNoLTAuNS4xMisxNy1zaWduZWQtc2l6
-ZS10L3NyYy9vdXRwdXQuaCBkYXNoLTAuNS4xMisxOC1nbGliYy1zdGRpby9zcmMvb3V0cHV0
-LmgKLS0tIGRhc2gtMC41LjEyKzE3LXNpZ25lZC1zaXplLXQvc3JjL291dHB1dC5oCTIwMjQt
-MTAtMTkgMjI6MTY6NDEuNjI0MjQ3Njk1ICswMDAwCisrKyBkYXNoLTAuNS4xMisxOC1nbGli
-Yy1zdGRpby9zcmMvb3V0cHV0LmgJMjAyNC0xMS0xMCAyMTo1NTo0OC43ODEwNTkxNTYgKzAw
-MDAKQEAgLTY1LDkgKzY1LDcgQEAKIAogdm9pZCBvdXRtZW0oY29uc3QgY2hhciAqLCBzaXpl
-X3QsIHN0cnVjdCBvdXRwdXQgKik7CiB2b2lkIG91dHN0cihjb25zdCBjaGFyICosIHN0cnVj
-dCBvdXRwdXQgKik7Ci0jaWZuZGVmIFVTRV9HTElCQ19TVERJTwogdm9pZCBvdXRjc2xvdyhp
-bnQsIHN0cnVjdCBvdXRwdXQgKik7Ci0jZW5kaWYKIHZvaWQgZmx1c2hhbGwodm9pZCk7CiB2
-b2lkIGZsdXNob3V0KHN0cnVjdCBvdXRwdXQgKik7CiB2b2lkIG91dGZtdChzdHJ1Y3Qgb3V0
-cHV0ICosIGNvbnN0IGNoYXIgKiwgLi4uKQpAQCAtODEsMTMgKzc5LDExIEBACiB2b2lkIGRv
-Zm9ybWF0KHN0cnVjdCBvdXRwdXQgKiwgY29uc3QgY2hhciAqLCB2YV9saXN0KTsKICNlbmRp
-ZgogaW50IHh3cml0ZShpbnQsIGNvbnN0IHZvaWQgKiwgc2l6ZV90KTsKLSNpZmRlZiBub3R5
-ZXQKICNpZmRlZiBVU0VfR0xJQkNfU1RESU8KIHZvaWQgaW5pdHN0cmVhbXModm9pZCk7CiB2
-b2lkIG9wZW5tZW1vdXQodm9pZCk7CiBpbnQgX19jbG9zZW1lbW91dCh2b2lkKTsKICNlbmRp
-ZgotI2VuZGlmCiAKIHN0YXRpYyBpbmxpbmUgdm9pZAogZnJlZXN0ZG91dCgpCmRpZmYgLVgg
-Li4vZXhjbHVkZS50eHQgLXVyTiBkYXNoLTAuNS4xMisxNy1zaWduZWQtc2l6ZS10L3NyYy9y
-ZWRpci5jIGRhc2gtMC41LjEyKzE4LWdsaWJjLXN0ZGlvL3NyYy9yZWRpci5jCi0tLSBkYXNo
-LTAuNS4xMisxNy1zaWduZWQtc2l6ZS10L3NyYy9yZWRpci5jCTIwMjQtMTAtMjEgMTA6NDQ6
-MTIuNzMyNTMzMTMzICswMDAwCisrKyBkYXNoLTAuNS4xMisxOC1nbGliYy1zdGRpby9zcmMv
-cmVkaXIuYwkyMDI0LTEwLTIwIDIyOjA3OjM1LjM5MDA1NTg0MCArMDAwMApAQCAtMTgwLDcg
-KzE4MCwxMSBAQAogCQlvdXQyID0gJm1lbW91dDsKICNlbmRpZgogCWlmIChmbGFncyAmIFJF
-RElSX1NBVkVGRDIgJiYgc3YtPnJlbmFtZWRbMl0gPj0gMCkKKyNpZmRlZiBVU0VfR0xJQkNf
-U1RESU8KKwkJcHJldmVycm91dC5zdHJlYW0gPSBmZG9wZW4oc3YtPnJlbmFtZWRbMl0sImEi
-KTsKKyNlbHNlCiAJCXByZXZlcnJvdXQuZmQgPSBzdi0+cmVuYW1lZFsyXTsKKyNlbmRpZgog
-fQogCiAK
-
---------------lcQNv0RqaowrTi50J14MphP3--
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index 46c6295..ff576ff 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -335,21 +335,29 @@ unsigned conv_escape(char *str0, char *out0, bool mbchar)
+ 	int ch;
+ 
+ 	ch = *str;
++	value = ch;
+ 
+ 	switch (ch) {
+ 	default:
+-		if (!isodigit(ch)) {
+-			value = '\\';
+-			str--;
++		if (ch == '"' || ch == '\'')
+ 			break;
++
++		if (ch == 'U') {
++			ch = 8;
++			goto hex;
++		}
++
++		value = '\\';
++
++		if (isodigit(ch)) {
++			ch = 3;
++			value = 0;
++			do {
++				value <<= 3;
++				value += octtobin(*str++);
++			} while (--ch && isodigit(*str));
+ 		}
+ 
+-		ch = 3;
+-		value = 0;
+-		do {
+-			value <<= 3;
+-			value += octtobin(*str++);
+-		} while (--ch && isodigit(*str));
+ 		str--;
+ 		break;
+ 
+@@ -424,20 +432,17 @@ hex:
+ 		ch = 4;
+ 		goto hex;
+ 
+-	case 'U':
+-		ch = 8;
+-		goto hex;
+-
+ 	case '\\':
+-	case '\"':
+-	case '\'':
+-		value = ch;
+ 		break;
+ 
+-	case 'a':	value = '\a';	break;	/* alert */
+-	case 'b':	value = '\b';	break;	/* backspace */
++	case 'a':				/* alert */
++	case 'b':				/* backspace */
++	case 'f':				/* form-feed */
++		value -= 'a';
++		value += '\a';
++		break;
++
+ 	case 'e':	value = '\033';	break;	/* <ESC> */
+-	case 'f':	value = '\f';	break;	/* form-feed */
+ 	case 'n':	value = '\n';	break;	/* newline */
+ 	case 'r':	value = '\r';	break;	/* carriage-return */
+ 	case 't':	value = '\t';	break;	/* tab */
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
