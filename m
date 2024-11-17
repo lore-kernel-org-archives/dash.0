@@ -1,134 +1,62 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DAEB661
-	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 02:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C281CA47
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 02:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731810313; cv=none; b=t0jKzNqmEXwB9RkWe9sjZZQMVehFWbNOJwjsFHvwlX0Xj2H6Q+YKnZ+9X+qNlLkVP9X3n8TRIRQ42QUwmoMVXWxShaca+htt+BRCUepzKIvEg57p0lpEakp13GN4uyFGbLV6ryudsCFf0quHf7drGlSbnwTAaCgay7VtqrXpxzY=
+	t=1731810630; cv=none; b=P1SeMsI6NMiaGSwQG++tqVclhpOAn4Ktt8ScIFV6HREDixHWBC/t4K30pvf3kRTWRp/yG2Eo0D8HZXNBReEwbGMwUGfuWfa7q2pyML4QPsBa+3yPpQrnlkJ/vMw4++rNwiFDDR/vuMkqwk5lx2Sj3AGwSox1ZY56qJZGlI4ghbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731810313; c=relaxed/simple;
-	bh=p4F8pU2R+vbv0k8UuYex5WoVrn9NP0fs9uqt+ydtkgc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=RIG0r9Di28ICK/O017hlcLQQT0ZRUnhctbsEmzh2IS6ybF96wQwHePMRtWeZSyaUxlRTSXtU2Iz+bqd6WaOZdr65gYTIPwkYACuKDaOQ3wZv41Ew16jkQZwjJNb2UgTxL4jfJ/bRYN6rnqdVrnZ1y2srWQUa015uMvxWnv4cMIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=crhuO3Zz; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="crhuO3Zz"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZPqiEX7hETLLAJEd45UUgiYLPLWpupVeBNFgmz8bm1I=; b=crhuO3ZzB5cNntPMUUEf0GWCf6
-	GNIwXPXs5FCyJRnQcr6vjgaBR+tWeayI8QmHlBvBpzfcWarv3xouZ2pYWN2wHDLK+Idxst6WfTI6z
-	me4WsUrZp4AEVTHiOphzHGl5Db6EZxnhQXSAHoZZFa0qUWENRPOWyPS99LWmTm+Ggj576YWt/BzI5
-	OjQxcJ4JWZKW+wiU/GLcjlJuzVqHFRG4o3BouFbS/aOJxCcRrD1bs9/lvPF/uinQNbXlkN5UT7IVr
-	FSvyKmd1z7xLsWbtO5fOEf4gvBXHhgUBFH5oqK/bv94Tjb7Tj2dd+OXvSv7L/bas3Agw88qlSW6vt
-	hRCJKFZw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tCUyF-00HMp9-1L;
-	Sun, 17 Nov 2024 10:25:04 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 17 Nov 2024 10:25:03 +0800
-Date: Sun, 17 Nov 2024 10:25:03 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Johannes Altmanninger <aclopte@gmail.com>
-Cc: dash@vger.kernel.org
-Subject: [PATCH] expand: Fix scanleft/right for !FNMATCH_IS_ENABLED && quotes
-Message-ID: <ZzlT_1CY5AjxtqAs@gondor.apana.org.au>
+	s=arc-20240116; t=1731810630; c=relaxed/simple;
+	bh=1WMWRTuzQIeiaP6feOdoQERYyFpqfvI2RTB9LHw5HLM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ikJmxFXmoTvfa38tBRmNZd9bv6oNFs2J84J8oYrPyBFc1nGJo2s4sKWgWNXphG6qFRpteEHmTqIKt63zHMxyWyyFOseO+tf5/0Vosf7pMDU7K/NiBAnHD1n9+P/jpZia4HfQVkh5IELJUI8G1FPiz+PElFqzY2H9uUxWJF7zwZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+From: Sam James <sam@gentoo.org>
+To: dash@vger.kernel.org
+Cc: Sam James <sam@gentoo.org>
+Subject: [PATCH] bltin: fix timescmd with C23
+Date: Sun, 17 Nov 2024 02:30:17 +0000
+Message-ID: <9f2a8ab063e595188df3fe0546484e5a8156318a.1731810617.git.sam@gentoo.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZuS3PI7He-T7pugf@gmail.com>
-X-Newsgroups: apana.lists.os.linux.dash
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Johannes Altmanninger <aclopte@gmail.com> wrote:
-> I'm hitting an easily reproducible crash.
-> It bisects to c5bf970 (expand: Add multi-byte support to pmatch, 2024-06-02).
-> 
-> After bisecting I reduced it to this example (probably not minimal)
-> 
->        echo \\ | dash -c 'foo=$(cat; printf .); foo=${foo%.}'
+With C23 and LTO, we get the following warning (or error if promoted to such):
+```
+src/builtins.c:28:5: error: type of ‘timescmd’ does not match original declaration [-Werror=lto-type-mismatch]
+   28 | int timescmd(int, char **);
+      |     ^
+src/bltin/times.c:15:5: note: type mismatch in parameter 1
+src/bltin/times.c:15:5: note: type ‘void’ should match type ‘int’
+```
 
-Thanks for the report.  This patch should fix the problem:
+Make the two consistent. This didn't show up before because pre-C23
+had unprototyped functions.
+---
+ src/bltin/times.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
----8<---
-When our own pmatch is used, loc2 is unused in scanleft/right
-when quotes is true.  However, it is still needed when quotes
-is false.
-
-Fix the scanleft/right code so that loc2 is always updated (so
-it will be garbage when quotes is true) but only returned depending
-on the value of quotes.
-
-Fixes: c5bf9702ea11 ("expand: Add multi-byte support to pmatch")
-Reported-by: Johannes Altmanninger <aclopte@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/src/expand.c b/src/expand.c
-index d73f29c..7a30648 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -621,18 +621,15 @@ static char *scanleft(char *startp, char *endp, char *rmesc, char *rmescend,
- 		match = pmatch(str, s);
- 		*(FNMATCH_IS_ENABLED ? loc2 : loc) = c;
- 		if (match)
--			return FNMATCH_IS_ENABLED && quotes ? loc : loc2;
-+			return quotes ? loc : loc2;
+diff --git a/src/bltin/times.c b/src/bltin/times.c
+index 1166a68..252b084 100644
+--- a/src/bltin/times.c
++++ b/src/bltin/times.c
+@@ -12,7 +12,7 @@
+ #endif
+ #include "system.h"
  
- 		if (!c)
- 			break;
- 
- 		mb = mbnext(loc);
- 		loc += (mb & 0xff) + (mb >> 8);
--		if (unlikely(FNMATCH_IS_ENABLED || !quotes)) {
--			ml = (mb >> 8) > 3 ? (mb >> 8) - 2 : 1;
--			loc2 += ml;
--		} else
--			loc2 = loc;
-+		ml = (mb >> 8) > 3 ? (mb >> 8) - 2 : 1;
-+		loc2 += ml;
- 	} while (1);
- 	return 0;
- }
-@@ -645,8 +642,7 @@ static char *scanright(char *startp, char *endp, char *rmesc, char *rmescend,
- 	char *loc;
- 	char *loc2;
- 
--	for (loc = endp, loc2 = rmescend;;
--	     FNMATCH_IS_ENABLED ? loc2-- : (loc2 = loc)) {
-+	for (loc = endp, loc2 = rmescend;; loc2--) {
- 		char *s = FNMATCH_IS_ENABLED ? loc2 : loc;
- 		char c = *s;
- 		unsigned ml;
-@@ -659,7 +655,7 @@ static char *scanright(char *startp, char *endp, char *rmesc, char *rmescend,
- 		match = pmatch(str, s);
- 		*(FNMATCH_IS_ENABLED ? loc2 : loc) = c;
- 		if (match)
--			return FNMATCH_IS_ENABLED && quotes ? loc : loc2;
-+			return quotes ? loc : loc2;
- 		if (--loc < startp)
- 			break;
- 		if (!esc--)
-@@ -676,8 +672,7 @@ static char *scanright(char *startp, char *endp, char *rmesc, char *rmescend,
- 		loc -= ml + 2;
- 		if (*loc == (char)CTLESC)
- 			loc--;
--		if (FNMATCH_IS_ENABLED)
--			loc2 -= ml - 1;
-+		loc2 -= ml - 1;
- 	}
- 	return 0;
- }
+-int timescmd() {
++int timescmd(int argc, char *argv[]) {
+ 	struct tms buf;
+ 	long int clk_tck = sysconf(_SC_CLK_TCK);
+ 	int mutime, mstime, mcutime, mcstime;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.47.0
+
