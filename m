@@ -1,31 +1,31 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57AACA64
-	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 18:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F95ACA64
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 18:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731869428; cv=none; b=q7rfpIESMjGkneKF0f9FkfXw6s2P9NBwAx/JFJH9b0eGSJ9Jc0DcoMVFLIuemgypAOdy58I+BrmWwMbmj0oh1IwVIwERjMADesVj4mEY5V+I2ai68ZDL92+idvsWsisLVFcUR+GtfgvtGaP+IaeOTiLvT+1rS09KPIoo4k0toeg=
+	t=1731869470; cv=none; b=BLjInSM/YQRoumwQB6g7TGwNZas4KLXfCu6egXzkr3Hi13ONVoeM9RjazcLSs4G8PbcbPN+RjQ576v9JBvvUpetrWU9QfnArWv+HWn8stBRSazRjEZYszrX5IGm7dcjnhjxHAH7G1WeNERGXJ6BwMkFxmJSa3f66GGvUsYfBI50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731869428; c=relaxed/simple;
-	bh=A/LriwlM7jQUgbiiPvsF22DSTEfCCFAKNkPGJhor4Sc=;
+	s=arc-20240116; t=1731869470; c=relaxed/simple;
+	bh=XPOJz69vK60mJ+t79I7AXZOrtKG8v4VXPFtzQLjV04Q=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=IsTiMcP4eaKgTIY4T9PCRIEsgqiBJYV+cRECNgtIjcDJQLWlWncWhyuYSZFpcRsmAPc8c7k4lS85Q5SNjTYNyLuMwcwGQ+dxwRuf4Hzrf20+bui2n6GAOk3UK0e05q2d78sefS/mjQhVkd1zP+CbI3jl1Zg1d+KjbKFDLayUHXY=
+	 In-Reply-To:Content-Type; b=iUbbCHkfu5JvunzZFySy+c7Y3lVNHCn9/hUtn/3xsROiMWoiPpQw9CgzLpuvBNsT/qFK+ywio+/8pqwWHnPKIna/an5thc9dohY+NjmNgg846N2Xh8I+rd9jNRXDcMrn+b8w8s6JMAaebVQDnR++pWok23tX7yR96wGL8+hyuck=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AHIoGBc235644
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AHIp0hd235684
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Sun, 17 Nov 2024 19:50:17 +0100
+	Sun, 17 Nov 2024 19:51:01 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AHIoDr1443095
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AHIowbk443118
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Sun, 17 Nov 2024 19:50:15 +0100
-Message-ID: <acdd690e-77fb-4a90-9471-4f165d5a0ad6@knaff.lu>
-Date: Sun, 17 Nov 2024 19:50:13 +0100
+	Sun, 17 Nov 2024 19:50:59 +0100
+Message-ID: <69f0a5dd-cd31-48c3-a633-9d26ab93714f@knaff.lu>
+Date: Sun, 17 Nov 2024 19:50:58 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -34,7 +34,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Alain Knaff <alain@knaff.lu>
-Subject: AT&T Unix PC : 14-broken-wait-h (amended)
+Subject: AT&T Unix PC : 15-realloc-null
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
@@ -71,68 +71,27 @@ Content-Transfer-Encoding: 7bit
 
 Hi,
 
-UnixPC ships with a wait.h for the wrong endianness.
+On UnixPC, realloc of a NULL pointer returns NULL, whereas on most
+today's architectures it behaves the same way as malloc.
 
-This patch provides a local replacement (triggered by absence
-WEXITSTATUS flag)
-
-After having applied the patches until and including this one, it should
-compile for UnixPC, but not yet work. The next couple of patches address
-issues that only become apparent at runtime or optional features.
-
-Edit: but there is an amendment *here*. The "bad" sys/wait.h problem is 
-apparently more general than just AT&T Unix PC, and autoconf has a 
-specific test for this condition (and simply ignores sys/wait.h if it is 
-bad). This new version of the patch follows the approach given in 
-https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Particular-Headers.html
+So we just wrap it.
 
 Regards,
 
 Alain
 
-diff -X ../exclude.txt -urN dash-0.5.12+13-wait3-replacement/configure.ac dash-0.5.12+14-broken-wait-h/configure.ac
---- dash-0.5.12+13-wait3-replacement/configure.ac	2024-11-10 20:26:19.105474215 +0000
-+++ dash-0.5.12+14-broken-wait-h/configure.ac	2024-11-17 18:36:24.270333145 +0000
-@@ -46,6 +46,7 @@
- dnl Checks for header files.
- AC_CHECK_HEADERS(alloca.h paths.h pwd.h stdbool.h dirent.h \
- 		getopt.h sys/resource.h termios.h sys/time.h)
-+AC_HEADER_SYS_WAIT
- 
- dnl Check for declarations
- AC_CHECK_DECL([_PATH_BSHELL],,AC_DEFINE_UNQUOTED([_PATH_BSHELL], "/bin/sh", [Define to system shell path]),[
-diff -X ../exclude.txt -urN dash-0.5.12+13-wait3-replacement/src/jobs.c dash-0.5.12+14-broken-wait-h/src/jobs.c
---- dash-0.5.12+13-wait3-replacement/src/jobs.c	2024-11-10 21:51:55.911519696 +0000
-+++ dash-0.5.12+14-broken-wait-h/src/jobs.c	2024-11-17 18:36:24.270333145 +0000
-@@ -43,8 +43,12 @@
- #endif
- #include <sys/types.h>
- #include <sys/param.h>
-+
-+#ifdef HAVE_SYS_WAIT_H
-+# include <sys/wait.h>
-+#endif
-+
- #ifdef BSD
--#include <sys/wait.h>
- #ifdef HAVE_SYS_TIME_H
- #include <sys/time.h>
- #endif
-diff -X ../exclude.txt -urN dash-0.5.12+13-wait3-replacement/src/system.h dash-0.5.12+14-broken-wait-h/src/system.h
---- dash-0.5.12+13-wait3-replacement/src/system.h	2024-11-10 14:53:08.418618090 +0000
-+++ dash-0.5.12+14-broken-wait-h/src/system.h	2024-11-17 18:36:24.274333237 +0000
-@@ -220,3 +220,14 @@
- #ifndef HAVE_LSTAT
- #define lstat stat
- #endif
-+
-+/* As recommended by https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Particular-Headers.html */
-+#ifndef WEXITSTATUS
-+# define WEXITSTATUS(stat_val) ((unsigned int) (stat_val) >> 8)
-+#endif
-+#ifndef WIFEXITED
-+# define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
-+#endif
-+#ifndef WTERMSIG
-+#define	WTERMSIG(stat_val) ((stat_val) & 127)
-+#endif
+diff -X ../exclude.txt -urN dash-0.5.12+14-broken-wait-h/src/memalloc.c dash-0.5.12+15-realloc-null/src/memalloc.c
+--- dash-0.5.12+14-broken-wait-h/src/memalloc.c	2024-10-27 20:32:54.604833876 +0000
++++ dash-0.5.12+15-realloc-null/src/memalloc.c	2024-10-27 20:32:44.700597405 +0000
+@@ -68,7 +68,10 @@
+ pointer
+ ckrealloc(pointer p, size_t nbytes)
+ {
+-	p = realloc(p, nbytes);
++	if(p == NULL)
++		p = malloc(nbytes);
++	else
++		p = realloc(p, nbytes);
+ 	if (p == NULL)
+ 		sh_error("Out of space");
+ 	return p;
