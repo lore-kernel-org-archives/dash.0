@@ -1,70 +1,133 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6D5DF78
-	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 09:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD31DF78
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 09:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731834975; cv=none; b=iz41PCyPXVvp4co2xaphuBqjPt2iKgSrNW/RX883pl1sctjv0NZHaKO8IhkgN5UyJdptAgR+ngHDePvnQ6yaCpVhJsVHdl0K0eWv5HjRqVWu8Gq13xX2G8d1WP6HBwOxPDgLv22r4O40FKCNlFOiV4vHTKL+Qjred2Q+MXYpdRs=
+	t=1731835141; cv=none; b=t2rOWnslS8ItjiLdnDgsqYexTHF2q/e0jhc4Ibg+XRhnR7ZDR5LWkEuybQQtJJ2UwKrSXTWwZu3aiFXEdF+k6ea/GMJ4ZlesjswuZSFxpj8+hfht/5vILRvJNwrV3UvJ3uGoK6DG4K+Xeek/9sXogTY0wPftLAlAK1zBkTa5heo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731834975; c=relaxed/simple;
-	bh=C8Ebp5WCsge3CvSMgxm7xCqC5hf88ITgmB2bI6EcxC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kuarPo0RhZzGmhu7YWhwHtdg261oZeB1Osac2uTVRgEdOfjC3iVUg+B6EnNEkH8uVih/UguWOvhegztWGoG6rxur9CWFKpMRr3ImnD9D4DdtPtD1NWqTlk05a2AfaQni+CsbmsCk2bsZhfwOd9Hf35ZQ7IsRhLlePYbhTrtROpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=l7Ew2r8g; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="l7Ew2r8g"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=srM+J3uZxmv7dPS9BoK8d2D76Y8bsIxOAFdCncWi1w0=; b=l7Ew2r8g0F94MM8c9IWt81824v
-	8eLAE/hezNXxuIZXAJNHGw2GlE03cYR9bY0fsJytC5nTN8nLbWvYFzGC4etS2t8Yj/osdBALiVUKd
-	HokodjjihpxSptoc+u9Kzo5l9uME9KPMrM7q8o9FwpZQdn52IEUHF6UMhAfMio3wof4/ibX3Nf9s8
-	0wkuk7rYe3V7EGo/iQHHx9R3clYTnGlcwW5cDWAhhT5Xa2w4aX3PgzW4d0WkME7i+UEkG5E0/k/Eu
-	8/+9UysjoSrloSc4bDAg3C28QMZGivqpW1xr2/gRNGqUG/TPUapN1W4s0iGuNr/9rkL/daKp8yEP9
-	Cc1vrzmg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tCbO5-00HP7u-06;
-	Sun, 17 Nov 2024 17:16:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 17 Nov 2024 17:16:09 +0800
-Date: Sun, 17 Nov 2024 17:16:09 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Alain Knaff <alain@knaff.lu>
-Cc: dash@vger.kernel.org
-Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 01-remove-extraneous
-Message-ID: <Zzm0WZ6NsRxjZhWe@gondor.apana.org.au>
-References: <ZzlScuJIC8G1gcjJ@gondor.apana.org.au>
- <9dda0a2f-efda-4ba0-93ed-ea683256446e@knaff.lu>
- <Zzmz7xY_4HM6hpgG@gondor.apana.org.au>
+	s=arc-20240116; t=1731835141; c=relaxed/simple;
+	bh=DWtq9Mk8SmxqWP9YBlnrSZ0vj0D/fC1r7HfzGYlFCkY=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=EL+NdZnmirXa8ImkxQdbVwx680N93PwEPrXntwdUL6Uf7Q2IBDJ6K/gkVkyBMVz6wNnZNS5Vz9ssQt8XVIPEzzcYIIhuEkAi+3vSWOsdtVpJ/ne8SgRLCzdu+QA489ScEkDc0edQXNA8XesJuQ/vEt2BB3Jeb3jiZWT/vW3mhhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
+Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AH9Ir2P206126
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK)
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 10:18:54 +0100
+X-Envelope-To: <dash@vger.kernel.org>
+Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
+	(authenticated bits=0)
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AH9IpSk413123
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO)
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 10:18:53 +0100
+Message-ID: <d7a3d31c-964a-4131-b57e-b6fa7c18c5b4@knaff.lu>
+Date: Sun, 17 Nov 2024 10:18:51 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zzmz7xY_4HM6hpgG@gondor.apana.org.au>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Alain Knaff <alain@knaff.lu>
+To: dash@vger.kernel.org
+Subject: Another attempt of my work with a new subject, first item
+Autocrypt: addr=alain@knaff.lu; keydata=
+ xsDiBEk9qFcRBADO4trPtib39qvAEBlkAIcBGnZ137EmmNLU1pFZC5acLyJ4wYhVdcol97lC
+ 4ZkD0DJek6DVidQfz4hA7JbZy2W8l6O/o2k/Ja2bWkb8qtrcUNVDJzdJjNqXmmxdsyLd5QVt
+ uCHgi3Zz0kq9aJnRCVuAyfrjMdaUsOThi07u1EyEywCgjxVKODAifumqfdjVxS5NoV7x7TkD
+ /0k2F3/5/NYchgLz6Qu3As5MVtPs7NkJ0Mpal4Gy8CaKefHcynY+zCziM/oBw0+PIFxyFud0
+ uT9HRIdEp1DlaTTUYlt95HeDYmCUh0Wt1PwNNRWcm+vTUuK7tOxzYadUqbzO+F6C+WN8msxA
+ hcxzUgsL/YyXVilvL8XqB+RlS5bBA/9OxXc2mJs01nWu5khvVFNwUCDS8FRYyoHeodVZFGLC
+ UG1PrV9nHva5vYJk1QlZP3qEotnK+6l4708X9yhdw2+UCtxvseTQ6JWBtIdJyo+Qv7apSQA3
+ kkau6Om7SOyW1i/2LcCZU84SC923uBH7VNeUzCnzelVFubk6eRwzjNvrj80cQUxBSU4gS05B
+ RkYgPGFsYWluQGtuYWZmLmx1PsJgBBMRAgAgBQJJPahXAhsDBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQyAYxsm9DGWFEsgCeOSavzyOp8Bj3nOP8hC6XeCX/3k4Anj0KegsyeIVxuj5X
+ TUnh535vXfZvzsFNBEk9qFoQCACt2vctXYAr+ndRbaeR4ygJ8rKH8ARu68nDuQuxOKCasaQr
+ xm8+/RxvmTfriP00tYZAca2tmCjwntKVsK4eNSivvo6c7BwziCnQx/vW+kJK4ctckMHSZPqe
+ 4a1HWYURg5oxaqGo4f06YAn9O0yDo6xdGGNUMpYHv2O1/jsAEgAM/c/US+gNctzsNKQ4lVwp
+ HH4NEabev+zlisnTO3V39iXijZbe9AYlD4qZH/0nFBDCCt9EDTe+/6IFfvIrnVx7o367U9XL
+ SCLVQt4k7xqCIow7RP5BlOYLDV50yMva8c62yhWpDYKSyJsQGn/nGiiv6P4Ye/monfkQD+PC
+ nKPXDYCjAAMFB/9D2FSYHyikvOoXXMTfjGHUyIQK6FCtKINTFfBPuwlWOWCukrQrzH0BmTVC
+ /WuMOrrmxl0IFHGtOV2Zp+bdsjhlzgZ4kXAmqw1Qiphb/YLD6VY5TQ59Tkl7+nCQ0wjcRim1
+ Sg6OzmoNttHpTt9eAvLZMz7yi9Nq40yKXh+zXZtzHIgdsXG+tO9+LEWojdbXgIdZin2yUKYt
+ KxbpwyM0qCN9oGtKTAi0GX+tuHdAqWwYEgVnd27LcBGLTs6QJPsjQKHiAtYJwu6MWiF7bvCr
+ iBNyVG3yU3inZcQvIdYxO0VUN3wVSEIbRHcNzG2u1UD6ZuF+3bv39dh54m1CQzbzzRepwkkE
+ GBECAAkFAkk9qFoCGwwACgkQyAYxsm9DGWHNLwCfWr4DLrBZMktv9RTGbcIZ+/NgTswAn3aG
+ LBuTFPDEO0bfA+7PlpCctCJT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 17, 2024 at 05:14:23PM +0800, Herbert Xu wrote:
+[Trying again as a new message rather than as a reply]
+
+Hi,
+
+On 17/11/2024 03:18, Herbert Xu wrote:
+> Alain Knaff <alain@knaff.lu> wrote:
+>>
+>> I've now split up the patch into parts. In addition to just the
+>> splitting, the patch set contains the following changes/improvements:
+>> - adapted it to dash 0.5.12 which has been released in the meantime,
+>> - some cleanup,
+>> - it now also compiles & works on Solaris 10 & 11
 >
-> No it still didn't work.  I know a pet peeve of patchwork is the
-> Subject line and it treats identical Subjects as comments instead
-> of new patches.
+> I'm sorry but something has gone wrong.  None of your patches have
+> been picked up by patchwork:
+>
+> https://patchwork.kernel.org/project/dash/list/
+>
+> Perhaps try resending just one small patch to debug the problem
+> before you do the whole thing again?
+>
+> One thing to try would be to send the patch inline instead of as
+> an attachment.
+>
+> Thanks,
 
-Yes that's exactly what happened.  All your patches are here:
+Ok, so here goes 01. Please tell me how it goes, and if ok, I'll send the others.
 
-https://patchwork.kernel.org/project/dash/patch/aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu/
+If it goes well, can I send the others as replies to my initial message each, without repeating explanation text?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+
+Alain
+
+diff -X ../exclude.txt -urN dash-0.5.12/src/bltin/bltin.h dash-0.5.12+01-remove-extraneous/src/bltin/bltin.h
+--- dash-0.5.12/src/bltin/bltin.h	2020-06-03 01:19:23.000000000 +0000
++++ dash-0.5.12+01-remove-extraneous/src/bltin/bltin.h	2024-10-20 18:26:46.960598638 +0000
+@@ -63,7 +63,6 @@
+ #define fputs outstr
+ #define fflush flushout
+ #define fileno(f) ((f)->fd)
+-#define ferror outerr
+ #endif
+ #define INITARGS(argv)
+ #define	error sh_error
+diff -X ../exclude.txt -urN dash-0.5.12/src/jobs.c dash-0.5.12+01-remove-extraneous/src/jobs.c
+--- dash-0.5.12/src/jobs.c	2022-01-20 05:54:13.000000000 +0000
++++ dash-0.5.12+01-remove-extraneous/src/jobs.c	2024-10-27 19:53:42.912675611 +0000
+@@ -112,9 +112,6 @@
+ STATIC void forkchild(struct job *, union node *, int);
+ STATIC void forkparent(struct job *, union node *, int, pid_t);
+ STATIC int dowait(int, struct job *);
+-#ifdef SYSV
+-STATIC int onsigchild(void);
+-#endif
+ STATIC int waitproc(int, int *);
+ STATIC char *commandtext(union node *);
+ STATIC void cmdtxt(union node *);
+diff -X ../exclude.txt -urN dash-0.5.12/src/mystring.c dash-0.5.12+01-remove-extraneous/src/mystring.c
+--- dash-0.5.12/src/mystring.c	2022-12-11 06:29:21.000000000 +0000
++++ dash-0.5.12+01-remove-extraneous/src/mystring.c	2024-10-20 18:27:56.634245499 +0000
+@@ -46,7 +46,6 @@
+ #include <errno.h>
+ #include <inttypes.h>
+ #include <limits.h>
+-#include <inttypes.h>
+ #include <stdlib.h>
+ #include "shell.h"
+ #include "syntax.h"
