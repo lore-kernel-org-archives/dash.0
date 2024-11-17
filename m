@@ -1,31 +1,31 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB7B1392
-	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 10:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B754A23AD
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 17:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731840532; cv=none; b=H8eaW59NfuTpuy+nR+MrtL4mBoruwNVhcB/aC5e7cg6bbw5ZpBBHnH7k/KgTRpjxl1RDeWRGFnovt/oPtqm0I4MigsB8qSzHOgYKKQRUtcl/n+ZZE0+pTcMgFAK1Rm8KdVRlU7rXVVibzKZ1hLPwzXYCUxSvyDzqbkXV9rAd8aQ=
+	t=1731864142; cv=none; b=uxbO68G2ejmZKULq+R541Ukb5t5ZdZDgOXlh07j+7B57yhL+K4wmQIvoA+x9himEbXb6cxkfy72cLFGHJl/aW3ePx6iKdsK96Q0WJFkVE1GeVZeT9C58rdS1+Qy2RTW8SWOr1BYxkdf+XIllSEJNDjT3pyKoc1tmtxrfpfg9T3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731840532; c=relaxed/simple;
-	bh=dmIpEICPNWwSmbXjg3v0OqSk5g+pkKDet3/oIV1wEjQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XHTJSMatXvMs1ungY/1aOqa2dtRLVAE4lPQ/GXBt+E3Gd5TEeeeqhmnNY4wII14kTu7vy4xMztR4sng47FrFweXlvH+h1kSh6okernFMn3SqxtMkxQpDTCCbdh1X2spCHQuldxX4E9wBr2Y+0IdTkd/G/3jVOK7i0s7KSmnKJeA=
+	s=arc-20240116; t=1731864142; c=relaxed/simple;
+	bh=ZDG8sSR7+CuxEWmXYo5u+tAwDjH1Gs9nKK2ERov7LMk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=FQiNGQPx51le1Je3++SsYW4FJ0M7DHiXhoy3ITyHnGCiwYaV3O2CSgsKXVZc+TGjJ5fhwdhxYAhk9EK79MhzlozfpgUM3D1M1ftQrVjzOl7WtD5V6XV0hz4zhLo9CEuL7JjSt2RorJF9ZVWPvr34596RXawfyXxi51Qd+le4STc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AHAmcw0210772
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AHHLxOA231143
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Sun, 17 Nov 2024 11:48:39 +0100
+	Sun, 17 Nov 2024 18:22:00 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AHAmaGi417922
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AHHLwra438611
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Sun, 17 Nov 2024 11:48:38 +0100
-Message-ID: <63546476-037a-4356-904e-4576023bbd01@knaff.lu>
-Date: Sun, 17 Nov 2024 11:48:36 +0100
+	Sun, 17 Nov 2024 18:21:59 +0100
+Message-ID: <3b5cd0a2-a3da-4013-ad20-f77dbeaa6b72@knaff.lu>
+Date: Sun, 17 Nov 2024 18:21:57 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -33,14 +33,14 @@ List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
- PC : 01-remove-extraneous
+From: Alain Knaff <alain@knaff.lu>
+Subject: AT&T Unix PC : 09-type-sizes
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
-References: <ZzlScuJIC8G1gcjJ@gondor.apana.org.au>
- <9dda0a2f-efda-4ba0-93ed-ea683256446e@knaff.lu>
- <Zzmz7xY_4HM6hpgG@gondor.apana.org.au> <Zzm0WZ6NsRxjZhWe@gondor.apana.org.au>
-From: Alain Knaff <alain@knaff.lu>
+References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
+ <6ea7da38-204f-54bf-7156-085a1589c40b@knaff.lu>
+ <6cacf608-326e-211a-7d37-164041710980@knaff.lu>
+ <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 Content-Language: en-US
 Autocrypt: addr=alain@knaff.lu; keydata=
  xsDiBEk9qFcRBADO4trPtib39qvAEBlkAIcBGnZ137EmmNLU1pFZC5acLyJ4wYhVdcol97lC
@@ -65,39 +65,50 @@ Autocrypt: addr=alain@knaff.lu; keydata=
  iBNyVG3yU3inZcQvIdYxO0VUN3wVSEIbRHcNzG2u1UD6ZuF+3bv39dh54m1CQzbzzRepwkkE
  GBECAAkFAkk9qFoCGwwACgkQyAYxsm9DGWHNLwCfWr4DLrBZMktv9RTGbcIZ+/NgTswAn3aG
  LBuTFPDEO0bfA+7PlpCctCJT
-In-Reply-To: <Zzm0WZ6NsRxjZhWe@gondor.apana.org.au>
+In-Reply-To: <ZhDq9L88eTrLxlWW@gondor.apana.org.au>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Herbert,
+Hi,
 
-On 17/11/2024 10:16, Herbert Xu wrote:
-> On Sun, Nov 17, 2024 at 05:14:23PM +0800, Herbert Xu wrote:
->>
->> No it still didn't work.  I know a pet peeve of patchwork is the
->> Subject line and it treats identical Subjects as comments instead
->> of new patches.
-> 
-> Yes that's exactly what happened.
+The 9th patch supplies auto-detection of size of various integer and
+other types
 
-Good
-
->  All your patches are here:
-
-Not *all* of them yet. Unfortunately I'll have to leave for a couple of
-hours, and will post the rest in the evening (continuing at
-*-09-type-sizes). 13-wait3-replacement, and possibly also
-14-broken-wait-h will have an amendment, and might take somewhat more
-time (but still this evening).
-
-> 
-> https://patchwork.kernel.org/project/dash/patch/aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu/
-
-Noted. In the end it seems that it is enough to just drop the "Re:"
-
-> 
-> Cheers,
-
-Thanks,
+Regards,
 
 Alain
+
+diff -X ../exclude.txt -urN dash-0.5.12+08-vsnprintf/configure.ac dash-0.5.12+09-type-sizes/configure.ac
+--- dash-0.5.12+08-vsnprintf/configure.ac	2024-11-10 17:29:04.521055631 +0000
++++ dash-0.5.12+09-type-sizes/configure.ac	2024-11-10 17:06:37.153028629 +0000
+@@ -68,17 +68,30 @@
+ AC_CHECK_DECLS([isblank],,,[#include <ctype.h>])
+ 
+ AC_DECL_SYS_SIGLIST
++AC_TYPE_PID_T
++AC_TYPE_UID_T
++AC_TYPE_SSIZE_T
++AC_TYPE_UINT32_T
++
++AC_CHECK_TYPE([intmax_t],,AC_DEFINE_UNQUOTED([intmax_t],long,[Define intmax_t type, must also be supported by printf]))
++
++AC_CHECK_TYPE([uintmax_t],,AC_DEFINE_UNQUOTED([uintmax_t],unsigned long,[Define uintmax_t type, must also be supported by printf]))
+ 
+ dnl Check for sizes of types
++AC_SYS_LARGEFILE
+ AC_CHECK_SIZEOF([intmax_t])
+ AC_CHECK_SIZEOF([long long int])
++AC_CHECK_SIZEOF([long int])
+ 
+ dnl Select a fallback format string for intmax_t in case we don't find PRIdMAX
+ if test "x$ac_cv_sizeof_intmax_t" = "x$ac_cv_sizeof_long_long_int"; then
+   intmax_fstr="lld"
++else if test "x$ac_cv_sizeof_intmax_t" = "x$ac_cv_sizeof_long_int"; then
++  intmax_fstr="ld"
+ else
+   intmax_fstr="jd"
+ fi
++fi
+ 
+ dnl Check for PRIdMAX and define it to a fallback if not found
+ AC_CHECK_DECL([PRIdMAX],,
