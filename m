@@ -1,31 +1,31 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC5D19BA6
-	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 18:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7831CA64
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 18:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731869526; cv=none; b=DDdOmjkI3ucCruKLsk6AUDtBSE7FCceXpSjFwxcd9/Z1iITp2Qi2whUylzJrD2EwurOENlY/JQvnQPXNR6RW4HPeblm7YwzRexQguPGEFh9QFg5vwz1mqqTR6nCR2F+nVy9/WRO+fTKf3AOGaciJz+ex+yJuejGDtEMZBVEwbyk=
+	t=1731869599; cv=none; b=JBVUearMTikVArhT3lBmA6VYjyAs3JFdVE/t4q4yUV//XNUWNeIjJvRaa4KN5hgtAwTnz/fHcvGXxlz/kZ6DuRSniYqEDEUNYscskTBeuWomezRNi5aJsqISqBoIGLpa4n69zl6HmZwxdNYrygOdPvhA8/kINh+VKeNuNNNY1cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731869526; c=relaxed/simple;
-	bh=eQsfUqjAv70NisjYtuHkkB8xiESoAWo951DnqmJCshc=;
+	s=arc-20240116; t=1731869599; c=relaxed/simple;
+	bh=d7LPgbBk4yeI8Lui7boeX2fD+Yoz76T5JNrW4sJouHs=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=SIWnPqSfVjtivmxLC5prn/5p2S3TwP4dd8T2ifUDG/qsnsm/fGo3ICr49X6L8JzPwxbptscC38j2A/yyPQaSTlZ5gyeG825ukobTvFi6uv1yweiAyMq+hIzhAUzbeVxuBBfJM0F3aOK9LLPr6dlpvjGcH2RmV7TqSNc/7lElukw=
+	 In-Reply-To:Content-Type; b=TiHo5TbwJyh11SU97GB6+JUZRrrzGL+lTuZHtIDTAMJek8bYXDYog36uPL12AsAdyVHRzg1Eh9pClrNflF1p4ed+fjg8550NepYkdG2aUay5x/6/O9vHzxwEzM8M4XlMrBl//mcBcYtxCfAWv4HXYPLUwoS4xACdsLNbQBWEUIs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AHIppma235725
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AHIr8pd235778
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Sun, 17 Nov 2024 19:51:53 +0100
+	Sun, 17 Nov 2024 19:53:09 +0100
 X-Envelope-To: dash@vger.kernel.org
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AHIpoRr443160
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AHIr6vh443209
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Sun, 17 Nov 2024 19:51:51 +0100
-Message-ID: <b516083a-c7ca-494e-9810-4a5d310ea51b@knaff.lu>
-Date: Sun, 17 Nov 2024 19:51:50 +0100
+	Sun, 17 Nov 2024 19:53:08 +0100
+Message-ID: <735f2589-069e-4928-af9c-3840da5a3a3b@knaff.lu>
+Date: Sun, 17 Nov 2024 19:53:06 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -34,7 +34,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Alain Knaff <alain@knaff.lu>
-Subject: AT&T Unix PC : 16-signed-size-t
+Subject: AT&T Unix PC : 17-monitor-mode
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: dash@vger.kernel.org
 References: <aa0e9215-622a-17e0-327b-f0233ed32ad8@knaff.lu>
@@ -71,34 +71,31 @@ Content-Transfer-Encoding: 7bit
 
 Hi,
 
-On UnixPC, size_t is a *signed* type, unlike on all other platforms.
+Monitor mode is the feature that makes the shell display the status of
+any exited children when pressing return at the shell prompt.
 
-Thus the SSIZE_MAX macro doesn't work on UnixPC as on other platforms
-(because right-shift of signed quantities pad with value of leftmost
-bit, rather than always shifting a zero in)
+It can be enabled/disabled using set -m/set +m. It is enabled by
+default in interactive shells, and disabled in non-interactive shells
+(such as those running a script)
 
-This replacement works ok (and obviously works for unsigned size_t
-too)
-
-After having applied this one, dash should work on UnixPC for basic
-tasks, the next 2 are optional features.
+Normally monitor mode doesn't need any advanced job control features
+to work, but for some reason dash only makes it available if job
+control is available. This patch changes this by directly probing
+mflag rather than jobctl.
 
 Regards,
 
 Alain
 
-diff -X ../exclude.txt -urN dash-0.5.12+16-monitor-mode/src/system.h
-dash-0.5.12+17-signed-size-t/src/system.h
---- dash-0.5.12+16-monitor-mode/src/system.h	2024-11-10
-14:53:08.438618562 +0000
-+++ dash-0.5.12+17-signed-size-t/src/system.h	2024-11-10
-14:53:08.446618751 +0000
-@@ -31,7 +31,7 @@
- #include <sys/types.h>
-
- #ifndef SSIZE_MAX
--#define SSIZE_MAX ((ssize_t)((size_t)-1 >> 1))
-+#define SSIZE_MAX ((((1L << (sizeof(ssize_t)*8-2))-1)<<1)+1)
- #endif
-
- static inline void sigclearmask(void)
+diff -X ../exclude.txt -urN dash-0.5.12+15-realloc-null/src/main.c dash-0.5.12+16-monitor-mode/src/main.c
+--- dash-0.5.12+15-realloc-null/src/main.c	2024-10-21 10:44:12.732533133 +0000
++++ dash-0.5.12+16-monitor-mode/src/main.c	2024-11-01 21:20:07.814920133 +0000
+@@ -209,7 +209,7 @@
+ 		int skip;
+ 
+ 		setstackmark(&smark);
+-		if (jobctl)
++		if (mflag)
+ 			showjobs(out2, SHOW_CHANGED);
+ 		inter = 0;
+ 		if (iflag && top) {
