@@ -1,31 +1,31 @@
 Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C55D28EB
-	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 08:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801FAA92D
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 09:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731833909; cv=none; b=W5Wm4aJwGVFzV/Md8PnMhnfcEPK1Ge5fcJG/wt4KVC198KVM5dw3dWuddulLzQZCwcXiW5BoWYXfuP3jVtYyqRK3nbkJaEcTKbQW8vZWKMvKouHwV3q1S+7A0B8Jb06uupDP7Mix1yzbZivZRxfSbYt8Qxo7bhq9rVZRQphTdIE=
+	t=1731834792; cv=none; b=UFGHOh52PF5lkYafE7G4tz3R+Psx2ktxY0aAIwavJ/RuW+z+xhuO0kFz8F30gC76K3wvd9iKwt5pjhzdv+6rIJMgMDSScQx4efatnG48Ij5qV9t4RuiB5DcoTms3vuDseqsqyTiw0ByOF0wBqgY4jXiiXjCYGTwQb9vZkP/55xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731833909; c=relaxed/simple;
-	bh=yg8QFqaNMrC91cgKti5HRL4WVulGWHC313Eo4hzYFSA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kU53p1tlTnPkrktx6lMdVwGAQgxn6Ec3wn6KdjstlmLAeNQEagVQC5WagnYYEElPewwdVOzmBsjQTdE/4Dau4186mwdmDaVqji/UeMqywsXrwG+B4jj+8XMg70Yyug73rCyohupfqu42OTOeNVPpRRzyhdcp0lArRwWRzWCrV2U=
+	s=arc-20240116; t=1731834792; c=relaxed/simple;
+	bh=kypmJQRNfUv/bbzI5ZL4spN3xvslRv7Z+u2BForUQnw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=rVrM+WVJjQ+7acpsyMpQJZXmaBdpWnAbZthaalTK/nRzmWg/0RD8esJzU5DGyMhCBT71XWUAImJztw8KRIG4HEVAyK3AhBPL/IuiLio6WzEb2QMGukCp77ce6MRZ5hMWrnqmEqQPGam2NyTgPfVHrB1X9LgWmRBPSJhL+MFnXEQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
 Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
-	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AH8w3JL204826
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AH9CtKY205769
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Sun, 17 Nov 2024 09:58:05 +0100
-X-Envelope-To: dash@vger.kernel.org
+	Sun, 17 Nov 2024 10:12:57 +0100
+X-Envelope-To: herbert@gondor.apana.org.au
 Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
 	(authenticated bits=0)
-	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AH8w1ll411941
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AH9CsOU412741
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Sun, 17 Nov 2024 09:58:03 +0100
-Message-ID: <9dda0a2f-efda-4ba0-93ed-ea683256446e@knaff.lu>
-Date: Sun, 17 Nov 2024 09:58:01 +0100
+	Sun, 17 Nov 2024 10:12:55 +0100
+Message-ID: <18a8a1d3-8cc9-4ff5-8de5-a37eace4225f@knaff.lu>
+Date: Sun, 17 Nov 2024 10:12:54 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -33,13 +33,13 @@ List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+From: Alain Knaff <alain@knaff.lu>
 Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
  PC : 01-remove-extraneous
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
+To: dash@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 References: <ZzlScuJIC8G1gcjJ@gondor.apana.org.au>
 Content-Language: en-US
-From: Alain Knaff <alain@knaff.lu>
 Autocrypt: addr=alain@knaff.lu; keydata=
  xsDiBEk9qFcRBADO4trPtib39qvAEBlkAIcBGnZ137EmmNLU1pFZC5acLyJ4wYhVdcol97lC
  4ZkD0DJek6DVidQfz4hA7JbZy2W8l6O/o2k/Ja2bWkb8qtrcUNVDJzdJjNqXmmxdsyLd5QVt
@@ -67,6 +67,8 @@ In-Reply-To: <ZzlScuJIC8G1gcjJ@gondor.apana.org.au>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+[Trying again with list as To:, and Herbert as Cc:]
+
 Hi,
 
 On 17/11/2024 03:18, Herbert Xu wrote:
@@ -91,11 +93,9 @@ On 17/11/2024 03:18, Herbert Xu wrote:
 > 
 > Thanks,
 
-Ok, so here goes 01. Please tell me how it goes, and if ok, I'll send 
-the others.
+Ok, so here goes 01. Please tell me how it goes, and if ok, I'll send the others.
 
-If it goes well, can I send the others as replies to my initial message 
-each, without repeating explanation text?
+If it goes well, can I send the others as replies to my initial message each, without repeating explanation text?
 
 Thanks,
 
