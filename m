@@ -1,62 +1,83 @@
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C281CA47
-	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 02:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8691C26289
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 06:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731810630; cv=none; b=P1SeMsI6NMiaGSwQG++tqVclhpOAn4Ktt8ScIFV6HREDixHWBC/t4K30pvf3kRTWRp/yG2Eo0D8HZXNBReEwbGMwUGfuWfa7q2pyML4QPsBa+3yPpQrnlkJ/vMw4++rNwiFDDR/vuMkqwk5lx2Sj3AGwSox1ZY56qJZGlI4ghbg=
+	t=1731826464; cv=none; b=PrQUfvvU1iu9RDy+G1EqI+7paBrLxY13E0lZ3hLgs8WwVnI3jQ7JzxLaU3GwVkkvQ3/7omO5/UCp8feuX6Of2fT5TgxrNAGbsFDFRxly+JFABoXxQ1roP+2TLYzY70JgEeKrBfJFMZGCrLA40XE8zrTDZD/fh6f0HDDnhfug/K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731810630; c=relaxed/simple;
-	bh=1WMWRTuzQIeiaP6feOdoQERYyFpqfvI2RTB9LHw5HLM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ikJmxFXmoTvfa38tBRmNZd9bv6oNFs2J84J8oYrPyBFc1nGJo2s4sKWgWNXphG6qFRpteEHmTqIKt63zHMxyWyyFOseO+tf5/0Vosf7pMDU7K/NiBAnHD1n9+P/jpZia4HfQVkh5IELJUI8G1FPiz+PElFqzY2H9uUxWJF7zwZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-From: Sam James <sam@gentoo.org>
-To: dash@vger.kernel.org
-Cc: Sam James <sam@gentoo.org>
-Subject: [PATCH] bltin: fix timescmd with C23
-Date: Sun, 17 Nov 2024 02:30:17 +0000
-Message-ID: <9f2a8ab063e595188df3fe0546484e5a8156318a.1731810617.git.sam@gentoo.org>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1731826464; c=relaxed/simple;
+	bh=DgG+iMZTHISZLFYxeQhVtHniaO7eTU1ny8yJ6UBUBuk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M1zfC1wM84GakRBtWM0VAqqIF1u3UWRiUBF3BtAC/IjKSEl2ce3+bwH/WASn+CslwXkiaDzEurdhfmrArAGtDbH/NKEf8ZcTvPpkgMeyeIGllpe8IEQKK+7sUAfaittbKf5B9ukYL2WPiJ4YFQAE9qJLhQ4vO17XDCiF2TBBFXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eKdU9efJ; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKdU9efJ"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-382433611d0so217519f8f.3
+        for <dash@vger.kernel.org>; Sat, 16 Nov 2024 22:54:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731826461; x=1732431261; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8GeGZMn/c67YSbJ+ytjU2Rz43VUsp3LrMWK1RjNPeFw=;
+        b=eKdU9efJ6Adbcqe4TEKi138tqYMHNwpVssqMNb+YvFy1j9CjoDaGZyVbuWe/Ma7IkY
+         YR8wtAVUaXguATR/+W4lqYPGDWYjI3/zMu2KOQIjBvaE5G7AnsyUTJQXCdEx9XzInH/s
+         VR/coNvM4y98l84vPsIcAKn8ytNhGB+qvSv3Hfx1SJgRjLkPTpMMKvLKvQBPhbjZVZ9f
+         y81Lf8yxrbB5H+aTYH0lf+8mRo6Btd4D4o+qqx7nBSgRjos+TS92SxbpwP7gzOl+ZbcU
+         HOErXNVrD7rOJZJEp72XMhUdmI1zqoIe36HyT4CZMZMhvUv1Cbqvdi6K5PQeYR2WdFBz
+         0VaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731826461; x=1732431261;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8GeGZMn/c67YSbJ+ytjU2Rz43VUsp3LrMWK1RjNPeFw=;
+        b=myfzOASEOQlWiUdke5ZiNbqH6dkx1iq5UvghEkYm57vG1J8L1wt6Pe1X/DRpIDgsdT
+         Ras93AMPI4CKZhK5Y0vStlnW01e3Thf1V+XOVA0W23TdLVGAgmM6L0WDqRsCYLyD21UR
+         kMnDO1xe4JpiozWpfDOcwfIog4kpGRvTfBYmEt4ZNr9TjCeydi3LSm8d1uxh9OmNDbwr
+         Wgk7DzxFUVhqUEnoFUY76VYc2GPz1M2mePoiHo50J46SK16x01Mlu4N9L11cd+XudDnZ
+         pdj8iJmNlKYcY8m/kneNGSGlOo4Uem1HmrFgf5puqe+OCaZwXWYpDFgJr9M2dWDIq5Vf
+         zOOw==
+X-Gm-Message-State: AOJu0YzL/jan+8JAcuRyTP84pm/zMePnvZ1lPdSs41BTfy8L5sM2iHDe
+	tkiRKTAKsJNHjO43J75nFztTDmG09dTtDsEtHk1C5U/M+Nuf705w4d5IgA==
+X-Google-Smtp-Source: AGHT+IFpq10nDxkkFYs9R9b9dcPOFOSbhCy0emXCfxuwdIHoDsAJhn4FoER5Z5++166duQJnESXnWw==
+X-Received: by 2002:a5d:6486:0:b0:382:3959:f429 with SMTP id ffacd0b85a97d-3823959f5d8mr3325897f8f.5.1731826460668;
+        Sat, 16 Nov 2024 22:54:20 -0800 (PST)
+Received: from gmail.com ([2001:871:22f:1e7:3203:c8ff:fecb:a3c3])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df7e177sm387836466b.84.2024.11.16.22.54.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Nov 2024 22:54:19 -0800 (PST)
+Date: Sun, 17 Nov 2024 07:55:22 +0100
+From: Johannes Altmanninger <aclopte@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org
+Subject: Re: [PATCH] expand: Fix scanleft/right for !FNMATCH_IS_ENABLED &&
+ quotes
+Message-ID: <ZzmTWsAPq7G_PCeA@gmail.com>
+References: <ZuS3PI7He-T7pugf@gmail.com>
+ <ZzlT_1CY5AjxtqAs@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZzlT_1CY5AjxtqAs@gondor.apana.org.au>
 
-With C23 and LTO, we get the following warning (or error if promoted to such):
-```
-src/builtins.c:28:5: error: type of ‘timescmd’ does not match original declaration [-Werror=lto-type-mismatch]
-   28 | int timescmd(int, char **);
-      |     ^
-src/bltin/times.c:15:5: note: type mismatch in parameter 1
-src/bltin/times.c:15:5: note: type ‘void’ should match type ‘int’
-```
+On Sun, Nov 17, 2024 at 10:25:03AM +0800, Herbert Xu wrote:
+> Johannes Altmanninger <aclopte@gmail.com> wrote:
+> > I'm hitting an easily reproducible crash.
+> > It bisects to c5bf970 (expand: Add multi-byte support to pmatch, 2024-06-02).
+> > 
+> > After bisecting I reduced it to this example (probably not minimal)
+> > 
+> >        echo \\ | dash -c 'foo=$(cat; printf .); foo=${foo%.}'
+> 
+> Thanks for the report.  This patch should fix the problem:
 
-Make the two consistent. This didn't show up before because pre-C23
-had unprototyped functions.
----
- src/bltin/times.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/bltin/times.c b/src/bltin/times.c
-index 1166a68..252b084 100644
---- a/src/bltin/times.c
-+++ b/src/bltin/times.c
-@@ -12,7 +12,7 @@
- #endif
- #include "system.h"
- 
--int timescmd() {
-+int timescmd(int argc, char *argv[]) {
- 	struct tms buf;
- 	long int clk_tck = sysconf(_SC_CLK_TCK);
- 	int mutime, mstime, mcutime, mcstime;
--- 
-2.47.0
-
+thanks this works for me. I've been using master for the trap fix.
