@@ -1,83 +1,138 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sendar.prophecy.lu (sendar.prophecy.lu [213.135.235.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8691C26289
-	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 06:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C55D28EB
+	for <dash@vger.kernel.org>; Sun, 17 Nov 2024 08:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.135.235.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731826464; cv=none; b=PrQUfvvU1iu9RDy+G1EqI+7paBrLxY13E0lZ3hLgs8WwVnI3jQ7JzxLaU3GwVkkvQ3/7omO5/UCp8feuX6Of2fT5TgxrNAGbsFDFRxly+JFABoXxQ1roP+2TLYzY70JgEeKrBfJFMZGCrLA40XE8zrTDZD/fh6f0HDDnhfug/K4=
+	t=1731833909; cv=none; b=W5Wm4aJwGVFzV/Md8PnMhnfcEPK1Ge5fcJG/wt4KVC198KVM5dw3dWuddulLzQZCwcXiW5BoWYXfuP3jVtYyqRK3nbkJaEcTKbQW8vZWKMvKouHwV3q1S+7A0B8Jb06uupDP7Mix1yzbZivZRxfSbYt8Qxo7bhq9rVZRQphTdIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731826464; c=relaxed/simple;
-	bh=DgG+iMZTHISZLFYxeQhVtHniaO7eTU1ny8yJ6UBUBuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M1zfC1wM84GakRBtWM0VAqqIF1u3UWRiUBF3BtAC/IjKSEl2ce3+bwH/WASn+CslwXkiaDzEurdhfmrArAGtDbH/NKEf8ZcTvPpkgMeyeIGllpe8IEQKK+7sUAfaittbKf5B9ukYL2WPiJ4YFQAE9qJLhQ4vO17XDCiF2TBBFXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eKdU9efJ; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKdU9efJ"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-382433611d0so217519f8f.3
-        for <dash@vger.kernel.org>; Sat, 16 Nov 2024 22:54:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731826461; x=1732431261; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8GeGZMn/c67YSbJ+ytjU2Rz43VUsp3LrMWK1RjNPeFw=;
-        b=eKdU9efJ6Adbcqe4TEKi138tqYMHNwpVssqMNb+YvFy1j9CjoDaGZyVbuWe/Ma7IkY
-         YR8wtAVUaXguATR/+W4lqYPGDWYjI3/zMu2KOQIjBvaE5G7AnsyUTJQXCdEx9XzInH/s
-         VR/coNvM4y98l84vPsIcAKn8ytNhGB+qvSv3Hfx1SJgRjLkPTpMMKvLKvQBPhbjZVZ9f
-         y81Lf8yxrbB5H+aTYH0lf+8mRo6Btd4D4o+qqx7nBSgRjos+TS92SxbpwP7gzOl+ZbcU
-         HOErXNVrD7rOJZJEp72XMhUdmI1zqoIe36HyT4CZMZMhvUv1Cbqvdi6K5PQeYR2WdFBz
-         0VaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731826461; x=1732431261;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8GeGZMn/c67YSbJ+ytjU2Rz43VUsp3LrMWK1RjNPeFw=;
-        b=myfzOASEOQlWiUdke5ZiNbqH6dkx1iq5UvghEkYm57vG1J8L1wt6Pe1X/DRpIDgsdT
-         Ras93AMPI4CKZhK5Y0vStlnW01e3Thf1V+XOVA0W23TdLVGAgmM6L0WDqRsCYLyD21UR
-         kMnDO1xe4JpiozWpfDOcwfIog4kpGRvTfBYmEt4ZNr9TjCeydi3LSm8d1uxh9OmNDbwr
-         Wgk7DzxFUVhqUEnoFUY76VYc2GPz1M2mePoiHo50J46SK16x01Mlu4N9L11cd+XudDnZ
-         pdj8iJmNlKYcY8m/kneNGSGlOo4Uem1HmrFgf5puqe+OCaZwXWYpDFgJr9M2dWDIq5Vf
-         zOOw==
-X-Gm-Message-State: AOJu0YzL/jan+8JAcuRyTP84pm/zMePnvZ1lPdSs41BTfy8L5sM2iHDe
-	tkiRKTAKsJNHjO43J75nFztTDmG09dTtDsEtHk1C5U/M+Nuf705w4d5IgA==
-X-Google-Smtp-Source: AGHT+IFpq10nDxkkFYs9R9b9dcPOFOSbhCy0emXCfxuwdIHoDsAJhn4FoER5Z5++166duQJnESXnWw==
-X-Received: by 2002:a5d:6486:0:b0:382:3959:f429 with SMTP id ffacd0b85a97d-3823959f5d8mr3325897f8f.5.1731826460668;
-        Sat, 16 Nov 2024 22:54:20 -0800 (PST)
-Received: from gmail.com ([2001:871:22f:1e7:3203:c8ff:fecb:a3c3])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df7e177sm387836466b.84.2024.11.16.22.54.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Nov 2024 22:54:19 -0800 (PST)
-Date: Sun, 17 Nov 2024 07:55:22 +0100
-From: Johannes Altmanninger <aclopte@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org
-Subject: Re: [PATCH] expand: Fix scanleft/right for !FNMATCH_IS_ENABLED &&
- quotes
-Message-ID: <ZzmTWsAPq7G_PCeA@gmail.com>
-References: <ZuS3PI7He-T7pugf@gmail.com>
- <ZzlT_1CY5AjxtqAs@gondor.apana.org.au>
+	s=arc-20240116; t=1731833909; c=relaxed/simple;
+	bh=yg8QFqaNMrC91cgKti5HRL4WVulGWHC313Eo4hzYFSA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kU53p1tlTnPkrktx6lMdVwGAQgxn6Ec3wn6KdjstlmLAeNQEagVQC5WagnYYEElPewwdVOzmBsjQTdE/4Dau4186mwdmDaVqji/UeMqywsXrwG+B4jj+8XMg70Yyug73rCyohupfqu42OTOeNVPpRRzyhdcp0lArRwWRzWCrV2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu; spf=pass smtp.mailfrom=knaff.lu; arc=none smtp.client-ip=213.135.235.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=knaff.lu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=knaff.lu
+Received: from out.lll.lu ([IPv6:2001:7e8:f647:7601:109f:38a2:baed:e155])
+	by prophecy.lu (8.15.2/8.15.2/Debian-22.1ubuntu3) with ESMTPS id 4AH8w3JL204826
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Sun, 17 Nov 2024 09:58:05 +0100
+X-Envelope-To: dash@vger.kernel.org
+Received: from [192.168.42.21] (vodsl-562.vo.lu [80.90.34.50])
+	(authenticated bits=0)
+	by lll.lu (8.17.1.9/8.17.1.9/Debian-2.1) with ESMTPSA id 4AH8w1ll411941
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
+	Sun, 17 Nov 2024 09:58:03 +0100
+Message-ID: <9dda0a2f-efda-4ba0-93ed-ea683256446e@knaff.lu>
+Date: Sun, 17 Nov 2024 09:58:01 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZzlT_1CY5AjxtqAs@gondor.apana.org.au>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Portability of dash to legacy systems, such as AT&T Unix
+ PC : 01-remove-extraneous
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org
+References: <ZzlScuJIC8G1gcjJ@gondor.apana.org.au>
+Content-Language: en-US
+From: Alain Knaff <alain@knaff.lu>
+Autocrypt: addr=alain@knaff.lu; keydata=
+ xsDiBEk9qFcRBADO4trPtib39qvAEBlkAIcBGnZ137EmmNLU1pFZC5acLyJ4wYhVdcol97lC
+ 4ZkD0DJek6DVidQfz4hA7JbZy2W8l6O/o2k/Ja2bWkb8qtrcUNVDJzdJjNqXmmxdsyLd5QVt
+ uCHgi3Zz0kq9aJnRCVuAyfrjMdaUsOThi07u1EyEywCgjxVKODAifumqfdjVxS5NoV7x7TkD
+ /0k2F3/5/NYchgLz6Qu3As5MVtPs7NkJ0Mpal4Gy8CaKefHcynY+zCziM/oBw0+PIFxyFud0
+ uT9HRIdEp1DlaTTUYlt95HeDYmCUh0Wt1PwNNRWcm+vTUuK7tOxzYadUqbzO+F6C+WN8msxA
+ hcxzUgsL/YyXVilvL8XqB+RlS5bBA/9OxXc2mJs01nWu5khvVFNwUCDS8FRYyoHeodVZFGLC
+ UG1PrV9nHva5vYJk1QlZP3qEotnK+6l4708X9yhdw2+UCtxvseTQ6JWBtIdJyo+Qv7apSQA3
+ kkau6Om7SOyW1i/2LcCZU84SC923uBH7VNeUzCnzelVFubk6eRwzjNvrj80cQUxBSU4gS05B
+ RkYgPGFsYWluQGtuYWZmLmx1PsJgBBMRAgAgBQJJPahXAhsDBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQyAYxsm9DGWFEsgCeOSavzyOp8Bj3nOP8hC6XeCX/3k4Anj0KegsyeIVxuj5X
+ TUnh535vXfZvzsFNBEk9qFoQCACt2vctXYAr+ndRbaeR4ygJ8rKH8ARu68nDuQuxOKCasaQr
+ xm8+/RxvmTfriP00tYZAca2tmCjwntKVsK4eNSivvo6c7BwziCnQx/vW+kJK4ctckMHSZPqe
+ 4a1HWYURg5oxaqGo4f06YAn9O0yDo6xdGGNUMpYHv2O1/jsAEgAM/c/US+gNctzsNKQ4lVwp
+ HH4NEabev+zlisnTO3V39iXijZbe9AYlD4qZH/0nFBDCCt9EDTe+/6IFfvIrnVx7o367U9XL
+ SCLVQt4k7xqCIow7RP5BlOYLDV50yMva8c62yhWpDYKSyJsQGn/nGiiv6P4Ye/monfkQD+PC
+ nKPXDYCjAAMFB/9D2FSYHyikvOoXXMTfjGHUyIQK6FCtKINTFfBPuwlWOWCukrQrzH0BmTVC
+ /WuMOrrmxl0IFHGtOV2Zp+bdsjhlzgZ4kXAmqw1Qiphb/YLD6VY5TQ59Tkl7+nCQ0wjcRim1
+ Sg6OzmoNttHpTt9eAvLZMz7yi9Nq40yKXh+zXZtzHIgdsXG+tO9+LEWojdbXgIdZin2yUKYt
+ KxbpwyM0qCN9oGtKTAi0GX+tuHdAqWwYEgVnd27LcBGLTs6QJPsjQKHiAtYJwu6MWiF7bvCr
+ iBNyVG3yU3inZcQvIdYxO0VUN3wVSEIbRHcNzG2u1UD6ZuF+3bv39dh54m1CQzbzzRepwkkE
+ GBECAAkFAkk9qFoCGwwACgkQyAYxsm9DGWHNLwCfWr4DLrBZMktv9RTGbcIZ+/NgTswAn3aG
+ LBuTFPDEO0bfA+7PlpCctCJT
+In-Reply-To: <ZzlScuJIC8G1gcjJ@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 17, 2024 at 10:25:03AM +0800, Herbert Xu wrote:
-> Johannes Altmanninger <aclopte@gmail.com> wrote:
-> > I'm hitting an easily reproducible crash.
-> > It bisects to c5bf970 (expand: Add multi-byte support to pmatch, 2024-06-02).
-> > 
-> > After bisecting I reduced it to this example (probably not minimal)
-> > 
-> >        echo \\ | dash -c 'foo=$(cat; printf .); foo=${foo%.}'
+Hi,
+
+On 17/11/2024 03:18, Herbert Xu wrote:
+> Alain Knaff <alain@knaff.lu> wrote:
+>>
+>> I've now split up the patch into parts. In addition to just the
+>> splitting, the patch set contains the following changes/improvements:
+>> - adapted it to dash 0.5.12 which has been released in the meantime,
+>> - some cleanup,
+>> - it now also compiles & works on Solaris 10 & 11
 > 
-> Thanks for the report.  This patch should fix the problem:
+> I'm sorry but something has gone wrong.  None of your patches have
+> been picked up by patchwork:
+> 
+> https://patchwork.kernel.org/project/dash/list/
+> 
+> Perhaps try resending just one small patch to debug the problem
+> before you do the whole thing again?
+> 
+> One thing to try would be to send the patch inline instead of as
+> an attachment.
+> 
+> Thanks,
 
-thanks this works for me. I've been using master for the trap fix.
+Ok, so here goes 01. Please tell me how it goes, and if ok, I'll send 
+the others.
+
+If it goes well, can I send the others as replies to my initial message 
+each, without repeating explanation text?
+
+Thanks,
+
+Alain
+
+diff -X ../exclude.txt -urN dash-0.5.12/src/bltin/bltin.h dash-0.5.12+01-remove-extraneous/src/bltin/bltin.h
+--- dash-0.5.12/src/bltin/bltin.h	2020-06-03 01:19:23.000000000 +0000
++++ dash-0.5.12+01-remove-extraneous/src/bltin/bltin.h	2024-10-20 18:26:46.960598638 +0000
+@@ -63,7 +63,6 @@
+ #define fputs outstr
+ #define fflush flushout
+ #define fileno(f) ((f)->fd)
+-#define ferror outerr
+ #endif
+ #define INITARGS(argv)
+ #define	error sh_error
+diff -X ../exclude.txt -urN dash-0.5.12/src/jobs.c dash-0.5.12+01-remove-extraneous/src/jobs.c
+--- dash-0.5.12/src/jobs.c	2022-01-20 05:54:13.000000000 +0000
++++ dash-0.5.12+01-remove-extraneous/src/jobs.c	2024-10-27 19:53:42.912675611 +0000
+@@ -112,9 +112,6 @@
+ STATIC void forkchild(struct job *, union node *, int);
+ STATIC void forkparent(struct job *, union node *, int, pid_t);
+ STATIC int dowait(int, struct job *);
+-#ifdef SYSV
+-STATIC int onsigchild(void);
+-#endif
+ STATIC int waitproc(int, int *);
+ STATIC char *commandtext(union node *);
+ STATIC void cmdtxt(union node *);
+diff -X ../exclude.txt -urN dash-0.5.12/src/mystring.c dash-0.5.12+01-remove-extraneous/src/mystring.c
+--- dash-0.5.12/src/mystring.c	2022-12-11 06:29:21.000000000 +0000
++++ dash-0.5.12+01-remove-extraneous/src/mystring.c	2024-10-20 18:27:56.634245499 +0000
+@@ -46,7 +46,6 @@
+ #include <errno.h>
+ #include <inttypes.h>
+ #include <limits.h>
+-#include <inttypes.h>
+ #include <stdlib.h>
+ #include "shell.h"
+ #include "syntax.h"
