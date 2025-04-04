@@ -1,80 +1,106 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B89E1DA53
-	for <dash@vger.kernel.org>; Fri,  4 Apr 2025 13:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E482E62C1
+	for <dash@vger.kernel.org>; Fri,  4 Apr 2025 19:52:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743772224; cv=none; b=JmelhUQboftL1VW+89qtm9gTL+zjNNZ2b2+ZdENC4MMhTg54RbZ4Bf8/pGWNZpoGNpOQvSRLdmuVDucHAGdSf0fhuZXHc0knZyDClxy4fksddYRw04Hxqra3MsXfmT4qsDzfJMcEOlfRl5FnY1IipeDmB4EHqi6UUBzjGa6v7nw=
+	t=1743796333; cv=none; b=jXAvVbiHR9R6LN/T4ipM4+4hLT59kpA0OO0v6ESYOMF89USB1Le/2Nc+bn1ZMrAdm+8an6piKx09w21c0iRyoPJALsEnmi3IXyN/wMFtz4M9LS6bZc9HpRr0CM9D7h4e/UBdjOSWxhMu1M6OtstHEm9N+AeI2BwuonoXYoOJ7XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743772224; c=relaxed/simple;
-	bh=uyJGdSFa6INy5sFy3WS5U4xJgKNYdwLY4ivAC0USsqs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=QU6QK6LWTZAiiXAr/BBNP57LFk81eWC/ztYypjeGuXV63UvhjqxcGqUBu3xzXU9EYLrgcLNKxnMoCFeYKxLmmcKGqGD+I5FJOdaV27ZSrvWG5leTDp7+bFQD4VhlUW0q28D6rDi22fAnSChVmvDz3+uoLGPfYKUvHeKfEo3T54I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gmBI+0PK; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743796333; c=relaxed/simple;
+	bh=M+kn4cFG+ysvSbG9gfW5l05PKS8vTSsPn1/oUZ+rgcw=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=KnP79BbIrxBvHBM5Z0tTUJikK/11GzXGS0RLMBOK2tE8O5pl/rfwUHGWAezKpYvBZVaNF6M1kuicP3Y42hOEqTAJ9fRC4EXjQObl2BSMxtDmrnCLcqzTVq7zSB+dbSXovXTX4IGYkX3kAh5xfDNKgrMvxWlQkGiH1wverasgTL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me; spf=pass smtp.mailfrom=larryv.me; dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b=tXarCOYw; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=pdJ2MCTI; arc=none smtp.client-ip=202.12.124.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=larryv.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gmBI+0PK"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ff784dc055so1822457a91.1
-        for <dash@vger.kernel.org>; Fri, 04 Apr 2025 06:10:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743772223; x=1744377023; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=a+lyKWbCWcFOk0nSfR/zinwenWLNvUnI8DM43zjaltE=;
-        b=gmBI+0PK5u+wvWJRH+JipDg/+hGX2wySTR0rkj9LEmVBMKhK8CHb3onTs+ahY3QixR
-         iJaoxHuld8+iA4hqVwpFbx7TGVgCNlqGZ8fIFVf5XzKvC3paGNnhHilRQ0YdWmxtYOa1
-         lMpwPpASYnCStwCW8Po+X2CMLccGqT7PrEKJ8daxXXCIAEgSqe4Xk/Yw83QVhaEXaPYK
-         mVo84+0VB9C1WlRRCrDRc9u29b8RAD/t4uDCp9CN7oDwZkHKLfVvcsPJLvx+ngphsYey
-         I9lFt49babN7XubkbRYBYmChY3wB4vgtNx7KHKAdJV8SGdZut9TWzxcfRoGBTMFCAOsJ
-         hgfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743772223; x=1744377023;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=a+lyKWbCWcFOk0nSfR/zinwenWLNvUnI8DM43zjaltE=;
-        b=efLkdp4Z//fn/6r9wn2hUBhn1gF0mUaxHylpAqGobVEvHrTqaxTVBkOV7+ijwJ2TBT
-         8Y/Km6+zdJdCh3uFozkEdZnTtwymokXOZzRsCt0PgEFnOXgcRY/gPOuSGL8nFgd7STkh
-         qg0BrOTHfh6U+NI2Ufr2ppOLkeGw43Kmc2r/Z1pzIFtTNXOn0f1XQ91wmq2c5fWbAmWy
-         oHoE+WF/1q7ZKwbGCqhlNp6j3MZQkiGz3KvMZ3L1BMs1XbSoOre2ka311/9PTmGfFV18
-         i8OIIx/tonvFCpSe7iB9gGLJAiLomWe8aqG/yWqcUL0rpxnw6G0CG0cZOfDaCR4V1N59
-         aBtA==
-X-Gm-Message-State: AOJu0YxIiU5z0i47NOxBnYEz16ZiWzsdX3PMjRFBYdsSbLRODnaeIHGl
-	u38y5tOucMTlKztO6kr99idn6NFRBz4kDr8fvkqzZY+93CbswyDsx5QJbMOG0CsrqzWrDpoxIYh
-	NviB2Hw39pSA6u4g96PW1NMEDyM64l11a
-X-Gm-Gg: ASbGncsQeWUHnEGGeyG4XaWyB5/GJJyr+2kc8xQrdLM9YygtqBp8X9VfQsQlBqLBF31
-	96Pfqg1S1roQGOwpbRmsgVVwpFv+bKAXoF5g5C9dp7RUrcFjhURz+q3duabTcuF7PO3rNh2aUsi
-	M4B4OCmKFWBrBG9ks4vRRv3Fl/ZnrH8bAdVeu2
-X-Google-Smtp-Source: AGHT+IEQUl/f/x3iXMCZZRWcoGuh2PFjGz2UIcMPUjd20EQpS51WkMdbJ3WFDu+WWmT5OzoT8MkTQxJzKfMdMlAo1qk=
-X-Received: by 2002:a17:90a:c2d0:b0:2ee:aed2:c15c with SMTP id
- 98e67ed59e1d1-306a48d19fbmr4985388a91.28.1743772222722; Fri, 04 Apr 2025
- 06:10:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b="tXarCOYw";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="pdJ2MCTI"
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 36BB92540139;
+	Fri,  4 Apr 2025 15:52:09 -0400 (EDT)
+Received: from phl-imap-04 ([10.202.2.82])
+  by phl-compute-04.internal (MEProxy); Fri, 04 Apr 2025 15:52:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=larryv.me; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1743796329;
+	 x=1743882729; bh=tY/7mfmfj+Z8/3IHcdy4svcqbbrgAbA5BGHsrXnI2LE=; b=
+	tXarCOYwwXgriOIHvqg7jXcm9Ta66XFRNWPAeMtZDJ6ZaPOhbeC/3xbGZpqafJIx
+	mrrBn+biieTRrcF0p1m21UlOp3LMedPhdHhqvyWBmlMK/19kfshgvyDBd7C2L2NN
+	m5+bamigAW4u6wts1fR9AeWph+igPk/swZ/UVaeZMMb9E2Mip0fTkkq3EC+9anDJ
+	TcWJpUte46FxJZlaCWCLpgK2n6ci2Abmpec8xpDygX4nuVmpreBW+uJZprasbHEC
+	5jBfZxAIYxlsiuhmwNiB8sMYRfLFLmHQ6OCWNJ6j5RGJjjZszXlEbZfF5aMo1RVs
+	K9iwBquXXIGC4rO+DfG3AA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1743796329; x=
+	1743882729; bh=tY/7mfmfj+Z8/3IHcdy4svcqbbrgAbA5BGHsrXnI2LE=; b=p
+	dJ2MCTIEQ1S/dg3Zxvyawt12l5px5PEc9EerDv4e+bvAhiyEWeuu//VV/+3M6d4D
+	aWu4iY805dhr7uWvPRBCvgU97aZXmsnGI0EmqmFx1hMMcywiLXQwaEfLP0yiCc4c
+	uhl1/o5VA9u5W8rdHbhcl9joTA3KNt8OKgkcODpx9ceW+ZpLUPvwFgfJlilyyrV1
+	AmLEChLFlcH5DUCUo1C5ugYZd2DPYocxtOZgiyBez3Ogx2jnQEhtLcVGYLu0mIdG
+	Jjm9EyGUm2aQMHfAd/aC1mYNFqpEPJdDcHBPF49rHlmQ1Q/kZw7ci+Yy+i8UhxuL
+	xVeHmD0GuXnZh0RTZ2ydQ==
+X-ME-Sender: <xms:aDjwZ-l8EKc-suNMttT9jX6qZgPJe0j9k2JFZ7ANjTutIruWRKqMJw>
+    <xme:aDjwZ12hAG-dK2NxPMZDAfJlHbcd0yu3yHrJdY2_XF7aE3HHxJWpk-NXoUnfUiwtO
+    cpjsVBUCQanye2umQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduledvfedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpefogg
+    ffhffvvefkjghfufgtgfesthejredtredtjeenucfhrhhomhepnfgrfihrvghntggvucgg
+    vghljoiiqhhuvgiiuceovhhqsehlrghrrhihvhdrmhgvqeenucggtffrrghtthgvrhhnpe
+    fhfefgkeevhfeikedthffftdehvdehfeejvefgffdtudetffdtkeejtddugefhgeenucev
+    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehvqheslhgrrh
+    hrhihvrdhmvgdpnhgspghrtghpthhtohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtohepnhhrohihtggvrgdokhgvrhhnvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtoh
+    epuggrshhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:aDjwZ8qaWjMRIUCSL7K_6xKs7jxUEK4I8t8Ypa3PBl7iIL_vWV6ZlQ>
+    <xmx:aDjwZynQwGdV0RXeUdAW7RXATCGqOYS-5m8lcN4Xz2Eh1JF9Xobcuw>
+    <xmx:aDjwZ807LRiVOcJuGmBua9Zb3D0hsLCD1p6pYFltFBtxG58Z7G-RBA>
+    <xmx:aDjwZ5tA31YMiTHNU4dgjpRoCsnelSkU4Zs12Zg3qtH3m0WYNkSXrw>
+    <xmx:aTjwZ11f5rDAFV78KIgwiGfUXp96NEPo1A7Ipj0cL4NpY-sKvP2xAR0i>
+Feedback-ID: i0b2842c6:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id CBF9A2E60088; Fri,  4 Apr 2025 15:52:08 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Nathan Royce <nroycea+kernel@gmail.com>
-Date: Fri, 4 Apr 2025 08:09:46 -0500
-X-Gm-Features: AQ5f1JoIg5OcrepKXeqQLXbRRKoxzNZZl_iAd7NoCHbx7gWo1oq3hV_-TyhNgVE
-Message-ID: <CALaQ_hoenH-y1+vh1M8dYyBMvPoanBXLumHi3o=Rq2MYghLU7g@mail.gmail.com>
-Subject: Automatic Termination After Background Job Completes
-To: dash@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-ThreadId: T9c5f07050d4ec5aa
+Date: Fri, 04 Apr 2025 15:51:19 -0400
+From: =?UTF-8?Q?Lawrence_Vel=C3=A1zquez?= <vq@larryv.me>
+To: "Nathan Royce" <nroycea+kernel@gmail.com>
+Cc: dash@vger.kernel.org
+Message-Id: <11f69c85-4714-440a-b443-556a1d532c89@app.fastmail.com>
+In-Reply-To: 
+ <CALaQ_hoenH-y1+vh1M8dYyBMvPoanBXLumHi3o=Rq2MYghLU7g@mail.gmail.com>
+References: 
+ <CALaQ_hoenH-y1+vh1M8dYyBMvPoanBXLumHi3o=Rq2MYghLU7g@mail.gmail.com>
+Subject: Re: Automatic Termination After Background Job Completes
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Setting an emacs/vi flag when starting dash, and using an external
-command for a background job, the shell terminates once the job
-completes.
+On Fri, Apr 4, 2025, at 9:09 AM, Nathan Royce wrote:
+> Setting an emacs/vi flag when starting dash, and using an external
+> command for a background job, the shell terminates once the job
+> completes.
 
-1) Good (builtin command)
-$ exec dash -E
-  $ (printf "hello) &
+With dash 0.5.12, I'm seeing this behavior regardless of whether
+the background job uses a shell built-in or an external utility.
 
-2) Good (external command)
-$ exec dash
-  $ sleep 5 &
+	zsh% PS1='dash$ ' dash -V
+	dash$ : &
+	dash$
+	zsh%
 
-3) Bad (external command)
-$ exec dash -E
-  $ sleep 5 &
+
+-- 
+vq
