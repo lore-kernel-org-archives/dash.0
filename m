@@ -1,67 +1,71 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC9A25F7AD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA5126D4D5
 	for <dash@vger.kernel.org>; Tue, 29 Apr 2025 21:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745963283; cv=none; b=EIDkwSpt/IlrRCS4Vbq+dwFd5lwp80uFgKfMOdRAyfJOBIKo87VYyMFEZ3ZxRrWTz5K0RUpBTI+kNqC69ggSUPbMhMcs2ykM8hgIKtMnVV/0b9nCHCBpboKoQholcuSIxGROeY6QhZ0bCCm23ZcdV7gsOES3drceCYaZmsKnzd8=
+	t=1745963283; cv=none; b=ixFNJAmK8DRe2TIiN/gVV9KJJj9fYG4/1lry49tH1X/6ickN2TQdsi+YoorGBkPyPfDGEJa1bSRySHm/lFW5gx5CwwJ2t5ZYeCAk4rmA8oAEObxlv60VwVTha/48JN2PbtV3NUE3mBcAj2O4blaEogvNwjB/0CpG1b8+llLtLtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745963283; c=relaxed/simple;
-	bh=XELhG571FaTemXjT4gYcf2abmeX7RL90NRPekX4LPH4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f1VwQ2/xK9tiQq9da4Uq0i/ZgVG5RgTuTxgW0SF0He1rEQmh9itbFuv5wkXF/3y7hoW4aBnz8a9IK3Gn1HFCdyBEAhD00GW+4U/sV5sA0ePUxo7H/OCz5jKr157W9mjErtqLdBEvVjHJFIDgLDGTpM2TlFuCKKzu0Cb3QKDdQj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZKqxI70p; arc=none smtp.client-ip=209.85.218.48
+	bh=dbDo+Al471qI+zBH7J1yDbXalVPJMJw7D5GG27x8LFE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Ws/V9ddxzMJlZ8jb21BOSjiss1XHSasHENhdU0kabroXXhbwlAzg593jTLB6Hd22l4Nzxls/ekEnp37deK+JoooclDJBbODE+AhtFCT6Exr7iUBX5ZguShTfw174yPzRusJDH5ZN17xAKbedKdKdSXfTyjxYeF1AsWA4w7z9avM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GD1NV1hz; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZKqxI70p"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ac6e8cf9132so1282730966b.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GD1NV1hz"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ac25520a289so1042922366b.3
         for <dash@vger.kernel.org>; Tue, 29 Apr 2025 14:48:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1745963280; x=1746568080; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/MLpaglspoReaf6Sam7Ts8jtOzFCXLKRLZHpUNsG5Oo=;
-        b=ZKqxI70pojblEtxzcjyuxkwewAfCJy+mItDTmY4BVEzy4QHgu7gTRVnp9DqZcBbr74
-         xkMS7R7echarNCr154O/pYA24AydEfQuXRDB5vx2zQqrTYTqS1UzJ4QfQbQkKnK6nfNl
-         FsJAmbGGp4SUhKXPkKzCReYvVrvEO0HHRlVPMJcI+BJ7IBr5h8KPhUY8LWKZs92Io+XN
-         n654VDUqfal2OeYDOW59qYhetFPKJu+KZCleEudUCPuGvscAJCHRYWI5g71TtxgF3ZxI
-         QzOnBhiwKPNRDmq/wBZCzltVeXURaL/2QzINXSnImBFT+WVhGWzKmgSd4jIfD8UtTOqK
-         7fng==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FDiSKGFbVDMTyD7eh1AmrmrnJI6+1+msmpBaJ6afHkI=;
+        b=GD1NV1hzls/PAUAJgkUy9CHHl9MCGzZfOBGjdSk3ZGutbDsG4W6BHc5ehlfXrzRrH9
+         G9+xpyYuWv92riMjtko0KQuHMun56jeNzx+04V6ZRZ1VYsebEISeKwLRjM+0rDcx2Yqj
+         RPQ53lp7OI5a4Br6GDZEzJJgBZhsvOpWabRLgetINq+klCj5JKYNt41ot+Qss3dSlhRH
+         tze3iqPHJF9SF/uOkUAzCBm6D8vNt4uniSbf6tY++GBMJ9tvbCHcFWDP2RH9ag8PQFOf
+         68fe9hAaU896vCbOlwtKyea1DGVT9EUTDPU9FLbn066UUl4cSExaXr2NumzBNaftkakJ
+         a/RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1745963280; x=1746568080;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/MLpaglspoReaf6Sam7Ts8jtOzFCXLKRLZHpUNsG5Oo=;
-        b=GAmr8kFtz2MS+k0AZjC08eD2UdIMu/1WJh7xgqT1tjSWR7dJubA9ZAebio183GTo+3
-         gVbRQqx0JdhHm01Qq6KesYBZprFK96qQzlE2Yi67v/HjnxlLKis4vmyyccCiWwUYcW1m
-         v5QWzKkMCMiFwbTjIWpKpS/14vt4Mxk+kjWfHn+Kh06T/J0TtUFOrMayhjTEkAfWlo+h
-         DCQIrXcF+EO+8izIqOMQUgUYoHh30UBrs06Ko1HRV3mQi0/4Mg8r5EAiE52AAUVtJL/d
-         2n4U92Z4DucSuauWtMqWzieMWlUnVtSqYKv6ADvitRm3NPmGpw2PEMASS5zO7MK7vieb
-         iP+g==
-X-Gm-Message-State: AOJu0Yxv/QDOLRg43k8y+HjimkLJx9p9aJseOKT2vKForgS8QoQ8Rl9G
-	XIvy38pTlUurnaohy34LsfbVWPeg+cE/mDZHtAOXdahlhth+F67DHK+FDA==
-X-Gm-Gg: ASbGncvmXSupOWq6IgzkA+x1n0udJdcAbhp92LcKBR3BWgiJUynYoUZ26vAnx31TXal
-	t8LaTRKqd6LDfeJpqeXnEu3OjnDuNISDCJRVXSz3qYji4QF+fj7r3+iFBrXhivhYHuvjBDb6tnW
-	2RO/98RVNGGoUOEEX+A65O38soE7oVTOpfj3/5zbQb8e4ajcfxeOlhka0fC0ShfiO7QFJHKptKw
-	OmT2tdeh5l5+oDSBPj2tlO++byOoJSLpYXyYBQG/skhaK9ZHGhnbL7Mg0NQ6qbQrpqehxZaUE5B
-	vmc9tTleV8DXeJFZa/bERxhX+cyBJ0QhLi8mvaLdxKAG9MoR4o0HJbcVlz8muvEs7oL1EOQn6sD
-	rtC0EiK3S2gpLcQ==
-X-Google-Smtp-Source: AGHT+IGpfgSu52uK61fxNLv0CSKjwoYYA6oY4+4jpceqCmErAjo0cs9ATydFVBMAyuKNoeI1tpcFCg==
-X-Received: by 2002:a17:907:961f:b0:aca:a334:2d21 with SMTP id a640c23a62f3a-acedc6ffbc9mr88870666b.43.1745963279481;
-        Tue, 29 Apr 2025 14:47:59 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FDiSKGFbVDMTyD7eh1AmrmrnJI6+1+msmpBaJ6afHkI=;
+        b=qJTIp5h5mUWK9MfB882elgHYc1vmi+V7ZGOwwIDyPFeHnDVruz86X+8aWs1KzkGXxb
+         oZuiqjAgFK/NLbD+d3c6ERnrTHvyY5YiJIKMXYaq1OPbuymqPGi53VF+2YY5nLbUmkXo
+         BaYA4mGoeTHFdaWDRe+DQz++Iy/VCLSnyeXbgAHNV5ZtE//Q9k8+9ECkpKECG8ljaFRN
+         qwpDGb+LI0m/Ekq4SweXyW1TUnlJWW3whhEgRWQVwXYPB4CVRw/j8E7109vTBabTUsaf
+         gtn1DdArPaDLcKgzQtrtrq5Uk6CCyWQEXq35y3jzzSclxnAhcTeukM+2ESYWtgaisKdP
+         9AkA==
+X-Gm-Message-State: AOJu0YxM3mFxkYkE1VgU63w1in1hDGVxJbSHuGs6NgWSZEP09y/p/AEo
+	W5FJ63tdw2fPzRkpbKdGdiDVl9cW7Bc96y0h89X5aSInHLiULe2DhRCxUQ==
+X-Gm-Gg: ASbGncsDJzd9RRZfCHLMqnpXoF3Mer9tHPwKict7Htu1DDPDKc88GSrqtHmYqnsa0YV
+	lnGyxLRqkfZmSTQxIQn4Q+QX0aD1kC+zAUei5RIkZ0bcYpfi8d59A4QNecL0bvDdSsVDBAW+Zic
+	Y3+hj5yOupAOR1K0vkjNS+WAeVbNWUMWJgCN2EVH97NU+754X1lU1RkBBb2te57wLdUfz9tvFBi
+	UgJbOgukR8XGmtDMLgEbGDL90ICC91r3tipi8aELYtu4PCnxAXM/CHyVXwkeSymkzBGlTzsfxbJ
+	HUKUHQtqcZS6YFJWJfumkvcnslipNtEijx1EDfM5b+cpxddzynPTzEHAHcgnwzbWoTFvbzsnYW6
+	fk22SK4y1wbmHmA==
+X-Google-Smtp-Source: AGHT+IGfjYPyv3BTHEC2rrdihqmyLXcIQSDaST9L5xUeJQvqtUSSW/UWCDu0UNO8cx4Qpo3nFk6FMQ==
+X-Received: by 2002:a17:907:97d1:b0:aca:cac7:28e2 with SMTP id a640c23a62f3a-acedc7001a6mr78765066b.40.1745963280038;
+        Tue, 29 Apr 2025 14:48:00 -0700 (PDT)
 Received: from localhost.localdomain (92-70-146-242.biz.kpn.net. [92.70.146.242])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6edb1abdsm850984266b.177.2025.04.29.14.47.58
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6edb1abdsm850984266b.177.2025.04.29.14.47.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 29 Apr 2025 14:47:59 -0700 (PDT)
 From: Zurab Kvachadze <zurabid2016@gmail.com>
 To: dash@vger.kernel.org
 Cc: Zurab Kvachadze <zurabid2016@gmail.com>
-Subject: [PATCH 0/2] Fix two buffer overflows
-Date: Tue, 29 Apr 2025 23:47:30 +0200
-Message-ID: <20250429214732.22390-1-zurabid2016@gmail.com>
+Subject: [PATCH 1/2] expand: Fix negative size parameter to memmove in subevalvar()
+Date: Tue, 29 Apr 2025 23:47:31 +0200
+Message-ID: <20250429214732.22390-2-zurabid2016@gmail.com>
 X-Mailer: git-send-email 2.45.3
+In-Reply-To: <20250429214732.22390-1-zurabid2016@gmail.com>
+References: <20250429214732.22390-1-zurabid2016@gmail.com>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -70,17 +74,63 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This little patch series fixes two memory bugs in dash. One was reported by Kate
-Deplaix and the second one was accidentally found upon testing a potential fix.
+A bug was reported on the mailing list that causes dash to segfault on
+the following cmdline:
 
-Zurab Kvachadze (2):
-  expand: Fix negative size parameter to memmove in subevalvar()
-  expand: pmatch(): Fix buffer overread caused by passing array of chars
-    as string
+        dash -c 'echo test > "${1%.in}"' sh /tmp/META.in
 
- src/expand.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+This is caused by a memory corruption resulting from a bug in
+scanright(). The function returns a pointer to string A, but later in
+subevalvar() that pointer is subtracted from the base of string B (which
+address is less than the address of A's substring). This produces a
+negative integer which is later happily passed as a parameter to
+memmove. The correct behaviour for the function is to return a pointer
+to a substring of string B.
 
+This erroneous behaviour is caused by the fact that under certain
+conditions (FNMATCH_IS_ENABLED being undefined) scanright() iterates
+over the pattern string (that the string A in the example above - startp
+in the function), when it is meant to iterate over the string with
+removed escapes (string B - rmesc in the function).
+
+Due to the fact that if FNMATCH_IS_ENABLED is undefined, each for loop
+iteration sets loc2 (initially pointing to str. B's end - rmescend) to
+loc (initially pointing to str. A's end - endp), which is not the
+desired behaviour.
+
+This commit slightly changes the for loop header to make its behaviour
+correct for any value of FNMATCH_IS_ENABLED, thus fixing the root issue.
+
+Fixes: https://lore.kernel.org/dash/CWLP265MB4157446AD56C013BB88575CFBCA82@CWLP265MB4157.GBRP265.PROD.OUTLOOK.COM/
+Reported-by: Kate Deplaix
+Signed-off-by: Zurab Kvachadze <zurabid2016@gmail.com>
+---
+ src/expand.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/src/expand.c b/src/expand.c
+index d73f29c..171c135 100644
+--- a/src/expand.c
++++ b/src/expand.c
+@@ -645,8 +645,7 @@ static char *scanright(char *startp, char *endp, char *rmesc, char *rmescend,
+ 	char *loc;
+ 	char *loc2;
+ 
+-	for (loc = endp, loc2 = rmescend;;
+-	     FNMATCH_IS_ENABLED ? loc2-- : (loc2 = loc)) {
++	for (loc = endp, loc2 = rmescend;; loc--, loc2--) {
+ 		char *s = FNMATCH_IS_ENABLED ? loc2 : loc;
+ 		char c = *s;
+ 		unsigned ml;
+@@ -660,7 +659,7 @@ static char *scanright(char *startp, char *endp, char *rmesc, char *rmescend,
+ 		*(FNMATCH_IS_ENABLED ? loc2 : loc) = c;
+ 		if (match)
+ 			return FNMATCH_IS_ENABLED && quotes ? loc : loc2;
+-		if (--loc < startp)
++		if (loc == startp || loc2 == rmesc)
+ 			break;
+ 		if (!esc--)
+ 			esc = esclen(startp, loc);
 -- 
 2.45.3
 
