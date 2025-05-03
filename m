@@ -1,47 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D3DBA3F
-	for <dash@vger.kernel.org>; Fri,  2 May 2025 05:45:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBF21C683
+	for <dash@vger.kernel.org>; Sat,  3 May 2025 07:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746164750; cv=none; b=mSclFrQh5pDTdNCHqFLO8uQcP18z8JBxTzSLTTa5qRK/C+t69aLyKpX7gpLF7Ei8SsSzl5FuhTiO3HvKJGudUz7LtgxYd9rCmsgpK3mJthMb+lMD8mssDKSs7R3+1mtPZzeHRn5Q7GymKFIuq/q0ADJko4HC3DwNvqsM3SHmgHQ=
+	t=1746256978; cv=none; b=nWsLZWAtFqTp9b+s60JUB0n9iB9wvjpXjpsN5Hpdi7Z9f7vwtEkw30LSKBOB1MchdJWTZfGLtyYcsl3tFOpvUHBzFjmBXpdH7NiG2kWp2EXgJD1W0/v4kUh+xp1zgb3c0ewAUYvynpjeILYAJr1WvTOsBQQeOe5Ki734j1sRj3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746164750; c=relaxed/simple;
-	bh=7Sh8lnyJ+3YtwPuxA1mSSToI8wY0yELKJRyFLs5wkgE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DLb3Q/iUXZkzWpg3CeBi5+ek3ael7FyVxqQqIQ7gp617ZDyRN4SKRKMJ8sweXNbh8gYU4DwtGEI7dTXhPeqdhc3mGyZxH2x6kxyE2T8O1NKuqGcIJMOcqWhilog2SHGTrR5y9mLKORfHEBbPmAM4aTK/fuZ0QVszLN2J0eUS/vU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=l7NVkYh7; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1746256978; c=relaxed/simple;
+	bh=zMyYENbkZXsEM0EbzPQLlTBp02vLCdmnMzN6CTx+lkY=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=VsrEcRvN257k/zc2sYnnrz/pihcEWO4tIj+6kj3+H0M4CMGM9KZJDDogcK9SPEuWishVNnEB5M/awIJp2hzfZtgrj2x1mPEli1OtHI5Kzf35A4bUR98Ok4PabTumPuvQ6yuMTASxaPbJpKLB9yY/MNVIKT/kPjUFPtoDXY+4QT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=o+LGBz2P; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="l7NVkYh7"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="o+LGBz2P"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=oAOMkDwd5YyxvQz8dmD/8NsLxtSTXC9Fi6TiCJ/EftY=; b=l7NVkYh7SwWMr0qjPcZLg7ykic
-	ynErbNjy44aHCXNg3u5Qs8PKVEjNlX055riL9uECxSYKsminSKO3jDsqnz0T3F+pcwf8k9fCNi7PX
-	4ztzaoL7xlhwPDZEuDDJstGuV4/OKa5TGVKwYuswmOM8eY4upa5TT/nKar4BwS//7wQisa/kWpkaZ
-	Q3+gnIOZe/l7kL1NvcMO97sj/we+3se9TNr1xhwLegwfYuwQCnYxIDTNHasoIWJo3JPTsUvNtH8l+
-	UStS3DEZdP0EA5bWyfEeHg3I0RgOPe2y0YlbMm88KLVTuNlTFhCHzl/06RO3mXLqte2irixVBEydK
-	q0TsKaaw==;
+	bh=XcdE128wjT15lQY485kQIw/QewnvLG0LGFUMmKqoGAk=; b=o+LGBz2PT0vQs2mQRw39yAeIJB
+	M57bK5mh2NAnDdI8NVkUvAjMlQ3uggW3kMPolv4mZbAmR+oECXkagzrXeSm24xrnqZUGRK6WOk2bB
+	AA53udhIw4PzwRqHJRXO6QvgJ7MkxrxWwDK0frqtnFBlZHmkhrmL79DpVZe0G2CYS2ibR3bdy8/28
+	BR5ozUR399UdLMktK3es9kakWr9cUU6g9wWOQjhYU8WB6RMH/imWsgO+2lVzpMQMAHeOG+DPnbFyj
+	7Q3wxcHEDDzKxrgn8tjAWM98SD0GFfy7DMG06HpD0hnzQx7+lnv0PO2/M1ZvKOVEx/M8zK4Wus4Gb
+	9tKVHKHQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uAjDT-002lRs-3C;
-	Fri, 02 May 2025 13:45:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 May 2025 13:45:43 +0800
-Date: Fri, 2 May 2025 13:45:43 +0800
+	id 1uB7Cu-0031dP-39;
+	Sat, 03 May 2025 15:22:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 03 May 2025 15:22:44 +0800
+Date: Sat, 3 May 2025 15:22:44 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Zurab Kvachadze <zurabid2016@gmail.com>
-Cc: dash@vger.kernel.org
-Subject: Re: [PATCH 1/2] expand: Fix negative size parameter to memmove in
- subevalvar()
-Message-ID: <aBRcB6IwkkehEVB8@gondor.apana.org.au>
-References: <20250429214732.22390-2-zurabid2016@gmail.com>
- <aBRZWR5fFMN1-u_i@gondor.apana.org.au>
+To: dash@vger.kernel.org
+Subject: [PATCH] expand: Move stop array closer to strpbrk call
+Message-ID: <aBXERPJG0ewfvmTV@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -50,21 +46,47 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aBRZWR5fFMN1-u_i@gondor.apana.org.au>
 
-On Fri, May 02, 2025 at 01:34:17PM +0800, Herbert Xu wrote:
->
-> Thanks, but I think this is already fixed by:
-> 
-> https://patchwork.kernel.org/project/dash/patch/Z81WqTBtj9TRqQzy@gondor.apana.org.au/
+Move the stop array closer to the strpbrk(3) call in pmatch.
 
-Actually I think it's
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-https://git.kernel.org/pub/scm/utils/dash/dash.git/commit/?id=a76c0f428e64d6ccc37c066ed4d47f49b52f9ae7
-
-which I forgot to push out.  It's out there now.
-
-Thanks,
+diff --git a/src/expand.c b/src/expand.c
+index 1b9572d..25df03c 100644
+--- a/src/expand.c
++++ b/src/expand.c
+@@ -1886,9 +1886,6 @@ static __attribute__((noinline)) int ccmatch(char *p, const char *mbc, int ml,
+ 
+ static int pmatch(char *pattern, const char *string)
+ {
+-    /* stop should be null-terminated as it passed as a string to
+-     * strpbrk. */
+-	char stop[] = { 0, CTLESC, CTLMBCHAR, '\0' };
+ 	const char *q;
+ 	unsigned mb;
+ 	char *p;
+@@ -1918,11 +1915,17 @@ static int pmatch(char *pattern, const char *string)
+ 				c = *++p;
+ 			if (!c)
+ 				return 1;
+-			stop[0] = CTLESC;
+-			if (c != '?' && c != '[')
+-				stop[0] = c;
++			if (c == '?' || c != '[')
++				c = CTLESC;
+ 			for (;;) {
+-				if (stop[0] != (char)CTLESC) {
++				if (c != CTLESC) {
++					/* Stop should be null-terminated
++					 * as it is passed as a string to
++					 * strpbrk(3).
++					 */
++					const char stop[] = {
++						c, CTLESC, CTLMBCHAR, 0,
++					};
+ 					q = strpbrk(q, stop);
+ 					if (!q)
+ 						return 0;
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
