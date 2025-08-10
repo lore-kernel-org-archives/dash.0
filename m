@@ -1,71 +1,69 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF90347C7
-	for <dash@vger.kernel.org>; Sun, 10 Aug 2025 19:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259CC2309B5
+	for <dash@vger.kernel.org>; Sun, 10 Aug 2025 21:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754854436; cv=none; b=OJ8VJ1QmUeAJLgB3Lk3QIKJTdWofQmQ47y4G90KpBLUTdtHZdQhBZsS1DChNnEzJkinjxrzyJ/fmhr3HA4gILj1pfQw6FPNbkV0HdbVO7MvO+Tbjt1/cQhImqQ6ZdBxGwYSwtmQHvxNQa0Sf2au4u9dcKiMjXCb3uFaUDbQvsVg=
+	t=1754861425; cv=none; b=j2KwXbOP1MZc1Gk0273fA+bN+r76SVmKSv5y6shvPZQdG/aZnQGaDMcLsEJceQyAQXAuU3WjMjVc5MTnI6ocTWaglCvWB08IjjzG6AyI0FQzR5U94Ug5kGCN6C+xQUQ8aIi8uWVm4CtgO8RqVFXVigKpBepj6MdlvAO3ksLxhi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754854436; c=relaxed/simple;
-	bh=oWnO3tpb1t1GpzZ9pRx3R6T1QqUbMcdhyaR4Np/8gWQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Jd9h0+/ull++pD9so4qSOMlv4JgLndgnpPwc1laWrDCPQNeeF1US+PbF1Gv7Hhbjl8QZPawnGF9CXzXSENjTmTmTvros6ROeFqeG0Xrq1wxqb/rS/9l4GvCrZtMA+noiVDENv7kCV+IrprF4DTfKC0MaLiI+LuJhMDWq8I46BEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LfAhOI5D; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1754861425; c=relaxed/simple;
+	bh=4F2y5Z26hJDO/E+T+M+nE6xEoD3nqTWnTBxKgsJOkf4=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=VtPqvL1YJf7l/wJPE8rk1qnYZQebdFZwWz8DzrgIuWZ8s9PTFSysBxdNSPo9R44NeauvrBTAAI3q1Hs4j5I6gLgoFuOroJyc8R5JWAeu8goWu58cGzYUzYIViOma6EZLBgf4upK6LJ0fLn/OCuJeP4NSA2i0W5whbnS/LImJ5X8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XoGNb1Od; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LfAhOI5D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XoGNb1Od"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754854432;
+	s=mimecast20190719; t=1754861421;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JeqJ4j3jqG2QQoUbtrNlr33H5z0wUqUeZWI36EcnuYA=;
-	b=LfAhOI5DTxGfCzcbfx6yUpYTXag/gBoUbJHblPnVf0iIkLPyPiAAhaucqjCZwb1fZrDQYT
-	oIneyEHuplomsIKWbjsWrlER2PDEEvdEy7W53nH4YmSdJxKeU9YM9xVM04uIRZmx5m8CTQ
-	+6bVIBCYM3187xmOEOdYkfGNRvrp0IA=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tLk4Q7r2iF6Plf2Wdju45XgRHsPcSHXwiRaPUSLEuW4=;
+	b=XoGNb1Od6Up6rFjY/4qNvFbByBDKwNN/VXhsDUcsUSH5u1mo5WFWu+JXa3byob6XoG37pv
+	hJFigQgM9YKPCBAXN6+OWnhKsUCIUucZw2teMsOw+5PAWfXi+RWIY4t4NwX1bFZFNLDN9e
+	093pbu3ARSfLOzhtY6NdXmzUuFggg9E=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-198-aEiwgiwmPpW358RIGwbCzQ-1; Sun, 10 Aug 2025 15:33:50 -0400
-X-MC-Unique: aEiwgiwmPpW358RIGwbCzQ-1
-X-Mimecast-MFC-AGG-ID: aEiwgiwmPpW358RIGwbCzQ_1754854429
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-af9423cfdb9so320126266b.1
-        for <dash@vger.kernel.org>; Sun, 10 Aug 2025 12:33:50 -0700 (PDT)
+ us-mta-624-EXs6J01VPBu6043K8fNHLg-1; Sun, 10 Aug 2025 17:30:20 -0400
+X-MC-Unique: EXs6J01VPBu6043K8fNHLg-1
+X-Mimecast-MFC-AGG-ID: EXs6J01VPBu6043K8fNHLg_1754861419
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-61831157d7eso296176a12.2
+        for <dash@vger.kernel.org>; Sun, 10 Aug 2025 14:30:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754854429; x=1755459229;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JeqJ4j3jqG2QQoUbtrNlr33H5z0wUqUeZWI36EcnuYA=;
-        b=qCsZ/l55K0laHnEf07TkX+bxJvw96EM+wPS9SPCgjLEoDl2EZV1lYGIq5TGWP+QDKO
-         LFaupF2H0lX0x04kxanFUDhFTUWr6HBPLLw2SRBSdrioWgplYeWkP6g24gnapPqTfjvA
-         Av2xbderSA1akI77JsRJI7XqfuMmbQjjjhUqSIDcOt76LIbWVCPUZZc8l4obHKrwEHUR
-         MzaM0Ii/7sYCbkLq9SiMVw4Hsfd9N353QIGrKE5dj6kIHk4jSF1ERWgzDRYxNF8a8ds0
-         P9Q9nlBgRP5R4IC/a9UlJ0A2A7LKaxA72Q5kMsopSUiXusNNg3PW3t+WGWd+Xv3kwTw0
-         OVag==
-X-Forwarded-Encrypted: i=1; AJvYcCWvpHuIIj5mIc/ewfq3AbBCIsqgPwVAgxjOqHOkZiiy7ZLvSn77moDOoQAoDXPHdIvDc9Jq@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyua2r0DmlSFtyx6AP0OuYGBzNqyIrawjULjnXQrLJ7suHRvJ1+
-	ptGc48yFG+Lk1szokugtT4LxjgMV39ZSf4P1m7HvvdNVQ3E0t4iP7X+9v0EycAxH8JRrZQyK1En
-	DVZaIt0GYSi9xtFP7rpT9Ri77LhW10ZT/o/xSzgOFSNrcFAdN6931lbp+wImzyHg=
-X-Gm-Gg: ASbGnctmrz7KfBoQRUTxjHDRkepIKR8M9reRoow3QyGanigbwdsQyeT9I/iU8Z5Itwz
-	1RLdjpa0NEZw+5ZgMUTl0ztF2+q+ZCRdLCC56wNvVAXs/nu0j3FbVI0/JrVGqnoe8ny1NN5R73S
-	EIdhF6j3vfM69jJ5cpUB9sDimqVm9hZwzB8qq6vbMsy34xeHLRyLTotwAVhyMfMUzYMcjYn1POP
-	oUxfO1LTODMCW06x8L9ag5GqVnSUdy14dsX/iv87aQDf2h+/N2QVfMNKDioWGD3/SzA5Bte+eGe
-	0ZSHa5tFPksrU2lexIOnYzJIQiolVUG8p5s/qYu0Gv1o
-X-Received: by 2002:a17:906:ee89:b0:ae3:7058:7b48 with SMTP id a640c23a62f3a-af9c648c961mr951863866b.25.1754854428590;
-        Sun, 10 Aug 2025 12:33:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGIMr/W66oKYXQbtxVE8efGnl9boh+rnNp4Q0ODZSc148dJdtrllh21N56bIj2EjJQZ+7gq2g==
-X-Received: by 2002:a17:906:ee89:b0:ae3:7058:7b48 with SMTP id a640c23a62f3a-af9c648c961mr951862866b.25.1754854428206;
-        Sun, 10 Aug 2025 12:33:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754861419; x=1755466219;
+        h=content-transfer-encoding:subject:from:content-language:to
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tLk4Q7r2iF6Plf2Wdju45XgRHsPcSHXwiRaPUSLEuW4=;
+        b=fPdiR0ndIlO0HnboAg4dAiMGZ1HWKHfGbyx9HMJqxAqstjMuN+9fuF11iF893byLmT
+         dVhNnr6y5XPB/+nDCvB3HvJm4ZWX+0KpqDAAVH11lO8/SPVkP0uwXtzx82tpjV7QCjIH
+         ggg1RqoJ3huKTmFqXK4zUMVTK2PufCYDNUjCCluuB3K8gZMLITiGTcTSXMP2kKzG2fOP
+         IB5XFE5dT6yg9esbqTiWglAv2Jo1fBqGUOyuedhVFa80mQe7oV7BZ7GFRrmT7Nc5Ypj1
+         cQxFkHcVfPrbGJjM2jYhmVHL2Pr1M4e+CsToVxZkvhzrRLz7cUkmaLpAmU8zU7pdGuCG
+         Xidg==
+X-Gm-Message-State: AOJu0YxMzoJhRXGizHoBfTydl1Sosv78QUWTZ5Fjp3vq+1cXQf395NDG
+	oO/enT4IRBlFlps1q8fi5DeXGGmWWal230MZlMrbyLZtQE8W3uyUNBi6+zVRErqqbteA/5I3qoh
+	qwskp3B+mEWPgBsAjgbNaCJ8NLnza1XhMIHfbk/X7f6HssHVGu2fq0Ok040IO1lBt8g8ghFQX+V
+	WBlbhSVVHOF0HhIxXjwrrJhZjuZbWKIR3Auo6AuRE=
+X-Gm-Gg: ASbGncv7JI4EYscvDHiRK92eaAhv3bsAL/4tGCnTrDb5rqSUBEuToRPptNn144dFyHE
+	OtPEqnG9LywYE60/dV7WrZPGeeRaRkEhO4pIDoPgX4azKqo4ei7GlF7WwM+N+IDHfJPQqM5ocSm
+	byP4EXZTJNPBsZ43zSaDWMu6t8d+QnqAM07p/Ef0zppdOwmhcyUtOnEikXMLLFSmWYp4dODfpJm
+	XBgohC/re8V0MFXwdGCkCZ3LdBqCGu89z5+rofQy0aLGvCQCg/dSu/Cg5BHJRj6N4k/UDAlnTK8
+	Zy/deZJghY3MatonoZc0VFrGpWG4JUmCkIj7tAtKhIe2
+X-Received: by 2002:a05:6402:40c5:b0:618:19d2:7251 with SMTP id 4fb4d7f45d1cf-61819d27686mr3322875a12.10.1754861418596;
+        Sun, 10 Aug 2025 14:30:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHk0kQH4sH55NUTsKs6w3AmIcvIJmWarQ3Lpo7MglJR9c63Q4oXiibT+ze7BGwpWToroSWj1Q==
+X-Received: by 2002:a05:6402:40c5:b0:618:19d2:7251 with SMTP id 4fb4d7f45d1cf-61819d27686mr3322850a12.10.1754861418095;
+        Sun, 10 Aug 2025 14:30:18 -0700 (PDT)
 Received: from [192.168.1.181] ([193.165.40.212])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a07670bsm1912082266b.8.2025.08.10.12.33.47
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615a911451csm17023314a12.60.2025.08.10.14.30.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Aug 2025 12:33:47 -0700 (PDT)
-Message-ID: <559d8542-bda1-15a0-2e68-9b3ea04db2e7@redhat.com>
-Date: Sun, 10 Aug 2025 21:33:46 +0200
+        Sun, 10 Aug 2025 14:30:17 -0700 (PDT)
+Message-ID: <b9ce3783-0b6a-1b05-dc29-68e3d3b5aa74@redhat.com>
+Date: Sun, 10 Aug 2025 23:30:15 +0200
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -74,44 +72,112 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: Looking at "int vforked" in signal handler is racy
+To: dash@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
 Content-Language: en-US
-To: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-References: <dadfa485-b5ee-30d7-7154-362cf2eb04cd@redhat.com>
- <031e429e-e20c-4856-91dd-aedef155aae5@gigawatt.nl>
 From: Denys Vlasenko <dvlasenk@redhat.com>
-In-Reply-To: <031e429e-e20c-4856-91dd-aedef155aae5@gigawatt.nl>
+Subject: wait code is fishy
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
+Good day,
 
+I don't report a bug here, but some rather contrived code.
 
-On 8/9/25 15:52, Harald van Dijk wrote:
-> Hi,
-> 
-> On 09/08/2025 14:29, Denys Vlasenko wrote:
->> struct job *vforkexec(union node *n, char **argv, const char *path, int idx)
->> {
->>          struct job *jp;
->>          int pid;
->>
->>          jp = makejob(1);
->>
->>          sigblockall(NULL);
->>          vforked++;
->>
->> <<<< Parent can get a signal here.
-> The sigblockall(NULL) is meant to prevent that from happening.
+Looking at waitproc() first. Hmm, what that
+"break" doing? Aha:
 
-Yep, missed that. Should be ok. I'm mistaken.
+                 do
+                         err = waitpid(-1, status, flags);
+                 while (err < 0 && errno == EINTR);
 
-However, this method requires three syscalls:
-one to mask all signals before vfork,
-then two syscalls (one in the parent and one in the child)
-to unmask them back.
++               /* Return if error (for example, ECHILD); or if pid found;
++                * or if "block" is DOWAIT_NONBLOCK (=0), in this case return -1.
++                */
+                 if (err || (err = -!block))
+                         break;
 
-Whereas the method of recording PID usually needs
-just one getpid() syscall.
-Should we consider switching to that method?
+                 sigblockall(&oldmask);
+                 while (!gotsigchld && !pending_sig)
+                         sigsuspend(&oldmask);
+                 sigclearmask();
+	} while (gotsigchld);
+         return err;
+
+(Maybe rewrite it to less cryptic code?
+if (err)
+         return err;
+if (block == DOWAIT_NONBLOCK)
+         return -1;
+)
+
+So, looks like waitproc() never returns 0. It's always -1 or pid > 0?
+
+NOPE. It's non-obvious, but if we exit the loop if got a !SIGCHLD signal,
+err will be 0.
+
+(Which would be more obvious if it would say "return 0" instead of "return err").
+
+It has only one caller, waitone().
+Which always returns waitproc() return value as-is.
+waitone(), in turn, has only one caller, dowait(). Which does this:
+
+        if (block == DOWAIT_NONBLOCK && !gotchld)
+                return 1;
+        rpid = 1;
+        do {
+                 pid = waitone(block, jp);
+                 rpid &= !!pid;
+                 block &= ~DOWAIT_WAITCMD_ALL;
+                 if (!pid || (jp && jp->state != JOBRUNNING))
+                         block = DOWAIT_NONBLOCK;
+         } while (pid >= 0);
+         return rpid;
+}
+
+So the dowait() return value is 0/1 "got signal" indicator:
+0 is "we got a !SIGCHLD signal", 1 is "we didn't".
+
+Not clear why we bother. We already have that indicator,
+it's "pending_sig" global variable.
+
+So the calculation of "rpid" is redundant.
+The only caller which checks dowait()'s return value is waitcmd()
+and it can just look at pending_sig.
+
+The reason for "pid == 0" retrying NONBLOCK wait for more processes
+is unclear: if we got here, we already did wait for processes
+just now, got none, waited for signals and got a not-SIGCHLD one,
+so there should not be more processes to wait for.
+A comment explaining it would be nice?
+
+-                if (!pid || (jp && jp->state != JOBRUNNING))
+-                        block = DOWAIT_NONBLOCK;
++                /* If got signal, do one more nonblocking wait (why?) */
++                if (pid == 0)
++                        block = DOWAIT_NONBLOCK;
++                /* if waiting for a specific job, continue blocking wait unless it stopped running: */
++                if (jp && jp->state != JOBRUNNING)
++                        block = DOWAIT_NONBLOCK;
++
+
+(If you modify this code, please move waitproc() definition up,
+so that they are in more customary sequence in the source:
+
+waitproc() {...}
+waitone() {...}
+dowait() {...}
+
+instead of current
+
+waitone() {...}
+dowait() {...}
+waitproc() {...}
+
+And maybe fix the wrong function name in this TRACE:
+static int waitone(int block, struct job *job)
+{
+...
+         TRACE(("dowait(%d) called\n", block));
+
+)
 
