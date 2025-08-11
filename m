@@ -1,32 +1,32 @@
 Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E2AF2D6405
-	for <dash@vger.kernel.org>; Sun, 10 Aug 2025 22:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88C42594
+	for <dash@vger.kernel.org>; Mon, 11 Aug 2025 01:22:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754864454; cv=none; b=ZLUM7WkGfs8OuZ+AoP55r1KBr5IZrsQ7a180QGsoT57K5jWLEOgpekNJ9PQCyFNhkyfhqFL9CzQ1+TxelaKl34gXEKJleYKK288Uk7xanMILH3hlsIqzTVqp1Y1BysZoywbaKX/g7zhEQEM8wrk7VuHcVBp1Yob8Ei1QObRlziI=
+	t=1754875324; cv=none; b=QfmQ3LfN8wwZIr8zrppu0eGirqSXHsAktG7uuSMaMpun7XKo+Zw4Y5G4NBSPjtw+YAfbRpsW4+GkkSKELyZajEq35GKPAzDtmyPkNbHmuGI+kRPIlkUpPb0SRx+0SXoROZGIVIdI+OzJPFwQ13Aaf3AbFAH9+E0LPjtzK/DkeR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754864454; c=relaxed/simple;
-	bh=SaSrsUSgdSq5Y/q9cLdtycHUgL/mZ8lvNjde1PrHRn8=;
+	s=arc-20240116; t=1754875324; c=relaxed/simple;
+	bh=uE+V4/d/xHoiiL8rEJMPWmnaoP9s3Un2ofJWKemC7qY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=rRmHw5Qlu7B4KKoGrrd5mjMVjapkL1sO2FkLtm31sX4t/giD12X6jbahkdI58Hw8ACX699Cz/BVWg1wRlC5heXeU8guEFVYhQVC0AzTJJkss+UiUMGMJV63Ih971LD6k28GwxLx/ks+M5gD8D4H6c3Jx13ZJA9UqhreaqeJFOHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=Q/cDCrEg; arc=none smtp.client-ip=51.68.198.76
+	 In-Reply-To:Content-Type; b=e6CuGD20FakyHRfWirl5HSjXjvnk+ghSBXV1vdFUCsccJG6Wpaz4+BM1uAPPY8sOZWDQYppExj7P+/h5CS8aI/UWZFcpR7XQIZ5CT2UKIMfft76QUctmS5eo2I/Z/453Y932rgSqpCB2MLpXs04VvaJgbT8P08Toinl1wzKCnME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=IQYtBxaN; arc=none smtp.client-ip=51.68.198.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="Q/cDCrEg"
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="IQYtBxaN"
 Received: from [10.96.0.68] (185-177-124-97.hosted-by-worldstream.net [185.177.124.97])
-	by mail.gigawatt.nl (Postfix) with ESMTPSA id A5DEAE9;
-	Sun, 10 Aug 2025 23:20:41 +0100 (BST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl A5DEAE9
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id B0BF7E9;
+	Mon, 11 Aug 2025 02:21:58 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl B0BF7E9
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1754864441;
-	bh=hmTcNxF4/dHPLdJrBb9qvAvy/aXrGQEV47F/vU/Kqb0=; l=2163;
+	s=default; t=1754875318;
+	bh=sDZVieXVv6r1I31eVpxVRW1/RKJxtypJzVtJcGaehS0=; l=809;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=Q/cDCrEgJo04dSid3LkSqFgY3L9vM1u9XWU5q25sIiYsazw09mihHZcVR5/RV3uCp
-	 m/HnV3tYCNDRETpDUOgmYH69Po/+Lu3K6hvGg6mEogNE+vxOc1iYlmzKrVBIR9TOd1
-	 rOfpK/DF35aleNw21c7lQMwqF52vt2+o1Ao2AjG4=
-Message-ID: <b6a063f8-9844-4f81-90a8-0f65e7c819bf@gigawatt.nl>
-Date: Sun, 10 Aug 2025 23:20:40 +0100
+	b=IQYtBxaNv7eIcC1SHtxqlRQ8phYrzx1s6MeRvzwHY/MzhNqgrSRXRLCEUqc3bKPDQ
+	 InbM8GAA/vUV8AlJN/hffBNN/zkac7rU1+0nK1QlBhpdd2m1vs8c4bqZMp7Lfa8mLF
+	 V7po8S87ckznNATcGch5rOgmm5YKp4k+3572BKl8=
+Message-ID: <a708d788-e496-4478-b1b2-48ccfae092fd@gigawatt.nl>
+Date: Mon, 11 Aug 2025 02:21:57 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -34,95 +34,31 @@ List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Looking at "int vforked" in signal handler is racy
+Subject: Re: wait code is fishy
 To: Denys Vlasenko <dvlasenk@redhat.com>, dash@vger.kernel.org,
  Herbert Xu <herbert@gondor.apana.org.au>
-References: <dadfa485-b5ee-30d7-7154-362cf2eb04cd@redhat.com>
- <031e429e-e20c-4856-91dd-aedef155aae5@gigawatt.nl>
- <559d8542-bda1-15a0-2e68-9b3ea04db2e7@redhat.com>
+References: <b9ce3783-0b6a-1b05-dc29-68e3d3b5aa74@redhat.com>
 Content-Language: en-US
 From: Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <559d8542-bda1-15a0-2e68-9b3ea04db2e7@redhat.com>
+In-Reply-To: <b9ce3783-0b6a-1b05-dc29-68e3d3b5aa74@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 10/08/2025 20:33, Denys Vlasenko wrote:
-> On 8/9/25 15:52, Harald van Dijk wrote:
->> Hi,
->>
->> On 09/08/2025 14:29, Denys Vlasenko wrote:
->>> struct job *vforkexec(union node *n, char **argv, const char *path, 
->>> int idx)
->>> {
->>>          struct job *jp;
->>>          int pid;
->>>
->>>          jp = makejob(1);
->>>
->>>          sigblockall(NULL);
->>>          vforked++;
->>>
->>> <<<< Parent can get a signal here.
->> The sigblockall(NULL) is meant to prevent that from happening.
-> 
-> Yep, missed that. Should be ok. I'm mistaken.
-> 
-> However, this method requires three syscalls:
-> one to mask all signals before vfork,
-> then two syscalls (one in the parent and one in the child)
-> to unmask them back.
-> 
-> Whereas the method of recording PID usually needs
-> just one getpid() syscall.
-> Should we consider switching to that method?
+On 10/08/2025 22:30, Denys Vlasenko wrote:
+> The reason for "pid == 0" retrying NONBLOCK wait for more processes
+> is unclear: if we got here, we already did wait for processes
+> just now, got none, waited for signals and got a not-SIGCHLD one,
+> so there should not be more processes to wait for.
+> A comment explaining it would be nice?
 
-That approach seems solid to me at a very quick glance. I think you 
-don't even need separate have_vfork_sibling and vfork_parent_pid 
-variables, just make the existing vforked variable a pid, or 0. A mostly 
-untested patch using that:
+A signal that gets sent to a process group can simultaneously be a 
+nonfatal signal to the shell, and a fatal signal to the child, where the 
+nonfatal signal to the shell may get processed by the shell before the 
+SIGCHLD resulting from the fatal signal to the child. I do think it's 
+possible for that extra loop iteration to find more processes that have 
+terminated.
 
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -991,20 +991,17 @@ struct job *vforkexec(union node *n, char **argv, 
-const char *path, int idx)
-
-         jp = makejob(1);
-
--       sigblockall(NULL);
--       vforked++;
-+       vforked = getpid();
-
-         pid = vfork();
-
-         if (!pid) {
-                 forkchild(jp, n, FORK_FG);
--               sigclearmask();
-                 shellexec(argv, path, idx);
-                 /* NOTREACHED */
-         }
-
-         vforked = 0;
--       sigclearmask();
-         forkparent(jp, n, FORK_FG, pid);
-
-         return jp;
---- a/src/trap.c
-+++ b/src/trap.c
-@@ -312,7 +312,7 @@ ignoresig(int signo)
-  void
-  onsig(int signo)
-  {
--       if (vforked)
-+       if (vforked && getpid() != vforked)
-                 return;
-
-         if (signo == SIGCHLD) {
-
-I do wonder if the use of vforked in a signal handler, even in current 
-dash, would require the use of volatile to ensure no compiler 
-optimisations mess with it, but I think that is not affected by this 
-patch. If it is necessary, it is already necessary now, and if it is not 
-necessary now, it will not become necessary with this patch.
+Whether this is an important case to handle, I do not know.
 
 Cheers,
 Harald van Dijk
