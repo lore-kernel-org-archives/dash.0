@@ -1,80 +1,121 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573442628D
-	for <dash@vger.kernel.org>; Mon, 11 Aug 2025 05:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882D31EE019
+	for <dash@vger.kernel.org>; Mon, 11 Aug 2025 07:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754888458; cv=none; b=OCXOxnHf1FJt05O6RGbgfJXpQ11U14GAr7aA2DRyy0ur5bGp9xGDs2qAfw2ojAliC3H/QWurWHfnAZZJB/rO/SGhWi5alF7v8RbhmH4iVkEGxy6ASYe6dl9Jv31zV2PxXYJTg48+8kXGlv7VDkyByaRGHOfbLnA3zYrG3Q37dlc=
+	t=1754898741; cv=none; b=GUlU+Syw6nZpMae8vyGZ5aBnDFSAwgDBrDpXiFXrIwcGWDRo4iFH2I6RvkWO2VtC8OxmWwVuXTh5jj5JJP//7A4IHLnN/jQ9bw06fLmlyIsc3IERtorQOmhPzZ/knGcoOx+pcaQWoacsbvY2yAfLavvCJlW8HOnjY11DRsbC79s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754888458; c=relaxed/simple;
-	bh=EP0EMGdzIdwbhzSrkThyf/fQuYLwsUr6FjXWtv50rRE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LbyMONwS+faSbLR81Vxfo9JgNiovido+eLJcU1MYB6gQLKXwWE1lL2OUr5ZKuDJWU5CU7umboUJJ0tHwzQ6zpzzE7/tO4js9Am1PrbiKRRSCp+MzUfD4Z+F8w67rzOwRz+0dxAvlVsKfIRf3cDRi6XyOmJ6T7XoeGxAbkOOflRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Zw/JOKvw; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1754898741; c=relaxed/simple;
+	bh=kw0RcZVKBTdDpNUrbS3wWnCL1141Ma4QW4DGl/lb5BI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=fNINhiK6NvI+M1enFR5nd2KwqxKnUxgcnONDeq9zHTn+PlnPMEP3VSgM81CzkljGLDZjUeEUA2fONsmR8TnUc5KgrkW7qA1iU8F71+jOw2VB+sa3JDhCv0e7sP1qgF98Y4mbWlmkj664uagRPBi2cw0EDPxTqWuQhHB7flCHHIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NS/Emg5z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Zw/JOKvw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=dhLdD9+v/ssYnfjIkoc5bMOscSmzKjmZLa/mpHBiL/k=; b=Zw/JOKvwUiR8lKzUqX+FjKhOLM
-	4gocJ7O21E6840Ig7q1R5Xvutj30XYwtWrWctmg5MRNsXPYwU06QTc3BZAF618QuSIIen/Sk/T9D8
-	EUlWQ3g3AvbGMdsOjDoIrMlbBXSjPTCCUdl7rMd8Bf5jyhFayTIBkig7CY5wJsjHxSNyxWUstI0Nd
-	SJFOLXquZiGQykfmrC3kggNNJZ5gJf5KN/XZoBL3plffskWviOl8J4iBC8t7ytPmgT/w9400CcZ1D
-	3ujCD3Zavtv5UK9MmJ3xzTMnRwVmLxI30anbmfPewDrHNJ3uisPlBoMF0xwX8akTaVCeuNUXyKIwP
-	GhMH7U5Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ulKOv-00D9b5-1H;
-	Mon, 11 Aug 2025 13:00:46 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 11 Aug 2025 13:00:45 +0800
-Date: Mon, 11 Aug 2025 13:00:45 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Denys Vlasenko <dvlasenk@redhat.com>, dash@vger.kernel.org
-Subject: Re: Looking at "int vforked" in signal handler is racy
-Message-ID: <aJl4_WsQeHF6PI0N@gondor.apana.org.au>
-References: <dadfa485-b5ee-30d7-7154-362cf2eb04cd@redhat.com>
- <031e429e-e20c-4856-91dd-aedef155aae5@gigawatt.nl>
- <559d8542-bda1-15a0-2e68-9b3ea04db2e7@redhat.com>
- <b6a063f8-9844-4f81-90a8-0f65e7c819bf@gigawatt.nl>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NS/Emg5z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754898737;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oqk8aD58HuwrzJUEAjVsGZ0LRXOsdI/Gs2xmlxgQttA=;
+	b=NS/Emg5zQt62DiSHCVikJ8NQ97DE800er9sNNgENomw/xn3YJQB9hALptuZf2KlYs4HyYo
+	JXir50e4Gllo2Iokjm6FBWFUgECIEpwwDIDJEGziSPHJG04Tl4AC6QLoDRHA6RiRUrqX70
+	epeytQ5kYc4/qsTDoffjC+6VHOLdn3g=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-210-NfUgpYG1Mqm527Xw-MW0yA-1; Mon, 11 Aug 2025 03:52:14 -0400
+X-MC-Unique: NfUgpYG1Mqm527Xw-MW0yA-1
+X-Mimecast-MFC-AGG-ID: NfUgpYG1Mqm527Xw-MW0yA_1754898733
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-6181858bed8so950422a12.0
+        for <dash@vger.kernel.org>; Mon, 11 Aug 2025 00:52:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754898733; x=1755503533;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oqk8aD58HuwrzJUEAjVsGZ0LRXOsdI/Gs2xmlxgQttA=;
+        b=ckraBKcOiLDuxi9YAW3sxVhoD8tUFKNe/0XqGjgdwA28AMFVPAYwgcvwXJFGpaEgXY
+         moxMa1+P3geS0orfiGLEtWeEXdp/APXZTgF3wYmBZqtcwsdlodsAsWVQp+2rmLgKcOs0
+         ZymqbwTdBKoDa+NR1JMMj5TcseAv9m6bvLUC2Z1S9vZz+Zx5vs/uM/ZmJu3t90MmJkv2
+         Go6aL81IbwexLC7FyisS3qtbxk4frDJwUXBOpM7K14A2HaIS8WCCXairGyqZEh/Vh+Kq
+         WzWRpZakwBUloYbq5em2b0XF0OnsJdyOeG53EPVrqMZ1tm6kQdNR6kQiKVyiUDt7kQCN
+         W0VA==
+X-Forwarded-Encrypted: i=1; AJvYcCVUp4O3HJvc57nRLqZLhb3cZkx6NNbWceJPlig7It3UjI07dVOJILa4aN2hfIsEXn14CgTT@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0rXr1OeHiyFXs/KHohNRNyfx1sO1p8HotfQfii6VuR0wEg9Qf
+	eo5YoGwGOSMJtxW6nOP548lQx7UI8pthBPX8vUwvrnSW6jqK/NfEMvHvUXguqj5TNgCXe73vyKr
+	ssgRtPQBDeHBZxysxjUy5Cc0Ax/yySAC3wPDKoMUze6/l4AlsmwpNeRNqfzPaSP4=
+X-Gm-Gg: ASbGncvw7g2d0HgIlhvZ+PkYjXiLRI+SMLmfMXvkL4pZShErC9e9VUCJ8h/dd75N7T/
+	S9eLCJ871m78/v9YWR3/tqDfI1v7Hss/v1HLFIR2lWZOx0o4pjAkcO+cXH/FQVUREMQ/2FvUoYo
+	IcC+04pv4yhj1X9Y0XD7AE7Es4ln4rZB6l2NjZokX2LOMcC4ZV3n5ElpzhU7/Lx1JM/quL6MxvC
+	JIupfiD9AuTezHFDLhkQ4dJtfe66oTp6gUtz1FW+v7/DUwXjekiOLKU5G6SSjjseNXQZmNfpf2d
+	6BTmd76gxVHlyfQjNZWN9x4muy+MX3+d3Oy58iPhQlPI
+X-Received: by 2002:a05:6402:254e:b0:613:5257:6cad with SMTP id 4fb4d7f45d1cf-617e302b838mr9866711a12.11.1754898732622;
+        Mon, 11 Aug 2025 00:52:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFK1Bj00gvm05w6OrRMGdFKxX0ZAPEYyfX/wSPL4xGXAThyKaBH0rOUbFiUYe5PZz8J7Pp5ig==
+X-Received: by 2002:a05:6402:254e:b0:613:5257:6cad with SMTP id 4fb4d7f45d1cf-617e302b838mr9866705a12.11.1754898732253;
+        Mon, 11 Aug 2025 00:52:12 -0700 (PDT)
+Received: from [192.168.1.181] ([193.165.40.212])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615a8fe7a32sm18042829a12.37.2025.08.11.00.52.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Aug 2025 00:52:11 -0700 (PDT)
+Message-ID: <5d9124b5-d687-d864-b73d-79d9bbcf160a@redhat.com>
+Date: Mon, 11 Aug 2025 09:52:10 +0200
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6a063f8-9844-4f81-90a8-0f65e7c819bf@gigawatt.nl>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: wait code is fishy
+Content-Language: en-US
+To: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <b9ce3783-0b6a-1b05-dc29-68e3d3b5aa74@redhat.com>
+ <a708d788-e496-4478-b1b2-48ccfae092fd@gigawatt.nl>
+From: Denys Vlasenko <dvlasenk@redhat.com>
+In-Reply-To: <a708d788-e496-4478-b1b2-48ccfae092fd@gigawatt.nl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Aug 10, 2025 at 11:20:40PM +0100, Harald van Dijk wrote:
+On 8/11/25 03:21, Harald van Dijk wrote:
+> On 10/08/2025 22:30, Denys Vlasenko wrote:
+>> The reason for "pid == 0" retrying NONBLOCK wait for more processes
+>> is unclear: if we got here, we already did wait for processes
+>> just now, got none, waited for signals and got a not-SIGCHLD one,
+>> so there should not be more processes to wait for.
+>> A comment explaining it would be nice?
+> 
+> A signal that gets sent to a process group can simultaneously be> a nonfatal signal to the shell, and a fatal signal to the child,> where the nonfatal signal to the shell may get processed by
+> the shell before the SIGCHLD resulting from the fatal signal> to the child. I do think it's possible for that extra> loop iteration to find more processes that have terminated.
 >
-> That approach seems solid to me at a very quick glance. I think you don't
-> even need separate have_vfork_sibling and vfork_parent_pid variables, just
-> make the existing vforked variable a pid, or 0. A mostly untested patch
-> using that:
+> Whether this is an important case to handle, I do not know.
 
-Looks good to me.  Could you turn this into a patch please? If
-you could run some quick speed tests on this versus the existing
-code that would be even better :)
+Of course any additional iteration of wait3(WNOHANG) has a chance
+of finding more processes exited or stopped.
 
-> I do wonder if the use of vforked in a signal handler, even in current dash,
-> would require the use of volatile to ensure no compiler optimisations mess
-> with it, but I think that is not affected by this patch. If it is necessary,
-> it is already necessary now, and if it is not necessary now, it will not
-> become necessary with this patch.
+But by this logic, we may as well decide to do seventeen
+iterations of it, not two.
 
-Yes vfork should be marked as volatile.  Although being a global
-variable means that there shouldn't be any practical difference.
+It makes more sense to do the minimum number of iterations
+required for correct behavior.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Consider that the addition of DOWAIT_WAITCMD_ALL flag
+(the "jobs: Only block in waitcmd on first run" commit)
+was needed exactly because in waitcmd() -> dowait() case,
+dowait() is doing an unnecessary second wait3()
+instead of letting waitcmd to check whether it is necessary
+to wait more.
+
+Now, with the DOWAIT_WAITCMD_ALL, it still does
+the unnecessary second wait3(), it's just not causing
+a potential buggy behavior (hang) because it's now doing
+wait3(WNOHANG).
+
