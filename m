@@ -1,51 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2488393DD5
-	for <dash@vger.kernel.org>; Sun, 24 Aug 2025 02:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825CB1C8616
+	for <dash@vger.kernel.org>; Sun, 24 Aug 2025 02:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756003158; cv=none; b=rIT9r6BCmSm2/PcZ1FKqdQ2OCrySPl8aovo2JheymDklX5KvNYmMLX5lq9NXKRhqxf0nBrxp21ipe4IEAt7DIWQmc3LeBf1Z7vhVEJUmpnlMQfbapMAkfP37/43VXCfJ2IZtz/5PW9HrzlhjEez6ZHUECo6QUBN/0QycM0dZGa8=
+	t=1756003346; cv=none; b=miMW/+bqn+wbI6A7O+IMG/QO/DDW3wavw4WcHnogHrjB4pCBy4VzwYK/zb23XeSWqO+fLDo/BhHTujlp9VxOzx6nkF2FxXwEC1xqdVqUbhsBplgZic25b9XQTvr0QxnLcrAfKY4DPPa/PFrGYiTp6v9QAkId9aac5EJtCU09ZHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756003158; c=relaxed/simple;
-	bh=9Ycit4vBju++hBNJBlaWK3fjuz4EaOjOUgfMqYNNgWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VJt0XIO1OU0OiDEsz6FdWQOVcMfiV9NqTOGaV/5ZZ/uj0Pkt7uJeOcge4jllr0altLb5mIQagEvy1GhwRz/3vCa156mo6lt5m0MQkFnzxI2UtCqn33YRviV2TKLf0YbP3pjDp8AS1cgdHHqIH6kk5fwXJXwpUBD7KHDHw3r/yso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=KSqcCsa/; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1756003346; c=relaxed/simple;
+	bh=2vpd5mHA8rD0T8w2sLRWww59jUYa4YEgKGOHXzLrF1c=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mwwdzBPtT5ucR+6CDr1O6u7qLb4y1no1eZ3OB9eVdZ2JfQiiAfJNtuFaly2LzqdzVq+DJ56/pmuuGgA5LZM6eKKCApb3YO8xW+8UnoKW4qh1UowypYCsXIpUnSVAayJQuPSWiEiR7lWFckCHdwYPHdE5JzVNdkuJS3y3K7zLwKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gIn1d3lI; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="KSqcCsa/"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gIn1d3lI"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=4k9GL5y4aEefy61RXizBleGlFEoCYKN1CC5plOGAtpU=; b=KSqcCsa/NzgTh1L6miZJ3fGqys
-	Y0iWJDgaB0if7gUGqubvuQ3d0WD9C6/Ug1IEQcm2FaiQ8qLF90vUTxIio8wajEgHsOO/DhowTrWl5
-	SFKGA80ii/f/QMjBu18MxSx96uWeRsDo5+Vul6YbgWXI9YFyiEYxOvaHvgrzX+aO7KmWURHl8EXUP
-	XW6pM1Ml7AaTwX/O3TyaaU9o3ZpK/M8iYHXcJhBrpX2z7H4ARjP8sGmm7ycOYsTuwGZUvGky+fKZj
-	puaIWX+zTytRwxBmwMHGCgx7/CHU5lEmdWlB4zpXy7FERRnP1VvMcNZSir8JqHe/tx8mL6GXDc6Ri
-	SfBWYXpw==;
+	bh=LQlglp6SRqUMnoAIXyOCrT2NHFx+EcsO9/ROO6fNFg8=; b=gIn1d3lIqAvUXuSux1ev99aHJi
+	uWBya/V8HBs0hxt7v70nQFcg0aq3iiXx0UBjo4zsQMGTdRxhWf7Ij6RzrKB923o/y906pgSiB28hY
+	aQmq025QQDhn2+w/gHqwjXoTW28+614J7Emh/sYtl+PJsiz0Dcf28ZmB4Vriu5A7PkyMoZHlJNR69
+	j8uZieFfVkbgZIUBWuIG9UjcDybWg+5SH47G3CfYnrpTZJaAMiA/KUW94/nFtIo1DQpVYIwskrrfE
+	JZjSGSd4pCp7boM2Nq+Va/VyJc1RhHzr9lNxvtx4I+bMnjtqZJGdUx0zEPYudzady/ZS8JE4EzLUM
+	vAOq9g/w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uq0Nx-00Gjqe-1j;
-	Sun, 24 Aug 2025 10:39:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 24 Aug 2025 10:39:05 +0800
-Date: Sun, 24 Aug 2025 10:39:05 +0800
+	id 1uq0R5-00Gjqp-1f;
+	Sun, 24 Aug 2025 10:42:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 24 Aug 2025 10:42:19 +0800
+Date: Sun, 24 Aug 2025 10:42:19 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Denys Vlasenko <dvlasenk@redhat.com>, dash@vger.kernel.org
-Subject: Re: Looking at "int vforked" in signal handler is racy
-Message-ID: <aKp7SVpkQUtwJ1Qf@gondor.apana.org.au>
-References: <dadfa485-b5ee-30d7-7154-362cf2eb04cd@redhat.com>
- <031e429e-e20c-4856-91dd-aedef155aae5@gigawatt.nl>
- <559d8542-bda1-15a0-2e68-9b3ea04db2e7@redhat.com>
- <b6a063f8-9844-4f81-90a8-0f65e7c819bf@gigawatt.nl>
- <aJl4_WsQeHF6PI0N@gondor.apana.org.au>
- <c03cf64c-5e12-4317-861e-16a0bf413d95@gigawatt.nl>
- <44569fdb-3c8e-431f-9e26-25259bd268fe@gigawatt.nl>
+To: DASH Mailing List <dash@vger.kernel.org>
+Subject: [PATCH] jobs: Cache getpid
+Message-ID: <aKp8C9gQullVJhRf@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -54,24 +46,78 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <44569fdb-3c8e-431f-9e26-25259bd268fe@gigawatt.nl>
 
-On Fri, Aug 22, 2025 at 02:32:54AM +0100, Harald van Dijk wrote:
->
-> From a112e6581540bf7d34bb2f47042e8927bcd95d0d Mon Sep 17 00:00:00 2001
-> From: Harald van Dijk <harald@gigawatt.nl>
-> Date: Fri, 22 Aug 2025 02:05:14 +0100
-> Subject: [PATCH] jobs: avoid blocking signals on vfork().
-> 
-> As pointed out by Denys Vlasenko, we can avoid blocking signals on
-> vfork() by making the signal handler of a vfork child immediately
-> return. This saves a syscall.
-> ---
->  src/jobs.c | 5 +----
->  src/trap.c | 2 +-
->  2 files changed, 2 insertions(+), 5 deletions(-)
+As the vfork path now requires the use of getpid, cache the current
+PID in a new global variable mypid.
 
-Patch applied.  Thanks.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/src/jobs.c b/src/jobs.c
+index 83d9694..d2fb30b 100644
+--- a/src/jobs.c
++++ b/src/jobs.c
+@@ -872,6 +872,7 @@ static void forkchild(struct job *jp, union node *n, int mode)
+ 	lvforked = vforked;
+ 
+ 	if (!lvforked) {
++		mypid = 0;
+ 		shlvl++;
+ 
+ 		forkreset(mode == FORK_NOJOB ? n : NULL);
+@@ -887,7 +888,7 @@ static void forkchild(struct job *jp, union node *n, int mode)
+ 		pid_t pgrp;
+ 
+ 		if (jp->nprocs == 0)
+-			pgrp = getpid();
++			mypid = pgrp = getpid();
+ 		else
+ 			pgrp = jp->ps[0].pid;
+ 		/* This can fail because we are doing it in the parent also */
+@@ -991,7 +992,9 @@ struct job *vforkexec(union node *n, char **argv, const char *path, int idx)
+ 
+ 	jp = makejob(1);
+ 
+-	vforked = getpid();
++	if (!mypid)
++		mypid = getpid();
++	vforked = mypid;
+ 
+ 	pid = vfork();
+ 
+diff --git a/src/main.c b/src/main.c
+index 1e192f8..dde9a36 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -64,6 +64,7 @@
+ #define PROFILE 0
+ 
+ int rootpid;
++int mypid;
+ int shlvl;
+ #ifdef __GLIBC__
+ int *dash_errno;
+@@ -146,7 +147,7 @@ main(int argc, char **argv)
+ 	opentrace();
+ 	trputs("Shell args:  ");  trargs(argv);
+ #endif
+-	rootpid = getpid();
++	mypid = rootpid = getpid();
+ 	init();
+ 	setstackmark(&smark);
+ 	login = procargs(argc, argv);
+diff --git a/src/main.h b/src/main.h
+index 19e4983..ef242a1 100644
+--- a/src/main.h
++++ b/src/main.h
+@@ -38,6 +38,8 @@
+ 
+ /* pid of main shell */
+ extern int rootpid;
++/* pid of current shell */
++extern int mypid;
+ /* shell level: 0 for the main shell, 1 for its children, and so on */
+ extern int shlvl;
+ #define rootshell (!shlvl)
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
