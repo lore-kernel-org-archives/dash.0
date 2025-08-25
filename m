@@ -1,43 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825CB1C8616
-	for <dash@vger.kernel.org>; Sun, 24 Aug 2025 02:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A63283FE2
+	for <dash@vger.kernel.org>; Mon, 25 Aug 2025 09:53:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756003346; cv=none; b=miMW/+bqn+wbI6A7O+IMG/QO/DDW3wavw4WcHnogHrjB4pCBy4VzwYK/zb23XeSWqO+fLDo/BhHTujlp9VxOzx6nkF2FxXwEC1xqdVqUbhsBplgZic25b9XQTvr0QxnLcrAfKY4DPPa/PFrGYiTp6v9QAkId9aac5EJtCU09ZHI=
+	t=1756115628; cv=none; b=ZBVLztUcV2i93XZhTd2H40ACurBxtw8X7zow9BbAOFwgqRq9Th2tiCmsTJBWndlBtCMEejaLdYdA+kc8uKT+VzEgntKKbvO9ouCSUg3K/Grxs3yhtXn9WyJfFMPuxPOxK8kG998CfMYl/150gpYobuzeHy/+4TOrOTSF6LBQ6d4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756003346; c=relaxed/simple;
-	bh=2vpd5mHA8rD0T8w2sLRWww59jUYa4YEgKGOHXzLrF1c=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=mwwdzBPtT5ucR+6CDr1O6u7qLb4y1no1eZ3OB9eVdZ2JfQiiAfJNtuFaly2LzqdzVq+DJ56/pmuuGgA5LZM6eKKCApb3YO8xW+8UnoKW4qh1UowypYCsXIpUnSVAayJQuPSWiEiR7lWFckCHdwYPHdE5JzVNdkuJS3y3K7zLwKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gIn1d3lI; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1756115628; c=relaxed/simple;
+	bh=IIqiTP8BJ8mprCpA9nsr2YeqsdokP8q8Qq8gdawD48A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KttY2o7dQMsjfaN2a8z0Yqyxji5Zs8Q6NyenGVOgYcXuN7ze6RMsM9WWpPopAW6c5U8y8AGUB2fLCgIGUmTJe2nToo9yIS1xzU1j3DfHbhAB7U+Nz1FRJfGnPArcx6XvW8zhMNh834Lbp5IcMuslDzfymlHdQx4nnuHgRIXf3ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pBti+/Zk; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gIn1d3lI"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pBti+/Zk"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
-	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=LQlglp6SRqUMnoAIXyOCrT2NHFx+EcsO9/ROO6fNFg8=; b=gIn1d3lIqAvUXuSux1ev99aHJi
-	uWBya/V8HBs0hxt7v70nQFcg0aq3iiXx0UBjo4zsQMGTdRxhWf7Ij6RzrKB923o/y906pgSiB28hY
-	aQmq025QQDhn2+w/gHqwjXoTW28+614J7Emh/sYtl+PJsiz0Dcf28ZmB4Vriu5A7PkyMoZHlJNR69
-	j8uZieFfVkbgZIUBWuIG9UjcDybWg+5SH47G3CfYnrpTZJaAMiA/KUW94/nFtIo1DQpVYIwskrrfE
-	JZjSGSd4pCp7boM2Nq+Va/VyJc1RhHzr9lNxvtx4I+bMnjtqZJGdUx0zEPYudzady/ZS8JE4EzLUM
-	vAOq9g/w==;
+	bh=NAjRqQdzu5+0NaEzbLNBQf8BCRr/HOoLAGpfxMr/fuc=; b=pBti+/ZkMUUYemQg8xV/441Lxn
+	lc4DljtqcnD3QZIWOBUpqDSa2WD0OuLR9aS6YOKkgQD9pg9fUfzgoZdR6erUvgJyJcPncuT9LQrTy
+	LbLnhn9toR0cCNhPWVCAl5e2y0EdQwDuh3EENkV8zclWty06jdjH6pYjVuo1L9B9QmhY/pXjJzWBd
+	KcRocp1+TRrhdTZzXTVXgHkp+tBnLAHE2vxSQKhwmo8BRfWaCNdJdRP0IzT0t/qZ3eW+2BbbE0KBP
+	yAR+4I6XN/ysE5aMILY74h643DFdMMfy+oqr00s1y7bFomk56XushzfI3sgevKPyaTNwh96PxBYDF
+	MMcfnAhQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uq0R5-00Gjqp-1f;
-	Sun, 24 Aug 2025 10:42:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 24 Aug 2025 10:42:19 +0800
-Date: Sun, 24 Aug 2025 10:42:19 +0800
+	id 1uqTdy-00H4I9-2o;
+	Mon, 25 Aug 2025 17:53:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 25 Aug 2025 17:53:35 +0800
+Date: Mon, 25 Aug 2025 17:53:35 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: DASH Mailing List <dash@vger.kernel.org>
-Subject: [PATCH] jobs: Cache getpid
-Message-ID: <aKp8C9gQullVJhRf@gondor.apana.org.au>
+To: Denys Vlasenko <dvlasenk@redhat.com>
+Cc: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
+Subject: Re: wait code is fishy
+Message-ID: <aKwyn3BbzGJhUzS4@gondor.apana.org.au>
+References: <b9ce3783-0b6a-1b05-dc29-68e3d3b5aa74@redhat.com>
+ <a708d788-e496-4478-b1b2-48ccfae092fd@gigawatt.nl>
+ <5d9124b5-d687-d864-b73d-79d9bbcf160a@redhat.com>
+ <c9366587-0723-4380-b50a-a43035678523@gigawatt.nl>
+ <24b4a38f-5c88-729f-9b04-71a295f4efd8@redhat.com>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -46,78 +52,32 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <24b4a38f-5c88-729f-9b04-71a295f4efd8@redhat.com>
 
-As the vfork path now requires the use of getpid, cache the current
-PID in a new global variable mypid.
+On Mon, Aug 11, 2025 at 06:30:10PM +0200, Denys Vlasenko wrote:
+>
+> If we got pid == 0, it happens in exactly one case:
+> we did waitpid(WNOHANG), got 0 ("children exist but none yet
+> changed its state"), then waited for a signal and got one,
+> which wasn't SIGCHLD.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+The pid == 0 case only happens on a blocking wait + signal, not
+on a non-blocking wait.  A non-blocking wait would return with
+err == -1.
 
-diff --git a/src/jobs.c b/src/jobs.c
-index 83d9694..d2fb30b 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -872,6 +872,7 @@ static void forkchild(struct job *jp, union node *n, int mode)
- 	lvforked = vforked;
- 
- 	if (!lvforked) {
-+		mypid = 0;
- 		shlvl++;
- 
- 		forkreset(mode == FORK_NOJOB ? n : NULL);
-@@ -887,7 +888,7 @@ static void forkchild(struct job *jp, union node *n, int mode)
- 		pid_t pgrp;
- 
- 		if (jp->nprocs == 0)
--			pgrp = getpid();
-+			mypid = pgrp = getpid();
- 		else
- 			pgrp = jp->ps[0].pid;
- 		/* This can fail because we are doing it in the parent also */
-@@ -991,7 +992,9 @@ struct job *vforkexec(union node *n, char **argv, const char *path, int idx)
- 
- 	jp = makejob(1);
- 
--	vforked = getpid();
-+	if (!mypid)
-+		mypid = getpid();
-+	vforked = mypid;
- 
- 	pid = vfork();
- 
-diff --git a/src/main.c b/src/main.c
-index 1e192f8..dde9a36 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -64,6 +64,7 @@
- #define PROFILE 0
- 
- int rootpid;
-+int mypid;
- int shlvl;
- #ifdef __GLIBC__
- int *dash_errno;
-@@ -146,7 +147,7 @@ main(int argc, char **argv)
- 	opentrace();
- 	trputs("Shell args:  ");  trargs(argv);
- #endif
--	rootpid = getpid();
-+	mypid = rootpid = getpid();
- 	init();
- 	setstackmark(&smark);
- 	login = procargs(argc, argv);
-diff --git a/src/main.h b/src/main.h
-index 19e4983..ef242a1 100644
---- a/src/main.h
-+++ b/src/main.h
-@@ -38,6 +38,8 @@
- 
- /* pid of main shell */
- extern int rootpid;
-+/* pid of current shell */
-+extern int mypid;
- /* shell level: 0 for the main shell, 1 for its children, and so on */
- extern int shlvl;
- #define rootshell (!shlvl)
+> It's ok to leave the logic unchanged, but perhaps it should be
+> tweaked to be more understandable. Unreadable code snippet example:
+> 
+>                 if (err || (err = -!block))
+>                         break;
+> 
+> Assignment in the conditional, just what we need to be confused.
+
+Yes patches to reorganise this are welcome.  But please make each
+change small and easy to review as this area is complicated and
+bug-prone.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
