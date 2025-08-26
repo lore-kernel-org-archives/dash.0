@@ -1,83 +1,74 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A63283FE2
-	for <dash@vger.kernel.org>; Mon, 25 Aug 2025 09:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79422D6E75
+	for <dash@vger.kernel.org>; Tue, 26 Aug 2025 05:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756115628; cv=none; b=ZBVLztUcV2i93XZhTd2H40ACurBxtw8X7zow9BbAOFwgqRq9Th2tiCmsTJBWndlBtCMEejaLdYdA+kc8uKT+VzEgntKKbvO9ouCSUg3K/Grxs3yhtXn9WyJfFMPuxPOxK8kG998CfMYl/150gpYobuzeHy/+4TOrOTSF6LBQ6d4=
+	t=1756186738; cv=none; b=FMkQ5h37kt9pRBX8n7Hn1y6tpWwriF6VmGK2PayqHo+f+18QTCCAAi8T9tzr43FmpEmfgzvaNcElPKI6/Bpp2AVRKtsxUGPRcjdzl5J58aLKHoAbM9kWod5FByFjE9Vbj6/L2JOTaTS43tPX1VDj2moFJ1xpyJb+WBE8gA/I6QI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756115628; c=relaxed/simple;
-	bh=IIqiTP8BJ8mprCpA9nsr2YeqsdokP8q8Qq8gdawD48A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KttY2o7dQMsjfaN2a8z0Yqyxji5Zs8Q6NyenGVOgYcXuN7ze6RMsM9WWpPopAW6c5U8y8AGUB2fLCgIGUmTJe2nToo9yIS1xzU1j3DfHbhAB7U+Nz1FRJfGnPArcx6XvW8zhMNh834Lbp5IcMuslDzfymlHdQx4nnuHgRIXf3ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pBti+/Zk; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1756186738; c=relaxed/simple;
+	bh=/1FtinwxpHObGONHFa4cgDMAbkkVim6jP6NlkLE/Q6M=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=SQlFV3f+4Guenbyj4RAXAbckT35mkk7/QXUAKOwk88cNUsDXp4HvS+lfGlFdIN2mrS7yvpIUV1PWPngL5rH4L3AvIg3lIYUazkFPq0OZSiZrsFHiz0e2ti7muM6Vobr+/izK7oFtA0dGxugOpDhgcdGzoxwQD+/rCx6qjolQ+9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=huq2IMFg; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pBti+/Zk"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="huq2IMFg"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=NAjRqQdzu5+0NaEzbLNBQf8BCRr/HOoLAGpfxMr/fuc=; b=pBti+/ZkMUUYemQg8xV/441Lxn
-	lc4DljtqcnD3QZIWOBUpqDSa2WD0OuLR9aS6YOKkgQD9pg9fUfzgoZdR6erUvgJyJcPncuT9LQrTy
-	LbLnhn9toR0cCNhPWVCAl5e2y0EdQwDuh3EENkV8zclWty06jdjH6pYjVuo1L9B9QmhY/pXjJzWBd
-	KcRocp1+TRrhdTZzXTVXgHkp+tBnLAHE2vxSQKhwmo8BRfWaCNdJdRP0IzT0t/qZ3eW+2BbbE0KBP
-	yAR+4I6XN/ysE5aMILY74h643DFdMMfy+oqr00s1y7bFomk56XushzfI3sgevKPyaTNwh96PxBYDF
-	MMcfnAhQ==;
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eGamRoyQyKUmCVJsZU7Cejk0HR1ocG0cXHgXeAmQcBI=; b=huq2IMFgnomwR6ZNKssxXy2fjU
+	k8aj2GE6HGY4hD2oGNKTXj1R2PyKk3T9MEnbmOPEhSnfKOeoDoEEQ4LYov4EbGBFROVhuune52Aj5
+	4wY65HrkJIuSfG8usBICI9JLtNQnGFAmF0+Qr+8h8W9TZH92PTsD7VP37Ec9OtZKd8EIU+MjwW3+t
+	+TDKil+6TQSW2v595L6xajREuluv5IVktFu73ZphOs1FOw47SCBNv2QUhL7J24a69twWAyODEGuo5
+	mERmkneOwRe8dLRASjOVoai/ASaj8rpac6VQPBfingj4QwEPUfc3u7a253/l0Bwwo0en6waqusxlM
+	44IPHw2Q==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uqTdy-00H4I9-2o;
-	Mon, 25 Aug 2025 17:53:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 25 Aug 2025 17:53:35 +0800
-Date: Mon, 25 Aug 2025 17:53:35 +0800
+	id 1uqm8u-00HIWh-37;
+	Tue, 26 Aug 2025 13:38:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 26 Aug 2025 13:38:45 +0800
+Date: Tue, 26 Aug 2025 13:38:45 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Denys Vlasenko <dvlasenk@redhat.com>
-Cc: Harald van Dijk <harald@gigawatt.nl>, dash@vger.kernel.org
-Subject: Re: wait code is fishy
-Message-ID: <aKwyn3BbzGJhUzS4@gondor.apana.org.au>
-References: <b9ce3783-0b6a-1b05-dc29-68e3d3b5aa74@redhat.com>
- <a708d788-e496-4478-b1b2-48ccfae092fd@gigawatt.nl>
- <5d9124b5-d687-d864-b73d-79d9bbcf160a@redhat.com>
- <c9366587-0723-4380-b50a-a43035678523@gigawatt.nl>
- <24b4a38f-5c88-729f-9b04-71a295f4efd8@redhat.com>
+To: Lawrence =?iso-8859-1?Q?Vel=E1zquez?= <vq@larryv.me>
+Cc: nroycea+kernel@gmail.com, dash@vger.kernel.org
+Subject: Re: Automatic Termination After Background Job Completes
+Message-ID: <aK1IZXlbo2i-_rA6@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <24b4a38f-5c88-729f-9b04-71a295f4efd8@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <11f69c85-4714-440a-b443-556a1d532c89@app.fastmail.com>
+X-Newsgroups: apana.lists.os.linux.dash
 
-On Mon, Aug 11, 2025 at 06:30:10PM +0200, Denys Vlasenko wrote:
->
-> If we got pid == 0, it happens in exactly one case:
-> we did waitpid(WNOHANG), got 0 ("children exist but none yet
-> changed its state"), then waited for a signal and got one,
-> which wasn't SIGCHLD.
-
-The pid == 0 case only happens on a blocking wait + signal, not
-on a non-blocking wait.  A non-blocking wait would return with
-err == -1.
-
-> It's ok to leave the logic unchanged, but perhaps it should be
-> tweaked to be more understandable. Unreadable code snippet example:
+Lawrence Velázquez <vq@larryv.me> wrote:
+> On Fri, Apr 4, 2025, at 9:09 AM, Nathan Royce wrote:
+>> Setting an emacs/vi flag when starting dash, and using an external
+>> command for a background job, the shell terminates once the job
+>> completes.
 > 
->                 if (err || (err = -!block))
->                         break;
+> With dash 0.5.12, I'm seeing this behavior regardless of whether
+> the background job uses a shell built-in or an external utility.
 > 
-> Assignment in the conditional, just what we need to be confused.
+>        zsh% PS1='dash$ ' dash -V
+>        dash$ : &
+>        dash$
+>        zsh%
 
-Yes patches to reorganise this are welcome.  But please make each
-change small and easy to review as this area is complicated and
-bug-prone.
+I cannot reproduce this.  Please try the latest git tree and if
+it still happens, run it under strace and send me the result.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
