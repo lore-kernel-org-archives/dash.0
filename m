@@ -1,74 +1,62 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FCA1C01
-	for <dash@vger.kernel.org>; Thu, 28 Aug 2025 08:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F201373
+	for <dash@vger.kernel.org>; Thu, 28 Aug 2025 09:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756371239; cv=none; b=eeNukn0RWto1kqhzGdrbVFLBD860j1eaZSmXfZK1k/5AmMb3LkuQpRo7GjN+tYP9YUCHDUCiE1SrE/KixRhGiJfy7dBhnK06pv67E4DSN17Vby8bS46thHDkIfitDwrs+Vz9ilfVUhBxw+RxoUKfYMgzKZXEFtVcTjDVlHL+aNo=
+	t=1756372338; cv=none; b=mvlXItUrcrJbuzjH3z1OiMTUrOFVxmnvNqSNzYAFMXDzuwSLlF2egbSZghAcXa8ZW1RHQ1CsrlGTv5ErNNY04Y7palG1WQ5cGqi6KCtW38BiBGFuMzP3gfJUk/w7aidBLdrL/aO1j6Foa5Ba5NJic+GFMv4nYf8aaiPGrT9+d9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756371239; c=relaxed/simple;
-	bh=mM/2dcnIdMB1UnIKGMlKmOwpvVSOgzKNaizHx7Wstwk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=RDHG34SGNivMp5YeJWfuq1lJeb78hzBFjK7Bj/girumtTCc6iVSpnuoE6uUwhihNwKoaO5RfkHz5jv3ZNsJLhfrr8LM4eBICpybk/+HelUz2p+b6xzUbBsjSR+RHC2ci9quw810wNsyyyHNQw2kJ/JeHGLtKZ3WYMlRkONCzwHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=JYIG8nMi; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1756372338; c=relaxed/simple;
+	bh=l/pwVU2tF07SeZp9c4EWP3rnUywdSI4v3jwWakBHaYQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uBJCv0oIYpDrjhr4UNRw/WZeVstUjy5DQcgnrffly7hy5AFKp9k/AA2dkJpDYf9GP+hZNpirTIy5QLsiTa/F8eKqDxvPZMtV8JF4gP9a0VQ+zeI6891yL9CYCPJYMz8HavLVWutKF72acRdzQPnlENINmo7+S+2qmUVUd/sNv00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=kL/9fAjB; arc=none smtp.client-ip=51.68.198.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="JYIG8nMi"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=zXFtGvZD3i5t6ofaVic1uvTVvdimkyKtkqfdm0DlJdk=; b=JYIG8nMidwfbeWBukVL/LG2m02
-	y46rH/4JYAmKLeYrvokETo9wxV1zrYf0eQLhSN+y3Y4CODbD1W02qfyhRV6NIi9W1ur2lMLTFb3CH
-	4XDM2wlmm5rk5RSk+IHedJMNSA7Jd/XUxmYgsjn7lMYx/nbu+wjL2sS+lowNn2vggQdLbYxAzIRA0
-	z0PID+PuyYrbtpuyLGKWPb23M/tx3IpMmiI9GTLyv3qxNWA0+1ZNJBYHDdHKXcDHq9q4JyJNi7i5z
-	uMrkO9mnzdqfwTCfKcoYW0b69gsPK0CZN2WRs5O51FrdO3g/DobEQfE5uRrjXNrxtiPCUUwMba48G
-	4OHKgSqw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1urY8n-000S5I-1y;
-	Thu, 28 Aug 2025 16:53:51 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 Aug 2025 16:53:49 +0800
-Date: Thu, 28 Aug 2025 16:53:49 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Aleksander Ushakov <aushakov@astralinux.ru>
-Cc: dash@vger.kernel.org
-Subject: Re: [BUG] heap-buffer-overflow(read) padvance_magic() exec.c:232:8
-Message-ID: <aLAZHdSmoYSTnF7Y@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="kL/9fAjB"
+Received: from [192.168.178.24] (unknown [31.94.68.85])
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id E212311C3;
+	Thu, 28 Aug 2025 10:12:05 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl E212311C3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1756372326;
+	bh=X1nORgGRGBljSwZL2umsfTKoBtVJBN9wZ6KRTiSgMJ0=; l=498;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kL/9fAjBTc3IHS1xIqBmfOLp/LBfzeMVxni3FTIJRWVO+Ykbz59WsGMKzCo5WemJd
+	 cUv7Ay1vzwwLiml8SeJeC3DHBg50hm3oO9ayMEXSMoRaF9//GfnePefzFuh9r8Gt4c
+	 0/w9HhGZc7F7fpXSsAqmVehFZi8RWoIWAfe+l/qQ=
+Message-ID: <b948f6b0-a7a3-4441-90dc-d1dc968700ac@gigawatt.nl>
+Date: Thu, 28 Aug 2025 10:12:05 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d8cc15e4-7efc-422e-8e5d-e42e8d74dca7@astralinux.ru>
-X-Newsgroups: apana.lists.os.linux.dash
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] builtin: Fix argv overrun in aexpr and oexpr
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Aleksander Ushakov <aushakov@astralinux.ru>
+Cc: dash@vger.kernel.org
+References: <aLAG4YtNOsfqcq1l@gondor.apana.org.au>
+Content-Language: en-US
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <aLAG4YtNOsfqcq1l@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Aleksander Ushakov <aushakov@astralinux.ru> wrote:
-> Hello Dash maintainers,
+On 28/08/2025 08:36, Herbert Xu wrote:
+> Aleksander Ushakov <aushakov@astralinux.ru> wrote:
+>>
+>> I think I fixed the problem here:
 > 
-> I encountered a bug in Dash in commit b4ef25d7 and would like to report
-> it. The details are provided below.
-> =================================================================
-> ==19628==ERROR: AddressSanitizer: heap-buffer-overflow on address 
-> 0x5020000001f6 at pc 0x653a8d802916 bp 0x7ffd57f3d590 sp 0x7ffd57f3cd50
-> READ of size 2 at 0x5020000001f6 thread T0
->     #0 0x653a8d802915 in strcspn (/upstream/dash/src/dash+0x55915) 
-> (BuildId: 82ec7cbb990c5349f280ce0bf016a1bca211dffd)
->     #1 0x653a8d8d01af in padvance_magic /upstream/dash/src/exec.c:232:8
+> Thanks for the report.  I think the following patch should fix
+> it too:
 
-This may be a false positive, or strcspn is buggy.  padvance_magic
-actually passes vpath.text + 5 to strcspn, and as vpath.text[5] is
-NUL, there is no reason for strcspn to read vpath.text + 6.
+This patch fixes the buffer overrun but leaves the syntax error in the 
+expression undetected, which is inconsistent with how dash treats other 
+syntax errors in expressions, and inconsistent with how other shells 
+treat missing operands to -a and -o.
 
 Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Harald van Dijk
