@@ -1,101 +1,76 @@
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1D02D373D
-	for <dash@vger.kernel.org>; Thu, 28 Aug 2025 21:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E560A43169
+	for <dash@vger.kernel.org>; Sun, 31 Aug 2025 08:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756415594; cv=none; b=rdETbHBOZtzCboNH6F0/eIlj8NbCC9+9EprS+zgu55vNil6xwy8ZoNpfVsIwadbTWz3e0lGzGxcHsyhzKa3Zul+9KQEDqaEteuSdgS2KtMS6H/Dia15zkNJk3eXrbC8CLVVSGfSGUjkcj0tkyIiOlYO8Mh6nK7jTwjb1yx9z0ew=
+	t=1756629930; cv=none; b=VDMUucfEbhHM4aWW7MOb1q9hrtuTq08KA3A3yjJ88aIAUuuG/mzPDVeRuBU6TH1Cz6fUqAJlax2QUdr/K8OSQcjkCz+AwVLDz5AbjZ2GHh+9lBS06E8o9raQjURimOkvL5ABUn4JbfbDBu8J1iIyxJ+4GOZ6HRi6YHCbApLJ9Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756415594; c=relaxed/simple;
-	bh=yywuSRKuG0gRBMXQZfMKWScKAdFaMnEjcbeSKE6XmqQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PbyRrttUWiB3ZjeiOSqIDL7thtpsn0JAciyOHWSvOV86HwTvZizhMClCPeaO1jrN3ed+Xl9LlOWX6BJbduSlXGRyxvwLGoL6ByvV23A3nSXEze7Oxj6gnfc44uz9qpWKiyJKq5P279T5wISoJ/Djazs3ttJyEGQJGQSV1BIprZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aXfibKfM; arc=none smtp.client-ip=209.85.217.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756629930; c=relaxed/simple;
+	bh=wn5RZVLos+XvIZpfAAB45NesyW8rLNsmK+sA+Vpfsko=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=q+r0v0BdW6vNZW/LFj15ZHesdWbxdNHCaDZXoGXqvwWPf4+DBTYe6cVFbRGH2Nxv6mGQtrHXI6cloyeoG0XkOASHmOZjWebcSBdeJBdyOL+0ro5CHhDe1v9Q9ihLBiutGe5/ZnyGPBqHP/FFpsFiOmKy8z73npD9FAMt2k7iyHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=U0ebtdre; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aXfibKfM"
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-51dcac8c77fso45261137.0
-        for <dash@vger.kernel.org>; Thu, 28 Aug 2025 14:13:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756415591; x=1757020391; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uYYODMxgHQFhvnAGPQFcG5b6LvOsAj8dowOcxQG1xa0=;
-        b=aXfibKfMnLvngvYdOGK0edxdS7h/YeIdepZXhG4VUeWbb01VMA7w4EMzy62ZT5QDLK
-         rtG63uIx2FwYBGI8KEcTMDDFaIdMskip+gRxjRMxvA2CvQxhCynMoyIg7RqbN+D8wINY
-         Xmajv5RMKuWQWqlqxzLTfCqA44ATRGOwIvq5Yz+Xumb8MOtKfsS23Xai2vnJ+eC461uv
-         L+yu8mZJgSMiLd9AAO7wGxdgT7e6deezTbHkYs8KTsi/eXBB6BXhBpaM505aOch9fJs9
-         6rYBdZDWFUu7jwK0SARapGP8EbZMQXfTDajurLoO9rVxcQ/3ghfS6mzOFR4B88Aj+cJx
-         IyvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756415591; x=1757020391;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uYYODMxgHQFhvnAGPQFcG5b6LvOsAj8dowOcxQG1xa0=;
-        b=XMJkzkm1TtK7QOHqJ4Lx4x30RcUWfqBCk7ns8Arnds/sW2q4EergiKLR+SvlRFmbxI
-         ObWSpkGdaFtswFrjwcoTTtNJFjaBPlbFN43ZF0V6nGmByd9Zinou7CZ02EAZZ3MVYYum
-         44Ij24dXYpe3+stR6D9xAUVyPblbtSQOsO5O5Pv3/AOKMOwjFb52bvoU/XbXrXU/nXvj
-         uMMSUvGzpD2HZFkn+KyY9LSDs1OR9w0mfYcY41Ivm8zIb7uhrAsYRC442kRNv5v6XgEt
-         Drm0jusdAa5HKIGnfY557K/h7TSMOSLE0rxoHIEu0z91ln4GbfGtRb8CR5s1lyOVIXrX
-         M4eg==
-X-Gm-Message-State: AOJu0YzD7DuddBJap4wmzqUGpGblA4Z+OwP1jrqq4TLZDps8NhpZ1n2C
-	vtDDgt5kwgOSAxXMbHDxR279pzcGJNzF8tnVIZtJQmABRyEAEzfELfRETUd9CjKX
-X-Gm-Gg: ASbGncsSlXv8HkKSjQZYQwTF3d0maxPtqhSy73YiFpDz9YGy+9CI4P4JQsnteBp11af
-	oYI5pAxjYAR0BdXhnqqu+mlOiE598WWGcE+f4fdneAkvxb5WT7WQsCu3d7boi2+PQA/tr63sc/8
-	bK7Elki2aP9MQHo6FDa5cnUhh+8f1nieRKRLcKF+5Z/9yEwIgqxMX12Y2p63M+ls/jcIUHNTvMk
-	oV4Th8/avcQa9gloDw72YD5p0sJglntmwt6gKx9k/UNtQV5dLpLyEX2nrNCc6bxirv2428eAKcq
-	olAh4yK4oGUCWsmOMF/gJqt8bo27lMl0gO+I07OIFaPqbaR8phEuyFMM5AxFPcuRhjDcXiwpFNF
-	rNbWu7hOfC/Dz3SFHeBKp2Bq0M2qXo/ZW9Bt/96ZBDla/tNvDD5TkFLv3SHc=
-X-Google-Smtp-Source: AGHT+IEUfPjcUoYlEvPIVAcQhMSQioWsHV8nWsY6xs3r6qUTn/TOwE/JpB7gerqFgG3BVbPoWX2IMA==
-X-Received: by 2002:a05:6102:2909:b0:526:2d5:6c7a with SMTP id ada2fe7eead31-52604347210mr1025604137.5.1756415591587;
-        Thu, 28 Aug 2025 14:13:11 -0700 (PDT)
-Received: from localhost.redhat.com ([170.247.111.81])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-894388ff1dasm262911241.2.2025.08.28.14.13.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Aug 2025 14:13:11 -0700 (PDT)
-From: Eduardo Santos <eduardo.experimental@gmail.com>
-To: dash@vger.kernel.org
-Cc: Eduardo Santos <eduardo.experimental@gmail.com>
-Subject: [PATCH] [DNM] builtin: add source for Bash compat
-Date: Thu, 28 Aug 2025 18:12:20 -0300
-Message-ID: <20250828211219.392014-2-eduardo.experimental@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="U0ebtdre"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=YQ9mXDhi8iYV2JiQV/u1jHoDqYoVNVYuHF78qNOUBNg=; b=U0ebtdreQglU6NLwQjhH4AJaTo
+	EuRBnj9wsazaYYqvpZ3RmwcVFrz1uR8A7aRaY0d5SiyIt3TnonJewcpxbV2mSO/mpcBCGZMkze4ah
+	VTDw5YH00qi0gmvwPvmttpuK99GSxy9/x04LIwn/xyMEubMhyTfQSu1ClFZSSN3CPodRlf2zCszjM
+	9FWu84J8pY+ywUOvDn8UZprjukOoDE7AL9PvZ+0zbON/V/hQAngkRowdxpJfRzkNrSwUGNdrcubrz
+	axBKC948HXqHof63s/zt/RkzgVBiMWDFj2ncZUCbZvv8yhtGurKXXsf4Bxt4XvrIyAAp6BRgHj39J
+	rQKGmmKQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1usdR9-001KhD-0W;
+	Sun, 31 Aug 2025 16:45:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 31 Aug 2025 16:45:15 +0800
+Date: Sun, 31 Aug 2025 16:45:15 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Kuhl, Brian" <brian.kuhl@windriver.com>
+Cc: dash@vger.kernel.org
+Subject: Re: [PATCH] VxWorks Support
+Message-ID: <aLQLm5TAk8Pf0Rc0@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB47535C0C8F14FAF266B04D309967A@DM6PR11MB4753.namprd11.prod.outlook.com>
+X-Newsgroups: apana.lists.os.linux.dash
 
-Do not merge this patch; it is purely informational.
+Kuhl, Brian <brian.kuhl@windriver.com> wrote:
+> Recent versions of VxWorks support fork() and as result can support dash.
+> For example,  to cross compile for IA with this patch applied,  and your VSB environment sourced (aka sysroot)
+>  
+> ./configure --build=x86_64-pc-linux-gnu --host=x86_64-wrs-vxworks --prefix=/usr \
+>    CC=wr-cc CXX=wr-c++ LD=wr-ld AR=wr-ar NM=wr-nm OBJCOPY=wr-objcopy OBJDUMP=wr-objdump RANLIB=wr-ranlib READELF=wr-readelf SIZE=wr-size STRIP= wr-strip \
+>    ac_cv_func_faccessat=no    \
+>    CFLAGS="-DJOBS=0 "
+> 
+> make install DESTDIR=${VSB}/usr/3pp/develop
+> 
+> For other architectures update your <host> appropriately. 
+> 
+> ---
+> configure.ac     | 4 ++--
+> src/bltin/test.c | 2 ++
+> src/jobs.c       | 4 ++++
+> 3 files changed, 8 insertions(+), 2 deletions(-)
 
-I tried using DASH in a container image for GitLab CI/CD [1] but the
-runner expects the source special builtin from Bash to be available.
-This one-liner fixed it for me.
-
-[1] https://docs.gitlab.com/runner/configuration/advanced-configuration/#use-a-posix-compliant-shell
-
-Signed-off-by: Eduardo Santos <eduardo.experimental@gmail.com>
----
- src/builtins.def.in | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/builtins.def.in b/src/builtins.def.in
-index 95e420c..7a7d68a 100644
---- a/src/builtins.def.in
-+++ b/src/builtins.def.in
-@@ -61,7 +61,7 @@ histcmd		-u fc
- breakcmd	-s break -s continue
- cdcmd		-u cd chdir
- commandcmd	-u command
--dotcmd		-s .
-+dotcmd		-s . -s source
- echocmd		echo
- evalcmd		-ns eval
- execcmd		-s exec
+Patch applied.  Thanks.
 -- 
-2.51.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
