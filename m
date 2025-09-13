@@ -1,46 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E77417A306
-	for <dash@vger.kernel.org>; Sat, 13 Sep 2025 13:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17782ED845
+	for <dash@vger.kernel.org>; Sat, 13 Sep 2025 13:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757769534; cv=none; b=cEFtRczQOOVe0XjdUJj+JyTZZBeWQOGMCAzfmrNC+8dusxxxxOQC1B4enbgamJk2BDKkHKI/rE6u1phK0IJFnhfzTKhApkmBSq0MYIJYBmZbsX0QPmOWWW+V410Oj3f6qdYKte7b9EGgF4T4uA1vAzMnBHefud3IZBlI3Qu87/E=
+	t=1757770503; cv=none; b=c5qMpkzuxhl7DsYh0mXH7y+oHRRxroxQCr3YXW4P/T4AWk4sVXesSkp8hYQmz8tIrGp0gd5bDy0N2eCihgr/wjY4mBwHKcsvsH7uYz4YKaJJxI+e8+Au6qtzFfPzMRwCP23omzGpaqW1OrdMXnsqc9it+f92DvYsBLRd3s9NOOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757769534; c=relaxed/simple;
-	bh=o60nS2LnHHV9mCYNjSTe4LO6Wz8v9urP3mtxtmJ7EeU=;
+	s=arc-20240116; t=1757770503; c=relaxed/simple;
+	bh=VlnqpOa9wMi1DwekxLIRbN8krOowOpUOb1vbgMZb2mI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UbT7najDcvEJbO/KQudp5dPwMSmIMa7o47CnMkNAbrDlwOzzAqdJNrFiSYIaks2IsgXx887vnvVW63PXfCRXjZ0+Q5otJgEu5ESiRYkAw1heSjNxamZXJk5XUS1PK2gmxh556h/Z4TDnxLIEujGYIprHbGdm0chbZcv7OZQWQog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=lV9TFysu; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=t9Tj6cbhUJuIdTBw1C+KDXaCgslJ2T+uWLKbNmj4F1BtdliJ/Zd3lctYgtbwMwzMK9XBm70CJOLxHn0+BNjBYE0UlPBd1HQs5Abh6rpFwcL3VJZ2t4c1dlxMOuy37cfScysiuoa2Ld+mQkU1piErmOub4vd3Zwllcy0d7VawyvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=RfK/i5QZ; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="lV9TFysu"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="RfK/i5QZ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=cUwP13PpH8WPzqOnG+z/YG6LQ2CcF29SyMr3qGdh6go=; b=lV9TFysu6PffjY4AJ3uofodm2S
-	O/YN81O+hjNrvRi55umpdHH6JEc/3FX8EpM2T6oy+gBYcz0g2DqeP9dq1lnX2sspLoSzctNIWEzTD
-	yN13cAlFQOsLfXfRQyok34sUuDUF9v4aIPFEkRJx7c2roFxKaOv+wQo0jwifLy/aQoRYXBQPtJx5l
-	V73sLclgmz5NGWucVBb2lVqtUDXquEe9eudNvM3R5A0508kY3eY60hI6PItb9jOSzUCFGUtxut4LX
-	6OqtwgOSeSo6Umk/ajXvJAbDHrQGzt25X5Y+oK95gh7FTKT0sznXpAAqFDEcqTDWiTf5Ku+Eu0X6m
-	oFP3p0ow==;
+	bh=kaDAnGKgIFn7A349ggf0eyWAVNdmb2AXYUImZCnJWD8=; b=RfK/i5QZ9Cqb7Vusy5sdGqngDT
+	ZT+pqcTyLb1mCZCkKu3Y2Xf6zdaMChjZ+7xyOEmzGNvLp2hlZ1oZJN1UyM5RIQ8qMupUakMUYvPTN
+	yr9pKcdegnJEgirr6K9pHvPikidy0TX5yDublzzv0JsOOensDWKd1UieBzrjFpGyK33GCJ4GhgLPg
+	dvQlDKBTQXkghxBi5RRKWIat/ax8c6zB9CJxjk7JvNGQmE4X9CElVq1PUeTjq6tFGx55G3FR5NQrB
+	BQZtdozVidzGxto2jkvArShIAmPbIv3QFWxbSFxGyb//4yeiwGkTnZP3nQLnKcURKtL+wItugHA4x
+	Uk7OCXnw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uxPtx-0057qq-2i;
-	Sat, 13 Sep 2025 21:18:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Sep 2025 21:18:46 +0800
-Date: Sat, 13 Sep 2025 21:18:46 +0800
+	id 1uxQ9b-0057ze-2A;
+	Sat, 13 Sep 2025 21:34:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Sep 2025 21:34:56 +0800
+Date: Sat, 13 Sep 2025 21:34:56 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Nathan Mills <the.true.nathan.mills@gmail.com>
-Cc: DASH Mailing List <dash@vger.kernel.org>,
-	Robert Elz <kre@munnari.oz.au>
-Subject: [PATCH] expand: Check for NUL before parsing range expression in
- pmatch
-Message-ID: <aMVvNj-VbF8J6OTe@gondor.apana.org.au>
+Cc: DASH Mailing List <dash@vger.kernel.org>
+Subject: Re: I found multiple crash bugs in Dash v0.5.12-115-gb4ef25d
+Message-ID: <aMVzAMNge1RWdh38@gondor.apana.org.au>
 References: <CALjJ9ccRuGV9fmydBvwzOua_om7QVoro-nSA-pv+9-nX1KLfGA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
@@ -54,53 +52,72 @@ In-Reply-To: <CALjJ9ccRuGV9fmydBvwzOua_om7QVoro-nSA-pv+9-nX1KLfGA@mail.gmail.com
 
 On Fri, Aug 29, 2025 at 07:40:16PM -0700, Nathan Mills wrote:
 >
-> * Crashes #1 to 5 is a heap-buffer-overflow - finds hyphen instead of
-> closing bracket
+> * Crash #6 is a memcpy-param-overlap caused by not handling literal
+> CTLMBCHAR characters in the input correctly, so then _rmescapes treats
+> them as if they were encoded by Dash. Easily fixed by changing mempcpy
+> to memmove and then increment `q`.and rejecting literal CTLMBCHAR
+> characters. Note: my suggested fix may have problems handling UTF-8,
+> but seems to work fine at least for a couple of Unicode characters I
+> tried (one Korean, one Cyrillic).
 >
-> ** Crash #1 heap-buffer-overflow finds hyphen instead of closing bracket **
+> ** Crash #6 memcpy-param-overlap **
+> 
+> The character \x85 when converted to signed is -123 which equals
+> CTLMBCHAR. This character is in the input file instead of being
+> generated by the parser. `ml` is equal to 36, which is the ASCII value
+> of the dollar sign.
 > 
 > Base64'd:
-> W/ktJ0VFRUVFRUUgAAAARUVFAIAqWxgtLScAgCpbAS0AgAABLQ==
 > 
-> `src/dash -c "[''*-"`
+> djR0IQoKJHN1JCgoKIUkKSgpKSk8ZWUAAACAra0kJCT/JF7/
 > 
-> Fix for crashes #1 to 5:
+> Minimized:
+> 
+> src/dash <(echo -e '$(((\x85$)))<e')
+> 
+> **Fix for #6 **
 > diff --git a/src/expand.c b/src/expand.c
-> index 25df03c..ff86d53 100644
+> index 3edf160..5276776 100644
 > --- a/src/expand.c
 > +++ b/src/expand.c
-> @@ -1986,6 +1986,7 @@ static int pmatch(char *pattern, const char *string)
->                                         p += mbp;
->                                 }
->                                 if (*p == '-' && p[1] != ']') {
-> +                                       if (!p[1]) continue;
->                                         p++;
->                                         if (*p == (char)CTLESC)
->                                                 p++;
+> @@ -2132,7 +2132,8 @@ _rmescapes(char *str, int flag)
+>                                 tail = 0;
+>                         }
+> 
+> -                       q = mempcpy(q, p, ml);
+> +                       memmove(q, p, ml);
+> +                       q += ml;
+>                         p += ml + tail;
+>                         goto setnesc;
+>                 }
+> diff --git a/src/parser.c b/src/parser.c
+> index d3b598b..919b4ba 100644
+> --- a/src/parser.c
+> +++ b/src/parser.c
+> @@ -1033,6 +1033,11 @@ readtoken1(int firstc, char const *syntax, char
+> *eofmark, int striptabs)
+>                                       out);
+>                         fieldsplitting = synstack->syntax == BASESYNTAX &&
+>                                          !synstack->varnest ? 4 : 0;
+> +                       if (c >= CTL_FIRST && c <= CTL_LAST) {
+> +                               char buf[40];
+> +                               fmtstr(buf, sizeof(buf), "Invalid
+> control character \\x%02x in input", (unsigned char)c);
+> +                               synerror(buf);
+> +                       }
+>                         ml = getmbc(c, out, fieldsplitting);
+>                         if (ml == 1) {
+>                                 if (out == stackblock())
 
-Thanks for the report.
+Thanks for the report.  This has already been fixed with
 
-This bug seems to go all the way back to NetBSD.
+commit 98cc11a5dbbc41f71fe68df0766d6ed647e83445 (HEAD -> master)
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Thu Aug 28 17:27:09 2025 +0800
 
----8<---
-Check for NUL before parsing range expression in pmatch.
+    expand: Do not call rmescapes in expari
 
-Reported-by: Nathan Mills <the.true.nathan.mills@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/src/expand.c b/src/expand.c
-index 35481d6..d57373c 100644
---- a/src/expand.c
-+++ b/src/expand.c
-@@ -1982,7 +1982,7 @@ static int pmatch(char *pattern, const char *string)
- 					mbp >>= 8;
- 					p += mbp;
- 				}
--				if (*p == '-' && p[1] != ']') {
-+				if (*p == '-' && p[1] && p[1] != ']') {
- 					p++;
- 					if (*p == (char)CTLESC)
- 						p++;
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
