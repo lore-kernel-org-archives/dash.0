@@ -1,45 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F59191484
-	for <dash@vger.kernel.org>; Sat, 13 Sep 2025 09:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E77417A306
+	for <dash@vger.kernel.org>; Sat, 13 Sep 2025 13:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757757576; cv=none; b=r2qaSEOOlbLSjjOxhnpZby6y52wK2jmEnINSyeSr9YKBOLn/pY+2/6Db4tzkGWLeeZ2Roh9Ukws7EM8yhN1VQ501JUEnb7d27pPmgxhrWCiG4BAF40rvaB0fn0cZN8NA83Gngz7ysnD/sJRXTxCYk8emGhOETPuFaoKwZ+bVzQ0=
+	t=1757769534; cv=none; b=cEFtRczQOOVe0XjdUJj+JyTZZBeWQOGMCAzfmrNC+8dusxxxxOQC1B4enbgamJk2BDKkHKI/rE6u1phK0IJFnhfzTKhApkmBSq0MYIJYBmZbsX0QPmOWWW+V410Oj3f6qdYKte7b9EGgF4T4uA1vAzMnBHefud3IZBlI3Qu87/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757757576; c=relaxed/simple;
-	bh=Zqw/txKURrX++hmI68XWsMUjEsuaYvP7jaFX6qKW7So=;
+	s=arc-20240116; t=1757769534; c=relaxed/simple;
+	bh=o60nS2LnHHV9mCYNjSTe4LO6Wz8v9urP3mtxtmJ7EeU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K4sC+auWL8EydPKMZZrPH7iqCsl9Gxf7ShalxqzzGMQwDNj2nX0k1e/t2cBU+5jKOuvY5fYJqaZcq6l6G5jv6MIZGcCcpsEqtBkgp+Zj0YOSQ5m1c0glIBHydO5NF2JZPLIDaYJMjIYFvPSt0ZcuN/h4mqsmd3Ol2kLJgpSwg/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=H8zlCNrI; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=UbT7najDcvEJbO/KQudp5dPwMSmIMa7o47CnMkNAbrDlwOzzAqdJNrFiSYIaks2IsgXx887vnvVW63PXfCRXjZ0+Q5otJgEu5ESiRYkAw1heSjNxamZXJk5XUS1PK2gmxh556h/Z4TDnxLIEujGYIprHbGdm0chbZcv7OZQWQog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=lV9TFysu; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="H8zlCNrI"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="lV9TFysu"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=F43RuTMAqlQPy5WN2q7Dgn5I7hYdgUlTiWlSnxYvgqc=; b=H8zlCNrIKBcADAKSYeutVi3c8P
-	pZrkEGGtTzGc9M7jjbj287VNpSrz8mtWCojZ9DNBtEOVbxMhGPAGlNTbBXMEUgbbN0DBzdKNJxU8P
-	QghJjTuw2AejSTb1UHwNpeBYHfNus32c9k6A+VrPt5qW/rjJHNBqF9qo5Zsk9oWPEREbRyfe9Yyuw
-	BGkHmTUBnkS+KEj3VJxp7PkQcqTCshhaItxHruyRZu8+DMUMh2DKh0q9N1DzW47fNzftdt5AZXfFy
-	BTnVB8Md1mfLv1XYG74nF3dLhP7G9SY41yiCj4Cy0exAVC8l62WdLtQ//WxgJIM+WMjZHf4Tfcxl0
-	+Ezk7bJw==;
+	bh=cUwP13PpH8WPzqOnG+z/YG6LQ2CcF29SyMr3qGdh6go=; b=lV9TFysu6PffjY4AJ3uofodm2S
+	O/YN81O+hjNrvRi55umpdHH6JEc/3FX8EpM2T6oy+gBYcz0g2DqeP9dq1lnX2sspLoSzctNIWEzTD
+	yN13cAlFQOsLfXfRQyok34sUuDUF9v4aIPFEkRJx7c2roFxKaOv+wQo0jwifLy/aQoRYXBQPtJx5l
+	V73sLclgmz5NGWucVBb2lVqtUDXquEe9eudNvM3R5A0508kY3eY60hI6PItb9jOSzUCFGUtxut4LX
+	6OqtwgOSeSo6Umk/ajXvJAbDHrQGzt25X5Y+oK95gh7FTKT0sznXpAAqFDEcqTDWiTf5Ku+Eu0X6m
+	oFP3p0ow==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uxMn6-0056Ed-1o;
-	Sat, 13 Sep 2025 17:59:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Sep 2025 17:59:28 +0800
-Date: Sat, 13 Sep 2025 17:59:28 +0800
+	id 1uxPtx-0057qq-2i;
+	Sat, 13 Sep 2025 21:18:47 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Sep 2025 21:18:46 +0800
+Date: Sat, 13 Sep 2025 21:18:46 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Nathan Mills <the.true.nathan.mills@gmail.com>
-Cc: DASH Mailing List <dash@vger.kernel.org>
-Subject: [PATCH] parser: Skip parsing of old-style command substitution
- here-doc marker
-Message-ID: <aMVAgFADRgG33XlG@gondor.apana.org.au>
+Cc: DASH Mailing List <dash@vger.kernel.org>,
+	Robert Elz <kre@munnari.oz.au>
+Subject: [PATCH] expand: Check for NUL before parsing range expression in
+ pmatch
+Message-ID: <aMVvNj-VbF8J6OTe@gondor.apana.org.au>
 References: <CALjJ9ccRuGV9fmydBvwzOua_om7QVoro-nSA-pv+9-nX1KLfGA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
@@ -53,116 +54,53 @@ In-Reply-To: <CALjJ9ccRuGV9fmydBvwzOua_om7QVoro-nSA-pv+9-nX1KLfGA@mail.gmail.com
 
 On Fri, Aug 29, 2025 at 07:40:16PM -0700, Nathan Mills wrote:
 >
-> * Crash #0 is a null-pointer-dereference. I haven't found the fix yet
-> but it is probably simple.
+> * Crashes #1 to 5 is a heap-buffer-overflow - finds hyphen instead of
+> closing bracket
+>
+> ** Crash #1 heap-buffer-overflow finds hyphen instead of closing bracket **
 > 
-> redir->nhere.doc is NULL. The global variable **heredoclist** is also
-> NULL and parseheredoc does nothing when heredoclist is NULL.
+> Base64'd:
+> W/ktJ0VFRUVFRUUgAAAARUVFAIAqWxgtLScAgCpbAS0AgAABLQ==
 > 
-> 1. readtoken1
-> 2. parseheredoc (heredoclist equals heredoc which is the same as the
-> value in the next step)
-> 3. parseheredoc (heredoclist is NULL, heredoc is 0x5555560bb6a8 <stackbase+232>)
-> 4. parsefname
-> 5. parseheredoc (heredoclist->here->nhere.doc->narg.text equals the
-> empty string)
-> 6. **SIGSEGV** openhere (redir->nhere.doc is **NULL**)
+> `src/dash -c "[''*-"`
 > 
-> ** Crash #0: null pointer dereference **
-> 
-> Base64'd
-> 
-> dmVzjHdyPDwAAACAYAAAAHd3cjw8AAAAgGAAAACA/38zZGlsaQ==
-> 
-> Minimized:
-> 
-> src/dash -c $(echo -c "<<\`<<\0\`")
+> Fix for crashes #1 to 5:
+> diff --git a/src/expand.c b/src/expand.c
+> index 25df03c..ff86d53 100644
+> --- a/src/expand.c
+> +++ b/src/expand.c
+> @@ -1986,6 +1986,7 @@ static int pmatch(char *pattern, const char *string)
+>                                         p += mbp;
+>                                 }
+>                                 if (*p == '-' && p[1] != ']') {
+> +                                       if (!p[1]) continue;
+>                                         p++;
+>                                         if (*p == (char)CTLESC)
+>                                                 p++;
 
-This is caused by the unnecessary recursive parsing of old-style
-command substitution which then gets confused by the embedded
-here-document.
+Thanks for the report.
 
-Fix this by skipping the recursive parsing of command substitution
-if it is old-style and a here-document marker.
+This bug seems to go all the way back to NetBSD.
+
+---8<---
+Check for NUL before parsing range expression in pmatch.
 
 Reported-by: Nathan Mills <the.true.nathan.mills@gmail.com>
-Fixes: 7a11b3e330a3 ("parser: Extend coverage of CHKEOFMARK")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/src/parser.c b/src/parser.c
-index a3b004b..975cf89 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -1510,7 +1510,6 @@ parsebackq: {
- 	int uninitialized_var(saveprompt);
- 	struct heredoc *saveheredoclist;
- 	struct nodelist **nlpp;
--	size_t psavelen;
- 	size_t savelen;
- 	union node *n;
- 	unsigned ml;
-@@ -1521,24 +1520,28 @@ parsebackq: {
- 		STADJUST(oldstyle - 1, out);
- 		out[-1] = CTLBACKQ;
- 	}
--	str = stackblock();
--	savelen = out - (char *)stackblock();
--	grabstackblock(savelen);
-+	if (!chkeofmark || !oldstyle) {
-+		str = stackblock();
-+		savelen = out - (char *)stackblock();
-+		grabstackblock(savelen);
-+		STARTSTACKSTR(out);
-+	}
-         if (oldstyle) {
-                 /* We must read until the closing backquote, giving special
-                    treatment to some slashes, and then push the string and
-                    reread it as input, interpreting it normally.  */
--                char *pout;
-+		bool done = false;
-+		char *pout = out;
-                 int pc;
- 
--                STARTSTACKSTR(pout);
--		for (;;) {
-+		while (!done) {
- 			if (needprompt) {
- 				setprompt(2);
- 			}
- 			switch (pc = pgetc_eatbnl()) {
- 			case '`':
--				goto done;
-+				done = true;
-+				break;
- 
- 			case '\\':
-                                 pc = pgetc();
-@@ -1564,9 +1567,11 @@ parsebackq: {
- 			}
- 			STPUTC(pc, pout);
-                 }
--done:
--                STPUTC('\0', pout);
--                psavelen = pout - (char *)stackblock();
-+		if (chkeofmark) {
-+			out = pout;
-+			goto parsebackq_oldreturn;
-+		}
-+		pout[-1] = 0;
- 		pstr = grabstackstr(pout);
- 		setinputstring(pstr);
-         }
-@@ -1608,10 +1613,6 @@ done:
- 		 * parsing.
- 		 */
- 		tokpushback = 0;
--		if (chkeofmark) {
--			pstr[psavelen - 1] = '`';
--			out = stnputs(pstr, psavelen, out);
--		}
- 		goto parsebackq_oldreturn;
- 	} else {
- 		if (chkeofmark) {
+diff --git a/src/expand.c b/src/expand.c
+index 35481d6..d57373c 100644
+--- a/src/expand.c
++++ b/src/expand.c
+@@ -1982,7 +1982,7 @@ static int pmatch(char *pattern, const char *string)
+ 					mbp >>= 8;
+ 					p += mbp;
+ 				}
+-				if (*p == '-' && p[1] != ']') {
++				if (*p == '-' && p[1] && p[1] != ']') {
+ 					p++;
+ 					if (*p == (char)CTLESC)
+ 						p++;
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
