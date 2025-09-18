@@ -1,87 +1,86 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E841A83F7
-	for <dash@vger.kernel.org>; Sun, 14 Sep 2025 22:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9367A17E4
+	for <dash@vger.kernel.org>; Thu, 18 Sep 2025 00:34:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757888548; cv=none; b=nzUSIu5ySPk0nptrCDg8ju+8Xxr1OpnZx/4yOEhZiqZJVYxOLvmwNWAY7vUf+wT1b6/t1+eI9uqW3+jPlNNA1/rvmnGOkT+MWFY1qF4dZIXkAcSq++wN1ET7PK3TZvZ1zg59t1iUFSHn//ViC+w8wTv7dfQ9elOJSVm2uWVpEqQ=
+	t=1758155691; cv=none; b=Z1iOd19AwEqivnj4XXUgFUY2RpDUWgCjT97/fsKwWxTbQEEmgcBNAHe+j1mT4twZ5qyVxeAHryWf/LO3fcqDu+17KnCQWwVWL1b4JD/Zwquk0qUg+ZXm4X8bLccnbTeDbMNMfV8Sxv0hGyUXKNznoeGSHa3XRXCGlQK+AnpIPpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757888548; c=relaxed/simple;
-	bh=mPzgk10XRAlZF8aTkFZ0UTmtVMpnlCTaufghE8sXK2A=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TQHct0y4i31AYec3k727Tfdp2GE8vWLuR1k990xwW4+MV172A8Y/ANZ0TcGEAi87VALFKdKJ2NMQVGzWGDvTlSGzrnjf0A3gz0OL45Oz4NZC3PxKFfL1f6YtHQFKEO8rbaf4YEDe+CvyL6TBC63gRwxHefiQGuPmv45tqPVEGXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mTJ1fZcX; arc=none smtp.client-ip=209.85.222.174
+	s=arc-20240116; t=1758155691; c=relaxed/simple;
+	bh=9Az2fdLyOG8L5K8vmsPUWVchA2yDg1mshbP/ym7KR4k=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=N4O5tK6IMwoDLcknIWIloo+uCZGiunrpA/4ixpYJ2Hb+5dp+/Oeq9t0fzp+Wd53ztI6xKElBpni2tb7eEOcAWf6XcGX9JDMZvXO+MVX/c1Fwmi/zVuext79Q5eeUn6+gJ31sLygUcB/uDfue8HVl7NhiCoqYJeRrQJNjao3HlO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=adzjTjFz; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mTJ1fZcX"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-80e2c52703bso315388685a.1
-        for <dash@vger.kernel.org>; Sun, 14 Sep 2025 15:22:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="adzjTjFz"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b04ba3de760so49323366b.0
+        for <dash@vger.kernel.org>; Wed, 17 Sep 2025 17:34:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757888546; x=1758493346; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rfc8Is/oW5RXhfjN9sAPJLK7rpITYXt+qi74O5CKLps=;
-        b=mTJ1fZcXc7s4dhKSSanDGQ+Mfw0+j/CMiokPDNs5yYYMzHE7Dr+H3AF+RMuPETaGtx
-         gJesnWJPJv65OAAxxzgOK8wMMeC3rW0FSsgwE/Awjgy6ruNk2hGPMGgI5CirbqYOkmGx
-         745b/tHKNSR8SQsfHv2dzaoZ5WWw8gd0qJjPgHoFw3PXVcUCoq8WzaUD0rmd4h+AgFZQ
-         6R+JLGiV37una4Hd35SWcpw3PG4r/iRcQ80cfQLLIRneAymBDZ2KZ1GVAxFahhIFmB9v
-         olKlK4Xi4n1AqKh3pyyGGzGxDS7br0QkELfWrJohiYLBCZPfcUL2U7Ygrsz+nNpamR1j
-         B6HA==
+        d=gmail.com; s=20230601; t=1758155687; x=1758760487; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Az2fdLyOG8L5K8vmsPUWVchA2yDg1mshbP/ym7KR4k=;
+        b=adzjTjFzKNuLYnH/X52xUq9shol+/f8zC8Usy4CNqb5uPQjn2qPvhKe10CtHXx0ggC
+         ealqAj5AUUqznzXBJzqmdWroyGoy+wHKcTUioG6I6I0MA5kZGEP/rbAqrlJQkdnDWAmy
+         XI85a35xJaYgc2hxh7BOE1+2fIl7S6ASsTPBZMgqR9TaDvq69EivcK1qiFBWMQNZVsA2
+         74sIuZ5LQMBkq6bCr9GjGd+PgYVx7qJHcphbRJhCzl+lCwC/8VoZl6RJSHs3zU8R6ghn
+         W11svUCwAG60b/M5S2BMqlb2cZAKM6Qm4C2MPgxN2GPC+P7NapCrExk6yjp1TP2OjaUE
+         ForA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757888546; x=1758493346;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rfc8Is/oW5RXhfjN9sAPJLK7rpITYXt+qi74O5CKLps=;
-        b=XF2tjlxKmaB9qhw5nVSl5OGppvpv3Qs1WZoQaEDISj3RonZHz5DS7RCjONuYnmgtgT
-         H//f3wOSp6EoCJJg4mIANDtgun7G6wjFFfEnF2hpMWZ8giSyXG4jNH0PLARuODAeudPy
-         4emnWu+G26WDhviKGgS5PqbAjfPVGXxsr+I++hpVKatWlHWOrVhH3hDuXME6PHtmfEbP
-         wppgAku45A872dEHDLSPxYTWzqua+lUvUuZRAC9wofBuuz1yflFeD0Erpm8wq+BwpsLo
-         pvx7iKr2Opxuorm2LTdqcVoVtJIE2h0s/EwhELs+eTV4U/IwgaFOOF9n3pvN3FYG8PFb
-         q+6Q==
-X-Gm-Message-State: AOJu0YzxLMa5ZxTtsmKFe7p+Q1g1U6R4J65+cR5v/HsT/iF520gAZsht
-	7mQ+tAC8j3r7FaLK7FBHUNslxgtx/6leQEV6zRUamXHBkvyc068EludCY/ERGw==
-X-Gm-Gg: ASbGncvUDfItOmL7Pa4JbU/XEobCRV3lwcOBpFNknFcZhhcFZSm1TVqoLIm9ozjKvMe
-	dKBbs96ElKiysnX4MZREtZrr2rAMVqbkB9+FBSck4IthT6rtpGfp6QbXZpbQ60vAMfSZMeCL0WJ
-	4oxJH7zABUgbe+vXQaXvCQx33kKTmpHpJ1BHVh81/c2yxMQgaB7X47BOoGXCyEd0U/x7mZTwG0B
-	LlqOiVfEAkfv+2I9lc+ATRmpC5svsCrCZuoY4MXVA7LLxJ8k7rkwsGQKDwFbGNI0cfbc9bg1t7B
-	GdUMTvVpIv61+1J2o2pPta6eclKHhv6xe/1txOGykoKOz9W+adEBDAgXRW6teyO4xJLcYHqaHUw
-	5Jwc2tZCr3V1R/v4gGuazubAPAkdO9OGkYVhhtbna0wEWX2cb8H2SowGsAi9YUw==
-X-Google-Smtp-Source: AGHT+IFY62IJhjjzyRvy9nlPCyH5P9hYEtxSIlQw6hsOo6tRy7EQr5NA3Bqhk3p7j57cHNjlkw+MVA==
-X-Received: by 2002:a05:620a:3955:b0:805:feb3:debf with SMTP id af79cd13be357-823fed2e83emr1443661485a.27.1757888545848;
-        Sun, 14 Sep 2025 15:22:25 -0700 (PDT)
-Received: from HQ ([2607:fea8:e920:1ca::b])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-828f8db3d60sm153048785a.40.2025.09.14.15.22.24
+        d=1e100.net; s=20230601; t=1758155687; x=1758760487;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Az2fdLyOG8L5K8vmsPUWVchA2yDg1mshbP/ym7KR4k=;
+        b=Ljxyon636UEbqyx3P3oUQHXPfUyCfCeqhxx8fXkTXmPlsqpTvZJ+G4rHXwYvrp83L8
+         7RZlG82cCOFnc9Npf1WdoMvJam2EJCiZommasgoyLEsAnFk8C9pCg2JF185ZX0/dN4Z2
+         rCMR7ODCYjwXKHU6gcePRa2i1ucVxZFVExN8B8pnbdzDL3LvJU7Tp/5bZp1doLBGi61m
+         1GDl04WQYmwq3/YVqhVdOULywP0AYVHAw94Fo0tj0wYG+ahnQk38fL3OApS5023PvKHo
+         +pz2Yolw+19lzo/knfOAjQA0W9rKmGHEWNjmfUdmXNqly263bu0R1zI0oQW71hbc0XC0
+         thPA==
+X-Gm-Message-State: AOJu0YwYRJgBYL7UtHrYDifKDrxpvreGe5bnqDEvdU9n5joxGZapHS9m
+	XOw/UW8gDg3MXvdp/DBW28a8og+nO7HBI/jZdVoXc96TLYn++Tda2iWK9rM4C4Gv
+X-Gm-Gg: ASbGncuCtCm/orBf1Xs9ve8GQIL6ycmrf7bes3UqkD6WjK384obgK8pA3PZlJyRnpFJ
+	Y77EsG4SywjSxODNut9asVKloGbvhDeUukZ7gxciVajwyGszR100h3DvCer0xBSYL5lZenQJBeY
+	J5vIJx5ggm9uex0ziZAqkDqst5CWl15jmrvP9dobby93fiCLIsDs/43K2yGCWzpqPImJhHS9YhQ
+	YYzMT5ZGbo6vmlUu2hLIoVN3zK+18uT2kkdXH+E7fBKY+3SbOFVWyKSrR2KFVh6YbYmwPwgQYJ9
+	eN/qRPwn1iBpgqvbkcEeDk0qRIunUt0YCM/gUbUPn1SA4CPU1L+NL8UeexH0IJNeYg+xwHAk/uD
+	s0K3HPuOzNJTe01i4HaEKXr4twuTBSZi5vthYraXuRuKDV6DP0c36N3VRK5eSaf9qmg035hMC9/
+	N0Mn7w5JkJofQ=
+X-Google-Smtp-Source: AGHT+IFmnt3xV0KkxkUPEVpBlXD2HGM1l7zDqbOq/wKM87hYoSHQLdr1nUpmykaeUvcBMNhLv6etlg==
+X-Received: by 2002:a17:907:6091:b0:b04:5a74:b675 with SMTP id a640c23a62f3a-b1bb086da65mr433088666b.9.1758155687426;
+        Wed, 17 Sep 2025 17:34:47 -0700 (PDT)
+Received: from Al-T400 ([169.224.9.244])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b1fc5f44fb5sm73895266b.16.2025.09.17.17.34.46
         for <dash@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Sep 2025 15:22:25 -0700 (PDT)
-Date: Sun, 14 Sep 2025 19:22:00 -0300
-From: Sebastien Peterson-Boudreau <sebastien.peterson.boudreau@gmail.com>
+        Wed, 17 Sep 2025 17:34:47 -0700 (PDT)
+From: Abdullah <3bd3bdr@gmail.com>
 To: dash@vger.kernel.org
-Subject: Re: [PATCH] [DNM] builtin: add source for Bash compat
-Message-ID: <aMdACGW-YOTYzZXj@HQ>
-Mail-Followup-To: dash@vger.kernel.org
-References: <20250828211219.392014-2-eduardo.experimental@gmail.com>
+Subject: Incorrect detection of EOF with interactive editline
+Date: Thu, 18 Sep 2025 03:33:57 +0300
+Message-ID: <20250918003435.11162-1-3bd3bdr@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250828211219.392014-2-eduardo.experimental@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-FWIW, this can also be done with a function inside the shell itself :)
+When an interactive shell (with editline) has a trap signal set
+(e.g., [1]) and the signal is caught AND there's nothing on the input
+line, the shell (or at least editline), after executing the trap
+handler, treats the empty line as EOF.
 
-	source () {
-		. "$@"
-	}
+Try [1] with interactive editline, have a clean line input line,
+and change the size of your term, then your shell would die.
 
-...hopefully I used the correct special parameter and quotes, but in
-most cases you can probably just use $1 and be fine. 
--- 
-S.
+Also, we should call el_resize on WINCH, because we have not set
+the EL_SIGNAL option (and we shouldn't set EL_SIGNAL, that would mixup
+with trap handlers).
+
+
+[1] $ trap 'echo "WINDOW CHANGED! New size:"; stty size' WINCH
