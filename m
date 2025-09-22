@@ -1,104 +1,98 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38CA1FDA89
-	for <dash@vger.kernel.org>; Mon, 22 Sep 2025 19:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4D6C2E0
+	for <dash@vger.kernel.org>; Mon, 22 Sep 2025 20:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758569699; cv=none; b=AHKtSxcP44etu+3FEoDstzL1RJJYDRrdx2Hdb/O08k2uOXPXM05zhCd8GR5s2DW0BBzaBReWYl3ZoK5xTsZhJ8RqngpTfedoWojV3kKhqBelpVdGpsmTJRyfVI3DnZnAf53Vkl1/6sItjZFiGWQ9IDA55s9/XkoULIOXiplAGcA=
+	t=1758573996; cv=none; b=hSjlnxnuWlo7VrTMztJd6caBVW8tvr8dFXmz2wtqMUkF+07KkW04+h9Upk5P8nI5w9PCJmqf7R2YBkQI8cWgxp/gjjKT/Amtb3ooOD7+8qybu4YRZRNNv6+s+6cCDc8eml2GRPdTWIIlkgTBWL9VPyJ7KJlA67nQfD8f45eZoRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758569699; c=relaxed/simple;
-	bh=PJVH+JgUOC8Bs9GUDh65Giee2Q3XJfbe8iJ4amlNnFE=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=a4uosKfyZfY1M6GTS1aRQzSOodSjeN4lfUtqH+42HyyFGnFlFtlM/BJOQwRGirp3DJFtrns1VWGXefMYaL1h6wQWLKDW5fb5plM5Jt6lYud6I6phh0jyrMyBk6u7EL44+mcbCIL0Vboe3gIVHqRy6biXM6KTAyR9Tz5fKcepGEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=reillybrogan.com; spf=none smtp.mailfrom=reillybrogan.com; dkim=pass (1024-bit key) header.d=reillybrogan.com header.i=@reillybrogan.com header.b=B/ONC0hF; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=reillybrogan.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=reillybrogan.com
+	s=arc-20240116; t=1758573996; c=relaxed/simple;
+	bh=QOajEJ6rO9ah3ZHImHKwRO2s/a3riVoZ/wbRSmDj460=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XWP1v3AjNm9N6fEICvRZEJ6pqx1/tYYf1u+K8+FmQBbH/Yx1g73itH6o+QC/9e+G82YzeuhLXvLbGKMwKl0Jgjwf6kaJrOg+dGcE/fjmDJfW9s1FQHXEIVPapmaacwwwcq75ojmiiHAuWnik65z1bH4bft9f6CBfku3gK0W7IqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JHlotjxa; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=reillybrogan.com header.i=@reillybrogan.com header.b="B/ONC0hF"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-77dd76f6964so56481466d6.1
-        for <dash@vger.kernel.org>; Mon, 22 Sep 2025 12:34:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHlotjxa"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-631845b51e2so2901165a12.3
+        for <dash@vger.kernel.org>; Mon, 22 Sep 2025 13:46:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=reillybrogan.com; s=google; t=1758569696; x=1759174496; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1758573989; x=1759178789; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=THcYjrUu6Tn11eVkd4EdOUJQwf89Yh3x5dIOhGBlHUk=;
-        b=B/ONC0hFizfh2EVOOFb4AXrF3pl72CpQeScC97vk7XB+Rt5L2UyHJLBzYMiTF6Hsqg
-         idT+5+mANRfx5dcBFsDWThZi6bZvek9ZFhHXQehhwS2cNjOCjHh71TnZabXXe2qz/uHN
-         I0gPCdHMDlgMDIxJOVh/QklkA6zaoNtZ374HA=
+        bh=0s3V62U3R8Wew1tGjc1uMP3R0Cg6jX3BNBw4sul1fas=;
+        b=JHlotjxam/YPE1+8v45g8C5Mcq+waBTtlAJHDD83i9v2oYwFTbMRiSkl6HVSreZT8n
+         CiaHEiOqmKHw6p+AcLqClXt7MNm7+RpyDI6hy5LJm2zSjRFcL9t3N9IKz7QdqWrBlMNR
+         JXRfKcnj8HUvVI7blDyfjkG0BRkOSLWBy+ZbYjXU6OjGgOg+L5f+8kEepmSKPPQMbJmn
+         BbgwqSfTOeHHqPWbtDqs5o4z3zRo4stByCTx8TO9qWj6eg94YqGQ9I4oSGMCvXP498KS
+         zLMdejofASVsnTFgy9pbSV4WLHeSbLPTSnSIgzUDbNHKi2mhti2MnS7svljwmKnLoncu
+         3E5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758569696; x=1759174496;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=THcYjrUu6Tn11eVkd4EdOUJQwf89Yh3x5dIOhGBlHUk=;
-        b=WYgjXxXUsPKQsBAU7aigxN9kzzfg0DeLY4HEQT2JGjFVrV9TunPUwncwVdHOb6+4qF
-         GKT+4nFTb4pEU1g+HHI88Xg1xGspbToliol+N28uh0sGAqanp2qJg5jpzXVnXvVaW395
-         gLRUirynDRpAOVyEAR3Rw0eozlyvD8NtT3nvEB3GzlxVpsQGQRRHf84etAK9T5RiSaFI
-         wXg/EdkSYq7t0QBcWKYW2bOPnA4s/VZ/HE+OS7uMNWn5YH++XyLqg5hueHuem85H7QTc
-         b3WJfgSNJJZ6cOr35xQ2k8Ut75+QuedNXLKIIy0MgpG0vpukFd8DPl34ojDb/S43aKKU
-         0dRQ==
-X-Gm-Message-State: AOJu0Yy7+oX6guvQppjPPqwaY56NH9ECihLzoZNErPnG5yq5GAGjnlSX
-	Zeh6l9uY4nqxU8/Ml+pIP7B7bVXmHdAszY7aFxG1o4A9gNuayRKrqk7bZzw8frcM0XzcsicxVju
-	hCYGLdD0=
-X-Gm-Gg: ASbGncs08ftQlpdMgewX4NP9deYlRQ3QjMam/WXJcE1yAbIAB3QnGhrRbZcgpyLM9T2
-	p0rHiWmkgNhAGz6VqGWWZ+hOTG1JA6KrRoFZ3pVIiSIhYIzXC8CZz6fq9gpDNII8+f649o+zZjT
-	DdtNWWIx0P4SDch0+1y1101kP72B6vjWQmJfbE9ZDellpl8a2z73wsgf679uzuSkxYi8hZEOfCZ
-	bc8AeXUqEsc8jbWD46sszuZJS9FI2gC1MaJbG8ERYoCZCTMv2sGCr7zaAhotPJCYbaFVixiHfNc
-	uH1ELpPDW7npANj09MDEd00h4KxGRR9TxoSel9v+QwslbMVZLGmJxoPLamCf0FxIIETalRU4SNX
-	g4ehdlde7lDcIq81dvu4TeGIV0zMrT9P3oG0NMwAgvydLQoHw3l1NdbIJs7Ldl55RtsWuAiWEKF
-	6fTdQ=
-X-Google-Smtp-Source: AGHT+IHQyW76ifaDMST0DMVZKQxfUDcVzzBW/gT6mVArT6uCPqnd0Msz6dtINgS20LiQGYSpMTlOBw==
-X-Received: by 2002:a05:6214:2525:b0:78c:f62c:8eb1 with SMTP id 6a1803df08f44-7927a40b4d6mr179770826d6.26.1758569696534;
-        Mon, 22 Sep 2025 12:34:56 -0700 (PDT)
-Received: from [192.168.1.241] (24-152-154-74.fttp.usinternet.com. [24.152.154.74])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-79344899b25sm79068246d6.7.2025.09.22.12.34.56
-        for <dash@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Sep 2025 12:34:56 -0700 (PDT)
-Message-ID: <105f1d0e-f7c4-431b-b95d-efad442aaa34@reillybrogan.com>
-Date: Mon, 22 Sep 2025 14:34:55 -0500
+        d=1e100.net; s=20230601; t=1758573989; x=1759178789;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0s3V62U3R8Wew1tGjc1uMP3R0Cg6jX3BNBw4sul1fas=;
+        b=pSLsMU/xW7Lepu1bn40gj63wkJZf3qqYZrPf4+blUp4w5kx2g1u/dTX+WBySWtzywh
+         nNOl1gdWr0pKbuqkjYaoKO3ziUqgLBWEUcTFe13c7YLkoQteYD9Tl2CxpH9qwm9awvfh
+         kewtlrtbL/F4bNXCCUicLt6zWjaC7KeeKEJV2aftx6wIqdEeMkuFTWio2J4PMG0dffzt
+         IzuUMAkOd60xVNX/+/ZyQ/r/qzbbRC5ky7Le5MZW1FEWRlUrvPdWWBa1eGBFc7QchFUy
+         VrgjA8gaDBQQ5ysnZabT1AuxstlzgEhGIc3nmbc82IP6VGdAfSqs7d483HwKVmH2LSWC
+         HxWA==
+X-Gm-Message-State: AOJu0YyCGoqEZYGmIkMU7R+lcQh5TMNtNR6bjt7gLi7VeprIVmlQiHmM
+	Z5Xw2uM3d9lg/WKoF42Fop1nwHv1rKfYqXxD1xZ3rPa3xYvbbG257mP9
+X-Gm-Gg: ASbGnctSNEhoe0Nfkzp6fV7n8pd2KHkDJnBfdoVn/4vXiVhEkBvb7MS+m2sLCziuuqn
+	M1scceUDaNwHnM1BZQS29teHesdDDHY8rpqDq86lg5mSNPOHtJeGdxhDf+H1AlBoP9QGPOPR8eM
+	LZ6MzPefl0geWg5e4y0zKbk0R/JpPV+Kg5q2a7+lIJE/MCsI3JNml2SH6C4dAMVMCQJmgYF2b9M
+	JR3lUk31INcAbuEObuM+5Cw0RME86pL0t6rvi7vO1gh6GKeYcLcpnXyzX71aHPcb7i8dDes41Ig
+	p/NSApYgBCJtByqKZLAKfrwfQ2Vr8c6S+AGQK91DNTktJY9j8iND0tM75XdQGpuycLXjONYr2a1
+	LkzgFwojS2RJBb4UK3uSJ6gro/GyuOClzpOSQNWjzezn/d468g57L1KiP+H9571PI0AvO
+X-Google-Smtp-Source: AGHT+IEvWm7/46j4IyqEDFgUfmIYMa9XGvJ+/8paIZKDETjwA96LaD3WGvXANU30WdgvgDds8SEefg==
+X-Received: by 2002:a17:907:96ac:b0:b2e:e87e:ef2e with SMTP id a640c23a62f3a-b2ee87ef779mr193382766b.39.1758573988589;
+        Mon, 22 Sep 2025 13:46:28 -0700 (PDT)
+Received: from Al-T400 ([169.224.9.244])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b1fcfe88badsm1141888466b.52.2025.09.22.13.46.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 13:46:28 -0700 (PDT)
+From: Abdullah <3bd3bdr@gmail.com>
+To: reilly@reillybrogan.com
+Cc: dash@vger.kernel.org
+Subject: Re: bug: 0.5.13 regression in parsing
+Date: Mon, 22 Sep 2025 23:40:02 +0300
+Message-ID: <20250922204617.3648-1-3bd3bdr@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <105f1d0e-f7c4-431b-b95d-efad442aaa34@reillybrogan.com>
+References: <105f1d0e-f7c4-431b-b95d-efad442aaa34@reillybrogan.com>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: dash@vger.kernel.org
-From: Reilly Brogan <reilly@reillybrogan.com>
-Subject: bug: 0.5.13 regression in parsing
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-I upgraded the dash package on aerynos to v0.5.13 and started seeing 
-some build failures in packages that previously built just fine.
+Same error also happened to me with dash 0.5.12.
 
-Build error:
-```
-+ make -j 32
-   GEN      src/extensions.c
-   CC       src/libxcb_errors_la-xcb_errors.lo
-./libtool: 369: Syntax error: "}" unexpected
-```
+But I assume the bug is not from dash but from libtool.
 
-And the relevant line in the libtool script:
-```
-archive_expsym_cmds="echo "{ global:" > $output_objdir/$libname.ver~
-             cat $export_symbols | $SED -e "s/\(.*\)/\1;/" >> 
-$output_objdir/$libname.ver~
-             echo "local: *; };" >> $output_objdir/$libname.ver~
-             $CC -shared $pic_flag $libobjs $deplibs $compiler_flags 
-$wl-soname $wl$soname $wl-version-script $wl$output_objdir/$libname.ver 
--o $lib"
-```
-(I've uploaded the full libtool script at 
-https://gist.githubusercontent.com/ReillyBrogan/9a4e6a02e5871fdbeb793a549131e197/raw/5a00be91f0cf38df7706eabc4c0eadcac74e84dd/gistfile1.txt)
+> archive_expsym_cmds="echo "{ global:" > $output_objdir/$libname.ver~
+>              cat $export_symbols | $SED -e "s/\(.*\)/\1;/" >>
+> $output_objdir/$libname.ver~
+>              echo "local: *; };" >> $output_objdir/$libname.ver~
+>              $CC -shared $pic_flag $libobjs $deplibs $compiler_flags
+> $wl-soname $wl$soname $wl-version-script $wl$output_objdir/$libname.ver
+> -o $lib"
 
-Bisecting between 0.5.12 and 0.5.13 reveals that 
-e878137f63e61926bbdff7062a558f0143ed5872 is the first bad commit.
+That is a broken syntax, they should've used single quotes.
+I.e.:
 
-Regards,
-Reilly
-
+> archive_expsym_cmds="echo '{ global:' > $output_objdir/$libname.ver~
+>              cat $export_symbols | $SED -e 's/\(.*\)/\1;/' >>
+> $output_objdir/$libname.ver~
+>              echo 'local: *; };' >> $output_objdir/$libname.ver~
+>              $CC -shared $pic_flag $libobjs $deplibs $compiler_flags
+> $wl-soname $wl$soname $wl-version-script $wl$output_objdir/$libname.ver
+> -o $lib"
