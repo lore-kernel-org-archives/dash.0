@@ -1,74 +1,67 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5FD460B8A
-	for <dash@vger.kernel.org>; Tue, 23 Sep 2025 10:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A29321425
+	for <dash@vger.kernel.org>; Tue, 23 Sep 2025 11:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758625189; cv=none; b=Nt+Bxzr/xBzlsu0Da8sP+hj9B4RKVpaClzUCdQHkdMiCgEbdWjoTBuTT8kN8WLV4TpZFYkDDeU2JwxxyYKvlVRbHd5QIuTaeFryi9GbZy2vWM4yChc3f9frPl+vv1/JJuNnjeJmmU+bCP6yUIHiRPyU8qhaIq5oT4a4eBvk62O0=
+	t=1758625405; cv=none; b=WEYcWUhv5IPksHQ69csLJnC01RT+dE0lo30rEY6crhLkaVUHNVWfFokeJscfKbKtjd6sX5YQAtWf4ylfQhA6I1c+MbEv8DfwY/a/tD4L9WuehSa2DqtYYkSYjnCuo9q98c4Zbix8hbMs1o67v6q3+14yo2qFm6D7JqETVlLvLNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758625189; c=relaxed/simple;
-	bh=axQdNmDw2MAdtnP95WSrKUgmOfNpYjm87+gF4P9g7iE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fryDJYYJvAXCXMOq0sgxmKAK7HrkjDRNePxrTWT15C1I/It+mEA8eiU12Jmt6evur/YjxXQ+VcCjuDxzCgdIHP2sV2Izx/7FKvLvQmnavRep0fBtdaLwXg46pNXLbE81wiKJR3QXQQCQn6Cq1xjWGH2JpLqE7hL/jZnx2eHIpfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=GTinZsBr; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1758625405; c=relaxed/simple;
+	bh=MkT/wLkt7SBoi7F4oVlLbmpPCB9IICYu1dBeoCD74gM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SbkUKKpsxHuNwxP2YoUoP4ZFsSlTuNYFHRoXx6IrvfxJ0KXDqM8U6xnHt1UH2k4lHsY7uTnDs4qHc+bMfIEKAh5fMOxPykLKvu4O5Pj28TYZ723q8Xc6FjmD0nc1oUCFopGV1lw976yMu2RcuGTjbqjtMyXSNoN22Gz1qxGMBkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=Ui0Rbpvm; arc=none smtp.client-ip=51.68.198.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="GTinZsBr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:MIME-Version:References:Message-ID:Subject:Cc:To:
-	From:Date:cc:to:subject:message-id:date:from:reply-to;
-	bh=3NzWTz6+u5OANFMMm1FAgMgPJBefPdgw2dWQUQBDZGs=; b=GTinZsBruw6FNSenI5xBzi02gJ
-	E9zfLN780Rb9XriKOs/V3PBJGnLWxQVFSO+aAsXLcT56XxoMQOC2VPJXSzjX5O//EjjhET1VC7e2H
-	ILUQIbDtOyTeua9XVjCdeJf75HVTDsN1wg9LGx2H8LOrNWuIumi7m9UZXaQqCHlrikA6JJpg9xF4e
-	B62qmIw9XpX+N+rxL/HfR5AovlykYgiRjBn7zR2Ndh9sAGQjxke7xCkQXEPJSWKWnwSUlRoo5YH2e
-	MQg35nH887oL38j5E/OzVpmpt2pEt6TK/R1ajQgGsd2DbDnqTzjeToEjhLwy/N5Hxj/VmHWq3vLav
-	VSJh/08A==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v10kF-007ezH-3D;
-	Tue, 23 Sep 2025 18:59:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 23 Sep 2025 18:59:39 +0800
-Date: Tue, 23 Sep 2025 18:59:39 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Reilly Brogan <reilly@reillybrogan.com>, dash@vger.kernel.org
-Subject: Re: bug: 0.5.13 regression in parsing
-Message-ID: <aNJ9m__22OQL_zHI@gondor.apana.org.au>
-References: <aNI-RCggOzN-tyHy@gondor.apana.org.au>
- <77d15ae4-e9e9-44f5-9eda-f287a4815411@gigawatt.nl>
- <aNJ3dYOcNX_lrTbr@gondor.apana.org.au>
- <aNJ4Nd-lE1rIjhH3@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="Ui0Rbpvm"
+Received: from [192.168.178.24] (unknown [31.94.68.2])
+	by mail.gigawatt.nl (Postfix) with ESMTPSA id CEA2091;
+	Tue, 23 Sep 2025 12:03:20 +0100 (BST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl CEA2091
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1758625401;
+	bh=H0gYIJGliG6Won/J/lhHpi8i3zxf9MAD9P6kSwx3kXk=; l=803;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Ui0RbpvmMdOpu/dGKjd0bZq24VXEviJewst1S2Ks1HkgarnGaWb8/U+26D1SW/quG
+	 QA/a362tBfvpZInxfxMqfynd4EygH4w8uJSSUlyKm7L0lBA8RgFNLVTZ0BEWJb/sbp
+	 tm1IDAi/BzcHMc/fJ0Yuz3/2xL5TWwUEkYOsYOT0=
+Message-ID: <6f017266-fc35-4864-9f10-3ead8af4e9f4@gigawatt.nl>
+Date: Tue, 23 Sep 2025 12:03:20 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: bug: 0.5.13 regression in parsing
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Reilly Brogan <reilly@reillybrogan.com>, dash@vger.kernel.org
+References: <aNI-RCggOzN-tyHy@gondor.apana.org.au>
+ <77d15ae4-e9e9-44f5-9eda-f287a4815411@gigawatt.nl>
+ <aNJ3dYOcNX_lrTbr@gondor.apana.org.au> <aNJ4Nd-lE1rIjhH3@gondor.apana.org.au>
+Content-Language: en-US
+From: Harald van Dijk <harald@gigawatt.nl>
 In-Reply-To: <aNJ4Nd-lE1rIjhH3@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 23, 2025 at 06:36:37PM +0800, Herbert Xu wrote:
->
-> I need to look into exactly which bash/dash test it's using that
-> we've managed to break and see if we can undo it.  If not then
-> libtool will just have to be fixed.
+On 23/09/2025 11:36, Herbert Xu wrote:
+> On Tue, Sep 23, 2025 at 06:33:25PM +0800, Herbert Xu wrote:
+>>
+>> Thanks for the hint.  I can reproduce now by attempting to build
+>> xcb-util.  I'm looking into it.
+> 
+> OK it's the same old problem: whenever we add a new feature that
+> makes us closer to bash, libtool gets confused and mistakes dash
+> for bash.  Normally it would explicitly invoke /bin/bash if it
+> detects that /bin/sh is dash.
 
-Actually it appears that nothing has changed.
-
-autoconf relies on LINENO to distinguish between dash and bash.
-Because dash has supported LINENO for years, this causes massive
-breakage because autoconf then goes on to rely on a non-POSIX
-echo with dash, which causes backslashes to be lost.
-
-Debian works around this by disabling LINENO in dash.
-
-So it's a bug in autoconf that should be fixed there.
+configure did/does prefer bash but can run with dash, either on systems 
+where bash is not available or when CONFIG_SHELL is set to bypass the 
+automatic switch to bash. This has been working for years, and I very 
+much suspect that if you run with a slightly older version of dash, you 
+will see that it also works for you.
 
 Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Harald van Dijk
