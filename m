@@ -1,89 +1,62 @@
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [51.68.198.76])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC0218027
-	for <dash@vger.kernel.org>; Tue, 23 Sep 2025 10:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.198.76
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDFC145B3F
+	for <dash@vger.kernel.org>; Tue, 23 Sep 2025 10:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758622878; cv=none; b=hkiOWVbt2DcLMfwd3tnmSz7nAn2Q1sCoS2/BHR6oDPe27T0vvII93Z6xhUs0f9IbDKNvf5GXYxoqgtRovnIlc5JYMvTVTGBo/DyS64eMbPNPBU3lYCF+BI6VJxpKHIheGMp0TteF6gr/oRAAW/eQO9LciLfP2/OQNdG8FeVbFkI=
+	t=1758623616; cv=none; b=VwqLx88R5YoglWYApswuaAlOY94nXyBO478UJ79ab6SVENtuOMKTH/g6+zTsfuzhn611WbRggH1gNteb4Kb8/5fxIkbiZx2XkxvTNRcl4WZFRJcxzDaCSA041gPm3rX0XfPiaD63rWR6OI9A9/K7guGgKzDQ9J/4RC9zwuL61V8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758622878; c=relaxed/simple;
-	bh=liyPmkoE6lUIR7tUTz/voK8pwsQVfIDUvY7E5o+MycU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J3fbZsCd+coYCUC/7GxUOQjuOJ1Sw9be8Y+DUeKA0iaI0xThvYo5B8mVCeSt2lkZnOOD+sH7SGD4tI9u1EZVxgwt9mFM+pPfHmz6as7TuxDDjmKyoNlGPzin1JTSMZCehTGrb+ZD99Q2X8a+p6c4DojHA+XlxTJmp8vt/IO4H5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=X358Hy7T; arc=none smtp.client-ip=51.68.198.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
+	s=arc-20240116; t=1758623616; c=relaxed/simple;
+	bh=UYOePwoO2zk05UVqKkk35o5tqHQ1raUI5DbsXCsk5xU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lHkJ4oe/OnQhmIcjsWnGk3ASCKnY8RTwUxN3bJI7Q+8sNhu8Pld/wpRmJS7HiIioV8b/u9aista+OLO4K/OZCLi3kBv9BHaykfVt0dxCtKwwra35EioreljR+89m/vvj6FD7YruaFoFDzmKoqd7b7T6j+dpDgK9Cvxy38qr2gNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ryyUeAKs; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="X358Hy7T"
-Received: from [192.168.178.24] (unknown [31.94.68.2])
-	by mail.gigawatt.nl (Postfix) with ESMTPSA id B350D420;
-	Tue, 23 Sep 2025 11:11:39 +0100 (BST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl B350D420
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1758622299;
-	bh=NNgkjiwhLwKJ1MV/2G3/+lsL5JpKSSSVoZB4kIa6Rc4=; l=1655;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=X358Hy7T3adlF1br4r98RNkHkg8Sa/p/yxXf6HV26kY549qCZe098TRszuNkUsXa+
-	 rprn1SdgsRZ4M7I1WQYUhUgd2af2yLZCWvN3MA8d3B2/jEMZVRAqwtUlMboqNz1HiJ
-	 XNMtQ5NgtsEqIpiN38QkV+Y01KhvUVsrqGFbkLsw=
-Message-ID: <77d15ae4-e9e9-44f5-9eda-f287a4815411@gigawatt.nl>
-Date: Tue, 23 Sep 2025 11:11:37 +0100
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ryyUeAKs"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:MIME-Version:References:Message-ID:Subject:Cc:To:
+	From:Date:cc:to:subject:message-id:date:from:reply-to;
+	bh=haTO6wRD2J61RRanw3iwPwN5KnkGnhzue9D7lLdDt4c=; b=ryyUeAKsNIiQyy+lzI/f2j8Wxg
+	SyoqkqBJIW22MPmIpbhH3NguUSiK2Z79fywxeQc0myHYSFHIqE48K5OnWZj1EPjhskTazuUJrBbtG
+	lvw/zF9BvzcFKoEt6OaEMO6BDAzdaHDR/2lk8IzFrgZKts+pazO76upxdNRN0V06edNFw4RN7UqiP
+	gWhqw2hSQN8X4HrbOIy/K6LlWcey5kBFRlLKOIr/WpNiCwV24MVvJMPH5tcxuqmm/yUpXphpmj+FB
+	D4kJ2dvtgdOTMz5XszgpHKB2CEJL6aNPLJlEM8yTzd1fRlpEgUJCZh13dM3ryYdmv+tz36/B/R/Dc
+	u5d+8FMw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1v10Kr-007eeC-0v;
+	Tue, 23 Sep 2025 18:33:26 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 23 Sep 2025 18:33:25 +0800
+Date: Tue, 23 Sep 2025 18:33:25 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: Reilly Brogan <reilly@reillybrogan.com>, dash@vger.kernel.org
+Subject: Re: bug: 0.5.13 regression in parsing
+Message-ID: <aNJ3dYOcNX_lrTbr@gondor.apana.org.au>
+References: <aNI-RCggOzN-tyHy@gondor.apana.org.au>
+ <77d15ae4-e9e9-44f5-9eda-f287a4815411@gigawatt.nl>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: bug: 0.5.13 regression in parsing
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- Reilly Brogan <reilly@reillybrogan.com>
-Cc: dash@vger.kernel.org
-References: <aNI-RCggOzN-tyHy@gondor.apana.org.au>
-Content-Language: en-US
-From: Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <aNI-RCggOzN-tyHy@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <77d15ae4-e9e9-44f5-9eda-f287a4815411@gigawatt.nl>
 
-On 23/09/2025 07:29, Herbert Xu wrote:
-> Reilly Brogan <reilly@reillybrogan.com> wrote:
->>
->> (I've uploaded the full libtool script at
->> https://gist.githubusercontent.com/ReillyBrogan/9a4e6a02e5871fdbeb793a549131e197/raw/5a00be91f0cf38df7706eabc4c0eadcac74e84dd/gistfile1.txt)
-> 
-> There's something wrong with this script because it fails with
-> every shell, including bash:
-> 
-> $ bash -n gistfile1.txt
-> gistfile1.txt: line 369: syntax error near unexpected token `}'
-> gistfile1.txt: line 369: `            echo "local: *; };" >> $output_objdir/$libname.ver~'
-> 
-> Did it get corrupted somehow?
+On Tue, Sep 23, 2025 at 11:11:37AM +0100, Harald van Dijk wrote:
+>
+> config.status file is a file that gets generated by configure, so something
+> is going wrong running configure with dash 0.5.13, and some more digging is
+> needed to figure out where exactly it's going wrong.
 
-Those lines are:
-
-   archive_expsym_cmds="echo "{ global:" > $output_objdir/$libname.ver~
-               cat $export_symbols | $SED -e "s/\(.*\)/\1;/" >> 
-$output_objdir/$libname.ver~
-               echo "local: *; };" >> $output_objdir/$libname.ver~
-               $CC -shared $pic_flag $libobjs $deplibs $compiler_flags 
-$wl-soname $wl$soname $wl-version-script $wl$output_objdir/$libname.ver 
--o $lib"
-
-What those lines should look like, and look like on my local system 
-after running configure:
-
-   archive_expsym_cmds='echo "{ global:" > $output_objdir/$libname.ver~
-               cat $export_symbols | $SED -e "s/\(.*\)/\1;/" >> 
-$output_objdir/$libname.ver~
-               echo "local: *; };" >> $output_objdir/$libname.ver~
-               $CC -shared $pic_flag $libobjs $deplibs $compiler_flags 
-$wl-soname $wl$soname $wl-version-script $wl$output_objdir/$libname.ver 
--o $lib'
-
-config.status file is a file that gets generated by configure, so 
-something is going wrong running configure with dash 0.5.13, and some 
-more digging is needed to figure out where exactly it's going wrong.
-
-Cheers,
-Harald van Dijk
+Thanks for the hint.  I can reproduce now by attempting to build
+xcb-util.  I'm looking into it.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
