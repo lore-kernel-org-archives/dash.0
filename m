@@ -1,72 +1,227 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from relay.hostedemail.com (smtprelay0014.hostedemail.com [216.40.44.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D8E625
-	for <dash@vger.kernel.org>; Mon, 29 Sep 2025 05:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB7327FB2B
+	for <dash@vger.kernel.org>; Mon, 29 Sep 2025 09:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759122099; cv=none; b=MRHJ1dOuOR4DJboGF6KZAbKuoH/EO8vAUE1+jP90BF3b3tSaam0BoSaqHcJ2xVZgZ1PWVwfNwp0eIjdopJM75KLxKQ/sKI4jI/Eu/e8hrPt/kDp8WJuMJ9fs1UTsSuLOmZbTaytLCxN1fdZU70yUcGgsXukPut714Emov+HQDX0=
+	t=1759137308; cv=none; b=ffiAdG82Lfyq4x+Al6wFHzI3FIxeNZ1St1fDSe11aTbhONdNhTddLvJw6IK3FGUFbhwtxyeXCHpKJR6wBFFQj8Ei9T2p684saDQALHvFRAReYyvPO4fRaxLxqci/0eKX63FY4rD3ItfeIN7nZvSTwWYgemN/1cvzjREZVvL+5LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759122099; c=relaxed/simple;
-	bh=3vgu/E8pV4LVenkbBz9d5FTkXccMtTqJTRimPCBeVVk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=Mnvc9TUfd7LZU3hjeSMxcj9CgzHyAp9SaHqTRKUXOUAuss8stb5gFkcEu+VPq0i9wtovlsxdty9FSGMaKx03yMQVuVYoC1hGriJOW7bsakHCmaWpoY1MoAO9GV+2c29Nl//dv6IVR3L5mFLKyY9cy2QKUG/VNLmShLGa3iNs8cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=nIzWALkF; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1759137308; c=relaxed/simple;
+	bh=1p4Ydfokik7S6AKwCbT5d893LS0e/QEqyHbCIPS/ZjU=;
+	h=Content-Type:Message-ID:Date:MIME-Version:From:Subject:To:Cc:
+	 References:In-Reply-To; b=fccLyCl/IGqk/rAqEAftr1VKVbUejsXRGiNlHFlVmRTAHyBv6TFw5Ni3YZQHaKZg9VHJkQZt9Y/MHHrCWqAMqgX+uo0z869TMQHOBaM15jMEzH8QpgBNmt+AgTZyzHCuf1Aklz5uqchJsXzYbWGvSsTOhBc647Z8pyVwB9Ltir8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=systematicsw.ab.ca; spf=pass smtp.mailfrom=systematicsw.ab.ca; dkim=pass (2048-bit key) header.d=systematicsw.ab.ca header.i=@systematicsw.ab.ca header.b=U5viPN2u; arc=none smtp.client-ip=216.40.44.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=systematicsw.ab.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=systematicsw.ab.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="nIzWALkF"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:MIME-Version:Message-ID:Subject:Cc:To:From:Date:cc:
-	to:subject:message-id:date:from:references:reply-to;
-	bh=e1MPpU21fQY3M4v4cdiTicwlgV8Xl5qgFNy3qILNLhE=; b=nIzWALkFIt964h+PU+NX2wjhfS
-	FfdpFivIZ2WADw+I3XaxWNhMOVNRHJDKQ5OxDywE/OdzaFFV6NZUdmgcd8Aei5r1abwj+iyg7tEy1
-	oX7jQWVNF4skippXtBYFBDyvmxGGWwmSL44PtPEdUy5qY8PGS2+iDGXkQ6G90nNaSujeHYHWd/Dpm
-	/rpxEcnPKtkXvsEX0me+wTnsmn5l4qqSIb5SVmyjud5Doxhu9B44PUtDDPuUiGdP/qv9zyp+wMuPg
-	Lri2h/mSrcLl+J3W92LcZXhRM0+04529Bf9KUgqHUk8f4NVaUtxQVR09JzY08ClL1X1yMcBSLNiwU
-	SD3clz4w==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v360q-0094zV-2a;
-	Mon, 29 Sep 2025 13:01:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 Sep 2025 13:01:24 +0800
-Date: Mon, 29 Sep 2025 13:01:24 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Brian.Inglis@systematicsw.ab.ca
-Cc: dash@vger.kernel.org
-Subject: Re: dash 0.5.13 configure config.status truncated running under dash
- 0.5.13
-Message-ID: <aNoSpE9jqtHtTI7M@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=systematicsw.ab.ca header.i=@systematicsw.ab.ca header.b="U5viPN2u"
+Received: from omf19.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay07.hostedemail.com (Postfix) with ESMTP id 22CFC1602F4;
+	Mon, 29 Sep 2025 09:15:05 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: Brian.Inglis@SystematicSW.ab.ca) by omf19.hostedemail.com (Postfix) with ESMTPA id 8684020028;
+	Mon, 29 Sep 2025 09:15:03 +0000 (UTC)
+Content-Type: multipart/mixed; boundary="------------FgfX2GkBws7KZIjeKpvGkBrf"
+Message-ID: <2afff6a4-d645-4a94-8644-45f669b70da5@systematicsw.ab.ca>
+Date: Mon, 29 Sep 2025 03:15:02 -0600
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ba3014e6-b1f6-4b6b-99ac-524dafd22f33@SystematicSW.ab.ca>
-X-Newsgroups: apana.lists.os.linux.dash
+User-Agent: Mozilla Thunderbird
+From: Brian.Inglis@systematicsw.ab.ca
+Reply-To: Brian.Inglis@SystematicSW.ab.ca
+Subject: Re: dash 0.5.13 configure config.status truncated running under dash
+ 0.5.13
+Content-Language: en-CA
+To: dash@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+References: <aNoSpE9jqtHtTI7M@gondor.apana.org.au>
+Organization: Systematic Software
+In-Reply-To: <aNoSpE9jqtHtTI7M@gondor.apana.org.au>
+X-Stat-Signature: 19frpcjmhkmii3zwx1edhxk3zgsdy7y3
+X-Rspamd-Server: rspamout07
+X-Rspamd-Queue-Id: 8684020028
+X-Session-Marker: 427269616E2E496E676C69734053797374656D6174696353572E61622E6361
+X-Session-ID: U2FsdGVkX1+e8L+BCepMCoXYOxlDp+iZR4F5fSSy06Q=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=systematicsw.ab.ca; h=content-type:message-id:date:mime-version:from:reply-to:subject:to:cc:references:in-reply-to; s=he; bh=slB4cujzVfX5L8IoT2z3pJDa69/TwJ9TMpXk1rO6z00=; b=U5viPN2uYB+29cLlSTSpLVNgRxufUoTF1KqslHlQX6oRYa9vaMPewn5eWHvIL/Yt+PmwKYrffIeY/sFORqH56dTXLDWkKX01waYw728a6ShHvoPAg0DMmPYLYF4t961F+i4w4dO0leCpzekEghtm8O9tkImkVOJ9RAGlh0pnKYT9TW9Y7oltLKAyBHo79avhjv5b+VUwH4Wdw+AK+AgXKUFLp3uXiiEkieMBwGJ4sHe8Z60Hf2Fk5nqzr4BtY0OMNqjbJSuHdueqsUVi/BxAKedBcxN/s6/Gm5Acy3167uuCleF8nMTq7X4faHHuaJMSSaZ4++TK4OiBDopYPOzjaw==
+X-HE-Tag: 1759137303-67234
+X-HE-Meta: U2FsdGVkX1/QGXU2pWAjQAdw+5Ujc97S+aTfrQC1TxxXQmgtGUZ7jfTM4/tELdALmKtvasz7D/PmT5nVLphMV6BcBY+vWqsIyTae3NNmapBxgbd4m5AkHwq0ebZN9jj4B1ILR3WXZU3jLuJfs0awVbkx2SV69dZxrs+rcCY8MVBLiDkBlXU5+GNhB6pR2ydaoqtYt4hpm0IuSzHuAiRhFc8uL/ePT5/0jKkPSwHY1Mtgw4pjZJLqMwdm43c/c2Ud1eNlzK7r5qYLn0DbPAynfXndhsi4zq9vjdlnLvdSqP4fvCauiUoqxtr7fU3ABDz5KkrUvjqCdUh2of/b4QJu+4a0s3Ult1Yqy08+dPcW/w7W4H5W0Sd74IlDUvZf7xZDM1nJreUYULtYwJ+3Cn1v4Dip0grMPmoN/XjHam6hRCK+BWPghYE2aZalWgbcBIS5eL5WC3W7R4yawBBd0EtmKq9YNXPIJyBlymGgQ/FLWwaXlNzccfPilA==
 
-Brian Inglis <Brian.Inglis@systematicsw.ab.ca> wrote:
+This is a multi-part message in MIME format.
+--------------FgfX2GkBws7KZIjeKpvGkBrf
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+
+On 2025-09-28 23:01, Herbert Xu wrote:
+> Brian Inglis wrote:
+>>
+>> Package dash 0.5.13 configure and build seems to run okay with previous dash
+>> 0.5.12 == /bin/sh but rebuilding under latest dash 0.5.13 == /bin/sh fails in
+>> configure running config.status at line 665 due to truncation at line defining
 > 
-> Package dash 0.5.13 configure and build seems to run okay with previous dash 
-> 0.5.12 == /bin/sh but rebuilding under latest dash 0.5.13 == /bin/sh fails in 
-> configure running config.status at line 665 due to truncation at line defining 
+> Thanks for the report.  There has been two fixes since 0.5.13
+> that may fix this, please apply those patches and try again:
+> 
+> https://patchwork.kernel.org/project/dash/patch/aNK2DgpH6Bs0XCQm@gondor.apana.org.au/
+> https://patchwork.kernel.org/project/dash/patch/aNivTiVPAJAgHDDH@gondor.apana.org.au/
+> 
+> If it still fails please let me know.
+> 
+> I tried to reproduce this but I couldn't even without those two
+> patches.
 
-Thanks for the report.  There has been two fixes since 0.5.13
-that may fix this, please apply those patches and try again:
+Applied and rebuilt, getting the same failure with identical ERROR messages and 
+symptoms, after building okay with previous dash == sh, then rerunning with 
+latest dash == sh.
 
-https://patchwork.kernel.org/project/dash/patch/aNK2DgpH6Bs0XCQm@gondor.apana.org.au/
-https://patchwork.kernel.org/project/dash/patch/aNivTiVPAJAgHDDH@gondor.apana.org.au/
+Do the previously highlighted configure script last two config.status generation 
+stanzas seem to have issues, or is that as intended?
 
-If it still fails please let me know.
+It appears that the following _ACEOF\ncat >>$CONFIG_STATUS ... might be 
+misplaced, as it is immediately followed by a list of sed commands.
 
-I tried to reproduce this but I couldn't even without those two
-patches.
+These stanzas come from /usr/share/autoconf{,2.7}/autoconf/status.m4
+included by /usr/share/autoconf{,2.7}/autoconf/autoconf.m4 frozen in
+/usr/share/autoconf{,2.7}/autoconf/autoconf.m4f.
 
-Thanks,
+Or is this an issue that should be raised with the autoconf/autotools team?
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Take care. Thanks, Brian Inglis              Calgary, Alberta, Canada
+
+La perfection est atteinte                   Perfection is achieved
+non pas lorsqu'il n'y a plus rien à ajouter  not when there is no more to add
+mais lorsqu'il n'y a plus rien à retrancher  but when there is no more to cut
+                                 -- Antoine de Saint-Exupéry
+--------------FgfX2GkBws7KZIjeKpvGkBrf
+Content-Type: text/plain; charset=UTF-8; name="dash-0.5.13-2-compile.log"
+Content-Disposition: attachment; filename="dash-0.5.13-2-compile.log"
+Content-Transfer-Encoding: base64
+
+Y3lncG9ydCAwLjM3LjIgCgpQRiA9IGRhc2gtMC41LjEzLTIKUyA9IC91c3Ivc3JjL2Rhc2gv
+ZGFzaC0wLjUuMTMtMi54ODZfNjQvc3JjL2Rhc2gtMC41LjEzCkIgPSAvdXNyL3NyYy9kYXNo
+L2Rhc2gtMC41LjEzLTIueDg2XzY0L2J1aWxkCkQgPSAvdXNyL3NyYy9kYXNoL2Rhc2gtMC41
+LjEzLTIueDg2XzY0L2luc3QKQyA9IC91c3Ivc3JjL2Rhc2gvZGFzaC0wLjUuMTMtMi54ODZf
+NjQvc3JjL2Rhc2gtMC41LjEzL0NZR1dJTi1QQVRDSEVTClQgPSAvdXNyL3NyYy9kYXNoL2Rh
+c2gtMC41LjEzLTIueDg2XzY0L3RlbXAKQ0JVSUxEID0geDg2XzY0LXBjLWN5Z3dpbgpDSE9T
+VCA9IHg4Nl82NC1wYy1jeWd3aW4KQ1RBUkdFVCA9IHg4Nl82NC1wYy1jeWd3aW4KQ0MgPSBn
+Y2MKQ0ZMQUdTID0gLWdnZGIgLU8yIC1waXBlIC1XYWxsIC1XZXJyb3I9Zm9ybWF0LXNlY3Vy
+aXR5IC1XcCwtRF9GT1JUSUZZX1NPVVJDRT0zIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAt
+LXBhcmFtPXNzcC1idWZmZXItc2l6ZT00IC1mZmlsZS1wcmVmaXgtbWFwPS91c3Ivc3JjL2Rh
+c2gvZGFzaC0wLjUuMTMtMi54ODZfNjQvYnVpbGQ9L3Vzci9zcmMvZGVidWcvZGFzaC0wLjUu
+MTMtMiAtZmZpbGUtcHJlZml4LW1hcD0vdXNyL3NyYy9kYXNoL2Rhc2gtMC41LjEzLTIueDg2
+XzY0L3NyYy9kYXNoLTAuNS4xMz0vdXNyL3NyYy9kZWJ1Zy9kYXNoLTAuNS4xMy0yCkNQUEZM
+QUdTID0KQ1hYID0gZysrCkNYWEZMQUdTID0gLWdnZGIgLU8yIC1waXBlIC1XYWxsIC1XZXJy
+b3I9Zm9ybWF0LXNlY3VyaXR5IC1XcCwtRF9GT1JUSUZZX1NPVVJDRT0zIC1mc3RhY2stcHJv
+dGVjdG9yLXN0cm9uZyAtLXBhcmFtPXNzcC1idWZmZXItc2l6ZT00IC1XZXJyb3I9cmV0dXJu
+LXR5cGUgLWZmaWxlLXByZWZpeC1tYXA9L3Vzci9zcmMvZGFzaC9kYXNoLTAuNS4xMy0yLng4
+Nl82NC9idWlsZD0vdXNyL3NyYy9kZWJ1Zy9kYXNoLTAuNS4xMy0yIC1mZmlsZS1wcmVmaXgt
+bWFwPS91c3Ivc3JjL2Rhc2gvZGFzaC0wLjUuMTMtMi54ODZfNjQvc3JjL2Rhc2gtMC41LjEz
+PS91c3Ivc3JjL2RlYnVnL2Rhc2gtMC41LjEzLTIKRjc3ID0gZ2ZvcnRyYW4KRkZMQUdTID0g
+LWdnZGIgLU8yIC1waXBlIC1XYWxsIC1XZXJyb3I9Zm9ybWF0LXNlY3VyaXR5IC1XcCwtRF9G
+T1JUSUZZX1NPVVJDRT0zIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAtLXBhcmFtPXNzcC1i
+dWZmZXItc2l6ZT00IC1mZmlsZS1wcmVmaXgtbWFwPS91c3Ivc3JjL2Rhc2gvZGFzaC0wLjUu
+MTMtMi54ODZfNjQvYnVpbGQ9L3Vzci9zcmMvZGVidWcvZGFzaC0wLjUuMTMtMiAtZmZpbGUt
+cHJlZml4LW1hcD0vdXNyL3NyYy9kYXNoL2Rhc2gtMC41LjEzLTIueDg2XzY0L3NyYy9kYXNo
+LTAuNS4xMz0vdXNyL3NyYy9kZWJ1Zy9kYXNoLTAuNS4xMy0yCkZDID0gZ2ZvcnRyYW4KRkNG
+TEFHUyA9IC1nZ2RiIC1PMiAtcGlwZSAtV2FsbCAtV2Vycm9yPWZvcm1hdC1zZWN1cml0eSAt
+V3AsLURfRk9SVElGWV9TT1VSQ0U9MyAtZnN0YWNrLXByb3RlY3Rvci1zdHJvbmcgLS1wYXJh
+bT1zc3AtYnVmZmVyLXNpemU9NCAtZmZpbGUtcHJlZml4LW1hcD0vdXNyL3NyYy9kYXNoL2Rh
+c2gtMC41LjEzLTIueDg2XzY0L2J1aWxkPS91c3Ivc3JjL2RlYnVnL2Rhc2gtMC41LjEzLTIg
+LWZmaWxlLXByZWZpeC1tYXA9L3Vzci9zcmMvZGFzaC9kYXNoLTAuNS4xMy0yLng4Nl82NC9z
+cmMvZGFzaC0wLjUuMTM9L3Vzci9zcmMvZGVidWcvZGFzaC0wLjUuMTMtMgpHT0MgPSBnY2Nn
+bwpHT0ZMQUdTID0gLWdnZGIgLU8yIC1waXBlIC1mZmlsZS1wcmVmaXgtbWFwPS91c3Ivc3Jj
+L2Rhc2gvZGFzaC0wLjUuMTMtMi54ODZfNjQvYnVpbGQ9L3Vzci9zcmMvZGVidWcvZGFzaC0w
+LjUuMTMtMiAtZmZpbGUtcHJlZml4LW1hcD0vdXNyL3NyYy9kYXNoL2Rhc2gtMC41LjEzLTIu
+eDg2XzY0L3NyYy9kYXNoLTAuNS4xMz0vdXNyL3NyYy9kZWJ1Zy9kYXNoLTAuNS4xMy0yCk9C
+SkMgPSBnY2MKT0JKQ0ZMQUdTID0gLWdnZGIgLU8yIC1waXBlIC1XYWxsIC1XZXJyb3I9Zm9y
+bWF0LXNlY3VyaXR5IC1XcCwtRF9GT1JUSUZZX1NPVVJDRT0zIC1mc3RhY2stcHJvdGVjdG9y
+LXN0cm9uZyAtLXBhcmFtPXNzcC1idWZmZXItc2l6ZT00IC1mZmlsZS1wcmVmaXgtbWFwPS91
+c3Ivc3JjL2Rhc2gvZGFzaC0wLjUuMTMtMi54ODZfNjQvYnVpbGQ9L3Vzci9zcmMvZGVidWcv
+ZGFzaC0wLjUuMTMtMiAtZmZpbGUtcHJlZml4LW1hcD0vdXNyL3NyYy9kYXNoL2Rhc2gtMC41
+LjEzLTIueDg2XzY0L3NyYy9kYXNoLTAuNS4xMz0vdXNyL3NyYy9kZWJ1Zy9kYXNoLTAuNS4x
+My0yCk9CSkNYWCA9IGcrKwpPQkpDWFhGTEFHUyA9IC1nZ2RiIC1PMiAtcGlwZSAtV2FsbCAt
+V2Vycm9yPWZvcm1hdC1zZWN1cml0eSAtV3AsLURfRk9SVElGWV9TT1VSQ0U9MyAtZnN0YWNr
+LXByb3RlY3Rvci1zdHJvbmcgLS1wYXJhbT1zc3AtYnVmZmVyLXNpemU9NCAtV2Vycm9yPXJl
+dHVybi10eXBlIC1mZmlsZS1wcmVmaXgtbWFwPS91c3Ivc3JjL2Rhc2gvZGFzaC0wLjUuMTMt
+Mi54ODZfNjQvYnVpbGQ9L3Vzci9zcmMvZGVidWcvZGFzaC0wLjUuMTMtMiAtZmZpbGUtcHJl
+Zml4LW1hcD0vdXNyL3NyYy9kYXNoL2Rhc2gtMC41LjEzLTIueDg2XzY0L3NyYy9kYXNoLTAu
+NS4xMz0vdXNyL3NyYy9kZWJ1Zy9kYXNoLTAuNS4xMy0yCkxERkxBR1MgPSAtc3RhdGljLWxp
+YmdjYwpMSUJTID0KTUFLRU9QVFMgPSAtaiA1CgoKYXV0b3JlY29uZi0yLjcyOiBleHBvcnQg
+V0FSTklOR1M9CmF1dG9yZWNvbmYtMi43MjogRW50ZXJpbmcgZGlyZWN0b3J5ICcuJwphdXRv
+cmVjb25mLTIuNzI6IGNvbmZpZ3VyZS5hYzogbm90IHVzaW5nIEdldHRleHQKYXV0b3JlY29u
+Zi0yLjcyOiBydW5uaW5nOiBhY2xvY2FsIC0tZm9yY2UgCmF1dG9yZWNvbmYtMi43MjogY29u
+ZmlndXJlLmFjOiB0cmFjaW5nCmF1dG9yZWNvbmYtMi43MjogY29uZmlndXJlLmFjOiBub3Qg
+dXNpbmcgTGlidG9vbAphdXRvcmVjb25mLTIuNzI6IGNvbmZpZ3VyZS5hYzogbm90IHVzaW5n
+IEludGx0b29sCmF1dG9yZWNvbmYtMi43MjogY29uZmlndXJlLmFjOiBub3QgdXNpbmcgR3Rr
+ZG9jCmF1dG9yZWNvbmYtMi43MjogcnVubmluZzogL3Vzci9iaW4vYXV0b2NvbmYtMi43MiAt
+LWZvcmNlCmF1dG9yZWNvbmYtMi43MjogcnVubmluZzogL3Vzci9iaW4vYXV0b2hlYWRlci0y
+LjcyIC0tZm9yY2UKYXV0b3JlY29uZi0yLjcyOiBydW5uaW5nOiBhdXRvbWFrZSAtLWFkZC1t
+aXNzaW5nIC0tY29weSAtLWZvcmNlLW1pc3NpbmcKYXV0b3JlY29uZi0yLjcyOiAnLi9pbnN0
+YWxsLXNoJyBpcyB1cGRhdGVkCmF1dG9yZWNvbmYtMi43MjogTGVhdmluZyBkaXJlY3Rvcnkg
+Jy4nCi91c3Ivc3JjL2Rhc2gvZGFzaC0wLjUuMTMtMi54ODZfNjQvc3JjL2Rhc2gtMC41LjEz
+L2NvbmZpZ3VyZSAtLXNyY2Rpcj0vdXNyL3NyYy9kYXNoL2Rhc2gtMC41LjEzLTIueDg2XzY0
+L3NyYy9kYXNoLTAuNS4xMyAtLXByZWZpeD0vdXNyIC0tZXhlYy1wcmVmaXg9L3VzciAtLWxv
+Y2Fsc3RhdGVkaXI9L3ZhciAtLXN5c2NvbmZkaXI9L2V0YyAtLWRvY2Rpcj0vdXNyL3NoYXJl
+L2RvYy9kYXNoIC0taHRtbGRpcj0vdXNyL3NoYXJlL2RvYy9kYXNoL2h0bWwgLUMKY29uZmln
+dXJlOiBsb2FkaW5nIHNpdGUgc2NyaXB0IC9ldGMvY29uZmlnLnNpdGUKY29uZmlndXJlOiBj
+cmVhdGluZyBjYWNoZSBjb25maWcuY2FjaGUKY2hlY2tpbmcgZm9yIGEgQlNELWNvbXBhdGli
+bGUgaW5zdGFsbC4uLiAvdXNyL2Jpbi9pbnN0YWxsIC1jCmNoZWNraW5nIHdoZXRoZXIgYnVp
+bGQgZW52aXJvbm1lbnQgaXMgc2FuZS4uLiB5ZXMKY2hlY2tpbmcgZm9yIGEgcmFjZS1mcmVl
+IG1rZGlyIC1wLi4uIC91c3IvYmluL21rZGlyIC1wCmNoZWNraW5nIGZvciBnYXdrLi4uIGdh
+d2sKY2hlY2tpbmcgd2hldGhlciBtYWtlIHNldHMgJChNQUtFKS4uLiB5ZXMKY2hlY2tpbmcg
+d2hldGhlciBtYWtlIHN1cHBvcnRzIG5lc3RlZCB2YXJpYWJsZXMuLi4geWVzCmNoZWNraW5n
+IHdoZXRoZXIgbWFrZSBzdXBwb3J0cyBuZXN0ZWQgdmFyaWFibGVzLi4uIChjYWNoZWQpIHll
+cwpjaGVja2luZyBmb3IgZ2NjLi4uIGdjYwpjaGVja2luZyB3aGV0aGVyIHRoZSBDIGNvbXBp
+bGVyIHdvcmtzLi4uIHllcwpjaGVja2luZyBmb3IgQyBjb21waWxlciBkZWZhdWx0IG91dHB1
+dCBmaWxlIG5hbWUuLi4gYS5leGUKY2hlY2tpbmcgZm9yIHN1ZmZpeCBvZiBleGVjdXRhYmxl
+cy4uLiAuZXhlCmNoZWNraW5nIHdoZXRoZXIgd2UgYXJlIGNyb3NzIGNvbXBpbGluZy4uLiBu
+bwpjaGVja2luZyBmb3Igc3VmZml4IG9mIG9iamVjdCBmaWxlcy4uLiBvCmNoZWNraW5nIHdo
+ZXRoZXIgdGhlIGNvbXBpbGVyIHN1cHBvcnRzIEdOVSBDLi4uIHllcwpjaGVja2luZyB3aGV0
+aGVyIGdjYyBhY2NlcHRzIC1nLi4uIHllcwpjaGVja2luZyBmb3IgZ2NjIG9wdGlvbiB0byBl
+bmFibGUgQzExIGZlYXR1cmVzLi4uIG5vbmUgbmVlZGVkCmNoZWNraW5nIHdoZXRoZXIgZ2Nj
+IHVuZGVyc3RhbmRzIC1jIGFuZCAtbyB0b2dldGhlci4uLiB5ZXMKY2hlY2tpbmcgd2hldGhl
+ciBtYWtlIHN1cHBvcnRzIHRoZSBpbmNsdWRlIGRpcmVjdGl2ZS4uLiB5ZXMgKEdOVSBzdHls
+ZSkKY2hlY2tpbmcgZGVwZW5kZW5jeSBzdHlsZSBvZiBnY2MuLi4gZ2NjMwpjaGVja2luZyBm
+b3Igc3RkaW8uaC4uLiB5ZXMKY2hlY2tpbmcgZm9yIHN0ZGxpYi5oLi4uIHllcwpjaGVja2lu
+ZyBmb3Igc3RyaW5nLmguLi4geWVzCmNoZWNraW5nIGZvciBpbnR0eXBlcy5oLi4uIHllcwpj
+aGVja2luZyBmb3Igc3RkaW50LmguLi4geWVzCmNoZWNraW5nIGZvciBzdHJpbmdzLmguLi4g
+eWVzCmNoZWNraW5nIGZvciBzeXMvc3RhdC5oLi4uIHllcwpjaGVja2luZyBmb3Igc3lzL3R5
+cGVzLmguLi4geWVzCmNoZWNraW5nIGZvciB1bmlzdGQuaC4uLiB5ZXMKY2hlY2tpbmcgZm9y
+IHdjaGFyLmguLi4geWVzCmNoZWNraW5nIGZvciBtaW5peC9jb25maWcuaC4uLiBubwpjaGVj
+a2luZyB3aGV0aGVyIGl0IGlzIHNhZmUgdG8gZGVmaW5lIF9fRVhURU5TSU9OU19fLi4uIHll
+cwpjaGVja2luZyB3aGV0aGVyIF9YT1BFTl9TT1VSQ0Ugc2hvdWxkIGJlIGRlZmluZWQuLi4g
+bm8KY2hlY2tpbmcgZm9yIGJ1aWxkIHN5c3RlbSBjb21waWxlci4uLiBnY2MKY2hlY2tpbmcg
+Zm9yIF9fYXR0cmlidXRlX18oKF9fYWxpYXNfXygpKSkuLi4geWVzCmNoZWNraW5nIGZvciBh
+bGxvY2EuaC4uLiB5ZXMKY2hlY2tpbmcgZm9yIHBhdGhzLmguLi4geWVzCmNoZWNraW5nIGZv
+ciBzeXMvd2FpdC5oLi4uIHllcwpjaGVja2luZyBmb3IgZ2NjIG9wdGlvbnMgbmVlZGVkIHRv
+IGRldGVjdCBhbGwgdW5kZWNsYXJlZCBmdW5jdGlvbnMuLi4gbm9uZSBuZWVkZWQKY2hlY2tp
+bmcgd2hldGhlciBfUEFUSF9CU0hFTEwgaXMgZGVjbGFyZWQuLi4geWVzCmNoZWNraW5nIHdo
+ZXRoZXIgX1BBVEhfREVWTlVMTCBpcyBkZWNsYXJlZC4uLiB5ZXMKY2hlY2tpbmcgd2hldGhl
+ciBfUEFUSF9UVFkgaXMgZGVjbGFyZWQuLi4geWVzCmNoZWNraW5nIHdoZXRoZXIgaXNibGFu
+ayBpcyBkZWNsYXJlZC4uLiB5ZXMKY2hlY2tpbmcgc2l6ZSBvZiBpbnRtYXhfdC4uLiA4CmNo
+ZWNraW5nIHNpemUgb2YgbG9uZyBsb25nIGludC4uLiA4CmNoZWNraW5nIHdoZXRoZXIgUFJJ
+ZE1BWCBpcyBkZWNsYXJlZC4uLiB5ZXMKY2hlY2tpbmcgZm9yIGJzZWFyY2guLi4geWVzCmNo
+ZWNraW5nIGZvciBmYWNjZXNzYXQuLi4geWVzCmNoZWNraW5nIGZvciBnZXRwd25hbS4uLiB5
+ZXMKY2hlY2tpbmcgZm9yIGdldHJsaW1pdC4uLiB5ZXMKY2hlY2tpbmcgZm9yIGlzYWxwaGEu
+Li4geWVzCmNoZWNraW5nIGZvciBraWxscGcuLi4geWVzCmNoZWNraW5nIGZvciBtZW1mZF9j
+cmVhdGUuLi4gbm8KY2hlY2tpbmcgZm9yIG1lbXJjaHIuLi4geWVzCmNoZWNraW5nIGZvciBt
+ZW1wY3B5Li4uIHllcwpjaGVja2luZyBmb3Igc2lnc2V0bWFzay4uLiBubwpjaGVja2luZyBm
+b3Igc3RwY3B5Li4uIHllcwpjaGVja2luZyBmb3Igc3RyY2hybnVsLi4uIHllcwpjaGVja2lu
+ZyBmb3Igc3Ryc2lnbmFsLi4uIHllcwpjaGVja2luZyBmb3Igc3RydG9kLi4uIHllcwpjaGVj
+a2luZyBmb3Igc3RydG9pbWF4Li4uIHllcwpjaGVja2luZyBmb3Igc3RydG91bWF4Li4uIHll
+cwpjaGVja2luZyBmb3Igc3lzY29uZi4uLiB5ZXMKY2hlY2tpbmcgZm9yIHRlZS4uLiBubwpj
+aGVja2luZyBmb3Igd2FpdDMuLi4geWVzCmNoZWNraW5nIGZvciBzaWduYWwuLi4geWVzCmNo
+ZWNraW5nIHdoZXRoZXIgc3RhdDY0IGlzIGRlY2xhcmVkLi4uIG5vCmNoZWNraW5nIGZvciBn
+bG9iNjQuLi4gbm8KY2hlY2tpbmcgZm9yIG9wZW42NC4uLiBubwpjaGVja2luZyBmb3Igc3Rh
+dDo6c3RfbXRpbS4uLiB5ZXMKY2hlY2tpbmcgZm9yIEZfRFVQRkRfQ0xPRVhFQy4uLiB5ZXMK
+Y29uZmlndXJlOiB1cGRhdGluZyBjYWNoZSBjb25maWcuY2FjaGUKY2hlY2tpbmcgdGhhdCBn
+ZW5lcmF0ZWQgZmlsZXMgYXJlIG5ld2VyIHRoYW4gY29uZmlndXJlLi4uIGRvbmUKY29uZmln
+dXJlOiBjcmVhdGluZyAuL2NvbmZpZy5zdGF0dXMKLi9jb25maWcuc3RhdHVzOiA2NjU6IFN5
+bnRheCBlcnJvcjogVW50ZXJtaW5hdGVkIHF1b3RlZCBzdHJpbmcKG1sxOzMxbSoqKiBFUlJP
+UjobWzA7MG0gY29uZmlndXJlIGZhaWxlZAo=
+
+--------------FgfX2GkBws7KZIjeKpvGkBrf--
