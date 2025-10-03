@@ -1,72 +1,118 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtpout01-ext2.partage.renater.fr (smtpout01-ext2.partage.renater.fr [194.254.240.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27FB221FC7
-	for <dash@vger.kernel.org>; Fri,  3 Oct 2025 07:29:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A4D203710
+	for <dash@vger.kernel.org>; Fri,  3 Oct 2025 22:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.254.240.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759476595; cv=none; b=artq8u91ipy1jRl0aHsoc+XH0v5YVi6+O3bs6mnXkQfNcrbMqMzZ9yuqA0JiMhzXzKXCAV5Xx+QrLqMDCYlLYOGhqmbKK+GtEHyO7RR9BkIJbipVZcvgokvg+wbrF/YpbkHc+CvbZG3vg/xt4UzdwElpJ4gWisLrgBCSrtDLvz0=
+	t=1759532036; cv=none; b=hZqibYmSD2AtEWnz/fOyZgHzmG9XqiAzhSXOhOGqz/dmo6925zNpeaSZer8adqwLzcvnNvsJQB5jy3EaupbpbU0AEkaeoN9P9aNdEJqmby4nULfwRaTz3PXVhcdTMS8NW7Ufa38qAsxDuqjFLNI2xVkSgf5zMGBV2vXvyrCEop8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759476595; c=relaxed/simple;
-	bh=r5fDj74h0OGUIc5pXcz89Eh2TspAWTWVQV8iIFyXmO4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E96OBX1RUNLbZg3M69Oite1NOopEuX+fIforxEr40NxX6jXnNmQQQNOzK3d+YvSc4o0JGvrJoNC1/PqHYzf02Qew+5gj75wcfqpnsAL+QVXzHvg/RvOX5LxWHQGK+uf/C5u0QocOBQiZmkw4HvI0QIIR1SwKtny2tcU2HsF5M7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=hazWCvCP; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1759532036; c=relaxed/simple;
+	bh=TtVeRGTwovOGtooO/j/7gXczkPixTpYCEef+bVQIJ/w=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=oyTs/K1VH87owhCxH2DhvOKF+mWqdlLQDpgMqRNZE0Qm+5fwzuY9B+ELtbHBw2kT/2WJl8PUnRWPgt4Uf5cWF1lC9Nv34F5hsP2zDztsKhIpnKtdzByujDMikNZNPxQ71ankEIqLvYbsNHbJf9fHRXjVOHQLa2V+7UyWy3EEsE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=unistra.fr; spf=pass smtp.mailfrom=unistra.fr; dkim=pass (2048-bit key) header.d=unistra.fr header.i=@unistra.fr header.b=vxC6SZq4; arc=none smtp.client-ip=194.254.240.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=unistra.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unistra.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="hazWCvCP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:MIME-Version:References:
-	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
-	reply-to; bh=Umwsv06coXHfI3nz7uXZNLdUJn9mrYkbRiVe7CtNTls=; b=hazWCvCP4Yd61RYf
-	K7P10sQNbbvr9FES+iJhwH4wF5ebTnri3waO9jYPd+IDVzxtAEcvNmkAO9ItVhKvq085A9Iww5m78
-	0AXEMi+GuMkTtZ01ZH+Zz+cpEsm/U4f0+73ZKI1cWHgtp54aRew/uoFQ5ChXu0VOL72W/sbdom53e
-	XGP5LWICuUJ+q6er8jfvo2KnfF/+A8OR3+VuufpbvsjrOQAMT+HUYDuf4rY40qRREkq4lNykApLmL
-	zOBI81aH06/Ouic1fMTHgW8yQuMGcmXGcA4FUGTt2wzbijMXVxdo8tedzmgaIYUb6Y3MLeDdPS3sA
-	f0kdtAexfRSjuOcsyw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v4aEd-00ABgu-1X;
-	Fri, 03 Oct 2025 15:29:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Oct 2025 15:29:47 +0800
-Date: Fri, 3 Oct 2025 15:29:47 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Brian Inglis <Brian.Inglis@systematicsw.ab.ca>
-Cc: Dash <dash@vger.kernel.org>
-Subject: Re: dash 0.5.13 configure config.status truncated running under dash
- 0.5.13
-Message-ID: <aN97a6Nn2C56006t@gondor.apana.org.au>
-References: <ba3014e6-b1f6-4b6b-99ac-524dafd22f33@SystematicSW.ab.ca>
- <aNvMWqEu-uIiCbGk@gondor.apana.org.au>
- <81470aa2-3689-46a7-84bc-a7781cacf048@systematicsw.ab.ca>
- <aNx4g4eZSsdvXlRH@gondor.apana.org.au>
- <2b8b60af-82f0-437c-a99e-260aafe37b82@systematicsw.ab.ca>
+	dkim=pass (2048-bit key) header.d=unistra.fr header.i=@unistra.fr header.b="vxC6SZq4"
+Received: from zmtaauth03.partage.renater.fr (zmtaauth03.partage.renater.fr [194.254.240.26])
+	by smtpout10.partage.renater.fr (Postfix) with ESMTP id E7C846620D
+	for <dash@vger.kernel.org>; Sat,  4 Oct 2025 00:47:03 +0200 (CEST)
+Received: from zmtaauth03.partage.renater.fr (localhost [127.0.0.1])
+	by zmtaauth03.partage.renater.fr (Postfix) with ESMTPS id D746E80023
+	for <dash@vger.kernel.org>; Sat,  4 Oct 2025 00:47:03 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by zmtaauth03.partage.renater.fr (Postfix) with ESMTP id C7B5B80076
+	for <dash@vger.kernel.org>; Sat,  4 Oct 2025 00:47:03 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmtaauth03.partage.renater.fr C7B5B80076
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unistra.fr;
+	s=CF279DD4-6F58-4C59-BB33-73FDC6DFC1E3; t=1759531623;
+	bh=TtVeRGTwovOGtooO/j/7gXczkPixTpYCEef+bVQIJ/w=;
+	h=Date:From:To:Message-ID:MIME-Version;
+	b=vxC6SZq4O8DnI0k2rnmMFjSNVXZ1OpoZcM+j0HxkY/UAK723Z8aiIm7mbz2SQkJMv
+	 AzKyZ4XOVHhmCKvyFpID58Wko6CVUqSMLlMH64/RTsWjPmRu93A3E1oSTFJG6LsPvq
+	 7XGoPBr86HLsTGIxhKCn477iFf8ULiC9eXxau36AqQijj/B9UXvuCM1Sg4DnyISLXV
+	 nRMszkBqD6pMxoBFJ1zRiJL0fOBDOsFsG4y3LdPilhHtFtTW8LrMxNP7UuungyI2An
+	 6eAreLZJJq6kJWWl9I+wcwaavVXqXeCG6ZxCBHZl2J0GymKrP4B16pjC7vQs3hk+cs
+	 gHr8NJfDqBg6g==
+Received: from zmtaauth03.partage.renater.fr ([127.0.0.1])
+ by localhost (zmtaauth03.partage.renater.fr [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id ArRWRU3oM4_g for <dash@vger.kernel.org>;
+ Sat,  4 Oct 2025 00:47:03 +0200 (CEST)
+Received: from 82.64.190.187 (unknown [194.254.241.250])
+	by zmtaauth03.partage.renater.fr (Postfix) with ESMTPA id 9C5C780023
+	for <dash@vger.kernel.org>; Sat,  4 Oct 2025 00:47:03 +0200 (CEST)
+Date: Sat, 4 Oct 2025 00:47:01 +0200
+From: Marc Chantreux <mc@unistra.fr>
+To: Dash <dash@vger.kernel.org>
+Subject: < "$@" doesn't expand properly?
+Message-ID: <aOBSZYeG7UDIbOE6@prometheus>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+omWVax7Ms6Q9co7"
 Content-Disposition: inline
-In-Reply-To: <2b8b60af-82f0-437c-a99e-260aafe37b82@systematicsw.ab.ca>
+X-Virus-Scanned: clamav-milter 0.103.12 at clamav03
+X-Virus-Status: Clean
 
-On Thu, Oct 02, 2025 at 03:56:47PM -0600, Brian Inglis wrote:
->
-> As config files are not distributed in the repo, it appears to be caused by
-> autoreconfig 2.72 as I cannot even build 0.5.12 without your packaged config
-> scripts, so I have already raised an autoconf issue!
 
-Hang on, but you previously said that dash 0.5.12 was able to build
-dash 0.5.13, is this not the case?
+--+omWVax7Ms6Q9co7
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I have tried building dash 0.5.13 with 2.72 and it works fine.
-So I suspect there is something specific to Cygwin that is causing
-this failure.
+hello everyone,
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I wrote a simple "inplace" script to be able to
+work with commands that have no -i options.
+
+The simplest way to do it (I thought) was
+
+#!/bin/sh
+set -eux
+< "$@" | sponge "$1"
+
+so inplace counter awk '{$0+=3D2}1' would be expanded
+as
+
+< 'counter' 'awk' '{$0+=3D2}1' | sponge 'counter'
+
+
+but there is an error message
+
+=2E/inplace: 3: cannot open counter awk {$0+=3D2}1: No such file
+
+so it seems that the expansion leads to
+
+< 'counter awk {$0+=3D2}1' | sponge 'counter'
+
+is this an expected behavior?
+
+regards
+
+--=20
+Marc Chantreux
+P=F4le CESAR (Calcul et services avanc=E9s =E0 la recherche)
+Universit=E9 de Strasbourg
+14 rue Ren=E9 Descartes,
+BP 80010, 67084 STRASBOURG CEDEX
+03.68.85.60.79
+
+
+--+omWVax7Ms6Q9co7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQQrhynLytp14smlCwy+er2aYc+1WAUCaOBSYQAKCRC+er2aYc+1
+WIUxAP91RIOI8W67hbrLQvkoZ9BspPHcDed6sIEoAX5gu9UHOgEAsueKem8Fazn7
++p98CzMZNQTsAHn5GGwHBjf9t4AUzQk=
+=4Niw
+-----END PGP SIGNATURE-----
+
+--+omWVax7Ms6Q9co7--
