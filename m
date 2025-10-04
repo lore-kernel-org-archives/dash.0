@@ -1,147 +1,101 @@
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+Received: from relay.hostedemail.com (smtprelay0015.hostedemail.com [216.40.44.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F800215043
-	for <dash@vger.kernel.org>; Sat,  4 Oct 2025 15:14:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E017633E1
+	for <dash@vger.kernel.org>; Sat,  4 Oct 2025 22:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759590873; cv=none; b=RdFAirkbar5EvINOTC+6nr2MFv4mCAyB32/37lGNGZygtDE8458RcZiVXf7u1XJeAceBW7egR07g/LPdt7pnLDzx9s1Tcqj93HwZtRbeu2IO94jV/5DJMDGkC1qSF8XDDYBly1eF7dBfVSVsnqzUllQ5uqZXggiJTgSuAxjHbwk=
+	t=1759618037; cv=none; b=G6LynUQgqBWj7pgQecoVMT58wXdP5vvX7dejq/VSYM1Stwf2bUF+CW9yoIsNFrJ9QlbAW1mEZsJ1GdB+4EVVz+eByliozez37khGFD106UO3VM1X9L5AkBjJiwaVclMweMm+I4I72M7CxPt4VwxFxoJhjfmFU+NIAeIFnJ0e7HQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759590873; c=relaxed/simple;
-	bh=oeFL3GR/zMVl+OSDHlGLO2Bm7aavcL3rm3S4RZMRFZ8=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=Uv9jY/ap0CRJEwaLJvJv05V+vTrWbnP5r4rX8H8xEEHKx0PsM17sve5OdmgugRTQFzRuxFp5dpfki3X47p0h9Krz1ASo89Bsv57N8To9mdiZxWy330dd9N9YS0wTY6Liy1f8S5nMBhMkF1BY88PB/aKeJARQGex/NcjO21BAnMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me; spf=pass smtp.mailfrom=larryv.me; dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b=xftO5mai; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MiE9r6Kx; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=larryv.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=larryv.me
+	s=arc-20240116; t=1759618037; c=relaxed/simple;
+	bh=Xc9BYPELevUh+2nOVOT64KIWP+IzA4NXKT1PpNes5IM=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=i9FpZufzl9/M26LToGjaa/t6dVdMMZ22zMysEk5iZw7tL2hCOCX2vdBxJdOLm/a28qbF9ePjLWiOCtTXMx1bhrsLyVeiAoNAjImCSRi5RjaAlMfxpS2uMButeW+g+i1xXW1FIky2vDZuYDgFxAzeOxfRZGMbvQMZyKB9A3oOcWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=SystematicSW.ab.ca; spf=pass smtp.mailfrom=SystematicSW.ab.ca; dkim=pass (2048-bit key) header.d=SystematicSW.ab.ca header.i=@SystematicSW.ab.ca header.b=ECvqWpUO; arc=none smtp.client-ip=216.40.44.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=SystematicSW.ab.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=SystematicSW.ab.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=larryv.me header.i=@larryv.me header.b="xftO5mai";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MiE9r6Kx"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 6378114000CC;
-	Sat,  4 Oct 2025 11:14:30 -0400 (EDT)
-Received: from phl-imap-09 ([10.202.2.99])
-  by phl-compute-04.internal (MEProxy); Sat, 04 Oct 2025 11:14:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=larryv.me; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1759590870;
-	 x=1759677270; bh=GG4rFJX7bMZQ1iKCP9YT9m1ilI1lYG/jyipW6hs4YIc=; b=
-	xftO5maitbcWLra4ItO8kgCfsPQ9fRe2ncz+BEL+qKfpQgcx6fPuemK4Hi0+gPHt
-	YJT6k6ZGN9fPMEvBg9KRr9mscTfvQIznX1Ek5zgibrKMXF+2p5uklBraWY4ypcyE
-	dXgmq+OQDcysZOWnx8sH2qVdHKSx5Jw3xdp1cqY6UBJctflzoGqgBCpG3J9B1SXg
-	XBuWtSQEWDFqxJCYRYByqafzM6H4U/t8eJITsY7uCkjkFUftIbI+g0sEwGtAR73F
-	j0VAmFt23A+zfVsW04yvs2d/fyNKdulzGa6gKLDsnmQWMBJg00KOPt83wbNBHTe4
-	R5++/ZYtUnvE2YzC3Br4ig==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1759590870; x=
-	1759677270; bh=GG4rFJX7bMZQ1iKCP9YT9m1ilI1lYG/jyipW6hs4YIc=; b=M
-	iE9r6KxSWyTI34Zhe4o/KXF2jmINaO54eoSizyfoWoPtieJ1nwkj+NR56BE3zHqH
-	EvjsJdr2f7p+w36BJlfoiI+RO5rLxeRfK6JCBVVEYAnMv0niTjExNIj1y+g8JjMa
-	HibWeARIhyzuUYLFgP44z1Rtzw27bT009FzQ1c4KTHEvqvRFmWKcGpn08uQcnRIZ
-	+ETjxnz7yzecQIXiSiXsj80wikY7EQiCkyTkW2QOnMcc2rGWW2gdPrROvD5KDIvu
-	1OjC2Nt6CNB942C4LZ4n2474a7358SheoBxQenc5rDYoWFZudNgxTQ0oAXB1JblS
-	zauGqTR3TgnyHByMh/u/Q==
-X-ME-Sender: <xms:1jnhaObwXqEa1wtESjhT-w2YVPDqo80oRdLvqCBRLZgsM9-dlXplmg>
-    <xme:1jnhaMMJcmXPtgLIE2qe000U2Bs_G4gVEJijt2ja828csli-0U32hTRGB9UHmM917
-    K5a-fbjk7xwptZNu4quQVskpgpClWPsqvJ90cbJKG7mAiB1bmvzyQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdelvdduudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredtjeenucfhrhhomhepnfgrfihrvghn
-    tggvucggvghljoiiqhhuvgiiuceovhhqsehlrghrrhihvhdrmhgvqeenucggtffrrghtth
-    gvrhhnpefhfefgkeevhfeikedthffftdehvdehfeejvefgffdtudetffdtkeejtddugefh
-    geenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehvqh
-    eslhgrrhhrhihvrdhmvgdpnhgspghrtghpthhtohepvddpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtohepmhgtsehunhhishhtrhgrrdhfrhdprhgtphhtthhopegurghshhesvh
-    hgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:1jnhaJFdfxrZscKnhS261NMih3AhAcw2bXBCwFFm8Q-4cQ3Vfb_TMA>
-    <xmx:1jnhaMRl0d2KKE26hwE89OI3m9I8HTh_9hIuhrHBUebQoBBspUFWQg>
-    <xmx:1jnhaCvqDEZkjph7PH0Bqw2utxdoYPONR_vfAOfkCTdbVXMRDsgF-w>
-    <xmx:1jnhaLxBHjWhO0ORnOp2JlUqrIExpW2WQArSwTorX9vN4yrqB5tSNg>
-    <xmx:1jnhaJ9az8y9hzmzQGDGeMPauX-kxq3pBxoVxtDLAmxw0OcvTkl_GLHf>
-Feedback-ID: i0b2842c6:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 1739E3020086; Sat,  4 Oct 2025 11:14:30 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=SystematicSW.ab.ca header.i=@SystematicSW.ab.ca header.b="ECvqWpUO"
+Received: from omf04.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay09.hostedemail.com (Postfix) with ESMTP id D5FF9850EE;
+	Sat,  4 Oct 2025 22:47:07 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: Brian.Inglis@SystematicSW.ab.ca) by omf04.hostedemail.com (Postfix) with ESMTPA id 457CD20027;
+	Sat,  4 Oct 2025 22:47:06 +0000 (UTC)
+Message-ID: <e4361489-5c2b-472e-a812-5e07f41c5774@SystematicSW.ab.ca>
+Date: Sat, 4 Oct 2025 16:47:05 -0600
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A9WzF-w5Ew83
-Date: Sat, 04 Oct 2025 11:13:51 -0400
-From: =?UTF-8?Q?Lawrence_Vel=C3=A1zquez?= <vq@larryv.me>
-To: "Marc Chantreux" <mc@unistra.fr>
-Cc: dash@vger.kernel.org
-Message-Id: <cff17249-7e9d-47f9-aca1-ef1bfa5cd32a@app.fastmail.com>
-In-Reply-To: <aODE8547kOvhQPIf@prometheus>
-References: <aOBSZYeG7UDIbOE6@prometheus>
- <5a1befb9-0617-40b0-9c53-7bf6452f0dcd@app.fastmail.com>
- <aODE8547kOvhQPIf@prometheus>
-Subject: Re: < "$@" doesn't expand properly?
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+From: Brian Inglis <Brian.Inglis@SystematicSW.ab.ca>
+Reply-To: Brian.Inglis@SystematicSW.ab.ca
+Subject: Re: dash 0.5.13 configure config.status truncated running under dash
+ 0.5.13
+Content-Language: en-CA
+To: Dash <dash@vger.kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+References: <ba3014e6-b1f6-4b6b-99ac-524dafd22f33@SystematicSW.ab.ca>
+ <aNvMWqEu-uIiCbGk@gondor.apana.org.au>
+ <81470aa2-3689-46a7-84bc-a7781cacf048@systematicsw.ab.ca>
+ <aNx4g4eZSsdvXlRH@gondor.apana.org.au>
+ <2b8b60af-82f0-437c-a99e-260aafe37b82@systematicsw.ab.ca>
+ <aN97a6Nn2C56006t@gondor.apana.org.au>
+ <e16023a7-bca3-4537-a8f8-f0e952c70e1b@systematicsw.ab.ca>
+ <aOCb3piwcPXpm_NI@gondor.apana.org.au>
+Organization: Systematic Software
+In-Reply-To: <aOCb3piwcPXpm_NI@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Stat-Signature: m3z7ymgrm6xmc1ftt9nzhk6zdoo4gz5p
+X-Rspamd-Server: rspamout07
+X-Rspamd-Queue-Id: 457CD20027
+X-Session-Marker: 427269616E2E496E676C69734053797374656D6174696353572E61622E6361
+X-Session-ID: U2FsdGVkX18Fhv3lO+r+xzBonHSglTt4AV7TQF7fOpY=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=SystematicSW.ab.ca; h=message-id:date:mime-version:from:reply-to:subject:to:cc:references:in-reply-to:content-type:content-transfer-encoding; s=he; bh=LESeXH3vzTrFrPeti5mPqe6HgT6tYBYaDXtyPFiRstg=; b=ECvqWpUOtm93mdoyFClsw3LwdJnW12QbWTT1yhy9xwvJI7wfzHvLOLpJg45wzsHE7qo/oY0tdbrQY+CThNZWrUigYa9RNMdn+1avL+vJZbMsCFDgaBwsXFutTWstWgQnXf0V3QtMXqkwdfrk49YV002ciWW+TdmQVw+d1lgP+cA4XjDXPAOTIrD6Vultg4hUB3SzlxDaOXnqdL7yC1AkvIJu447xa1lvebf8C8bDXePd2D3PYz9rGn9uac80m2Oi6Pjq2w+ar+JTXjmsiblQfvpdfGwUljAs9Bzmi1h17LRELic13nB5vbgoqID7XKAEAg1TRlMPQG6HPtKh1ib6Vw==
+X-HE-Tag: 1759618026-458777
+X-HE-Meta: U2FsdGVkX1/Et5GN9nYga6TkBKR7eFYyM3k7viS0Fs45ZH9/Xp3S3AIgawQeJ5Sq9I5RamLz6BztJ60bDitgT86OHyrIl5ecntLLjn4zBsRbVp35RDvZ4tKrahje+cU2BBBF+a9/ChCBREm8OBELWwrA2shz2akqa8u8skDQV5+gzOGWTbZp5ZTM0M3OhmfhzDvaB9wc8NNFn0BVlzzJpCM08kRp5ZmyU7sRC4cCp+j0ZliJE4++v8ANn9AhzKVOiaXYKW1O46y5W1sVyduhsj8eRieP4mX6CJFvFDMUP8jISnu5xmJkbI2BvxapcFVldUoXtCV9MxiaiAPZar1P4D0fdG0ketY8
 
-On Sat, Oct 4, 2025, at 2:55 AM, Marc Chantreux wrote:
-> wow ... thank you so much for digging this. this is the second time
-> this year where oppose POSIX standard against consistency and ease of
-> use.
->
-> I can understand why because most of the scripts I learned with were
-> postfixing the redirections so word splitting doesn't matter at this
-> point
+On 2025-10-03 22:00, Herbert Xu wrote:
+> On Fri, Oct 03, 2025 at 09:19:39PM -0600, Brian Inglis wrote:
+>>
+>> Likely the autoreconfig with recently updated automake 1.18 using existing
+>> /usr/share/autoconf/autoconf/status.m4 stanza:
+> 
+> But it's always been like that.  The code is correct as it is.  The
+> quotes are split across two here-documents and there is nothing wrnog
+> with that.
+> 
+> For some reason, when you ran the script with dash 0.5.13, the second
+> here-document failed silently, thus creating an unterminated quote.
+> 
+> Please help us find the cause by doing a bisection.  As I said my
+> suspicion lies with the new memfd code which obviously won't be run
+> on Cygwin so there may be an issue with the fallback path.
 
-Sure it does.  Redirections can be infixed, so these are all valid:
+Nothing to bisect as all commit configs from 0.5.12..0.5.13 fail, because your 
+repo code does not include all your autoupdated config files checked in, and my 
+autoreconfig always generates config files that fail at that point.
 
-	<file cmd arg
-	cmd <file arg
-	cmd arg <file
+I will retry 0.5.12 using WANT_AUTOMAKE from 1.17 and WANT_AUTOCONF from 2.69 
+(not so granular without removing/reinstalling packages) back until it once 
+again works, and then retry 0.5.13, without and with suggested patches if 
+required, and if necessary bisect whichever axis/package makes a difference! ;^>
 
-Someone who agrees with your argument should logically expect this
-to "work":
-
-	set file arg
-	cmd < "$@"
-
-
->> Almost no shell works the way you are expecting, except for zsh in
->> native mode (which I suspect is where you first tried this syntax)
->
-> Not at all.
-
-Ah, well.  I guessed so because I know from the zsh mailing lists
-that you're a big zsh fan.
-
-
-> As the behavior is undefined, of course, I would like to propose to
-> behave the most helpful way when it makes sense because
->
-> * the other usecases are already doable:
-> 	* if the expected behavior is "$*", so use "$*"
-> 	* what's the point of A  < "$@" ? use "$1" instead
-> * it's a matter of consistency to me. why "$@" can't behave as "$@" ?
-
-One could easily make the same "consistency" argument from the
-perspective of the redirection operator.  POSIX disallows this
-expansion from producing multiple fields...
-
-	var='foo bar'
-	cmd < $var
-
-...so why should this one produce multiple fields?
-
-	set foo bar
-	cmd < "$@"
-
-In any case, the existing behavior conforms to POSIX and is far
-more portable, so it is not likely to change.
-
+What worries me is that something in the autotools config generation depends on 
+it being done under Linux, and something in the Cygwin autotools autoreconfig is 
+messing up cross-compatibility, enough that configs are going to start failing 
+under Cygwin that work under Linux cross-tools, as Cygwin has been increasingly 
+dropping our previous Windows interoperability interfaces, they are becoming 
+increasingly less compatible with new POSIX, GNU, and Windows releases, and 
+packages are becoming harder to build without hacking more tools!
 
 -- 
-vq
+Take care. Thanks, Brian Inglis              Calgary, Alberta, Canada
+
+La perfection est atteinte                   Perfection is achieved
+non pas lorsqu'il n'y a plus rien à ajouter  not when there is no more to add
+mais lorsqu'il n'y a plus rien à retrancher  but when there is no more to cut
+                                 -- Antoine de Saint-Exupéry
