@@ -1,74 +1,100 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79C32905
-	for <dash@vger.kernel.org>; Mon,  6 Oct 2025 03:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4193C2D5408
+	for <dash@vger.kernel.org>; Mon,  6 Oct 2025 15:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759721325; cv=none; b=jk51Gq0K772Af5vfLOyuZy2x0KyRZ61tjUq+uWQvs/fOGluntBSb/lPIO70J2gVKChxPdpxkFD0W9gMgF/Hk7H9a1vPIJOAF4mB8Q5gZMUbWjSs0iMSPbV6Y7pTwqKOTIIRNwe0IcMDBYEwlhWnovYvZUYGtJJYUbQWyWZlVIKQ=
+	t=1759763537; cv=none; b=O7774nBBjb4wYS32JLnukfp151aIzcRWYoWWTv0ccXq+0DH56SBoxi5Ue91LQj+ESIKjl4rXCoQktRRCvZ0OvwRZ/CMBQ6Q1f8O6Yo7ysa6X9ZC//EZbkhHO63iZRUWeCQjiWTFuZI9DTTiPXnJaKolNYxHw6mC7Xj7TXkeiGFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759721325; c=relaxed/simple;
-	bh=4M1AL+D5whWiBDUhw+Otfin2HMKF1/LLOGtn/iZbfkU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OWl5nQ7+C9QNKlW1+C52jyLaJs4t3/oTHfW8ZWJluOxVdPvYt3LJryCdMihsw/bm/n6eWA3C0wPiQlo9EyWAQF0SA9t4k6Y2OqTfS1Hl/+eJY2rzd1GyTLMHrQxwNZ1E8v9QuYTzblfEPwn5Aj2ZyeAZmmBCkvSTxjn4ivstcHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Bj/OG5+J; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1759763537; c=relaxed/simple;
+	bh=UvUQGUQ5JBYWsPF3dXQX6iAwy8oILLzV2IJ6nbkFtUQ=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=DNctXYSpuQoaXGyqkFWVySkbkOgUzICD0cr1TowvD3qnRHSiM4FSmkJDw1BMu/ja0wQ1IaU4u9WmsbjDB+rsBCH5jg1oR/Udif173ytJx9qWzj8lJSk2+RcrTOrX8R060wlRfEyVH6rVpv6PAjF+hblZhuJfkWvr8OwUdymsI30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de; spf=pass smtp.mailfrom=posteo.de; dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b=W6doUbCM; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Bj/OG5+J"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=WUFB2kdCB4/UyZUhJj6mQpRv8BTXqe5TXY5fGMUp284=; 
-	b=Bj/OG5+JxrsK9eaClPqzvVw9iNDCQY1C6QcOac8cr4Yv/JsaYhj6SlK6uDFYN9Ou+X7e9WUzG4x
-	XMzX1NCeaoxqSsNvaVKG5pV8OA+H3Dm+b77ykIwPQrLIGYp1a5qL0DRMFT/BEiN40PxlIhcHUW4uk
-	RE7SIQDLDwULObktMmXq8ap+RcYRHeYn1tJ2UuscL3RX9XhgzEYXuMrbYEZdhQ0B7r3j34GNLT4tq
-	G2ic3U/cOaCWwUwDx7P/caj76mzdctHKP6kIAwUxlATJBVzde35bBzkaoahw2oKByCx/+tiH6D4LL
-	zbx6rtYvy1AjuCMfyibNG/OPmJqVMzCYzrUQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1v5btu-00AgnE-0l;
-	Mon, 06 Oct 2025 11:28:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Oct 2025 11:28:38 +0800
-Date: Mon, 6 Oct 2025 11:28:38 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Brian Inglis <Brian.Inglis@systematicsw.ab.ca>
-Cc: Dash <dash@vger.kernel.org>
-Subject: Re: dash 0.5.13 configure config.status truncated running under dash
- 0.5.13
-Message-ID: <aOM3Zg-k5PoDzbVE@gondor.apana.org.au>
-References: <ba3014e6-b1f6-4b6b-99ac-524dafd22f33@SystematicSW.ab.ca>
- <aNvMWqEu-uIiCbGk@gondor.apana.org.au>
- <81470aa2-3689-46a7-84bc-a7781cacf048@systematicsw.ab.ca>
- <aNx4g4eZSsdvXlRH@gondor.apana.org.au>
- <2b8b60af-82f0-437c-a99e-260aafe37b82@systematicsw.ab.ca>
- <aN97a6Nn2C56006t@gondor.apana.org.au>
- <e16023a7-bca3-4537-a8f8-f0e952c70e1b@systematicsw.ab.ca>
- <aOCb3piwcPXpm_NI@gondor.apana.org.au>
- <e4361489-5c2b-472e-a812-5e07f41c5774@SystematicSW.ab.ca>
- <aOMmNGZXShEvZdTV@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b="W6doUbCM"
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 1FA3E240101
+	for <dash@vger.kernel.org>; Mon,  6 Oct 2025 17:12:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.de; s=2017;
+	t=1759763531; bh=FZSdmjPAXFVwLHEvuacW3y96mjV/fbwZWZm1+M2MGx0=;
+	h=MIME-Version:Date:From:To:Cc:Subject:Message-ID:Content-Type:
+	 Content-Transfer-Encoding:From;
+	b=W6doUbCMK2YMlYUFVLXTXDxaTqP0sOnHVl6m2iN+06v5iUn09Z9ZNG0vScQOOpri/
+	 RcqodxEYjdb0AXQgwNDwVQ2zv1+raaFFOwBh9i7sobtMEnJMiwxcgR1+YJoXeEzTOh
+	 J1wGPuqhCCQvBgOAq8OdzuZMisHwuTBniBxOyufsD3MUOeOt3BxPLV3ocGG1aF/Jup
+	 6FHVsDPWHRktCT1U3GIWHsfx6ccGaGnXvhn84KEeyD7XFZEV7AfWTH87rSbuTFVxXz
+	 z4q7hv/QPEnkTpfGhwSVr6U0+33dMK8/OCgR5nUdC1FSvR2s9LxVNpixgP6rLdEOtx
+	 0VCbAJQUZ3aYw==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4cgN6L3n8zz6tvh;
+	Mon,  6 Oct 2025 17:12:09 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aOMmNGZXShEvZdTV@gondor.apana.org.au>
+Date: Mon, 06 Oct 2025 15:12:10 +0000
+From: j.daubert@posteo.de
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dash@vger.kernel.org
+Subject: Re: [PATCH] builtin: Keep backslash on quotes outside of dollarsq
+In-Reply-To: <aOM2ykncn3sL2LsJ@gondor.apana.org.au>
+References: <aOM2ykncn3sL2LsJ@gondor.apana.org.au>
+Message-ID: <c0a8a284b7b64cfd6ed1062a50a8be08@posteo.de>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 06, 2025 at 10:15:16AM +0800, Herbert Xu wrote:
->
-> But did you replace your /bin/sh with the potentially buggy dash
-> 0.5.13 when generating those scripts?
+Thanks, the patch fixes the build problem of inetutils for me.
 
-A new bug has just been discovered, please ensure that you have
-this patch applied for testing:
-
-https://lore.kernel.org/dash/aOM2ykncn3sL2LsJ@gondor.apana.org.au
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Am 06.10.2025 05:26 schrieb Herbert Xu:
+> Juergen Daubert <j.daubert@posteo.de> wrote:
+>> I'm using dash 0.5.13 with the two patches
+>> 
+>>  [PATCH] expand: Fix off-by-one bug in expmeta
+>>  [PATCH] expand: Fix typo in pmatch for wildcard search
+>> 
+>> as /bin/sh and get the folling breaking while building
+>> GNU inetutils:
+>> 
+>> ...
+>> make[2]: Entering directory '/tmp/inetutils/src/inetutils-2.6/src'
+>>  CC       hostname.o
+>>  CC       traceroute.o
+>>  CC       inetd.o
+>> <command-line>: error: expected expression before '/' token
+>> inetd.c:166:31: note: in expansion of macro 'PATH_INETDPID'
+>>  166 | static const char *pid_file = PATH_INETDPID;
+>>      |                               ^~~~~~~~~~~~~
+> 
+> Thanks for the report! This is due to an unintended change in behaviour
+> of echo '\"'.  Thie patch should fix the problem.
+> 
+> ---8<---
+> Only dollar single quote should eat the backslash character before
+> a quote.  Make the skipping of the backslash conditional on mbchar
+> in conv_escape.
+> 
+> Reported-by: Juergen Daubert <j.daubert@posteo.de>
+> Fixes: 776424a8f915 ("parser: Add dollar single quote")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+> index ff576ff..106aecd 100644
+> --- a/src/bltin/printf.c
+> +++ b/src/bltin/printf.c
+> @@ -339,7 +339,7 @@ unsigned conv_escape(char *str0, char *out0, bool 
+> mbchar)
+> 
+>  	switch (ch) {
+>  	default:
+> -		if (ch == '"' || ch == '\'')
+> +		if (mbchar && (ch == '"' || ch == '\''))
+>  			break;
+> 
+>  		if (ch == 'U') {
