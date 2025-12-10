@@ -1,96 +1,85 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07D8338F56
-	for <dash@vger.kernel.org>; Thu,  6 Nov 2025 14:53:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5379C1FBCA7
+	for <dash@vger.kernel.org>; Wed, 10 Dec 2025 15:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762440794; cv=none; b=K86PW3xabU4FHKRbB/cHWoGpBsUyuOP6ch0PhhlC0nKgMo2dAzq1E0Pwt8cEVKePcxuOiCENH3pDKuWhVSp9538Dj6JwHGWJhTtKuyttHm15sX5EFnWqObjCZcB4VSc6narX5ebHI3+bl5TgR89Op04fNin8z4XtphvHDtAPFf4=
+	t=1765381352; cv=none; b=jxCDB9jkkXluF+lEWwE5xDUuoMAo7P9wQH2k1q/4EGjA7QLcdDdYZxJg3d53RgJUAx9Y9kZuUjm/WnYxHTf817xY4qGawvmKi6vMlxpfMVYvRJU1KQlXTjJKb6ZwHZGd1lACSw70IHVykFgMw2Rjq3wtq//wGE/PCpCp1F8kGDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762440794; c=relaxed/simple;
-	bh=s7xOzR36UYfhX8DU1sT1lubr34nhAwKL6EcFuROJpIU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=eNQZRqs3oKRUozC88TekAfLb9e0D1p9K3wrtDWjYaLEHbYzLbq2AOtxmIDG351vpYigCWIel8SEkx1YE6BuM5sG9W4LD5vjELyF04zvjKzFk+nEQhibnaKeM3XG0VHEHipW29mKzHU+7NenQPqRUFXzo7NWv6GFzOCtNd5psvbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sim-and-cure.com; spf=pass smtp.mailfrom=sim-and-cure.com; dkim=pass (2048-bit key) header.d=sim-and-cure.com header.i=@sim-and-cure.com header.b=GiHAp4b/; arc=none smtp.client-ip=209.85.161.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sim-and-cure.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sim-and-cure.com
+	s=arc-20240116; t=1765381352; c=relaxed/simple;
+	bh=9yTgUSUKJf7h5l/c3niETw8v0u9xzVCAq6u0LvDC5rw=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=TBlc1XdVtOC32R8bb2Xk+Vuv6T/HsXf3g4q0o7poP1QfOqsXRKskDiNTiP0OwaEdXrgkJFVXfupp/nS3yV1J4chGZoBLwq6h4eB7jTf+t1RdK0N5EtftuCy3Goqb1VuMq6Wslkob/elIZdOgbkjNt/u3ThNXpqaCjgz8i+uiPCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=draigBrady.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NRHvMydu; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=draigBrady.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sim-and-cure.com header.i=@sim-and-cure.com header.b="GiHAp4b/"
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-656b8900ac1so521272eaf.0
-        for <dash@vger.kernel.org>; Thu, 06 Nov 2025 06:53:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRHvMydu"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42e2e40582eso4137387f8f.1
+        for <dash@vger.kernel.org>; Wed, 10 Dec 2025 07:42:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sim-and-cure.com; s=google; t=1762440791; x=1763045591; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1765381348; x=1765986148; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:sender:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=s7xOzR36UYfhX8DU1sT1lubr34nhAwKL6EcFuROJpIU=;
-        b=GiHAp4b/VxM4hNsirqcWsvA8Ix9BwGPFgG5vmodu/FxNQZePqyldvL+7kh0f6RrMpn
-         QOID88FbjR2cKW8d0BaeuLlPoCruLs7Rspv9Gvdavz51iGWTzMQma1JtuiSaKmWpG40j
-         0084e9H1bVGEOC7ZI/wJARJtrnn2HV5hk+VEznv6FWxNmrcoIxD3RLmsYhorl+2HmuuP
-         E37gxo9vlRmwjS1IqXEGelfV739DHwbOj7vWMnTbtldNHeaWjV5fsPMFnFF4BFljsXVp
-         Wk6Pn5ypY3faUfRYfeODlazHFYZF+iXvGz8cmp5grCRF8pWrPJT2aa1OjyNNpODhw7FN
-         gzdg==
+        bh=9yTgUSUKJf7h5l/c3niETw8v0u9xzVCAq6u0LvDC5rw=;
+        b=NRHvMyduwKZ2CC+UuZn8bNf7IQV/UXvylCsebQJ9TdPmyffwnZ9HFYAIk/RQhQTdJm
+         3k5PjSl1sYDeM3mhEXE9Xay5baD3JelZRVD4t5Ukr6+/QqNkm7DAmGnk6vU5lj2toIuR
+         NbR95Ovu6Jj8LxnP5/THZsJOU+epgMEIuE6DQd/4pi7ROkHME5SQr4FYnXMgSgq/vR+b
+         32P+2nsezP3MzVdnzq0O+9wZOoW+TPD5ct09/mjpT1UYZj4UqImo6BnJa02jWt2YQ4yR
+         Al5APgxDKrCVXVhdHZzp9AI90zldzOqr44uiF7XHxpCUWSNALOwMctV2ZU81zOlc1J6O
+         x8zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762440791; x=1763045591;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s7xOzR36UYfhX8DU1sT1lubr34nhAwKL6EcFuROJpIU=;
-        b=J48+6mCVZ9e8dOLseKgbygVfhjeyk7fcIoI5giwa3MyhP0nE9JpTt2HcJWDcJfh01w
-         9snP9xRcdeiY63NrIq+jA7mmrGB9DjfvqJWgXOa+E6vwDyz6TqH+bboYn1/N51tuPDZB
-         C98FAdA3T4yINmShUuNZMVF87WeCzi+5wJ49ThgEffn0JAqc7qFYXCoYmd8TNFYVVBLY
-         chgc7+LBxOkT6o8m/YL5977IzUmSoWpKASJLcHjEKkHKcbF2Ff4SNA8BxMsemooGPeSP
-         MUbylPgy36GHM45EBvC5BuAs2K+ESxCKmQB28UwNt/gzOe2ea/EnObLMRIqlCvsqre8r
-         U70w==
-X-Gm-Message-State: AOJu0Yy6uRSw9fgc/Nj3elrtPaTT7BoRfFQZfIzQMMULztohjnev4akH
-	Gm4tdYRzaDAVn92LufOYJbst3VcClip8UP0xIHVO960TQjDrBQ8x69amKZxLVedd0YqZhVOY2yo
-	rP1wP0Edxe5RFzqlbROsEqzsaPjbScU01iTHYLqRS1PSP8JKB6nd9n9M=
-X-Gm-Gg: ASbGncvkYjGrZeurWxnqILH2T0VHa+r/LzLa6r6ljJrNELrt3/r0pF9DAX6MpZ4OKfl
-	4MMUm1gPuJHn3Jt2OsvTRImuq0xf9ueyoKXPRh90gToFqLzNas9WjqIEPfZ8D1JA1DH2PQJbeau
-	nhFiRZkG8NL49tIM5WlJS6yloU2iKhD/tVCSbafReDHhUkQ44UgQ8+a2WO3shUF+/D6ZslU+jyB
-	pnQ/J/dkdg0yX+q+3UwmnIxwZA8dINEUCoqFaVEeRdZj9Zp4jbHbaikyyBMZQ==
-X-Google-Smtp-Source: AGHT+IE+fK9ZE+ZgBqY3j1lPJNmfOaX+cxH/qJmjkfBPpbBC3UCno4tFhGtY9c+zPwH0us/1T0uvmX7FdHZj9vFsLnc=
-X-Received: by 2002:a05:6808:e84:b0:441:8f74:f1a with SMTP id
- 5614622812f47-44fed4fb3c1mr3504787b6e.52.1762440791026; Thu, 06 Nov 2025
- 06:53:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1765381348; x=1765986148;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:sender:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9yTgUSUKJf7h5l/c3niETw8v0u9xzVCAq6u0LvDC5rw=;
+        b=oZVTezK9LCojspcxHwrWE0R4ox8IUvcrz/ShfTmYyfxJLmlnFEotSmdSphQbKLKDBV
+         YbvPsImoNihjD5mq3xtNrRKb81ECXGulOfNxJYmSfgU/VC0n3ej+gYTsJPBgVDiFc5Tv
+         AW55yMAv6ZJZUr2mj9GuCzJ0ghe7eOw7DSS8c8PkRShSBThnolyaNNKZUoNlr8jEhj7g
+         9FQPr8EH3Yw3CsAGr852Rqt58mewfp0OFnwWIYIxgKJzHJnHw/2y1P1x7O2KQNVFBZU0
+         ZHX1fe9O4QLRu8P5FtHPob5HSBD75lOxtZuY7vMx5YmuZrd1VqNrF8T9hx5TO0wSDzQJ
+         0ECA==
+X-Gm-Message-State: AOJu0YxjTsZabpJRV1E/vIRr990ZmwCclvxXIrDQgcpbKTVcKBB3LaJa
+	sKVVhtcE3QHIfJGRwVmvbTwrtoPA2/RzPgvkU3/ker9xuGyTGsvyKAxWr+0V0A==
+X-Gm-Gg: AY/fxX4j93B4CX749zveEaWUlWsdxAT8zEZxOuW/rOXBSZ1yZd0XJm97iO/1bM0bcG4
+	ttugcW2U/pKHlXpokyXh7H0yqdgyR4M/BEYwK2b3DV+Nalcy4a05ylZ5qEZwkkXsk88mX5B8oO6
+	X1ilPyVLNTwNpDY2+vbJmVrdb6PXQyqsMgQ8VfYiSezlefWLfRAXtie9n8S/leVEBxkwBj5HJJA
+	NbHscv1edw0iyRtm46MYJt/TsbASSGMkNE/U7C1VPpr+aw9DeDSZj6pU1REqqknlA21ujqPNK1z
+	b4r1oT/UQd72H5cRm48girkjD0yQTF2TmVThGyUuX0K8mCmYEWX8GbWkeQMNnInHYh8kNxyeOA5
+	HLflnBOTjMphns/0am0k4jsavyyWho/wuNZvqeetF4xZTgfHXdA6YbiD5fz1ecwwVe4N+iv68gp
+	n6KFP2sgaQaKaY+UHXelIRcyfxlsdamGGx+He/1aU6AffhV3bTgoCjlP89Y5ESXxWqzvhyzaEJ/
+	cP+MA==
+X-Google-Smtp-Source: AGHT+IGc+zbq0up9m8u+GYHmYSRMNRiSCiKYQn/7KX/p2lMY2yFnc6v34y8WR1ms1OMj2WeNo7HZew==
+X-Received: by 2002:a05:6000:612:b0:425:73c9:7159 with SMTP id ffacd0b85a97d-42fa3afe908mr2944771f8f.33.1765381348186;
+        Wed, 10 Dec 2025 07:42:28 -0800 (PST)
+Received: from [192.168.1.31] (86-44-211-146-dynamic.agg2.lod.rsl-rtd.eircom.net. [86.44.211.146])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-42f7cbfeadesm38098721f8f.10.2025.12.10.07.42.27
+        for <dash@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Dec 2025 07:42:27 -0800 (PST)
+Sender: =?UTF-8?Q?P=C3=A1draig_Brady?= <pixelbeat@gmail.com>
+Message-ID: <6a95263b-9531-4ce4-b60a-e15dfb63e5ea@draigBrady.com>
+Date: Wed, 10 Dec 2025 15:42:26 +0000
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Hadrien LACOUR <h.lacour@sim-and-cure.com>
-Date: Thu, 6 Nov 2025 15:52:59 +0100
-X-Gm-Features: AWmQ_blLqcJi1uFzv7nYdXvOXFeUdGOKGNQfMSyRtQ0JIVzBR5woCgC_W2sBRzg
-Message-ID: <CAKmiXchO=0x573QEG6eZnOVkd8K=0PCiNM2x=qqrQPxDsoWpKQ@mail.gmail.com>
-Subject: dash 0.5.13.1: heredoc parsing failure
+User-Agent: Mozilla Thunderbird Beta
+Content-Language: en-US
 To: dash@vger.kernel.org
-Content-Type: multipart/mixed; boundary="0000000000004995850642ee395e"
+From: =?UTF-8?Q?P=C3=A1draig_Brady?= <P@draigBrady.com>
+Subject: POSIX read -d option is not implemented
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---0000000000004995850642ee395e
-Content-Type: text/plain; charset="UTF-8"
+It's especially useful to process NUL delimited input like:
+find -print0 | while IFS= read -r -d'' file; do process "$file"; done
 
-Hello, I'm on a ARM64 MacOS machine and updated from 0.5.12 to 0.5.13
-via Macports only to get a very strange failure (nothing printed)
-attached as a script. I then tried on
-5139d6a27763fc0be386e15634db21e45598b299 ("shell: Fix unsigned char
-promotion and truncation") since my problem seemed similar but not
-cigar; tried using a modern clang (21) instead of the system one too.
+See https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html
 
-Hope GMail doesn't botch anything (nothing else at work).
-
---0000000000004995850642ee395e
-Content-Type: application/x-sh; name="heredoc-fail.sh"
-Content-Disposition: attachment; filename="heredoc-fail.sh"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mhnjmekw0>
-X-Attachment-Id: f_mhnjmekw0
-
-Y29uYW5maWxlPXh5egoKY2F0IDw8J0VPRicKewogICJ2ZXJzaW9uIjogNSwKICAke2NvbmFuZmls
-ZSsiXCJpbmNsdWRlXCI6IFtcImJ1aWxkL2N1cnJlbnQvQ01ha2VQcmVzZXRzLmpzb25cIl0sIn0K
-ICAiY29uZmlndXJlUHJlc2V0cyI6IFsKICAgIHsKICAgICAgIm5hbWUiOiAiZGVmYXVsdCIsCgkg
-ICJkZXNjcmlwdGlvbiI6ICJEZWZhdWx0IGNvbmZpZyAke2NvbmFuZmlsZStmb3IgQ29uYW4gfWdl
-bmVyYXRlZCBieSAkMCIsCiAgICB9CiAgXSwKICJidWlsZFByZXNldHMiOiBbCiAgICB7CiAgICAg
-ICJuYW1lIjogImRlZmF1bHQiLAogICAgICAiY29uZmlndXJlUHJlc2V0IjogImRlZmF1bHQiLAog
-ICAgICAiam9icyI6CiAgICB9CiAgXSwKICJ0ZXN0UHJlc2V0cyI6IFsKICAgIHsKICAgICAgIm5h
-bWUiOiAiZGVmYXVsdCIsCiAgICAgICJjb25maWd1cmVQcmVzZXQiOiAiZGVmYXVsdCIsCiAgICAg
-ICJleGVjdXRpb24iOiB7CiAgICAgIH0sCiAgICAgICJvdXRwdXQiOiB7CiAgICAgICAgIm91dHB1
-dE9uRmFpbHVyZSI6IHRydWUKICAgICAgfQogICAgfQogIF0KfQpFT0YK
---0000000000004995850642ee395e--
+thanks,
+Padraig
