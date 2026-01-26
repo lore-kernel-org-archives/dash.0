@@ -1,379 +1,135 @@
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A72296BC5
-	for <dash@vger.kernel.org>; Fri, 23 Jan 2026 12:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46276315D22
+	for <dash@vger.kernel.org>; Mon, 26 Jan 2026 11:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769172249; cv=pass; b=TxxThzYTxaiWxt/2RJCxzrwunsGwuHGrtU6+P6v3alNRyzFuGojQDt3qRmqPXq70HD4We+lbhOtVRovEyNtKiSYWjO4+7U4BAmL5nzpMY3CKte9SsOfwDYBmoNLcvxbpuJgtfGGmAW//mGHTF2LqUcSHbeSISYNxqmRu0PgqHH8=
+	t=1769428538; cv=pass; b=DEo8cUiyEMIimycj5QWq9H4ty5FERndHYp+QwSWD2vgaYnmG/7uBd1jrLGRtZD2mXCgK7NCx4GJhtNox40U9/vlkwOXgCW+GD/sYcjW/75LyCprlG6xC45v6J0ZfGZNQ1X6rUUkiskG+NFLOni0Cb8+XpfDct9w9v5RbmwKjyFU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769172249; c=relaxed/simple;
-	bh=I/+bhIV9JxlE/XXC/7O9uEAjXkIc7EMTh3Q7RghpsmM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=KYdblzwAwJEQ4zh/598gOZryMshazlu49gprkL9nOhJCCAtNEapTzNN9e+K1BFforFJJb/eO8RapvxW8Ccu++CG/rI4DmRx4vznqSDHbv73QmjXwJJtOqpsD0Hr0G3HbR2an7EJUHAgdMVrv8tVUy1APgnkcxIw02A4Fhmgw/cc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FGBACAi+; arc=pass smtp.client-ip=74.125.224.41
+	s=arc-20240116; t=1769428538; c=relaxed/simple;
+	bh=FrB5zUPuR1VN1qxZZKHdrbaMnXGMBkuWyHKjFEgbytI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=Ff11yBbppmOkoIL5Nqp9VUjRgAZvGIaUr7imVC1aT2RG+dD1hYJNemv1yCoEpuWv7lYOsptYyHNaRewrU43p7n2GNmh3mEFu5w4/BM6PtzNttGRQBrugKpVz5FxUmo5OcX0R1vCLvHBxVcg4SqFzv4S4ngPYNYtfvxs5ekcjJsk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J7NeAr8K; arc=pass smtp.client-ip=209.85.128.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FGBACAi+"
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64960418d46so405994d50.1
-        for <dash@vger.kernel.org>; Fri, 23 Jan 2026 04:44:07 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769172246; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J7NeAr8K"
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-793fdbb8d3aso37636507b3.3
+        for <dash@vger.kernel.org>; Mon, 26 Jan 2026 03:55:37 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769428536; cv=none;
         d=google.com; s=arc-20240605;
-        b=KYMcQwVVAMGLBAYj8IIiXfVVTDDKWhCaKpFdX+zE6sEKA9fJA+OuSZ+FoTOgSyOT2l
-         pri+gnuakwtccsKRK9VKjWj+JnuaFqAvj7dNbIu1mNwiBkJrHGo5PxJ+wSaj3U2tbJ/X
-         ouiDasOcSkVPQ2j5T3aIcP4MwM6nvFzmA6t0yayFhj6tOre0amnpg6UPPWarM+CJB9Db
-         GKyW5TUK6wyJ5G7CAdw5+Thxt9X9aSo2fSs8x30gbO8Ra05ZU9IKePkgVibffmJAcjtZ
-         RsVpq3lyUNS+NaI5kWjhd+WRLJpZHRfBAeX6sssL3Ee1p/g+sd+VxEd5zdEzNx7njMUQ
-         XRIw==
+        b=I1D1su4dK/gH8DtbJkv9XCeqkPKaRLFzxK2QXxUSYNrnJ9nmXy1eGKgQVpi+j9hYnG
+         LoiyLDcaC3xnoVYQuv4QnGxDLYuFJTTl0LIR0bEIcP5lNV1i9A4LHBhSI952iMGod6GF
+         gBj+we5TyBuliy9cbYZ1DbO0mWVluB58ExCm2naGYK+3aK4CC9SM7fBCfq9l+tN6xEZX
+         3gtqkXhjGGN0neBu96A3az0luHcTCv5mRcwpyLU4iEimPbIyzhRn8aO6ajPUa1QxpJ25
+         VXxfAV+AklRPiE9MI/8FPpqtvxw3mvq/VvOtPZ5Pj/2fnBNhrGdk4sawsF6SR+EZO4eH
+         NerA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :dkim-signature;
-        bh=toi1cc5q5DXnKU4K33UTlSXTVfAlNw5EI6/6FehdPAY=;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=VNOf65vzwACCvtZ55/sE1jHyQg5R40X74J9/M7E/rXA=;
         fh=Q7kkUHvUpV7GF22BcVPTe0jHcVVjWF0IspJwmqq6Oh4=;
-        b=LbGTlFZexPih/rzUnMuF0R0oHESi4a5dR5ImCV675iSIpwUy+CINWmyAq7cCxQC250
-         1P1kGgiJfp4gbsik/YffRCVhNM6vjPqgcZJ4fm0hGBk9DKZ41Bzyu+EZM33nFvZML3uG
-         Lz4zA4fr7CEcaj2Va5lBWUXNa7SvNw8v5u2pqWsWMFGsPJxK2G8nDMs5s/LIbzYyyMeu
-         iHiL66J8/wHA8Y+6kc9uiIfqZYfaAOm5ApBXSqwA8bMog2u85fD64mXQ0LVj8wtzWoVl
-         9/Iyj4J7id7tgII6sDPUPQd9WgovE0tB/3upDbF9T/z3UUdoSJHlCt66EjRA9EFc9w6q
-         /5ow==;
+        b=XNHy47JjIGPLF1AN/8TNtw8lJSdUj0jY3j4MHLW1EWJY0IhTIGkftFMbZUnQWS7Ijx
+         wHOm4WRrDUj/n12eWoaSBNwFRCHqlG+6IkLNV6v49pUfYsBrVLKRtBpUzQLHqRq/IGGE
+         w5XjGUQzJo1tHcG3vYup+qaXlq6zxwxw2kLcUYtqUiIpCGbka7cKwehhW6I0llUKW93c
+         dBgUgqZoIPcTjEOA05FeRdF8fwF14TZtr9Wf+V/HtG7Ipb5XXR7F+Qcm5RmQCuI8u4X3
+         nQoAHg1iDdmpku+viqHfOsZPZ1WML1W2sHBjMqfU1vQqL5qsXn3/xh2D1tJYo80Gr9HR
+         3IUQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769172246; x=1769777046; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=toi1cc5q5DXnKU4K33UTlSXTVfAlNw5EI6/6FehdPAY=;
-        b=FGBACAi+DbXD0lgSOLD5W6C3G4vqcLJvT/XDgqQufs6oLymGEf2opB8TVkt0/5M/D8
-         HrqDD65keVtogvZC+rx/SCK6Cd1HZbdG98qoAl/bJb5PTk/PDf8kI2Piqb43cy/R77Ln
-         bROvBuftcRyoP0syjyc/o4G+WBSHsSV8mWpO1cty2smagaXsPyz93mrp2Vz2QH+RT+jl
-         77TFy1BborWUVxdt+548KDPgJD8Vvc+gSUNCwzDVtyVdRElvKrTsAvsS0J/LiXJSglYb
-         gBqEJMtG9mcEEcO3+Mmusx+7qCDdqIpGEnj6Ijz3zVuoP4ATo6oq+cmmE1v/mNZ+hEaL
-         Nvog==
+        d=gmail.com; s=20230601; t=1769428536; x=1770033336; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VNOf65vzwACCvtZ55/sE1jHyQg5R40X74J9/M7E/rXA=;
+        b=J7NeAr8KFsbYHdNvmHROmNBZRpg+u/7DDTuOP7gUAeAhorUnMK157/cMqSj5TiDzLX
+         2somE3gqE4N++/HozPN+wl9NpmYpEyHBNmlvZy00XKY6a9dVCvAo/S6T3DOHx6VtsQD7
+         vBSyN7d13xNfmrvY2LirMs4nD+MCMf2ou5MyrUBfSc5eH5aQ6uZFDLT4/kuJu+l87mVG
+         WBTqUNS0IWOsY5vOwIZ/m8Leb/xtLevxacm9ycltOhWrhksNT8FACxCH6f8YruQ5ZpUx
+         5dhYCcJcxRGaosn8593VBORi8K9jqh/zqyf4FT165yO4y3OXfcCmYE1EavKTKruWcYVx
+         PfjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769172246; x=1769777046;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=toi1cc5q5DXnKU4K33UTlSXTVfAlNw5EI6/6FehdPAY=;
-        b=BzJS9ttBAWdYvzBXobWWg/rFl3gIi6OPIbvPNJ/dVsmjfJVgr1XerYU36yVlXry8hc
-         mgnMTZdgravcBJ3e/rFhGEKZbQKH8yPMjo7JFhtNtSbxFpN6kNKJ9qgG8bTL7ifPE5ip
-         dshuxrCpwjf+xPV7eiSbLM3Z3C7Sg/KzKQ42YCqnEE3VOtkFSlAIk7t4vLIc7TgJohp0
-         I4MHZUUcziRNWLcQbad6WyoyqIGAUGJOhKpcqirEoh5nLyO39Q+9AAVxj6eyH8/wLi6z
-         hTsmFvWpFev6nII2f+ZVxU9CxTArBI9+P2hJInkEbXAjg9ifOnbK+wwYJSIibW31CEyV
-         Limw==
-X-Gm-Message-State: AOJu0YybtaRHha5cLKg1cFpPlKXDA3dZh2WBY9MuZZJzaR8rLf1ZgEKq
-	ftEyxHtNJsdWC7JCPtYIwYjycoDIDiTRtyE5tw48jIALxBnkgxWKAX1tiKy07CrSiaCN5unHXTR
-	uKLUSF4xJWOXqL1Jd897gTCiDSCDXO36XhOKwqTI=
-X-Gm-Gg: AZuq6aKtYEgsf7brvoR4QF2SU+vTfywW3EVSKuNzkGU3Gl39/5IVLv99MqS3nUIN77F
-	pkIVOPFJh650QX+hqDzHI+MIY2+MtujuWTlay5YsDbUGpO57oMM7v5PRDGNp1aRx9qjegZb2p+O
-	s2YziKrndmOt3Iso6vYIPdkEvQulo4cobe++Za5izAU1kIugC2HajdoOrvn63sEB3NdSdGtI7hM
-	JK7ARzYekHCUhiXtnqpqKP6JI4L3o7buSzPvoPfRB7CXN9ZOmwQuYldhoW9Ae9/6EeHmkUHZ4kn
-	nrAsWiMUTVToxkw/ns8ZcCsXbg==
-X-Received: by 2002:a05:690e:b46:b0:644:7d7f:ed41 with SMTP id
- 956f58d0204a3-6495be6b4cemr2148834d50.3.1769172246074; Fri, 23 Jan 2026
- 04:44:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769428536; x=1770033336;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VNOf65vzwACCvtZ55/sE1jHyQg5R40X74J9/M7E/rXA=;
+        b=GtCX5VYlIjfEX+3yUGVo9S7RvRTE2KMZlWTZuunp9PWKxRVF/QS21b/pA8NCK3sWRE
+         X89ewnw/dlMuTDVnZsbJGT9+DWqcHx6c0kbu/xcsmRD3S+uwo48uEfdKpInNOp26SKrL
+         x/sUysR9R7xya/B5HvLi1nVAynw1Y241AISlXaxGYlsIQfDFxJb1VsbmdBUY+y+HI1tV
+         Mvf9PXE78HH+NmloaRU7P9V/aXxQbI/Fp+gZj5nwnbcH1VgnlPut1fDzqVNeFzuQbCyW
+         sd42cD/4Quq+9faMzqqRQvizkzEQb+5kNA7oS57yb9Vp2P5EM994EBy88jR3uC62x8oA
+         fsBA==
+X-Gm-Message-State: AOJu0Yypxd/zlhP7abYwNkWc4yK17kgexfEKh3WlX8nE8MkPlXh5BOvt
+	GANaq0Pr0r+Br3B9q5Rwdkqt1sIrr3KYRTk4LQGWTSJdjUa0+1bn0tYoUoB7935gViQ/c3utAd4
+	jL8HQXaiCYAmvgq0aUBbd31KnLLugHkUVWJOT
+X-Gm-Gg: AZuq6aKW+qSdNxWuBXaPPjRm4ZCUH5JxYbD5GjJSVN3NM08BM0rjk9URuBxZ3or+JV5
+	HrCjlgFz1vRNVY+MbmH85Rd7bTf8jbZlcg+DSgbVByPfKCSkyrieJoBKY2gt6x/0HXx5vpXipBe
+	SVzUThbcwLz6Az+qY9rWnygO/LowqyaA42vO1aP4zT+zdvzUm6TBXgIbX/KimBUvGaOI2v3E34Y
+	3uGa0I85tqhWQYjeRaCrnDvhUM3LncLTqQ9yXe3I3b/yk6Nd447aVoxlkYvnDuBvo9wVNuZ
+X-Received: by 2002:a05:690c:f05:b0:78f:984b:4be9 with SMTP id
+ 00721157ae682-7945a86ff68mr31438747b3.18.1769428536063; Mon, 26 Jan 2026
+ 03:55:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CADdNFavnk7LogUfLQrKkAuRryUuTrkx6OpeKVJpUr4ahXcD=6w@mail.gmail.com>
-In-Reply-To: <CADdNFavnk7LogUfLQrKkAuRryUuTrkx6OpeKVJpUr4ahXcD=6w@mail.gmail.com>
-From: Aleksander Ushakov <retes672@gmail.com>
-Date: Fri, 23 Jan 2026 15:43:54 +0300
-X-Gm-Features: AZwV_QhLgJg_5IZz_l_TizwYl-TYHG8U5clYgZ7Bl3IRaO5u7oYyka8fDf7IdyY
-Message-ID: <CADdNFatsHjyyxSVE4Zj+CumzCpY_5+bRKN1weTiedjRPd63-fg@mail.gmail.com>
-Subject: Re: [BUG] nullptr-with-offset growjobtab() src/jobs.c:818:34
+From: Jari Aalto <jari.aalto.fi@gmail.com>
+Date: Mon, 26 Jan 2026 13:55:24 +0200
+X-Gm-Features: AZwV_QiVTd6NJa5oW_48tSKHOpGoSwTWKJsY4PjbPSsskzJzqFGgS3-6xLA30lQ
+Message-ID: <CAOU7Hif8YDD-EAvqEV24_YAP5N32j=gh7zca=oXY8MfbUPQcYA@mail.gmail.com>
+Subject: Dash 0.5.12 bug - POSIX process substitution $() handling error with
+ embedded comments
 To: dash@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-I checked it on the latest clang 21.1.8. The problem has disappeared.
-But the problem keeps on older versions of clang.
-If we open C17 standard, then we can see
-"""
-If both the pointer operand and the result point to elements of the
-same array object, or one past the last element of the array object,
-the evaluation shall not produce an overflow; otherwise, the behavior
-is undefined.
-"""
-The problem place of code:
-jq = (struct job *)((char *)jq + l);
+Machine: x86_64
+OS: linux-gnu
+uname output: Linux congo 6.1.0-6-amd64 #1 SMP PREEMPT_DYNAMIC Debian
+6.1.15-1 (2023-03-05) x86_64 GNU/Linux
+Machine Type: x86_64-pc-linux-gnu
 
-A condition of C standard is 'pointer operand' and 'result' should
-point to elements of the same array.  But jq is nullptr. So jq and jq
-+ l point to elements of not same array, then the condition isn't
-complete.
+Dash Version: 0.5.12-12 (Debian/testing)
 
-May be just apply the simple patch?
+DESCRIPTION:
 
-diff --git a/src/jobs.c b/src/jobs.c
-index 6622bdd..89417c3 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -812,7 +812,7 @@ growjobtab(void)
-        jp = ckrealloc(jq, len + 4 * sizeof(*jp));
+POSIX command substitution does not work with comments.
 
-        offset = (char *)jp - (char *)jq;
--       if (offset) {
-+       if (offset && jq) {
-                /* Relocate pointers */
-                size_t l = len;
+REPEAT-BY:
 
-So the behaviour is same with
-https://www.spinics.net/lists/dash/msg02872.html. And the input data
-can be taken from there (first bug report). When I tested it on my
-system, sudo wasn't installed
-.
->
-> I encountered a bug in Dash 0.5.13 (on commit
-> 5139d6a27763fc0be386e15634db21e45598b299) and would like to report it.
-> The details are  provided below.
->
-> jobs.c:818:34: runtime error: applying zero offset to null pointer
->     #0 0x586492cd930b in growjobtab /upstream/ub/src/jobs.c:818:34
->     #1 0x586492cd8e45 in makejob /upstream/ub/src/jobs.c:773:9
->     #2 0x586492cdacc8 in vforkexec /upstream/ub/src/jobs.c:985:7
->     #3 0x586492cbacb7 in evalcommand /upstream/ub/src/eval.c:901:9
->     #4 0x586492cb7f9c in evaltree /upstream/ub/src/eval.c:299:12
->     #5 0x586492cdf69c in cmdloop /upstream/ub/src/main.c:242:8
->     #6 0x586492cdf35a in main /upstream/ub/src/main.c:176:3
->     #7 0x7fe9eb831249 in __libc_start_call_main
-> csu/../sysdeps/nptl/libc_start_call_main.h:58:16
->     #8 0x7fe9eb831304 in __libc_start_main csu/../csu/libc-start.c:360:3
->     #9 0x586492c86850 in _start (/upstream/ub/src/dash+0x3e850)
-> (BuildId: e68b2d28b6287f88e673d7eb3b1d49090e50fd76)
->
-> SUMMARY: UndefinedBehaviorSanitizer: nullptr-with-offset jobs.c:818:34
-> Aborted (core dumped)
->
-> ////////////////
-> Place in the code:
-> ////////////////
->
->         if (offset) {
->                 /* Relocate pointers */
->                 size_t l = len;
->
->   ------------>jq = (struct job *)((char *)jq + l);
->                 while (l) {
->                         l -= sizeof(*jp);
->                         jq--;
-> #define
->
-> ////////////////
-> My environment:
-> ////////////////
->
-> Debian-12, x86-64, clang-19 compiler
->
-> /////////////////
-> Steps to reproduce:
-> /////////////////
->
-> $ aclocal && autoheader && automake --add-missing && autoconf
-> $ CC=clang CFLAGS=" -Wno-everything -fsanitize=undefined -g -O0"
-> ./configure --disable-fnmatch --disable-lineno --disable-glob
-> $ make
-> $ cd src
-> $ export UBSAN_OPTIONS=print_stacktrace=true,symbolize=true,print_stacktrace=1,report_error_type=1,symbolize=1
-> $ ./dash < myfile.txt
->
-> //////////////////
-> Steps to get myfile.txt:
-> //////////////////
->
-> copy the text into file bs64.txt (between ==== and ======):
->
-> =====================================================================================
-> JFxf/6QAgCAwCmNkIC0KY2QgLS0tCgplY2hvIBB8fCAuAGZ3d3d3d3d3d3d3d3d3d3d3d3d3d3d3
-> d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3
-> d3d3d3d3d3d3d3d3d3d3d3d3d3d3dwoyPiYxCgoKCgoKaWxlCiQqKgoyPiYxCgoKCgoKaWxlCgoK
-> Dw9/Dw8CCiQkJCQ4WwpjZApjZApjZCAtAAIgMIAgMGRisbFjZCAtAAB//wpjZCAtCmNkIAABYyAw
-> CmNkIC0KY2QgAgICAKckMUUkMSQlJCQuJDpbpyQxRSQxJCQkJCQCJCQkJBgkJCQkJCQkJCQkJCTb
-> JP8AZfAkJCQkJGMg/y+SkpKSkpKSaGUD6HAWbyDkPiYxJEAgAEQg4eHh4eHh4W8gfiRAYGBgYIMA
-> H5KSkpKSkiQkQCQkAIAkAgIvCm5kCmhl//99Y2NjY2NjY2NjY2NjY2Njd2NjY4NjY2NjY2NjY2Nj
-> Y2NjY2NBY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjYyRmCmMoKS8KY2gAAAAgLwpjKCkgCmM9fiB2
-> aWw9fiBlY2ggKip7UGg5NGP/f3syWDRjICR7MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIx
-> MjIyMjIlOjIyMjIyJToqfYM9ezJYNGMgJHsyMjIyMjIyMjIyJTJEM00kKCghHP9/QEIpKWVjaDIy
-> NzoqfXiDQGo5ADfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+7n
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 52Nhc2Xn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fm5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fnIyQk
-> JCQkbyBobyBlBXZmPiYtIH5pbOfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fnIC8KYyAAIApEZCAvCmNkCh16Cgo/ASAtACAgCgo/ASAtACAOMApjYyAtCmNkIC8K
-> Y2QKHaX/pACAIDAKY2MELQpjIz8BIC0AICAKCj8BIC0AICAKCj8BIC0A5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn59Hn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fnfOfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fnAH//CmNkIC0KY2QgLWQgIApuZApjZCAuCmMtCmNkIC0KYyAwCmNkCmNkIC0KY2QgLQpjIDAA
-> AUQgLQpjZCAvCmNkIC1jIDAKaAH65+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5y1S5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn58fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5Ofn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fnIufn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fnL2Rldi9udWxs5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn
-> 5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5xTo5+fn5+fn5/7n5+c8PAAkUwokUwpcW1dP
-> Tq85XFwkJFxkfVxcW1dPTq85XFwkJFxkW1dPTmxlNSBpbGUKZiR7UEE9SCUlOiR7UEE9SCUlOip9
-> ZXVobyBmaSp9WWNobyBmaSBm6AMAACBmbGUkMWM9fiB2aWw9fiBmaWw9fiBmbGVlCmUKYyD/L5KS
-> kpKSkpJoZQPocBZvIOQ+JjEkY2QgLQAAf/8KY2QgLQpjZCUtCmMgMApjZCAtCmNkIC8KbmQKY2Qg
-> LQpjIApjZCAtCmMgeIAgOWRisbFjZAAgLQAAf/8KY2QgLQpjZCAtZCAgCm5kCmNkIC7zYgAAAP8g
-> LQpjIDAKY2QKY2QgLQpjZCAtCmMgMAABRCAtCmNkIC8KY2QgLWMgMApoAfoAsbGxsbEAgCAwClBk
-> IC0ZY2QgLQpjILGyo7FmX/+kAIAgMGNjY2NjY2NjY2NjY2NjY7GxsbGxsbEkHyQAABAXAQBvb29v
-> b29vb28KCmNkIC0KYyAwCmOxY2QgLQAAf/8KY2QgLQVjZCAtCmMgMApjZCAtCmNkIC8tCmMgMApj
-> ZC4tCmMgMApjAEAt+2JkXG8teWzHCiD/pACAIDAKj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+P
-> j4+Pj4+Pj4+PgACPj4+Pj4+nJDFFJDEkJSQkJCQ6UP//MUUkMUUkECQ6kpKSkpKSkpKSkpKSJCQk
-> JDpbpyQxRSQxJCUkJCQkOmNobyBmUVxc2VyCbhAdhiBmaWxcbD1+IGZpbApjZCAtCmNkJS0KYyAw
-> CmNkIC0KY2QgLwpuZApjZCAtCmMgABBkIC09fiBmbGVlCmUKYyD/L5KSkpKSkpJoZQPocBZvIOQ+
-> JjEkY2QgLQpjZCAtCmNkJS0KYyAwCmNkIC0KY2QgLwpuZApjZCAtCmMgCmNkIC0KYyB4gCA5ZGKx
-> sWNbpyQxRSQxRSQQJDqSkpKSkpKSkpKSkpKSko6SkpKSCmMKYw==
-> =====================================================================================
+See code below.
+- The old backtics `` work
+- The modern $() doesn't
+
+FIX:
+
+The process substitution is defined in POSIX and
+should work identically in both cases.
+
+COMMAND:
+
+bash -x <code>
+
+OUTPUT:
+
+++ echo 1
++ x=1
++ x=
+posix-test--process-substitution.sh: line 13: unexpected EOF while
+looking for matching `)'
+
+CODE: posix-test--process-substitution.sh
+
+#! /bin/sh
+
+# OK
+x=$(echo 1)
+
+# OK
+x=`# comment`
+
+#  Syntax error: end of file unexpected (expecting ")")
+x=$(# comment)
+
+# End of file
