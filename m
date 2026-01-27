@@ -1,129 +1,130 @@
-Received: from mercurius.teckids.org (commu.teckids.org [91.184.37.231])
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0194235045
-	for <dash@vger.kernel.org>; Mon, 26 Jan 2026 21:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.184.37.231
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769462057; cv=none; b=Do3c8/RIxkcdre6vqhk+INoDj2YAQxT2dpmzxEN6IlJXoVl5eb9pfdVKeZAz+qOfBCmWqc7nTWwydWm4Zmlbn5cXFSk7x6jDQuVhERj0AQbtAXCJLge3bmRnoy3kipx4aQP57tMREhr5MOcFYdemKjBPPzWlZmKVEDgn+/gitd0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769462057; c=relaxed/simple;
-	bh=JvlJYCSRgQX4H4LwzEpXxUcraE9JPOc9Qj+HhRxV3uE=;
-	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=e6F/NgXuOhsVZQEQArAXmnJ4DhEn7f2mihvAvTlLI6mtZ4pax3qb3M0NrIYWiEOTUawmSeGedE0q5zOklH/84a18najFQa2o/j6gE6ltuQgJvXy2puKte705FR7N+ycEsnPaYL4/QxqAwffwrwWHJqRyVi14d2CuKvL1X6wNGdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mag-kekse.de; spf=pass smtp.mailfrom=mercurius.teckids.org; dkim=pass (1024-bit key) header.d=mag-kekse.de header.i=@mag-kekse.de header.b=WGBN9iLN; arc=none smtp.client-ip=91.184.37.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mag-kekse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mercurius.teckids.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C425E200C2
+	for <dash@vger.kernel.org>; Tue, 27 Jan 2026 04:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769487988; cv=pass; b=MlLwLM+QczGNzDO0DfWXCPh/TWRUuN3j0WqvIoyHKXFz+9nMOgOqiPAKiBXjJfZk0PV8vnsvJWsuXa5amSlpcZMmp4foEoPH3nr/cOXdb7jADsmNC4r3MtU2BmttdHS9cDQJpcrU7RmnFOg/PTBLYIXcKDgSTFOGeez4LikM50g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769487988; c=relaxed/simple;
+	bh=E7KSaftpz5w8XxlHsmvWRtgbvyaSR1GjhDVMLXAb3VY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=U7T24l7oQjS2H64+0pIEC5s3/aPH5w3cmr4beiXdmrlo1Dj9ZcCjLGYV8yUOc25kQf4ZQEAYDyb/KzBxIdHun04JhPSQfjpuNYQmUc+pi5+7SWiXaYtSXgHSorv2t4FKKmKuy1VvKeEQmGcoFy3+Rtmuo7qz9m7/67v6tcqgFgo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=ih3mDRRn; arc=pass smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mag-kekse.de header.i=@mag-kekse.de header.b="WGBN9iLN"
-X-Envelope-From: <mirabilos@mag-kekse.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mag-kekse.de;
-	s=dkim; t=1769461595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=vZ0v05QsbnpXBVdSKtwZugTbyMG1ypLav5ahWBFFtJg=;
-	b=WGBN9iLNSNMhqLbplIPoHHaLfJ3pq1lQ9FkznJ29tiTbks5DsrqMImZaA+FnIXDXk8JIqJ
-	ZLi7uA5wAhJBEIvVraG2pUZ7lLUmpIevsbJEmMeVnfWZZZJEuZof42WkA4R6ZaQveM7te/
-	YjurA/xoEYF0WXrN40yqLjcrNDqJLjI=
-Received: from herc.mirbsd.org (caas.mirbsd.org [IPv6:2a02:a00:2000:6a::1])
-	by mercurius.teckids.org (Postfix) with ESMTPSA id 6F8AF305F9E;
-	Mon, 26 Jan 2026 22:06:35 +0100 (CET)
-Date: Mon, 26 Jan 2026 21:06:31 +0000 (UTC)
-From: mirabilos <mirabilos@mag-kekse.de>
-X-X-Sender: tg@herc.mirbsd.org
-To: Jari Aalto <jari.aalto.fi@gmail.com>
-cc: Martijn Dekker <martijn@inlv.org>, Chet Ramey <chet.ramey@case.edu>, 
-    dash@vger.kernel.org
-Subject: =?utf-8?Q?Re=3A_your_$=28#=E2=80=A6=29_bugreport?=
-Message-ID: <Pine.BSM.4.64L.2601262052451.32136@herc.mirbsd.org>
-Content-Language: de-Zsym-DE-1901-u-em-text-rg-denw-tz-utc, en-Zsym-GB-u-cu-eur-em-text-fw-mon-hc-h23-ms-metric-mu-celsius-rg-denw-tz-utc-va-posix
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="ih3mDRRn"
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-649392cc2efso861169d50.3
+        for <dash@vger.kernel.org>; Mon, 26 Jan 2026 20:26:26 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769487985; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gSnUXRUIJrs2I/J+1xRPvAhBQT5MSXjtssARXcwTQLfXZ0y+Gyx4pjFCERz+fX3Rr9
+         Ae0mtrj6L0KpaQ0XEZ6q2z3svdFxDDsbDydTY/ghFETDs8uglRpvLTGJwU5Xqe9YHK2i
+         ganBcZObgvPINLOkZ5mIYYyJXj+p6GnvtW0AtlwzVAeXcXWuZqH6jz7thE8RFHnbBeGD
+         9fPo4gVJVnP2K8tf2OIeA0jfi2vCt+m2E6JjsSmvF6n/bmPhbJ4dfZGimuMIlHgVsRH3
+         I6OuD+QW60btGt+5weLBqG/DVvEvN54qZYB+P9dxN7WlASBj5WDQZcjo+SE+/1hm6hnh
+         ePNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=1abP9Ykq2HLe03TkXfODrjQcg8cSK8R3zGMZM6Vk0ls=;
+        fh=8ViJBE7khi76CnJqQzrAav0OoHrBlpLAVTsfTw9REA8=;
+        b=kDqmeMRldxPTqhvQB66I0PgK+hJevj3HPwXAll+qrc6bieusY5GS4eEbM48maqJX6h
+         CncWZjcWq3OxoTa078GXIjJTx0wsgkEZ4It9PPKak0Tw0lOS+aCZTEHuQTCyETQsT9v2
+         +WmJZEDB+Dx5BUBtripCDaEXJYc381eaVTWd0jNQWh9NC9KzRb4dPf30Qzx4BMMmLqWc
+         qj152mMa+7szGpGiFPsHY/V9ZPagmibZJHdk/VmjW4E7SM4X6cH1t0NiqNaX2TC3lSqw
+         OkviK6mMGYkKBdyjxvJqWYJW8q2gOeNmfO46RYDHExwX7COBobYoHni6eiSn+mvkoJtf
+         sxYA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20230601; t=1769487985; x=1770092785; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1abP9Ykq2HLe03TkXfODrjQcg8cSK8R3zGMZM6Vk0ls=;
+        b=ih3mDRRnZUe71VIdb1KNn+FcO9CrwUkMCn7FQR/KfqZChXHO2qdjsGhSOXAq5XmhHN
+         u9B+2NZw8VvAgWFoJbltYx6z5uoXZulH9KcY9oWuJWOMligDOXP2NQIRn827uQ0mucVg
+         rrHSXgtD42AtU4i7LNDaruPke8my3Zu3zIdqJSiBZd1dgj/npOewKBi+4GcfMo18k9/5
+         V48afPdJx4cytZ/OmfZuYD5m/u9P6hdRUUJcn4MfiVu6rnUu6KUCipswd/hDU0J8cYbV
+         8EXdEXi2HnTS3PauaTH5NRFGno31ZOeZV5vhrOdJUXO1DGGoambrdVp/SsSt9l4CC8Wo
+         WAPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769487985; x=1770092785;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1abP9Ykq2HLe03TkXfODrjQcg8cSK8R3zGMZM6Vk0ls=;
+        b=TJivN2BLj5rKQkmRXVVE+5no0LkxqhKO+NzZdMs+0vt8FN+XKlPzdrrcWCf6gnq3iE
+         tsVnMOJTPmYiq5GIp7v3FCkhSMhnMDxAeG4HarX5tdvNpMMQS996zTnRLWA4LRTFLVJj
+         Bm29ZJTlUAfuBnfzQ8bYPomohMx0NUOMovJTo5LfBkbt0ah7H/8kMA2KS+kFY2WjySlb
+         tLhPtP9D3itU+zrUsLA+0c8GIWTPCiyuyy2hc6pawFN4UBd/aG4fb63+Bp/E6SNFaORi
+         sLd45bFyCp8RBlb5QRDnVCQOfr+LOVnU5wVJ87MtzYJYLkDhGJPTBX/7dFZhYBbs7sC+
+         gKCA==
+X-Gm-Message-State: AOJu0YywIqxtA8qwVXC53AMzPiyAuTbD4Jb/56D4TYsLNidb6iBSResQ
+	0cdMEwCEXROf0/wk0gEVKdZFPvEc6TAhhaQ4LFvbWeJNXZZzc6pKWG6tvCv/iD4VPwd8sK1m++R
+	FWI+SNsnUIQonW/Tttgc5VGvR8XKStPafIkrE
+X-Gm-Gg: AZuq6aJZCgGJ+aoqLuJZ9Mq9T9y05LUWAPeNnwiRUvKxw3vKkHtrtfhvh3TPm1y/Bu+
+	qHkYEWpkgj7utkKg8PzsGVdxi0Mkwxtq6xOyVEV15hPEkMw6lzghTckwqk15FDg2gNetyIU3rjJ
+	C40cIDSwgXT1p0IwYoh9QhI1D9N7Fu9XgRrdFNcoUXuuvJ4MCR0LSnlGW2rNjI6TolgVbiReUnQ
+	Shh3yVhVAdWT8XnCdEm1ZXfcgP89QQ4xi6dMKrLZNqhBRnxMAXtW/sJ2M8pg1vTKEk7tassroHN
+	KoXhfjL1
+X-Received: by 2002:a05:690c:10d:b0:78c:2fed:b9db with SMTP id
+ 00721157ae682-7947abfc6e8mr2053727b3.4.1769487985328; Mon, 26 Jan 2026
+ 20:26:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Tue, 27 Jan 2026 05:26:13 +0100
+X-Gm-Features: AZwV_QgMXv8mlJuWxDfz_jPs5j_PbKGlNydLzBoqPlqE2kHQmY7BBNrNPwJZ68s
+Message-ID: <CAK1hOcNHGv-7tkmD=XKw_oTy0s4NvZY0n1Mq4m_5_NX9miU2_Q@mail.gmail.com>
+Subject: Unreachable code in evalsubshell()?
+To: DASH shell mailing list <dash@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Jari,
+        switch (n->type) {
+...
+        case NBACKGND:
+                evalfn = evalsubshell;  //THIS IS THE ONLY USE OF evalsubshell
+                goto checkexit;
+...
+checkexit:
+                checkexit = EV_TESTED;
+                goto calleval;
+...
+calleval:
+                status = evalfn(n, flags);
 
-thanks for tracking me down in IRC about this. Unfortunately,
-a netsplit ate my answer. I=E2=80=99m writing from an eMail account that
-*should* work with Googlemail, but I don=E2=80=99t use this for FOSS
-communication normally.
+THe above means that in evalsubshell(n,...),
+n->type is always NBACKGND.
 
-13:15=E2=8E=9C<jaalto:#!/bin/mksh> ATTN: mksh maintainer, bug found in
-     =E2=8E=9C    process substitution parsing () with comments
-13:18=E2=8E=9C<jaalto:#!/bin/mksh> Also found in Bash (reported), Ksh (bug
-     =E2=8E=9C    report in-progress), Dash (reported). See bug report at
-     =E2=8E=9C    https://pastebin.com/4LD95GJS
+STATIC int
+evalsubshell(union node *n, int flags)
+{
+        struct job *jp;
+        int backgnd = (n->type == NBACKGND);  // ALWAYS TRUE
+        int status;
 
-(Also, ouch. Please do not capitalise any letter in =E2=80=9Cmksh=E2=80=9D,=
- TYVM.
-If you absolutely must have something in title case, write it out
-as =E2=80=9CMirBSD Korn Shell=E2=80=9D instead. See the FAQ.)
+        errlinno = lineno = n->nredir.linno;
+        if (funcline)
+                lineno -= funcline - 1;
 
-
-The thing is: the pr=C3=A6-POSIX accent-gravis-style command substitution
-is not identical to the POSIX $(=E2=80=A6) comsub. For example, the user ma=
-y
-not use double quotes both outside and inside, as the results differ
-between shells there (and yes, POSIX allows that, and it is good to
-do so).
-
-You cannot use an accent-gravis inside a string either, as it is
-taken as the closing one:
-
-$ PS2=3D'[PS2] '
-$ echo foo`echo bar'`'baz`
-[PS2]
-
-The contents of $(=E2=80=A6) comsubs are parsed as full commands, using a
-recursive parser, to avoid the pdksh bug of=E2=80=A6
-
- (mksh) $ echo $(case foo in bar) echo miau ;; esac)
-
-(pdksh) $ echo $(case foo in bar) echo miau ;; esac)
-pdksh: syntax error: `;;' unexpected
-
-So, the closing parenthesis for POSIX-style comsubs is searched
-for only at the top level of the expression inside. The docs
-support this:
-
-| With the $(commands) form, all characters following the open
-| parenthesis to the matching closing parenthesis constitute the
-| commands string.
-|
-| With both the backquoted and $(commands) forms, the commands string
-| shall be tokenized (see [153]2.3 Token Recognition) and parsed [=E2=80=A6=
-]
-
-Token Recognition has:
-
-| 9. If the current character is a '#', it and all subsequent characters
-| up to, but excluding, the next <newline> shall be discarded as a
-| comment.
-
-And the accent-gravis-style comsubs have special rules:
-
-| The search for the matching backquote shall be satisfied by the first
-| unquoted non-escaped backquote; during this search, if a non-escaped
-| backquote is encountered within a shell comment, a here-document, an
-| embedded command substitution of the $(commands) form, or a quoted
-| string, undefined results occur.
-
-So, writing =E2=80=9C`#comment`=E2=80=9D, even if it works, is actually und=
-efined, too.
-
-
-Therefore, it=E2=80=99s not a bug, it=E2=80=99s expected behaviour.
-
-bye,
-//mirabilos
---=20
-=E2=80=9ECool, /usr/share/doc/mksh/examples/uhr.gz ist ja ein Grund,
-mksh auf jedem System zu installieren.=E2=80=9C
-=09-- XTaran auf der OpenRheinRuhr, ganz begeistert
-(EN: =E2=80=9C[=E2=80=A6]uhr.gz is a reason to install mksh on every system=
-=2E=E2=80=9D)
+        expredir(n->nredir.redirect);
+        INTOFF;
+        if (!backgnd && flags & EV_EXIT && !have_traps()) {
+//*** UNREACHABLE code branch *** !backgnd is FALSE
+//*** (if we remove this, the nofork: label is also unused)
+                forkreset(NULL);
+                goto nofork;
+        }
+        jp = makejob(1);
+        if (forkshell(jp, n->nredir.n, backgnd) == 0) {
+//*** unreadable code: the backgnd is 1 in the line above, which in
+this case means FORK_BG
+//*** maybe make it explicit?
+                flags |= EV_EXIT;
+                if (backgnd)
+                        flags &=~ EV_TESTED;
+nofork:
