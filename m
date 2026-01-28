@@ -1,70 +1,75 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82AA2C027E
-	for <dash@vger.kernel.org>; Wed, 28 Jan 2026 04:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194D328682
+	for <dash@vger.kernel.org>; Wed, 28 Jan 2026 04:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769573820; cv=none; b=mpbd0LWqxGy9J60598CLqbv5vCY5U7mAd4Vq+sjRH5L5HQkFSQiDPdquVnJs9dr09aRYHroY9oZglz3o9VLPso+ux5MTW+sQYqj/5PqEDm+IBMS2buDereMjPWCcOIQMHiamOldKphZS3FRpw88doYciuaINwzL/fFA48yyIAcU=
+	t=1769574651; cv=none; b=T2UyEUwkjEqq5bOhdzOIbaObYfQ7HmobVVgupEapsd8AJd1DTBuDxqefgkefjTQchTx/IO5jQsYbG4HwfgbLKH3r+L06dNzjzs0WGcsD00ugzARe4MtGgTfDaeO5mpkgHWn4avn+3vVwxpLB3SqnmnFq+KnBl64bR1IOaywdCGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769573820; c=relaxed/simple;
-	bh=Gs2mC2gZI2px3zE7gQ6/vguFqAWBC3j/eCPmiJmwIJI=;
+	s=arc-20240116; t=1769574651; c=relaxed/simple;
+	bh=iEdUG52w3xWbb8pdgHoGGufmrkFXBpgHCRurBPCGEFQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=UlZM7abjyoLKO/d1epPEpNVeAgay7qxTv0Vx4Bt7JfHd6Uk8mGBJq4Zd804jTfFQ1xNMuWV2bI2k5P9LVi0C1nZ8j7PUAN/thuxUmQs+da8xz/BZQnnF8VhvOnMHlYz55LuadOdBJMgwYksXJjIg91PKEmUmpQ80zsaeCO9vO8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=k2TcuvyR; arc=none smtp.client-ip=180.181.231.80
+	 Content-Disposition:In-Reply-To; b=aBAF/Ps2YfwFbcZetvzawuilqTiHW+PK92bH39601flUy5Xffhe1VALYe/um+LOxB+P8r6obtz8ikmO0pzumpZKtjvl81ikbRainZQbgCo/C0t3QEE3OwbT7ehyJFJth+7/GJhy7qoDmFYwMFsLs1mPVy6idGn4LkAZsSqA7qM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=DQ6AqYWP; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="k2TcuvyR"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="DQ6AqYWP"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
 	content-type:references:reply-to;
-	bh=XP8cVEU6BB4qbYDY1qnCu4j2VKpVVJ//dGgG+/gYuvE=; b=k2TcuvyR2JyWw9ISiYY4D9sEN6
-	uoZd6dV8FvAXcraqOJTwSEwvitcW0wWmzV9d+TdrPoW9tVpqILvnhS0R40G9APfHCDJp1BUQsaiTs
-	iu1ajBO3Go2YoyHYQ8kAZ+yfTBVJtbI/1ioPxHHcDSpsVYM5wexwLeKen0PTSAruCyVsgfAY1mFwi
-	Lehc+GJ19gAFzrCy1zrfrFcWNYDdlK1yEocHzHuBLoOeQebfjRxB9EEwgg5UMKyj4Wen9MoqDRNfZ
-	AVvdRclh6RVhdj99RFn0EDTFcMiPoAoQgKvmJtIR05Yi9R7odgyoXS0gLZXHSpnTxUQkx+1+4ZBxT
-	j/32iAmw==;
+	bh=R73jVDFmWx9Xe+dQuXSu22OpnKGPJlbLNXt4K5pYsaw=; b=DQ6AqYWPnU83CsKTHYibJ2v8qz
+	yf/+UeS3Ug4d8dQI7e6cdETInzgVgsjx7g6Ar6cGoY7GWgYULWBOCR3v6HTKzyi7Y/ffuYjKCC6E+
+	OakbOb+wzpcEOLzzCELjqfwRrLI1bHRdfYiWAMD4YYXSUmlaubCb2e1RHO1zBLMyEYcjc9yM2WPj0
+	02G6k2a7p8n5yVavRa7VNy4E4fiwIpo9nW5Cj2WEktJh8mt972+ol69nz4jT352vClNPPP66tPm6R
+	uqs5V779qGb6UUSWnqiFMv6UPhvV9rOkutVgPvC1dcN3K5dSUJn9H+SzeZUI/OhmfLo7D9odzZsjO
+	ej1TVFMA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vkwz7-002eUd-1B;
-	Wed, 28 Jan 2026 12:16:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Jan 2026 12:16:53 +0800
-Date: Wed, 28 Jan 2026 12:16:53 +0800
+	id 1vkxCW-002eZk-2s;
+	Wed, 28 Jan 2026 12:30:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Jan 2026 12:30:44 +0800
+Date: Wed, 28 Jan 2026 12:30:44 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Hadrien LACOUR <h.lacour@sim-and-cure.com>
+To: Jyri-Matti =?iso-8859-1?Q?L=E4hteenm=E4ki?= <jyri-matti@lahteenmaki.net>
 Cc: dash@vger.kernel.org
-Subject: Re: dash 0.5.13.1: heredoc parsing failure
-Message-ID: <aXmNtV-8gCNEToij@gondor.apana.org.au>
+Subject: Re: Behavior change in Dash pipes/read?
+Message-ID: <aXmQ9OK72gWxvZn-@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAKmiXchO=0x573QEG6eZnOVkd8K=0PCiNM2x=qqrQPxDsoWpKQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANhYXO9FwbqvSJba8B6p+dzL4AoeA5O85kRxXdzWRe19hMwVtQ@mail.gmail.com>
 X-Newsgroups: apana.lists.os.linux.dash
 
-Hadrien LACOUR <h.lacour@sim-and-cure.com> wrote:
+Jyri-Matti Lähteenmäki <jyri-matti@lahteenmaki.net> wrote:
+> Hi,
 > 
-> Hello, I'm on a ARM64 MacOS machine and updated from 0.5.12 to 0.5.13
-> via Macports only to get a very strange failure (nothing printed)
-> attached as a script. I then tried on
-> 5139d6a27763fc0be386e15634db21e45598b299 ("shell: Fix unsigned char
-> promotion and truncation") since my problem seemed similar but not
-> cigar; tried using a modern clang (21) instead of the system one too.
+> after upgrading from Dash 0.5.12 to 0.5.13.1 some of my scripts
+> stopped working. Here's a test case:
 > 
-> Hope GMail doesn't botch anything (nothing else at work).
+> $ /nix/store/wy9ass74g4yc1x354ydbdlxkfkxxjv2x-dash-0.5.13.1/bin/dash
+> -c 'echo hello | { read -r x; echo "$x"; }'
+> $ /nix/store/4kjsgkcxqfadycyspzfrf9gg5n5bpc27-dash-0.5.12/bin/dash -c
+> 'echo hello | { read -r x; echo "$x"; }' hello
+> 
+> (with 0.5.12 "hello" is printed, but with 0.5.13.1 it's not)
+> 
+> Can someone confirm?
 
-Dash 0.5.13 uses tee(2) on Linux for pipes, while other systems
-will fall back to reading a single byte.
+Again this sounds like a bug in the tee(2) fallback path.
 
-I suspect this is a bug in the fallback path which I no longer test.
+I just tested the fallback path on Linux and it seems to work.
 
-Please run dash 0.5.13 under strace and send me the result.
+So I'll need your help in identifying the root cause.  Please
+run dash under strace and send me the result.
 
 Thanks,
 -- 
