@@ -1,56 +1,83 @@
-Received: from smtpcmd12131.aruba.it (smtpcmd12131.aruba.it [62.149.156.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mercurius.teckids.org (commu.teckids.org [91.184.37.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0982323406
-	for <dash@vger.kernel.org>; Tue,  3 Feb 2026 10:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.156.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6665039E6D1
+	for <dash@vger.kernel.org>; Tue,  3 Feb 2026 13:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.184.37.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770116136; cv=none; b=Y7M+w+vFTn5aBt4Nh7+GiCtsyfZK1hUDkPEmgdKPaKhfYNoX2yF7+D03Q0HvrIiyaY98638SVSXdW7DSFohbM/p9x8Be5a7d3pLBZMdSUXukcCC5J+UbqP5nmQUSDumR0u9shIXhSb8avdhfEkaESwGKZzDlM9WkCY3TLgk/uVg=
+	t=1770125967; cv=none; b=A8nxLD2KSF/ad2f7YyoYRlH7NT/vwZHs8FUsGZoEktFDix13lm2KS8X7/+TotUDfS6opeNOgvJ+9EGHfku7cAMtHvCf0wI/rh88FKQiP3osiE+E2fXdfwsMTLZ8hM70JQ0WsLAfFLWgdHjx/t6ec7qEX9RHx2/W+oTj7fDU6jbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770116136; c=relaxed/simple;
-	bh=NT2IB/uMmcrBpdGrpyhyXFsAmx9Jvhii/UCCiischdg=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=lHT940vc7Us6dYShYYEdl38fwhl3UWfeQ9SKmZSKNtYTFs/Jh+0wLjTj8W8nHJ3jr6M5zCw2OgjFyC9QfpRezHIdKlmwmdaITm07pAEiWybnewsXrXcGHvn7TXDHO4n2boR64lokIM+2v50Mp9rvIl4lytyFnR/o5pNFS/8h06o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=benettiengineering.com; spf=pass smtp.mailfrom=benettiengineering.com; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=AjjlxuTc; arc=none smtp.client-ip=62.149.156.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=benettiengineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=benettiengineering.com
+	s=arc-20240116; t=1770125967; c=relaxed/simple;
+	bh=DvLkegSDVN8Mga6hmxOA90e9J9q3LfcbShr9FUvAigk=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=KQiEUIV63I1xA5yWCTDom3zuUTfEdEiGTIJz5sPkmmSgAZ+LA0cLNWfzkq6f2C11lPU6BzUkNdK3+DIcVwcRherhTEjKJJRZtZwX9L0FBGgK3suEJVRGeCRKgwsrTJi7fuB4zaw4Zxd5rxS7P9c7fca+raauy09kjV1PLD/1PI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mag-kekse.de; spf=pass smtp.mailfrom=mercurius.teckids.org; dkim=pass (1024-bit key) header.d=mag-kekse.de header.i=@mag-kekse.de header.b=OD+k2Qjp; arc=none smtp.client-ip=91.184.37.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mag-kekse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mercurius.teckids.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="AjjlxuTc"
-Received: from [192.168.50.220] ([84.33.84.190])
-	by Aruba SMTP with ESMTPSA
-	id nE1BvZjL8P2aDnE1Bv234C; Tue, 03 Feb 2026 11:52:25 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-	t=1770115945; bh=NT2IB/uMmcrBpdGrpyhyXFsAmx9Jvhii/UCCiischdg=;
-	h=Date:MIME-Version:To:From:Subject:Content-Type;
-	b=AjjlxuTc07x1XP2Y6KDPVCrC1eEZ3g7zsN8pkzwbGq5gU8x7YZTIY9IRbrXKX4PWI
-	 6Piqq+0OYByBQT8i7T7EB/MJdqTyYXbz80SCkfDjbp7MjBtaeIi9uuO+mJTFjMfGem
-	 v0P/NCCSR+KjaGJZ7HYezP6Kh5zNSObiA/h28c3l7F5yNKajxwX/Fi17f1Kw6pufya
-	 v3Zk7azobIc3cDQ5qC+2TXSobSDrSgVtWp59u1XYx9t17t1VMCbUsX5vXWazHJAA07
-	 um1cGJDXrMJp6nOSXdM9oUQ2nyMj211aU7oyEfMapkWPAnw8r+XgH8rbxqBVkL/lZn
-	 TWwOo35Gdiopw==
-Message-ID: <7c705a63-90a7-4437-8c75-24a117e66b1c@benettiengineering.com>
-Date: Tue, 3 Feb 2026 11:52:24 +0100
+	dkim=pass (1024-bit key) header.d=mag-kekse.de header.i=@mag-kekse.de header.b="OD+k2Qjp"
+X-Envelope-From: <mirabilos@mag-kekse.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mag-kekse.de;
+	s=dkim; t=1770125582;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DvLkegSDVN8Mga6hmxOA90e9J9q3LfcbShr9FUvAigk=;
+	b=OD+k2QjpY3N9rnuz053BTASEWuE1nVnzyWTCbHU3bD5VvQfunB4NmNak4TdRhCZMn0ydau
+	jr/ydBx7QTlD9E2RYu7s7JDaULJ/kI07VFMkr43xs25KxIfrkB9tKPdIuD1Yw2K0av6s/I
+	Z7Hc4FvtVNVDOD2BMgilAbnBB+SXNgw=
+Received: from x61p.mirbsd.org (x61p.mirbsd.org [IPv6:2001:470:1f15:10c:21d:e0ff:fe77:c17b])
+	by mercurius.teckids.org (Postfix) with ESMTPSA id EFD57305EC4;
+	Tue, 03 Feb 2026 14:33:01 +0100 (CET)
+Date: Tue, 3 Feb 2026 14:32:59 +0100 (CET)
+From: mirabilos <mirabilos@mag-kekse.de>
+To: Jari Aalto <jari.aalto.fi@gmail.com>
+cc: Martijn Dekker <martijn@inlv.org>, Chet Ramey <chet.ramey@case.edu>, 
+    dash@vger.kernel.org
+Subject: =?UTF-8?Q?Re=3A_your_$=28#=E2=80=A6=29_bugreport?=
+In-Reply-To: <CAOU7HicmTfdNgsJEZM8xE51KNg+-kkGBtf_Lh6V7XY-pM804bg@mail.gmail.com>
+Message-ID: <3b2752aa-3af0-c42c-81f5-b0025c12284b@mag-kekse.de>
+References: <Pine.BSM.4.64L.2601262052451.32136@herc.mirbsd.org> <CAOU7HicmTfdNgsJEZM8xE51KNg+-kkGBtf_Lh6V7XY-pM804bg@mail.gmail.com>
+Content-Language: de-Zsym-DE-1901-u-em-text-rg-denw-tz-utc, en-Zsym-GB-u-cu-eur-em-text-fw-mon-hc-h23-ms-metric-mu-celsius-rg-denw-tz-utc-va-posix
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: dash@vger.kernel.org
-From: Giulio Benetti <giulio.benetti@benettiengineering.com>
-Subject: Missing v0.5.13.1
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4xfB/wYdbS/OlnWzU3NCstOtY+4yZ+5/gDnPYvp8yxhli+pVk7AYQbuez9rTdrQMI9CH12Ac3+nqelVdmtMP9nncZbtFFI3oy0PEI+ePfJKg7bvVO/PPra
- MM//o7Dt+Zf8aJkiZXG266JEMT0+xKU3hm9gpa629XQO75EqilTIaWmOk2nZTa2lqUn0/qwqGQArRx67oIdPzs2Gzku2jefuyzI=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 
-Hello,
+Hi Jari,
 
-can you please tag version v0.5.13.1?
+>Ouch, too bad POSIX didn't define them to be exact equivalents.
 
-Thank you
-Best regards
+the idea was, perhaps, that $(=E2=80=A6) was supposed to be an improvement
+over the previous accent-gravis-style which had known problems and
+incompatibilities. (Some of these are also documented in the GNU
+autoconf texinfo page, section Portable Shell, which I recommend,
+it=E2=80=99s a good read.)
 
--- 
-Giulio Benetti
+>From user's perspective, I wou=C3=B6d have expected the statements to
+>exhibit the same behavior.
+
+The difference here is: the accent-gravis style merely searches
+for the matching one, the POSIX style does a full recursive parsing
+to allow for parenthes=C4=93s to be not balanced inside, e.g. for case
+(except pdksh didn=E2=80=99t implement it like that, it was quite the journ=
+ey
+for mksh to get there).
+
+>Thanks for the explanation,
+
+You=E2=80=99re welcome, and thanks for caring about shells!
+
+bye,
+//mirabilos
+--=20
+=E2=80=9ECool, /usr/share/doc/mksh/examples/uhr.gz ist ja ein Grund,
+mksh auf jedem System zu installieren.=E2=80=9C
+=09-- XTaran auf der OpenRheinRuhr, ganz begeistert
+(EN: =E2=80=9C[=E2=80=A6]uhr.gz is a reason to install mksh on every system=
+=2E=E2=80=9D)
