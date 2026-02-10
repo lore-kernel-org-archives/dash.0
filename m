@@ -1,139 +1,86 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [82.165.170.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805301662E7
-	for <dash@vger.kernel.org>; Tue, 10 Feb 2026 01:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051331A0BE0
+	for <dash@vger.kernel.org>; Tue, 10 Feb 2026 02:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.165.170.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770685875; cv=none; b=o2ecct22IV4Ll+heySuGvq87A+1NG1Yj09peRZ2uqh8+15r3d7Ak6BwU376/hnDSD9/BFscwlvqffPI87z+RNRDHRX6XAnZC1YEIMVLrQEjjzMTHl13EuYu+RgYogBvtps8mxxGrayfYNMw8gSCF8ijLelgnHej2C1rp8n/L8tw=
+	t=1770689329; cv=none; b=h2y7mi4yYH+SQmu7uG9rWvcaRTZSQ8S2TZsYo3fdTKW2BDpaRdDDorLWhC4UiPxGIrM2JvdmRH1iTl4gkXlt3SsTyKQwj9uce0ksnnhJ+lrVoK5L8RzZzhDv7NVh8NOm/WNaRQpdLeICawvF1R+idt93LVglQMKV+qCyMKffAKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770685875; c=relaxed/simple;
-	bh=GOTs1PhDyJ8SOTg5gorCenaOKdODHWyWfoEk7nU+NjU=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=bguNuhMh/3yHVe5cKcpVT0kub0yqa+qiZkk865+RQYyyZvSpP/VvLiEsnOdkFTJE6+q09FJU7Eo1go2JPycTNquKcNU/bvA1CPXjE0DyhBZ0HoRcdUnAhzy4piszKIiM+7PSHvYf4JdVdjRz16r08hmRaOcXusBOKz5pdH51v3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U+h9QOMF; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770689329; c=relaxed/simple;
+	bh=WQwFAgrQxxjOPkpIXvaqP42Cps8NvYffUwQDEPT4ipg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CFpYm6qyMcDxUTZe8d922J51feXkW7MRdkO/SFFzpvYWWlZRnpP4K3zgAusR3QvEUZa0vsSkoLrCD5G0YW/K4YZaK+yNqQ9OE0LQI/IGzN6UxabKbM1WlYqqHOeKNzwJIzV5RjzZmDfmW+cBhVqwq+9/B+TKpmibcu/VYo90StU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=HVYYvaPR; arc=none smtp.client-ip=82.165.170.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+h9QOMF"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4832701b9b7so18822095e9.2
-        for <dash@vger.kernel.org>; Mon, 09 Feb 2026 17:11:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770685873; x=1771290673; darn=vger.kernel.org;
-        h=content-disposition:mime-version:mail-followup-to:message-id
-         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=epblhyQcoLqyjuSI8m/vZLBzzSFQ816yaaItFlP4vlE=;
-        b=U+h9QOMFyc1pyu+iT/A2qFZHvYF/VMO5qpbyCu0mB7cxBEce3Owm9RCJL43yS/fBac
-         buBQZk/fs+OLisPI4J1SGZo60HsxkTVFpmEeKYA45JmEOCsK5Q4p7Q2hhuOXi9kJGhyD
-         MGQTpseEUhUYHYIGIttCzuHa6EVMnDDWnft3O0isOAA90AP7c/ZnJ+TaytItyaPn9kpW
-         AqDVXWZYppwQgmLM/47qTOJTaIAGGxOihKpjjZnYh9otk0xjqmBnjtkKTMbkUSP9KPj3
-         TV8LnBjj7aXM+tVfhsIosocYwKDVjpsIewmEpJDuFQT1jb8Vxtp6+FzykFgBxV8OWqqn
-         oZkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770685873; x=1771290673;
-        h=content-disposition:mime-version:mail-followup-to:message-id
-         :subject:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=epblhyQcoLqyjuSI8m/vZLBzzSFQ816yaaItFlP4vlE=;
-        b=Ad6PS4+onYk5vFb5RKpbsRq4hj7V0+IPbaJCom3TVRZA5Gkf+jywAi2WkCwNQ13jsS
-         C2btB7oA8Uob90gp8G/hAp8Ap9nM0uNgnux3gNRw34pcsxna+HyTg9TKvnzZLqXL62Px
-         RK6SutsovklF8jieYrtKbEWMMR+Eob+qbzceGQQ1lCQC181IqIlikZKpiONTzga8Pmln
-         QLbWOE8fP6rMJd3INOLsaNgcMUlinKBXntC2EddaglWNFNVeNE8C5KDbrFETrOikwz3A
-         H7yNjAk2Zc9zp2TafsCrCIiniUWENohANJC87yIdXvdExWk621DFXD8WKt7vL7VuDKwG
-         hFUQ==
-X-Gm-Message-State: AOJu0YwaeTe+uR61kPxGCLi4UsMw143SapGV8suTkO5d9LiuzXSmh0TX
-	KdWV+e+nppuDEWBkpLIYm0XkhSxlz7n3xX4hj/aYNLNmnt2AXd77i8xD53CsE9YXQQ==
-X-Gm-Gg: AZuq6aKM8Mp1ApYsarKOQTEMBnhEMdUoPV2wiJPMcuW78badioDeib21h6bk6dV9j0t
-	EMgvKwb6CcrxB3z6bkgPoElSFhljQKMwhp19JAfe2uY9FN6x9ycg0XDU2lTwcpVCWb9o9/Hw04y
-	nEqVXqhVajeRuLyl9Fb0dnxkB2OjSEvRBTTs2cDJxi9x+EbktU81dogoR/0zPOR9rnPR3Mw4rZt
-	NMPvns+pQgfu9RKL+7lkfbCk06PmTuRdkvNS0d5VrPyxh33HAImJxp8+7N2Ipw4Cwc2GomfQ6Gs
-	9EOK1Vdefl7e0V7JAeVsn2vTMp0mCdo5X/07eDzk0+xtnItKunoRPkhnED1c/PjFYqHEToOS7YM
-	FsVCG2R53JIUkPVwd7X3KWkLB04AYdiSrjufLSiU7AOBXeM88G+dDUmqLjXtR8s4vGqKZFFwA2w
-	TPKz7Suxe0tQ==
-X-Received: by 2002:a05:600c:4506:b0:480:1c53:2085 with SMTP id 5b1f17b1804b1-48320213830mr158163335e9.19.1770685872772;
-        Mon, 09 Feb 2026 17:11:12 -0800 (PST)
-Received: from teapot ([78.143.211.56])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483209cfd77sm109129145e9.14.2026.02.09.17.11.12
-        for <dash@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Feb 2026 17:11:12 -0800 (PST)
-Date: Tue, 10 Feb 2026 01:11:11 +0000
-From: Earnestly <zibeon@gmail.com>
-To: dash@vger.kernel.org
-Subject: Surprising behaviour when reading from a named pipe and standard
- input
-Message-ID: <aYqFr-Twb-njdsDh@teapot>
-Mail-Followup-To: Earnestly <zibeon@gmail.com>, dash@vger.kernel.org
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="HVYYvaPR"
+Authentication-Results: mail.gigawatt.nl; dmarc=fail (p=none dis=none) header.from=gigawatt.nl
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl C27FCA4393
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1770688819;
+	bh=LAYjzNiXPUFZzffoglPz4aysd304GHlYoYAUx1NH7M0=; l=1333;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=HVYYvaPRmVseBuN9oV3cb4+mcSBeP1OD56uPFXVcNLBoJ18Z0q41bYJVeefS+u8pS
+	 YRzyAJztw8JF5CAMdIqysdE9YNmZTarF009AUmvy34OSMW+77HqgZCF7AsXLk1SeU/
+	 MA0Uo4xM5OREQjk9QNoUE4FF3l+TfMyuJi5JBPQw=
+Received: by mail.gigawatt.nl (Postfix) id C27FCA4393;
+	Tue, 10 Feb 2026 02:00:19 +0000 (UTC)
+Message-ID: <f13da815-0438-44be-b224-a6f5c5ee4454@gigawatt.nl>
+Date: Tue, 10 Feb 2026 02:00:18 +0000
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: Surprising behaviour when reading from a named pipe and standard
+ input
+To: Earnestly <zibeon@gmail.com>, dash@vger.kernel.org
+References: <aYqFr-Twb-njdsDh@teapot>
+Content-Language: en-GB
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <aYqFr-Twb-njdsDh@teapot>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I came across this behavioural difference between dash and sh(bash),
-bash and zsh.
+On 10/02/2026 01:11, Earnestly wrote:
+> I came across this behavioural difference between dash and sh(bash),
+> bash and zsh.
+> 
+> When attempting to read from a named pipe and stdin at the same time in
+> a backgrounded process I appear to be losing stdin:
+> 
+>      #!/bin/dash --
+> 
+>      f() {
+>          mkfifo pipe
+> 
+>          cat pipe - <&0 &
+In both bash and dash, backgound commands have an implicit </dev/null 
+redirection unless an explicit redirection is provided, but they 
+disagree on exactly how that works.
 
-When attempting to read from a named pipe and stdin at the same time in
-a backgrounded process I appear to be losing stdin:
+In bash, <&0 suppresses the implicit </dev/null, meaning the outer 
+environment's stdin gets used.
 
-    #!/bin/dash --
+In dash, internally, <&0 is a no-op because redirecting stdin to itself 
+shouldn't change anything. Because it is a no-op, it does not suppress 
+the implicit </dev/null.
 
-    f() {
-        mkfifo pipe
+In dash, effectively, it is as if <&0 overrides rather than suppresses 
+the implicit </dev/null: the implict </dev/null is performed, and then 
+<&0 overrides that but at that point fd 0 is already /dev/null, so after 
+that, it is still /dev/null.
 
-        cat pipe - <&0 &
+I have mixed feelings on which behaviour makes more sense, but for 
+better or worse this is something that portable shell scripts just need 
+to avoid. You can make this work by temporarily duplicating stdin to a 
+different fd and then back:
 
-        echo hello > pipe
-        rm -f pipe
+   { cat pipe - <&3 & } 3<&0
 
-        wait
-    }
-
-    echo hi | f
-
-This outputs (busybox sh likewise):
-
-    hello
-
-With sh(bash), bash and zsh I get (and expect):
-
-    hello
-    hi
-
-At first I thought it might be a difference in how dash implements
-set -m due to how jobs without it set have their stdin opened as
-/dev/null but adding set -m does not appear to help.
-
-Can you help me understand what is happening and why dash differs?
-
----
-
-I would like to use this technique with age to read identities from a
-pipe as the tool doesn't offer another way, read code below:
-
-    decrypt() {
-        # XXX https://github.com/FiloSottile/age/discussions/685
-        tmpdir=${TMPDIR:-/tmp}/curator-$$
-        pipe=$tmpdir/s
-
-        defer rm -rf -- "$tmpdir"
-        nofail mkdir -m 0700 -- "$tmpdir"
-
-        # XXX Using a pipe limits the size of the identity to around 1MiB on Linux.
-        #     cf. /proc/sys/fs/pipe-max-size
-        nofail mkfifo -m 0600 -- "$pipe"
-
-        # nb. stdin needs to be specified as without job control (set -m) the
-        #     command will have its stdin set to /dev/null.
-        age -i "$pipe" -d <&0 &
-
-        exec 9>"$pipe"
-        rm -f -- "$pipe"
-
-        key_request private >&9
-        exec 9>&-
-        wait
-    }
+Cheers,
+Harald van Dijk
