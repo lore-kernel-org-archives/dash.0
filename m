@@ -1,107 +1,127 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C198B35A93E
-	for <dash@vger.kernel.org>; Tue, 10 Feb 2026 10:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770719051; cv=none; b=TKnfOH1+EGRphB0GZxmvUZT5NVpCb2PaZvSudrNVZdarFGJHt/XW0q2gS091He2ahoxVO4ADZb72t3ywhLl0Pv1ZuXEF2PoNLfs91lUxEFFJ6+FmOkIobljSaYSEhGgTVwwyf49HR+/XcxYHt6J4Kv4F4USI0U67L/hqzkqu/Go=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770719051; c=relaxed/simple;
-	bh=9cEEZPGR9Cxc5LOFcFV1I2+i2Ug0nifjDEsgrXyyU8E=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nr3Zs0cXCbhW9V611uRbN+lRWdniMH7DCDg5XyVJhKNsI8Z9h29sgWTWub08M4dPxR/+jSrK6+hef5RAFfMtQJ80a4eSdHH+MHE3iWjK4TV+bneGVGI9xwddSFsNslpOWXpNsBK1ZUTILgZw0JUZGX/ugCT88fI5YgA8EZkPbwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hy0XVINR; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437CA2BEC42
+	for <dash@vger.kernel.org>; Thu, 12 Feb 2026 07:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770881388; cv=pass; b=deF5oV4EQ1rqD/W+t32dbLRynpeJ24sundIALjQZTBiHJ7akeRNlccncB6Zlz6eM/dpW2Mo74gl/j2Lv+7sjWbws82LJpybayOsxXctNSsN54SNdSoa/Bztb11SEX4WQ3FmQlNggKbdFGK7JWONkXV5PafTBfFeWI0IE3Etsc5A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770881388; c=relaxed/simple;
+	bh=q2JfTJ2FkqxzueQqPgt+xRI7V8xuRKZfq5mkOy5DPgs=;
+	h=From:MIME-Version:Date:Message-ID:Subject:To:Cc:Content-Type; b=VQIEj3BAhmt0d/JGHtRY36MNK/6WVTiC4qqUs41zYMfJgCXSFukZcz/hPJ4h5+Z01oxhyJw+NRVALGBCAKOuscxAe6xC4E/s2aXzRsddxLuFr5nFfrHX7yW0LySR3eV4oPBzl7VnV43dH+QjxVVupDm8Aj+GCCR0slPZhW9xG8A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CM1T/oK4; arc=pass smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hy0XVINR"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-480706554beso41931575e9.1
-        for <dash@vger.kernel.org>; Tue, 10 Feb 2026 02:24:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CM1T/oK4"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-65a1b17a99aso4018163a12.3
+        for <dash@vger.kernel.org>; Wed, 11 Feb 2026 23:29:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770881385; cv=none;
+        d=google.com; s=arc-20240605;
+        b=B2hygAxcM1e6yLd0nVb0lXQFKSBjZolmBmaAQym1qhNntFAtHzKliT6bX4j1KfN6GS
+         Psh9yq6fs1VFbO2X43q6f7PGRhdX7T5Oou2BENkGWkFwW50tXjLO8FlRxrIYfqhzS8Df
+         qJSLYG5pHNc+Dc568o1r4j0v++4owEIieLjK1avgS8TOxWBJ2CT8UnQxyVgPyuDul1dN
+         E72mfQgkJWtuUAtaIAbHN7gD+qj7DR9Rb0cS6+PMMqlLkJ/TLtMsK9MIU0haNuwA2QPW
+         vxzg4SnqCi8KjKDo3LomV1NDb+c8KtyPGlkXgjLXU1tymwwaXXUZPbUk8kfOrKnxio8A
+         31SQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:from:dkim-signature;
+        bh=80yCLPZ00trTb4gXr9d3sz21IXo4ruLskXlTpCWO5V0=;
+        fh=PxKmzUxN8oq96mZ5c3iTvnFc9UQ/YCLc1yZXXoLJMv8=;
+        b=SE5R13k2qTTy91hiIFIVMcGHxQgj/GvNC1rVcMut+j/dnUkrzfY5QTK+tHk8vaoGTB
+         CK4+DM+n4z5/M+SuBba/FoIeAFr8xe8uKFmstQo4oHCN0Sy22RBIfmKiCg0jVmLyXK+R
+         dOhtj6xFz86X8FtKgnA0b440SNmZkmmf/PExyEaEXRTFw7Wq4Z4KJoACeokAyDPNhsys
+         yTDLi9hfK7jgROaf4lEJeUYkdUFoRKhsrck/w04zBz6K3tvxB6g64ISfmM+9NO7Tt0ea
+         io/IQETUE4i6V60UM1LxqHXvYj8S92tVdjIFaP2naTyI+1MwH9bL3weLlS9HFiftZy1I
+         P/Lw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770719045; x=1771323845; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1770881385; x=1771486185; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=2qJuffcXPkCH1zhJoHmpMfo5vJmsSqo1Cy0gn7oaGVQ=;
-        b=hy0XVINRk124kAYHDvaWb18I0d/qmaY9LjofzuQwm5+2hX22pFwD24h4cOyoQH4fz5
-         UsQwKzbEgZaJkDyvmL0n977chkSjJTK6svYA314YAyAHcbTeS2pWJo7rsQIwiQ1i9i9T
-         +CuiN2rafJr0bzTy/FTr/DQ0ZWzS4IOwnPOn/AC9vk3clVQ4a3q71xEIliMG9W61LDVW
-         DbogEny8eg1oGQYSXerpfji6RvXTJ1uwB0NMcJJiia9kftOzl5JAvFtSdXLrOuvR2hfY
-         H1wfhX4SnEj2cdo0opgYlQtPaScHAfaNs2acWMDXVowmbDinGasL1qlKPVXUdJji9uO4
-         hIFQ==
+        bh=80yCLPZ00trTb4gXr9d3sz21IXo4ruLskXlTpCWO5V0=;
+        b=CM1T/oK4HIaODji1HWPhhauEwDKYO+rh2WKdYb2qYw3UkXtp2b1Uk9cxpIWGm+rTk8
+         jxIvJBlTR2vQQaMDgsS/7lvWyfHAnRfifbOF8I/DGU860d6jCV652yKD93VsNIx3GdWV
+         VOvYhFd/SoJt6ZNJiKw3iSg914hLAq2u62aaO/SC9FCnqZnb44YJPA6LP4fqutgIE9tR
+         kktsMKnaRso8HnsK+2Fz8w1ENbsl3/LvE8ZL2UMjhcA+gK9HmYKzXOOrtDlh4Jbr5I0F
+         GlJM37wOV4JfGvOje7SCLRdPpHBGwIIcyt9WHCL7ZyS8xSTJrc6jokTD4h+IWhHl2iHK
+         wFqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770719045; x=1771323845;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-gg
+        d=1e100.net; s=20230601; t=1770881385; x=1771486185;
+        h=cc:to:subject:message-id:date:mime-version:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2qJuffcXPkCH1zhJoHmpMfo5vJmsSqo1Cy0gn7oaGVQ=;
-        b=fT3JgbiA2EMYrzn0NM3zLrDIUgN3Bfi4JzZFDjmrEi9viNpa83PrE0d1gmVEYRWGn5
-         PkxHRndwblh4cz1U816vwy9xMaQ3AUOmnGVocFRi7xr7GkubEqH7O4d9Dp47/LoaUH+L
-         Svz6nkNPfzpW9AyxOuQ7g2W7HQJCuhk7KHRMdKdjoVfeM4gSn3Po3mtH9cvnqqkr1U8X
-         rwELYkqe0zbQDlNYjb8VcwUmcYt2dJMVVsOT4Om8oUzXusLQ4s3kiZ8jJ57wI40bHOiX
-         J9PMzBcbsNAEVy2JJb6ngnNJn1BDeUi3bO1C5e6119jwc8UO8OwZsoivgebDeN6xY4S9
-         Q4zw==
-X-Gm-Message-State: AOJu0YwVUJ/3DaGFL+qZitnn4w6nXEsiCgwkuldjF5PSjlCtIP0xq7tp
-	T5WwGbvgtAg2eSOKCkpUIAyR4zfb+yHR+s+cC4deU6heqsdPKFtbe+uQHBUkKUyUjw==
-X-Gm-Gg: AZuq6aL6IZ1/RYvOcJIw+hZVCzFnxjCY+RHUEqkE/WVobHjee9pz815pZqPpRRCe695
-	SUrf5o3l3587J2YVD4xK8lB+6QkbzGi3vCnLdsCAu6uS6X2AJTuKliZJvAQ4Rfzdhlml6xhyo3l
-	Rd/WomKJZYfhALCNNf50NaIeDShlgmzvAXJlb9uyswEjQgTXTtST4us7yoBm3nmQO8C6MS8ox9H
-	QkzzohVzzjlrIGWF5VkKfjKLdBIdoAMZwN4xfhbvOt3A3/PFT4qOB/sR2h+4Fu9HJUfZfx5Z8xI
-	nR4z+H0cFiuk/pROHP2obmMsgDWSB3lh7ZBJPPKEDMzaCzjVUgTB1aOT2GGfOntBuclpgxm3ZL8
-	HzfsuZedZ+6VKJ19fauuxN3fopEntv3bzqS4eFGGX9rvU4sLpV1t0wZ+8VkgjDhITGcJh+a+By/
-	hMkVu5SRx+dCVwP6XpFEQ9
-X-Received: by 2002:a05:600c:a416:b0:477:58af:a91d with SMTP id 5b1f17b1804b1-483255d164emr177320035e9.5.1770719044952;
-        Tue, 10 Feb 2026 02:24:04 -0800 (PST)
-Received: from teapot ([78.143.211.56])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d5d8f2csm74969075e9.1.2026.02.10.02.24.04
-        for <dash@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 02:24:04 -0800 (PST)
-Date: Tue, 10 Feb 2026 10:24:04 +0000
-From: Earnestly <zibeon@gmail.com>
-To: dash@vger.kernel.org
-Subject: Re: Surprising behaviour when reading from a named pipe and standard
- input
-Message-ID: <aYsHRFz5kAWkcLSb@teapot>
-Mail-Followup-To: Earnestly <zibeon@gmail.com>, dash@vger.kernel.org
-References: <aYqFr-Twb-njdsDh@teapot>
- <f13da815-0438-44be-b224-a6f5c5ee4454@gigawatt.nl>
+        bh=80yCLPZ00trTb4gXr9d3sz21IXo4ruLskXlTpCWO5V0=;
+        b=Mw38iwlyJ1AUS+qsmj/ch2nx80AJNjf8hgYX8ClcVLRORmQ6iF+w6Hbc/65NyhlkJd
+         GPTU8+nvf7kx6bCvhHPVQjuh6YOxdHw55S7TKwLxpJZcTB3IpsjeBGQnP6pFbzcd2sKT
+         j7UubD35xXmuPn08tlmGPgiIaDfv4MkqtVSxbBA8VZK6cs72aARAvKQyhMmGKPgSq2tW
+         4bsFOPhcvWroRgzENfa0AbeOdC+Zii5/HjYDtiJegPk+AuTMfSQ5MZxNEbr2nh+SHMch
+         JBox+odGCNYtVYnz3UTvIEaJcjEjI2T3iS07t17/sLurHI+p00MGVc3+35ZmvM8Aa5B9
+         vZkw==
+X-Gm-Message-State: AOJu0YwyK/jIgeiUO1cF8McjAqyrtOWXD68EsXg29CkrZ72qmZqgMb65
+	sZSJm1N7rnWpzCh1ljpjvVEG/1a3u93e5qbENpc0laVcMeGHuxvH2k7aup0BjoYpaUDV+euV2j7
+	EKDoXOcl52QOwXKGgLdywQksvmPdLA3+B0q06IZs=
+X-Gm-Gg: AZuq6aJxwR267MQs0HYUdHdQfFEFVzc7sECdzB3ERlazomyqrTHHl37rInzX9jtrKo7
+	j4XrkoqJ7yCIQKd6lP54voIJo22uAMaG0Z2kUkc2hZo3gtvCbfqJaFJqBHGzaYWQ++hdKZQZTPU
+	A563rOO3iRm7VAzeKY+WSVrzLriFUlrx+gFwcZJ4JWtEK4I4eqr4w9T1CtkUwDckwqzTmc1dzqJ
+	9SGNm+p55xKTR3jsT7kxi8hqv3R2ZZfzllm6NHeHkfIKcr9bUWU3ZWXm73ryK5ZgiKE/7tmycxZ
+	gck9nfwcu1U428aQx6TOjzptrI3bQEu/EoNsDhCkRrs/U3F1jVlkFtI/8E7rAaNzfcShN+eYfAT
+	x66oLojP/9UeBVlvp2mH1uYn/O8aDB3u3hwdEYsrfcTVf3zlrDq0I
+X-Received: by 2002:a05:6402:5213:b0:65a:3f4b:9479 with SMTP id
+ 4fb4d7f45d1cf-65b9db1124dmr543255a12.24.1770881385117; Wed, 11 Feb 2026
+ 23:29:45 -0800 (PST)
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 11 Feb 2026 23:29:44 -0800
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 11 Feb 2026 23:29:44 -0800
+From: Tiago de Paula <tiagodepalves@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f13da815-0438-44be-b224-a6f5c5ee4454@gigawatt.nl>
+Date: Wed, 11 Feb 2026 23:29:44 -0800
+X-Gm-Features: AZwV_QjPS5jWN8eVjGcbn6AE7R_BIqMX8M_Ord3hpjr7yvF-UUHZCOos7SLdFRA
+Message-ID: <CAO_NRt5mv7E-qkSA2hE+4HsQMzpczrF9ZAWL-jKbW0Li1F3U0A@mail.gmail.com>
+Subject: [PATCH] input: Fix heap-buffer-overflow in preadbuffer on long lines
+To: dash@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Tiago de Paula <tiagodepalves@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Feb 10, 2026 at 02:00:18AM +0000, Harald van Dijk wrote:
-> In bash, <&0 suppresses the implicit </dev/null, meaning the outer
-> environment's stdin gets used.
+Update lleft before calling preadfd so buffered data is preserved
+when refilling the buffer during long line scanning, preventing
+out-of-bounds reads.
 
-I hoped that dash would do the same, when faced with an explicit use
-of <&0, which I try to base on my reading of the standard:
+Fixes: a065467315dc ("input: Move newline loop into preadbuffer")
+Signed-off-by: Tiago de Paula <tiagodepalves@gmail.com>
+---
+I discovered this via perlbrew: config.sh contained a single
+'cppsymbols=...' line that was 12502 characters long. The issue
+can be replicated with:
 
-> If, and only if, job control is disabled, the standard input for the
-> subshell in which an asynchronous AND-OR list is executed shall
-> initially be assigned to an open file description that behaves as if
-> /dev/null had been opened for reading only. This initial assignment
-> shall be overridden by any explicit redirection of standard input
-> within the AND-OR list.
+    python -c 'print("VAR=" + "a"*8300)' > repro.sh
+    dash repro.sh
 
-    With emphasis on the last sentence.
+AddressSanitizer reports a heap-buffer-overflow in preadbuffer(),
+which led to me this fix.
 
-You write that dash does ultimately interpret this correctly but applies
-it too late, after fd 0 is already /dev/null.
+ src/input.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Perhaps because this is not merely a no-op (as 0<&0 is) and that dash does
-attempt to do the right thing (too late), it suggests maybe dash should
-change behaviour.
+diff --git a/src/input.c b/src/input.c
+index c36d120..3467bd1 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -386,6 +386,7 @@ eof:
 
-However you're right about portable shell scripts. I have to accept the
-minimal interpretation and your solution is very reasonable, perhaps even
-more explicit as well.
-
-Many thanks for your explanation.
+ again:
+ 		nr = q - parsefile->nextc;
++		input_set_lleft(parsefile, nr);
+ 		more = preadfd();
+ 		q = parsefile->nextc + nr;
+ 		if (more <= 0) {
+-- 
+2.53.0
