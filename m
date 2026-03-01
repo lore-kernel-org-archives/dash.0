@@ -1,131 +1,104 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4F76A001
-	for <dash@vger.kernel.org>; Sun, 22 Feb 2026 11:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771758565; cv=pass; b=BzTiAhvhbuOe0E2zuSgbkm21eUGA62aLqP9WR4/ymcIZW7MePU52puNeOp8wrmhG3AYs8gxMgS82qkkqzWUPsrEoT0GULP4bVeir/NCQAepuwht3Ife43vAArDdSMNry8Bwaru8u3FsrgwlKoU0fUk0pQVCG8LZYn0bT8cJldx8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771758565; c=relaxed/simple;
-	bh=S+eDHUrCS9N2TtfbbUUNzwYRIp1/KZFARS0mC5YZQuY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=iCVZBDh1QRl8K75TlcTebkkZ8MQSksO294IZNkqHUEqOzvqDRUSFArLUF5HoD1OhvIbyTtqSxXS9iGMiL5+5D1skh2VEyE24M+9VD6/M/zd8+CLHWx8S6qW7i1FdxgdbI6kMVdN6G3k3rfXP6iVBptrg3TdOtkQzpwl/tadVDGA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=upsun.com; spf=pass smtp.mailfrom=platform.sh; dkim=pass (2048-bit key) header.d=upsun.com header.i=@upsun.com header.b=wY/l6E++; arc=pass smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=upsun.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=platform.sh
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6002EAD1C
+	for <dash@vger.kernel.org>; Sun,  1 Mar 2026 01:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772329543; cv=none; b=e1be8KdxPVX4nYKMxFHSTI73Q5l2PqJA0iIv4gHauAQ9lDSiTdBRT3SdpHCKcC31fcA47xdVA4QKzO/wQiNCUzIEj9VW850K/6BbC9QGKaGrBdWhgnfENy5P7gzpkHVybex667RGDaApHCSGne+Iy0jm/FwXL23z5FQMWPNbdC0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772329543; c=relaxed/simple;
+	bh=dH6btJQ8+jVMTk5pjcHLSJXSG2fL19ihrVEmiN5QI4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FmzY3BzvJ+wsZNciCkM1M2WMA1GFuIF2dKZjozktwxs0JH3BKDtbaJmATEqenMiYe0gKwy2IYQuyTgfQbQs1fRc5CNy5tg1t1L695OhY6hCIbs5MEq9HlN7kbFy+MEY0vhSq4bE1O/cX4sMLSNQFzdp8SomSp+J88X0BlS+LKks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ishw9pRP; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=upsun.com header.i=@upsun.com header.b="wY/l6E++"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b8f8d80faebso633115566b.1
-        for <dash@vger.kernel.org>; Sun, 22 Feb 2026 03:09:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771758562; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jUAkkOCtWFS/VavAzPP+gHOvV86daSUVK3kxD9VThAPGIw480RAWP7yvpNYCpNEo+/
-         eSgrfQgHWT/yhi7mCYHdZiRG6eJVxZ8adUawitvCAWGVeWScnXNj2tUcw0ahbyq0gIP7
-         inPclerN5hR8LpYq6SzF43UpYWZwxnVZ7C5zKe9J4nTyzmnY0eF6JJA3nxfzJlhI0TmX
-         eIXq4KZ5VHhg9y+Hy2FCWp+iOB2fAhB8X6TldZqOSpj5IzPEgb+UyrHZIDH2CgikkEtT
-         KdOBGut4wCNXg6gt8nww0y9VaVh727sp+SwQXbaQXRT4kcD0fBPUEDCoCxtHzwO7VYg9
-         s01A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=QWk9IB7XrslP+G+RYKu/Wca4+JXPLOJsRHHzgA4ywww=;
-        fh=Q7kkUHvUpV7GF22BcVPTe0jHcVVjWF0IspJwmqq6Oh4=;
-        b=UpjjDB9gAe9IT8c9gfwkmOzmioWoK8lYFLRLpf5RNyl9T+zXM+2KbQ7xvuAAOqqrWe
-         KkKI1R0pINtl9hU0H/u8UgVklGf5IS58RYtz8gnmxal+tXiuqoGHBrAbWoa6TIU7TALs
-         pnAaaDk7k7Or5A63ev8CJW1XH4a0nWFfjpwMtV+wK/G40P/s3JWMNe6ztqLbjwukrLWG
-         1EhHlj1q/BBo8fWq+S2e/W60dOwkEKaqVVQuT/BLdvYlfj148ahC+MpbIBOLHpxMYcGG
-         3MDM4LgajaD12fOQTBnbXkomKxQ3DVENE6pTDTxIjGIRzHrjJToj9egjLcvucjJX3hee
-         Gk5Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=upsun.com; s=google; t=1771758562; x=1772363362; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QWk9IB7XrslP+G+RYKu/Wca4+JXPLOJsRHHzgA4ywww=;
-        b=wY/l6E++dSl7MQCM5IbF9vx7BHoJcMK2r2MCF3tS4OqCkqpIDe2AdMm9F92Irsu+CG
-         0JaVFR/mpeGK/OZ5rpSS0c0k/287xxFQNVYC/FBDqtrTvrgyNtTXQQXiP1MBBn8nJumk
-         V5wYXOEtYfKN/w9KH5pLqbkDtNgbPHtCHgQEAhWWSjF/lOxyH7IYYg596CuyaXZyfPaB
-         Uq9MYo2GwVnnYnnvBiuuJWK8gGhuPeMYnaeiJ87/K4ZTKOrRzk5dbLRvbGIMW//eqctH
-         N7ar+E4eJ3VmgmZ2D6zE1Jjl/VWcX6hGWltJCnTF93Fhku96BhEpaWYzAAB45GOr4KjK
-         z8wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771758562; x=1772363362;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QWk9IB7XrslP+G+RYKu/Wca4+JXPLOJsRHHzgA4ywww=;
-        b=M/wAxpDBJ5R12bSNGmSOkIc5p/kMUjKwQlhU0QnJZC3QL7YF7W8DIprasLJKsFmxUF
-         k1Q8LPnad+PNj2+Ymi14xJ1c4Nlr5KNqADcfqG90H8ewkmcpmz1I/7NjZYDieDUGi4i7
-         XG1a9nndybf4W0y7bdlkhTgRTdK9gdbhPHZ6Myb/HHEuNP+KAIBenu15jpo6nLDd+/NH
-         J6GZ6hUEhsckcKrm3QIJ9DoMVoc53Js/p3F6Jdby93ZDbDttTCZiZK+NxqiZ0Ztyotgj
-         QIF4RytwH8d+Ex8B07K7kd7hpUOURloOwm2EnGBqJQ+O3//TJmzy84ooUiJNYLGFX3CO
-         O/xg==
-X-Gm-Message-State: AOJu0Yy4MjZPL4WUI9sogsuf60EElHLjgyB9Al0ppbJTH5/RWJqOQMe0
-	9+Q/Illj90WeOnshO3JRzV7woIUzoBQT1Y5zA0f9mj7ZoSKqu05PEbiEYVAfAnr+5cJ01OgHdpa
-	zdKKbxE7eV4LsHRUbahiXAGV1AwgFMeeJh39de0tDXNfAWHXlm44=
-X-Gm-Gg: AZuq6aLeR42LCccdeiO3C77/UR5IoZjDTjl8euUGo/GmGWFJcW/OqmynyRGC6UuQCY3
-	oJNghTMkBRHQBb41q2wXumIF5OjirnYQBQ0hyAaS/Uc3qThpgqHbI7kU6cUtu9cxqTPIxX5CKGW
-	4ztnamwWgtaYKDsVjzY3bj66HlZ6kPRG6BmhRdX8nWY5WMYYGlVccJ/Sf8EzfMJ/pk3g+1xDbNc
-	S4ejnMj5m9eSYBGOtqCeZOMARu5al7ZggUvM5mozu8Ki2gLQO5psRCeJWsemv+ZDLVRyQtBJ/Zz
-	feiv1zdqycgro+IRmTM4m9b6wDt7M+vf/F5WWLQq/IXX5cneQA==
-X-Received: by 2002:a17:907:844:b0:b8d:bcea:44e with SMTP id
- a640c23a62f3a-b90543ad1eamr749548466b.15.1771758562177; Sun, 22 Feb 2026
- 03:09:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ishw9pRP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=K0NGd6D5T/MXGH1YA+Tf+lG2hget/sppALXl4qFXO6c=; 
+	b=ishw9pRPY7Bu+SjK9MtTEOKEsIFawLZpqR8lMulRRVeiQ2Se2Co6Wem3OLN43a2A6m3gpKCjybs
+	2UKd3qKky+aHsXsjW3rJcWNhmWg4SyQgIUso+5LYE8hGI9ksfIjGIdhu0yT8Y5Trqdhb3LhY5vPNK
+	I8+/niEVLiF4eBFFVbOhRmZpspGFyTC3rBqVf1oYv/BKE4XzBuTuqs4spUWljY1HYRj5jx7oB/Qnp
+	wZwTHCd+pEiDI7Xev8nc1H7+pFglTkoZVaDaLDGKLX2FpePx6m1N5gUvi71nYvgEDm0OgK4lkolUC
+	QK7p/S+pAubZxp5O7i4tyfUPocnNCn0UsDEw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1vwVsF-00AQbG-2k;
+	Sun, 01 Mar 2026 09:45:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 01 Mar 2026 10:45:35 +0900
+Date: Sun, 1 Mar 2026 10:45:35 +0900
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jyri-Matti =?iso-8859-1?Q?L=E4hteenm=E4ki?= <jyri-matti@lahteenmaki.net>
+Cc: dash@vger.kernel.org
+Subject: Re: Fwd: Behavior change in Dash pipes/read?
+Message-ID: <aaOaPybgS3vDfbtQ@gondor.apana.org.au>
+References: <CANhYXO-M=zNN3XDN9V3O2XaOvA=3wc1vkogSfyRUWhVCP9_iGA@mail.gmail.com>
+ <aYMOgmK_puMi2J3N@gondor.apana.org.au>
+ <CANhYXO9A5Y=TJi-TbEvv3ASPFjPjdd+pEfhmjqeMMXOCEoCpzw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Daniel Snider <daniel.snider@upsun.com>
-Date: Sun, 22 Feb 2026 05:09:10 -0600
-X-Gm-Features: AaiRm523Yh8N69N9_GhBFDEopkRi8ffLr22w_NfdJ5297l3Pr7ZfrKRysK8u8NY
-Message-ID: <CAB_UPCCnoM-7oU=u51jCDGarLPTM5TzYWVSfhqWHaQP0BFpotQ@mail.gmail.com>
-Subject: [PATCH] input: Fix heap buffer overflow in preadbuffer for non-SMALL builds
-To: dash@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANhYXO9A5Y=TJi-TbEvv3ASPFjPjdd+pEfhmjqeMMXOCEoCpzw@mail.gmail.com>
 
-From 0242b3e94da8de5043d5b2a8fba2f380347f6eaf Mon Sep 17 00:00:00 2001
-From: Daniel Snider <daniel.snider@platform.sh>
-Date: Fri, 20 Feb 2026 20:37:21 -0600
-Subject: [PATCH] input: Fix heap buffer overflow in preadbuffer for non-SMALL
- builds
+On Sat, Feb 07, 2026 at 09:03:16PM +0200, Jyri-Matti Lähteenmäki wrote:
+> Hi,
+> 
+> already tried that but it didn't work. I'm guessing strace-macos
+> doesn't pass stdin to the spawned process.
+> Figured I could try attach-to-process approach, are these of any help?
 
-Commit a065467 ("input: Move newline loop into preadbuffer") removed a
-guard that prevented looping back to preadfd when no more characters
-remain in the buffer.  In non-SMALL builds (with libedit), this causes
-preadbuffer to call preadfd again without resynchronising the buffer
-pointer, overwriting heap memory past the allocated IBUFSIZ input buffer.
+Thanks this is quite illuminating.
+ 
+> echo hello | /nix/store/kra243nir1p3pyc50312w3nmirbcbxr0-dash-0.5.13.1/bin/dash
+> ./test.sh
+> 8931
+> > strace -p 8931
+> sigprocmask(SIG_BLOCK, 0x0, "[]") = 0
+> sigprocmask(SIG_BLOCK, 0x0, "[]") = 0
+> ioctl(0, TIOCGETA, 0x100498498) = -1 EPERM (Operation not permitted)
+> lseek(0, 0, SEEK_CUR) = -1 EPERM (Operation not permitted)
+> pipe() = 0
+> fcntl(3, F_DUPFD_CLOEXEC, 10) = 11
+> close(3) = 0
+> fcntl(4, F_DUPFD_CLOEXEC, 10) = 12
+> close(4) = 0
 
-Any single-line shell input longer than IBUFSIZ (~8 KB) triggers a heap
-buffer overflow that corrupts glibc malloc metadata, resulting in
-SIGABRT or SIGSEGV.
+This shows that the new tee(2) path was entered and then bailed
+out because tee(2) is not available.
 
-Reproducer (requires --with-libedit build):
+> read(0, "h", 1) = 1
+> read(0, "e", 1) = 1
+> read(0, "l", 1) = 1
+> read(0, "l", 1) = 1
+> read(0, "o", 1) = 1
+> read(0, "\n", 1) = 1
+> read(0, "\n", 1) = 0
 
-  { printf 'export X='; head -c 16000 /dev/zero | tr '\0' A; echo; } > /tmp/t.sh
-  dash -c '. /tmp/t.sh'
+This still doesn't make sense though.  For some reason read(1)
+didn't stop on the first newline and just kept going until EOF,
+but at least it explains the empty output after the read.
 
-Restore the guard so that "goto again" only fires when no characters
-have been consumed from the current buffer (q == parsefile->nextc),
-matching the pre-a065467 behaviour.
+Could you please try building and running the commit just before
+tee(2) was introduced?
 
-Signed-off-by: Daniel Snider <daniel.snider@platform.sh>
----
- src/input.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+commit b1864ee9f2418f84d918ef101dab972ecf4f852f
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Sun Jun 2 09:31:35 2024 +0800
 
-diff --git a/src/input.c b/src/input.c
-index c36d120..c0f5a9f 100644
---- a/src/input.c
-+++ b/src/input.c
-@@ -429,7 +429,7 @@ again:
+    input: Use lseek on stdin when possible
 
- check:
-         if (more <= 0) {
--            if (!IS_DEFINED_SMALL)
-+            if (!IS_DEFINED_SMALL && q == parsefile->nextc)
-                 goto again;
-             break;
-         }
---
-2.53.0
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
