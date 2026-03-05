@@ -1,74 +1,108 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from sender-op-o11.zoho.eu (sender-op-o11.zoho.eu [136.143.169.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8AD31717E
-	for <dash@vger.kernel.org>; Tue,  3 Mar 2026 09:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772530733; cv=none; b=hE1dFc62mQp97DL3iIcBqTW47I3qGh28IvjjfWgtz4gLdZgWYhvlNmTeb/cHMSdJBvMI2CxYR+W4i2ew4UHj8PizWKRsnewRh4+3nEaSW1f3zD1+Y6Vhpte01MhQ3VTIr4eEen1Xv3cMKhX5T91R2eQuCgBiXaKwjKiEI51SbxY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772530733; c=relaxed/simple;
-	bh=/A4HBd9ioGLQnvBhp00sFMkSwTitgbPyxXQFVjLf7W0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pIBqpWTtTv/olKM/yAKxhyozvv+toasoLbUE+FgNqJ7jRu7VU39Far146cwQqmtfhiqT0waEsZ9tsPChZWAJKb6Rdu3+Kr5uSBRMQuJLPczlsGKGggh6tg6/M1ymdehAbLnD92tPCzx+fmVyaHoARBUTcew24EX9CXvbHo0KdFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=R4MYC616; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BB1273F9
+	for <dash@vger.kernel.org>; Thu,  5 Mar 2026 01:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772674349; cv=pass; b=Xiz92RfgreuR6DVQar8b4DuFX67nqQAvWzoUjukXsXEMdNpdwVIGQIeLD+r0wcnomRl2xAWC6CxRkjrsY4PlOU+FRavMNaugfwIXzl9Hf+CH0ISOyOsQi0YZCDd0MjCtkjm/vwiC/FRJmcR0FPQTRx7m/jd53r1uagB41oY8Y9g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772674349; c=relaxed/simple;
+	bh=pRHf3RggSlzFBULbeKtubuGH+4rnqBPltnHb+orRNEs=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=aQVLivszOh6sTzsPLGi7RHyl4PFgtoE/aFnqjdfYKAvf3H3BXpt7MMtkP9tAlx22w3+6QtEQr/pE8OH2cTBexTRxYcRG5s2+VhtEGl/3FmuL3HsBoupY+f0DpnizOzg0163/Beg0fI2GDb4Px9RpX3ZFF/NHdpeozcUghGyIyj4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=placeviolette.net; spf=pass smtp.mailfrom=placeviolette.net; dkim=pass (1024-bit key) header.d=placeviolette.net header.i=dev@placeviolette.net header.b=rVnRlGdB; arc=pass smtp.client-ip=136.143.169.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=placeviolette.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=placeviolette.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="R4MYC616"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=bv6Fx1JfgRZz8zSG/PiBR70eUmDj/wpqjQchyeVf29I=; 
-	b=R4MYC6164fcpl82A+SgtJTXOqhOJQiCEw0i/Dh15D8+8gAkBwyS0kiXFoNby3diQv0EDYQCbMJk
-	UaYsmkY45frlfuh8f1baeLu5EIHhGFPcQeE75PYFBjbeU4uGmFZLHs8vc0OzftuUEveUbCa7rYBAt
-	ik/YfLbnFG7sDzWlCL3VQmoVivMhLSc++QZhJ+JiZLXeEdBrUjRo/TiSzXuEX2BE0pMjLEuHYirCz
-	nsPoWJwt8GtIKIw+ZiwJeCI4vuUnqVdU1LzezIfN5FK6rHTSQAHQp2n+1vgfFJPAlF7kpXSZRSB52
-	8P+rZc+YnrTTS62FG751N6rDQQOI+b5Mh/yw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1vxMDG-00B3Pp-2o;
-	Tue, 03 Mar 2026 17:38:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Mar 2026 18:38:46 +0900
-Date: Tue, 3 Mar 2026 18:38:46 +0900
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Jyri-Matti =?iso-8859-1?Q?L=E4hteenm=E4ki?= <jyri-matti@lahteenmaki.net>
-Cc: dash@vger.kernel.org
-Subject: Re: Fwd: Behavior change in Dash pipes/read?
-Message-ID: <aaasJl7LlXhF_JY3@gondor.apana.org.au>
-References: <CANhYXO-M=zNN3XDN9V3O2XaOvA=3wc1vkogSfyRUWhVCP9_iGA@mail.gmail.com>
- <aYMOgmK_puMi2J3N@gondor.apana.org.au>
- <CANhYXO9A5Y=TJi-TbEvv3ASPFjPjdd+pEfhmjqeMMXOCEoCpzw@mail.gmail.com>
- <aaOaPybgS3vDfbtQ@gondor.apana.org.au>
- <CANhYXO-FCjH6GTGyh3=iRxa+07bADbODsbM3oacfn7Uu6kkH6g@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=placeviolette.net header.i=dev@placeviolette.net header.b="rVnRlGdB"
+ARC-Seal: i=1; a=rsa-sha256; t=1772674335; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=ECO1AZMMmu7y6TzrruNDfZ+7v2xQ77jaDatqOW/HwrtiWB3aYk1SzD+s1nm4MTJaOsBXGMFrj7rYrrSRgDFerHuYRsW8VNoGkUvO8jDl8hsFvF3sTUrRVNagQb6fPEaDcxh85U9XwzduHWHDN/enrZS035kSKYhdwW1h+y982bo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1772674335; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
+	bh=xKlhR3FUfHgOcDcX37zvYH6UotYzGrgr6rr39FhYjW4=; 
+	b=gTOm692T9LdKvKzblScBEmn4oysZbDmLrgmaMjjmGmAHWwkfBaADWzkaxRQQZ9CuZ7T3gxZleMD62pjI+R9QEScX4/mttaP8TkMfJMAkPYe7wq2GtnZCoiRMGlodtA+aMERCeZiva1GMKe1qMsyBaYkiSBG9hKE7rDnmJC3WwpU=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=placeviolette.net;
+	spf=pass  smtp.mailfrom=dev@placeviolette.net;
+	dmarc=pass header.from=<dev@placeviolette.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1772674335;
+	s=zmail; d=placeviolette.net; i=dev@placeviolette.net;
+	h=Message-ID:Date:Date:MIME-Version:To:To:From:From:Subject:Subject:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
+	bh=xKlhR3FUfHgOcDcX37zvYH6UotYzGrgr6rr39FhYjW4=;
+	b=rVnRlGdB71DQR+t5+pOg8qED/aO0LQLfHWF305mnha5xbvADp7efkWryM2ZVFHpd
+	kEqhM8RQ1IEBKz1gfWIzDk/cSgybr3ETaj/Qx2fCdcDzeA2wl3Z9aP+IJDMP82mJhxZ
+	Qz27BtpomzOU2dc+eydENkFw5xF9RKnZ1sPtnaGM=
+Received: by mx.zoho.eu with SMTPS id 1772674333240889.0443257379213;
+	Thu, 5 Mar 2026 02:32:13 +0100 (CET)
+Message-ID: <11d5b164-f43e-4f8d-a3cc-895199bfe01c@placeviolette.net>
+Date: Wed, 4 Mar 2026 20:32:10 -0500
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANhYXO-FCjH6GTGyh3=iRxa+07bADbODsbM3oacfn7Uu6kkH6g@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: dash@vger.kernel.org
+From: classabbyamp <dev@placeviolette.net>
+Subject: regression in parameter expansion with backslash escaped strings
+Autocrypt: addr=dev@placeviolette.net; keydata=
+ xjMEX5IvahYJKwYBBAHaRw8BAQdA6NvFAx7PdhZQy7XckUUC9KGeovQVfupAuStCWTeRqW/N
+ JGNsYXNzYWJieWFtcCA8ZGV2QHBsYWNldmlvbGV0dGUubmV0PsKQBBMWCAA4FiEE6G0BZreX
+ oeBx+e0Ea+B1WRikx/UFAmJMb/QCGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQa+B1
+ WRikx/VsBgD/X7zSJGjTcGosID+FUPTGttFyWaCYA1ARCHIeZ8Ae60MBAIIs8hVcgeaMt1tz
+ BfUMRF00se++9IKaH8hAKoHklNcDzjgEX5I1/xIKKwYBBAGXVQEFAQEHQM+52k4NS7RGNFfY
+ Tm/q8zp/6CJTXi5QkbE+s3E+iv0hAwEIB8J4BBgWCAAgFiEE6G0BZreXoeBx+e0Ea+B1WRik
+ x/UFAl+SNf8CGwwACgkQa+B1WRikx/UoJwEA/hvtaeX9ZKBRCQ8uXsarfUk8G2pAwsb7fqLk
+ BJmXvHsA/RnFexepvkpvn91JdDy+P7mxFMWDFU8z5f7/3BAzqE8D
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-On Sun, Mar 01, 2026 at 07:53:22PM +0200, Jyri-Matti Lähteenmäki wrote:
->
-> Why Only on Mac?
-> 
-> The key is in configure.ac:200-201:
->     if test "$use_libedit" != "yes"; then
->         AC_DEFINE([SMALL], 1, [Define if you build with -DSMALL])
-> * --with-libedit succeeds → SMALL is not defined → IS_DEFINED_SMALL == 0
-> * --with-libedit fails or is omitted → SMALL is defined → IS_DEFINED_SMALL
+Hello,
 
-Excellent work.  So it was --with-libedit that's the key to reproducing
-this.  I was distracted by tee(2) so didn't even look in that direction.
+dracut-ng reports an issue with dash 0.5.13.1, where parameter expansion 
+of strings containing backslash-escaped sequences interprets the 
+sequences. This behaviour was bisected to
+776424a8f9158bfe9f53aa55f931af9f73437caf parser: Add dollar single quote
 
-I can reproduce this now and I'll send you a patch soon.
+A simple reproducing case is:
 
-Thanks,
+#!/bin/sh
+
+str_replace() {
+     local in="$1"
+     local s="$2"
+     local r="$3"
+     local out=''
+
+     while [ "${in##*"$s"*}" != "$in" ]; do
+         chop="${in%%"$s"*}"
+         out="${out}${chop}$r"
+         in="${in#*"$s"}"
+     done
+     printf -- '%s' "${out}${in}"
+}
+
+str_replace "/dev/disk/by-label/dracut" '/' '\x2f'
+echo
+_name=$(str_replace "/dev/disk/by-label/dracut" '/' '\x2f')
+echo "_name=$_name"
+
+In bash and dash 0.5.12, this produces:
+
+\x2fdev\x2fdisk\x2fby-label\x2fdracut
+_name=\x2fdev\x2fdisk\x2fby-label\x2fdracut
+
+In dash 0.5.13.1, this produces:
+
+\x2fdev\x2fdisk\x2fby-label\x2fdracut
+_name=/dev/disk/by-label/dracut
+
+Github issue: https://github.com/dracut-ng/dracut-ng/issues/2280
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+classabbyamp
+
