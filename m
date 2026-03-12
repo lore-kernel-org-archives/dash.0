@@ -1,108 +1,89 @@
-Received: from sender-op-o11.zoho.eu (sender-op-o11.zoho.eu [136.143.169.11])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BB1273F9
-	for <dash@vger.kernel.org>; Thu,  5 Mar 2026 01:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772674349; cv=pass; b=Xiz92RfgreuR6DVQar8b4DuFX67nqQAvWzoUjukXsXEMdNpdwVIGQIeLD+r0wcnomRl2xAWC6CxRkjrsY4PlOU+FRavMNaugfwIXzl9Hf+CH0ISOyOsQi0YZCDd0MjCtkjm/vwiC/FRJmcR0FPQTRx7m/jd53r1uagB41oY8Y9g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772674349; c=relaxed/simple;
-	bh=pRHf3RggSlzFBULbeKtubuGH+4rnqBPltnHb+orRNEs=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=aQVLivszOh6sTzsPLGi7RHyl4PFgtoE/aFnqjdfYKAvf3H3BXpt7MMtkP9tAlx22w3+6QtEQr/pE8OH2cTBexTRxYcRG5s2+VhtEGl/3FmuL3HsBoupY+f0DpnizOzg0163/Beg0fI2GDb4Px9RpX3ZFF/NHdpeozcUghGyIyj4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=placeviolette.net; spf=pass smtp.mailfrom=placeviolette.net; dkim=pass (1024-bit key) header.d=placeviolette.net header.i=dev@placeviolette.net header.b=rVnRlGdB; arc=pass smtp.client-ip=136.143.169.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=placeviolette.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=placeviolette.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D289033D6E6
+	for <dash@vger.kernel.org>; Thu, 12 Mar 2026 10:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773309751; cv=none; b=tHIueZpoHIKc/ibOBuYrEzPg+k3nenvD5DU9nLYYfJchtTVIs7h2Zk3l+XMunx6++D8IPbqTZIj6VUQWZqWHlVWIESuw/d+PrznI9oQcNZI+Spxi4Mvq88pWMzgsM+6FfgdRwbNo6sRp/BF9edPXM26YLwfV5ozKpOdwUVCYG50=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773309751; c=relaxed/simple;
+	bh=eWx6GqsP13SjAenijrMQD27xekrApb73vImHB1mrBdY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dnrcK+s0yE7ixAi/0GZCBKlrQrR2tvbH3OLlmjsu9SkshboshMr2yOYrLfigeACW+BT9fNQFyVnlirs4ILXqfklBYF12GXaCGMn/H7JtmQ2avrod0sfHBYRWHTtdzm/xfZFfnUvss/x6SHlloi5fkq/yzG089yNNeA5qxss0b8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=OkscGxFN; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=placeviolette.net header.i=dev@placeviolette.net header.b="rVnRlGdB"
-ARC-Seal: i=1; a=rsa-sha256; t=1772674335; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=ECO1AZMMmu7y6TzrruNDfZ+7v2xQ77jaDatqOW/HwrtiWB3aYk1SzD+s1nm4MTJaOsBXGMFrj7rYrrSRgDFerHuYRsW8VNoGkUvO8jDl8hsFvF3sTUrRVNagQb6fPEaDcxh85U9XwzduHWHDN/enrZS035kSKYhdwW1h+y982bo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1772674335; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
-	bh=xKlhR3FUfHgOcDcX37zvYH6UotYzGrgr6rr39FhYjW4=; 
-	b=gTOm692T9LdKvKzblScBEmn4oysZbDmLrgmaMjjmGmAHWwkfBaADWzkaxRQQZ9CuZ7T3gxZleMD62pjI+R9QEScX4/mttaP8TkMfJMAkPYe7wq2GtnZCoiRMGlodtA+aMERCeZiva1GMKe1qMsyBaYkiSBG9hKE7rDnmJC3WwpU=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=placeviolette.net;
-	spf=pass  smtp.mailfrom=dev@placeviolette.net;
-	dmarc=pass header.from=<dev@placeviolette.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1772674335;
-	s=zmail; d=placeviolette.net; i=dev@placeviolette.net;
-	h=Message-ID:Date:Date:MIME-Version:To:To:From:From:Subject:Subject:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
-	bh=xKlhR3FUfHgOcDcX37zvYH6UotYzGrgr6rr39FhYjW4=;
-	b=rVnRlGdB71DQR+t5+pOg8qED/aO0LQLfHWF305mnha5xbvADp7efkWryM2ZVFHpd
-	kEqhM8RQ1IEBKz1gfWIzDk/cSgybr3ETaj/Qx2fCdcDzeA2wl3Z9aP+IJDMP82mJhxZ
-	Qz27BtpomzOU2dc+eydENkFw5xF9RKnZ1sPtnaGM=
-Received: by mx.zoho.eu with SMTPS id 1772674333240889.0443257379213;
-	Thu, 5 Mar 2026 02:32:13 +0100 (CET)
-Message-ID: <11d5b164-f43e-4f8d-a3cc-895199bfe01c@placeviolette.net>
-Date: Wed, 4 Mar 2026 20:32:10 -0500
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="OkscGxFN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=Yx/qZg4trrpHWYRrNDHbbNzO/HIvikY6XQLlKs9sexg=; 
+	b=OkscGxFN57AYwFaRJpMOuez5xnLW6P5MMZ5Inw/gZgexVU5le9/bJagu96m5rGljD57lFGEbVp/
+	GDNzlp/tLZGtsPZEvH5FmDq6/V+hp+hiP4M/U7tv57td1BRafc/rWErz8dXnr7dVaYwnDZ5AASUFO
+	6Dnf+hAgDFfu5OgIdgzpXpGP6d3mZxA6vvvBWeRJhlbmc3op3zP7YX/1egSvOtqe/DoivxoVNjpa3
+	URFzKtp71ktsIU1/Yg0jVBvA1y1NVj65xQFI82yTE0um3bahMahUR4TKqZmOFKcspSeCXnGeu3zkl
+	CctuhQKPaVyDek+KQM0m2OPtwXYG5Rw5hxGg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1w0crx-00DlSf-1F;
+	Thu, 12 Mar 2026 18:02:18 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 Mar 2026 19:02:17 +0900
+Date: Thu, 12 Mar 2026 19:02:17 +0900
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jyri-Matti =?iso-8859-1?Q?L=E4hteenm=E4ki?= <jyri-matti@lahteenmaki.net>
+Cc: dash@vger.kernel.org
+Subject: [PATCH] input: Fix preadbuffer loop when libedit is enabled
+Message-ID: <abKPKTXEadM1gr9-@gondor.apana.org.au>
+References: <CANhYXO-M=zNN3XDN9V3O2XaOvA=3wc1vkogSfyRUWhVCP9_iGA@mail.gmail.com>
+ <aYMOgmK_puMi2J3N@gondor.apana.org.au>
+ <CANhYXO9A5Y=TJi-TbEvv3ASPFjPjdd+pEfhmjqeMMXOCEoCpzw@mail.gmail.com>
+ <aaOaPybgS3vDfbtQ@gondor.apana.org.au>
+ <CANhYXO-FCjH6GTGyh3=iRxa+07bADbODsbM3oacfn7Uu6kkH6g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: dash@vger.kernel.org
-From: classabbyamp <dev@placeviolette.net>
-Subject: regression in parameter expansion with backslash escaped strings
-Autocrypt: addr=dev@placeviolette.net; keydata=
- xjMEX5IvahYJKwYBBAHaRw8BAQdA6NvFAx7PdhZQy7XckUUC9KGeovQVfupAuStCWTeRqW/N
- JGNsYXNzYWJieWFtcCA8ZGV2QHBsYWNldmlvbGV0dGUubmV0PsKQBBMWCAA4FiEE6G0BZreX
- oeBx+e0Ea+B1WRikx/UFAmJMb/QCGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQa+B1
- WRikx/VsBgD/X7zSJGjTcGosID+FUPTGttFyWaCYA1ARCHIeZ8Ae60MBAIIs8hVcgeaMt1tz
- BfUMRF00se++9IKaH8hAKoHklNcDzjgEX5I1/xIKKwYBBAGXVQEFAQEHQM+52k4NS7RGNFfY
- Tm/q8zp/6CJTXi5QkbE+s3E+iv0hAwEIB8J4BBgWCAAgFiEE6G0BZreXoeBx+e0Ea+B1WRik
- x/UFAl+SNf8CGwwACgkQa+B1WRikx/UoJwEA/hvtaeX9ZKBRCQ8uXsarfUk8G2pAwsb7fqLk
- BJmXvHsA/RnFexepvkpvn91JdDy+P7mxFMWDFU8z5f7/3BAzqE8D
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANhYXO-FCjH6GTGyh3=iRxa+07bADbODsbM3oacfn7Uu6kkH6g@mail.gmail.com>
 
-Hello,
+On Sun, Mar 01, 2026 at 07:53:22PM +0200, Jyri-Matti Lähteenmäki wrote:
+> 
+> Git bisect says that commit a065467315dc5f2f312f7e6f1d2e9d05a77b3cb7
+> ("input: Move newline loop into preadbuffer") is the first bad one (I
+> probably made some mistake earlier when I said commit 6574... would work.):
 
-dracut-ng reports an issue with dash 0.5.13.1, where parameter expansion 
-of strings containing backslash-escaped sequences interprets the 
-sequences. This behaviour was bisected to
-776424a8f9158bfe9f53aa55f931af9f73437caf parser: Add dollar single quote
+Indeed that was the buggy commit:
 
-A simple reproducing case is:
+---8<---
+The preadbuffer loop to get whole lines is broken because it never
+sets lleft before calling preadfd, the latter relies on it to
+correctly position the read buffer.
 
-#!/bin/sh
+Fix this by setting lleft before preadfd is called.
 
-str_replace() {
-     local in="$1"
-     local s="$2"
-     local r="$3"
-     local out=''
+Reported-by: Jyri-Matti Lähteenmäki <jyri-matti@lahteenmaki.net>
+Fixes: a065467315dc ("input: Move newline loop into preadbuffer")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-     while [ "${in##*"$s"*}" != "$in" ]; do
-         chop="${in%%"$s"*}"
-         out="${out}${chop}$r"
-         in="${in#*"$s"}"
-     done
-     printf -- '%s' "${out}${in}"
-}
-
-str_replace "/dev/disk/by-label/dracut" '/' '\x2f'
-echo
-_name=$(str_replace "/dev/disk/by-label/dracut" '/' '\x2f')
-echo "_name=$_name"
-
-In bash and dash 0.5.12, this produces:
-
-\x2fdev\x2fdisk\x2fby-label\x2fdracut
-_name=\x2fdev\x2fdisk\x2fby-label\x2fdracut
-
-In dash 0.5.13.1, this produces:
-
-\x2fdev\x2fdisk\x2fby-label\x2fdracut
-_name=/dev/disk/by-label/dracut
-
-Github issue: https://github.com/dracut-ng/dracut-ng/issues/2280
-
+diff --git a/src/input.c b/src/input.c
+index c36d120..0c2c066 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -386,6 +386,7 @@ eof:
+ 
+ again:
+ 		nr = q - parsefile->nextc;
++		input_set_lleft(parsefile, nr);
+ 		more = preadfd();
+ 		q = parsefile->nextc + nr;
+ 		if (more <= 0) {
 -- 
-classabbyamp
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
