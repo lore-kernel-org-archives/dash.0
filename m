@@ -1,43 +1,42 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE09A303A12
-	for <dash@vger.kernel.org>; Sat, 14 Mar 2026 09:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80789248F47
+	for <dash@vger.kernel.org>; Sat, 14 Mar 2026 09:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773480380; cv=none; b=ZXh030tDmWXKk9cvDifd/HH6ypy5UE00huK/N3C/eRJTOYrXRAiacSDXYHdVVZcSTkjtMJW1s4j/EWWUxiQia0h7bac5RIQXoKqQrxZid1uDp2DHcj2hEKe482HUywtA0V2VlyCxjo3RXs0ACONRXrbyAYEHuQiuzSfRZPhID/Q=
+	t=1773480903; cv=none; b=gxEg/2dKs7fBsovZvYAS/P7SkGsy92W7avT58JgjHthkEoXfuOUXPfYwmaBEytMd4NzgpVPyO5ixBFWTdCGKmSdveVBOkR1zjhxN1vvwIu42uXtPdG5jZ1EbycQ7PYCsBIRuXxElBjUv/qA0MnNTvyduoVKmBeq83lJO1ygAvBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773480380; c=relaxed/simple;
-	bh=+wbiEVGGnqxb3EcCZG7hi4DcOjCzOVfodiSoN3RJQh4=;
+	s=arc-20240116; t=1773480903; c=relaxed/simple;
+	bh=4xC57d/EJ/TBZ+9meCyqSoaMcMGZp1jEhDA+EWFaDFc=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=FNCmlIIIapfe0y6UthakAe164Foa7uPjWapbNv9UD0DhJltISUSaNzeZGv2wlgsuOO8PyKojI2fhr/QaokNF3FIF4Ir8GJK7pqdpGuNXHtYPTxk5T/o+o762rn8w6METRkr71LBcqRXnDmGtH1QJuEw2Gy8N8eet1geCoTeg0OI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=EYGn619P; arc=none smtp.client-ip=180.181.231.80
+	 Content-Disposition:In-Reply-To; b=SRLgodFtKeOruT/Nbgp+JR0vZS/JJ49jIrzf6Fr7CVzufvRDLYFhsHVZ0xuK/TgUmnA8adCjBJqSVbQdCeq9Mi8390QG0XWPeRicK1lemogFX/jqqR7n3XGw4MLi27bTZYQmT+JodYXDmqUH9sLfU6XYNBn+FDzqBcEhJq7PMVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=F+fLP55A; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="EYGn619P"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="F+fLP55A"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
 	content-type:references:reply-to;
-	bh=i+CW4wZgK/bjLK0ljOle2HBBUGsmOppgELr12YHwlPM=; b=EYGn619PqTjBC5spB5OfSTJkEm
-	p+eghfd/5tbFl+9cn2UZf9Fv8DXBReH47zmzW78uRXHqWyDgcxZROSaqoFhf7B46R85QL9frXxT6j
-	H1WXMoU7uek0IGUvfpXU7seY+WAMrQgGkL/A2T9uWFxexaYy1G3LRRfZC/sd99AKB4XYgWIUcyOeW
-	yOohggU1/wOqNiCekntSXM3vdoobFhL7zv/iix36r4GSiZFdZ/37jeWuXEPaB6BlZ7YlGLyzLV5Lq
-	kCHa9urrS0pELG27/Nnrg2uLZgLikoUCzM0LXoCoaqO0dlAWxy4t0NmA0Q90iNCvufVNdCOXxOIO3
-	Dvjm3THg==;
+	bh=GHOTXku2AYg1sYoit/uU7ciG22MeVICknQkT8N98osw=; b=F+fLP55ADfUhEimQIZ5oU9z1kN
+	fltfwYxFcH4vmB6WaXKAhv1CoSzrOqq/lIwChnqc/9YJXpZxxNjPnlDNeWabVVozekMubwmuenHS9
+	n70KSxokhz4MJEyzFJqy7aH5I491wuj1sV2vBuHQKofgMvtxVkpxVaOTpyV3Qegpso/lmODbQufGt
+	HTwJORPspTR/aeZolgQ02lUol3COSfhaUDOGXAPmr5HRt8M9Bre2jNF6d8C5BqJziTydWn0jkIB8o
+	ApG33aQkwh73iZxqOf6j31tKGjVjoeOFn34QIPQIPfUeLNMWDp2/pUAnwt4pCTtoectmWRBwQL1rr
+	ess7Bupg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w1LGA-00EN9Y-1y;
-	Sat, 14 Mar 2026 17:26:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Mar 2026 18:26:14 +0900
-Date: Sat, 14 Mar 2026 18:26:14 +0900
+	id 1w1LOb-00ENEv-2f;
+	Sat, 14 Mar 2026 17:34:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Mar 2026 18:34:57 +0900
+Date: Sat, 14 Mar 2026 18:34:57 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Daniel Snider <daniel.snider@upsun.com>
+To: classabbyamp <dev@placeviolette.net>
 Cc: dash@vger.kernel.org
-Subject: Re: [PATCH] input: Fix heap buffer overflow in preadbuffer for
- non-SMALL builds
-Message-ID: <abUptrjFvOwWM5yL@gondor.apana.org.au>
+Subject: Re: regression in parameter expansion with backslash escaped strings
+Message-ID: <abUrwVbgnvXBymLE@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -46,43 +45,69 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAB_UPCCnoM-7oU=u51jCDGarLPTM5TzYWVSfhqWHaQP0BFpotQ@mail.gmail.com>
+In-Reply-To: <11d5b164-f43e-4f8d-a3cc-895199bfe01c@placeviolette.net>
 X-Newsgroups: apana.lists.os.linux.dash
 
-Daniel Snider <daniel.snider@upsun.com> wrote:
-> From 0242b3e94da8de5043d5b2a8fba2f380347f6eaf Mon Sep 17 00:00:00 2001
-> From: Daniel Snider <daniel.snider@platform.sh>
-> Date: Fri, 20 Feb 2026 20:37:21 -0600
-> Subject: [PATCH] input: Fix heap buffer overflow in preadbuffer for non-SMALL
-> builds
+classabbyamp <dev@placeviolette.net> wrote:
 > 
-> Commit a065467 ("input: Move newline loop into preadbuffer") removed a
-> guard that prevented looping back to preadfd when no more characters
-> remain in the buffer.  In non-SMALL builds (with libedit), this causes
-> preadbuffer to call preadfd again without resynchronising the buffer
-> pointer, overwriting heap memory past the allocated IBUFSIZ input buffer.
+> dracut-ng reports an issue with dash 0.5.13.1, where parameter expansion 
+> of strings containing backslash-escaped sequences interprets the 
+> sequences. This behaviour was bisected to
+> 776424a8f9158bfe9f53aa55f931af9f73437caf parser: Add dollar single quote
 > 
-> Any single-line shell input longer than IBUFSIZ (~8 KB) triggers a heap
-> buffer overflow that corrupts glibc malloc metadata, resulting in
-> SIGABRT or SIGSEGV.
+> A simple reproducing case is:
 > 
-> Reproducer (requires --with-libedit build):
+> #!/bin/sh
 > 
->  { printf 'export X='; head -c 16000 /dev/zero | tr '\0' A; echo; } > /tmp/t.sh
->  dash -c '. /tmp/t.sh'
+> str_replace() {
+>     local in="$1"
+>     local s="$2"
+>     local r="$3"
+>     local out=''
 > 
-> Restore the guard so that "goto again" only fires when no characters
-> have been consumed from the current buffer (q == parsefile->nextc),
-> matching the pre-a065467 behaviour.
+>     while [ "${in##*"$s"*}" != "$in" ]; do
+>         chop="${in%%"$s"*}"
+>         out="${out}${chop}$r"
+>         in="${in#*"$s"}"
+>     done
+>     printf -- '%s' "${out}${in}"
+> }
 > 
-> Signed-off-by: Daniel Snider <daniel.snider@platform.sh>
-> ---
-> src/input.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> str_replace "/dev/disk/by-label/dracut" '/' '\x2f'
+> echo
+> _name=$(str_replace "/dev/disk/by-label/dracut" '/' '\x2f')
+> echo "_name=$_name"
+> 
+> In bash and dash 0.5.12, this produces:
+> 
+> \x2fdev\x2fdisk\x2fby-label\x2fdracut
+> _name=\x2fdev\x2fdisk\x2fby-label\x2fdracut
+> 
+> In dash 0.5.13.1, this produces:
+> 
+> \x2fdev\x2fdisk\x2fby-label\x2fdracut
+> _name=/dev/disk/by-label/dracut
+> 
+> Github issue: https://github.com/dracut-ng/dracut-ng/issues/2280
 
-Thanks.  This will be fixed with
+Yes this was an intentional change.  Note that echo in dash has
+always interpreted escape sequences, as required by POSIX.
 
-https://patchwork.kernel.org/project/dash/patch/CAO_NRt5mv7E-qkSA2hE+4HsQMzpczrF9ZAWL-jKbW0Li1F3U0A@mail.gmail.com/
+It's just that the supported escape sequences have been expanded
+with the dollar single quote feature addition.
+
+Note that mksh behaves in the same way as dash.
+
+If you want to print a string verbatim, you should use printf
+instead of echo:
+
+	printf '%s\n' "$str"
+
+instead of
+
+	echo "$str"
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
