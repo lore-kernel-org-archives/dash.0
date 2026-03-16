@@ -1,42 +1,42 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6947080E
-	for <dash@vger.kernel.org>; Mon, 16 Mar 2026 04:24:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35742DCBF4
+	for <dash@vger.kernel.org>; Mon, 16 Mar 2026 04:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773635078; cv=none; b=klsJtTzPNI98odOUpNC0q6td2nN1EMpU7cQl+m8qaSf/yRRif1gR6x7aU4TB9aXXzLQpyS6bo/3ioTCYyTSuZZ9jx1xQp17hfIVE2ZZT8oZRY1k5F3BRNnWTPHImujYq0fxRfH7fqAUSUgQFWUJvh1og22pYR3VXk7L2Tq43Xjk=
+	t=1773635249; cv=none; b=AK9kKeQMdY9P0XQyl6DizmUaf3U3CWZST6xcTZ0pIZNTfStZoW6ZeMNBMe/+gWtnTf5gWwITLQCEhoQW0GZwWJcv9ZJTWSjixcInU76S2KI9TMMGbkKVk0iP6e62Uqxqb138Wqu4nEJNWn909Ki7ZIn+JdBQggeOequXWHERAkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773635078; c=relaxed/simple;
-	bh=sUvUsw9k15usn4KLGVGcmqEN1SA+x5JBJGZ6Jh72+Fk=;
+	s=arc-20240116; t=1773635249; c=relaxed/simple;
+	bh=KpKNRJtMEQbbmbRsnq5l5QBQuZ/6dXlpUR82hpTil8M=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=juSPdgmp4ALFsD7whXWbhBkfJ7E257tVo0ZeQk+W9nj5z2YT98D2e8veEVPY5eypWMb3upoButmJZGVScVJr+unfkscFjKOhWehwOz0RTQKg2MG5+kGbcDRIM1jzGl5yDAhsUcsXthH5RH3x3NfQomRZHVipyUBePjyUVQUc2Bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=FAIbnHc2; arc=none smtp.client-ip=180.181.231.80
+	 Content-Disposition:In-Reply-To; b=ZDPoj/PlpNRuWKppqPhTRvXhplR0ELnNzbmTlXdbzy+qoawQngSMy4S0LXesMVR4PJJFEyicOjc4eLy+xWSbIj20RRkaecjDm8Ug7Ej1NRpKgbHTagOjPzIkLadU/614RG0q9iuNrz7sI0PfNTxC1nYaujTY246hm1Zjgagd9W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rB1Swizw; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="FAIbnHc2"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rB1Swizw"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
 	content-type:references:reply-to;
-	bh=3wyiIx8FfA27t238XAtK5/fl7hxL9PhBeM/WEFU5vEA=; b=FAIbnHc2hmNcvKO2OPaiPbfLP5
-	gi6FAwRW5v/9ICYJmBz+FWayERBZ35awSv2883RX22Z6X8MVgRetLuAe8ONrrFWhZPKWrZwwdsr7j
-	fATf2M8uTvS0sI0DlLpi3pGlSVpjFPo7U/MZDiPOS7u5jeCapmZwHC/obQ7QU8CCOHUe3OvPEfCm4
-	MmyaCnHgXROqJ8Ien47qVVge5TMhpvpijtE7B1iqORS/KmFCtWzs7/W1+udxdpsIs8SpApWK2M683
-	hNaLXDknznRAk+NUaE+lEEqNApvPvK6qedFPt6GwNXi8tjJjjnN6qrib3rB3dc8zePP57iyxW8X5K
-	uNHTlbAQ==;
+	bh=0nyHouMBpQmB9cZH64zQmVLoDLsmOSzb9YhLtd/kYxU=; b=rB1Swizw1zGEtNeCgAwOeE7wNp
+	5b2gdq8tOSfgpO4/EsjkUkkdh91WCWwvMfgvG3U2yZRaE8ZL7jiPDXPkkl1WKSAXnZQav8kT5YHxo
+	mtXI7MtmbC2VTF6/NIJBlIZgegrU9iQ+0GcSTY/zdpLG9hZloDElkl9eeczb+KUc3ZnvWMktyITg7
+	Bznn1aO+SR0hGLYC+UZTt4KpbR/E1qvdKgc1IhdhA/GEu0ggCEo2tlxKQWZnYI1+RmJL+9fx0XiqS
+	pRduOY01Hb/kUfP6w5sTcAKORuZj/tzNCtAdjiPf72Wg754+XFP/MR5s54xYkwfHKG38+xdbPajyl
+	eCENS4VA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w1zVI-00EjNK-2l;
-	Mon, 16 Mar 2026 12:24:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 16 Mar 2026 13:24:32 +0900
-Date: Mon, 16 Mar 2026 13:24:32 +0900
+	id 1w1zY4-00EjNs-1Y;
+	Mon, 16 Mar 2026 12:27:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 16 Mar 2026 13:27:24 +0900
+Date: Mon, 16 Mar 2026 13:27:24 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Denys Vlasenko <vda.linux@googlemail.com>
 Cc: dash@vger.kernel.org
-Subject: [PATCH] jobs: Make stoppedjobs trivial if JOBS == 0
-Message-ID: <abeGAGxKpxqCMdyl@gondor.apana.org.au>
+Subject: Re: trstring() has \ooo octal printing code, it's buggy
+Message-ID: <abeGrH5FA6kz4ZjD@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -45,40 +45,22 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK1hOcPd4Lm6ixcQ_+NG5rsA5uP4A0-oHwWQWdqj3BCyJHJE7Q@mail.gmail.com>
+In-Reply-To: <CAK1hOcMsRRQsgp+pyNmui2v+gMx6zFf6nLa89jzeid-AfcKv8w@mail.gmail.com>
 X-Newsgroups: apana.lists.os.linux.dash
 
 Denys Vlasenko <vda.linux@googlemail.com> wrote:
 > Good day,
+>                                putc('\\', tracefile);
+>                                putc(*p >> 6 & 03, tracefile);
+>                                putc(*p >> 3 & 07, tracefile);
+>                                putc(*p & 07, tracefile);
 > 
-> There is only one place where JOBSTOOPED can be set,
-> and this place is conditional on #if JOBS:
+> The last three putc need '0' added to the char value:
+> they need to print '0...'7' bytes, not 0...7
 
-Do you actually use dash with JOBS == 0?
+Please send a patch.
 
-I wonder how much testing this actually gets because I have never
-used it.  We could do something like this for stoppedjobs.
-
----8<---
-When job control is disabled or unavailable, stoppedjobs doesn't
-need to do any work.
-
-Reported-by: Denys Vlasenko <vda.linux@googlemail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/src/jobs.c b/src/jobs.c
-index 36c6261..4aa65b6 100644
---- a/src/jobs.c
-+++ b/src/jobs.c
-@@ -1237,6 +1237,8 @@ stoppedjobs(void)
- 	int retval;
- 
- 	retval = 0;
-+	if (!JOBS)
-+		goto out;
- 	if (job_warning)
- 		goto out;
- 	jp = curjob;
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
