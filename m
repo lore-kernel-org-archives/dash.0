@@ -1,363 +1,129 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA6734A77F
-	for <dash@vger.kernel.org>; Wed, 18 Mar 2026 11:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773832336; cv=pass; b=qx/wy/E3gap9/oQtXabpe8rKKcrGjQGPMRe3tHWyyAmYg5u+i4dPPjUZ74mHkX+3+SeDawTdoo3xtJoxUGoqxwAz7rPheTNNZ/nYk+LqIUxND0kylhl0qU9OlFHTo5zUqFP73h0AIzcoUReiRze4+WEJ4Fs/ZfAwwrSdw3EajV8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773832336; c=relaxed/simple;
-	bh=B5wseKJyFfB7JkQA+jgY9n21upshSwnLfQW4sw0CDvc=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=sUNbXUkWACye+TxGyfn1F5aZAhJNcGpU2HhrU0i2QY+6RMtdvqZbflKKPeFt1tBYmGxBewuDolXIljVLL7/8yU2CzyNlFxAfd2EKRe0sNTfUtClkLQI77tnDVYlJx6/aHffB6UCGsRdZ19UsdHu3sloJft3cqwWgQpFnzcntrag=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UqiVtasa; arc=pass smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqiVtasa"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2b06c43e6a7so5750745ad.2
-        for <dash@vger.kernel.org>; Wed, 18 Mar 2026 04:12:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773832334; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UGCnJnX/rAA71DNf9VgQNHPkKEGcKCJVyQAcLTk4J4DGbevKwindvAa3NmuMP1T5NT
-         ZLhfVztoQX6++GWJo381+mnZjWKGB5ND67ODLUFYkliiI5v9rjj372KNrhvYVB3r9kt/
-         Yg5U/F9exI3mMD4JLkPSimbGpf0psTWwm8s2b30YGAeSQ+H55W/usdR+ri67WCdOKPsm
-         LC62yv1GMw/0W7oa0/l0MUFRhyk31sBu0dpSC2v80Di4JXgcZxkmAbfTtKXjWVWsT9qX
-         RfrVkV12xMzBRHbbw9lx/v7v3Od8+FgHlVqFqCHjaFINrov/G9ksZcipQj4lENU3OwP1
-         4I7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=vIDC0MTsVuGDM11BdQ7s0Kk7HHPHUDSBTSQLzXN7hpw=;
-        fh=Q7kkUHvUpV7GF22BcVPTe0jHcVVjWF0IspJwmqq6Oh4=;
-        b=kaoLVxWMNSS0eYnOANx2ikQjrzS/4DgWqynw23esx+T//4VwUgtRdoa8c5fDM7+rS4
-         5qqFF67hhKl6wgkiFRYTOaZGMKDIiokXK5GfjIXFY6frShKk/B1mtf/qDM5ZX1HzEWJ2
-         Cv3H4aY4ZfKwLFpiOukYUTbiWcJ0FfrrcwEO9cAiKo0V2/qXlUT5TtHc5jRFowH/nq50
-         JDxK3n3Ph96wmqGmlqQTVluCauf5+m1/etqWrHJsdQJNAjpl9z5CgL3MImM0kc8FvymA
-         U5+OypyrSfazJmE8+eVFTacBpsfv810bF65y4Jf371XuEltNHaEyB+lvn71A9rzFq5M0
-         t+wQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773832334; x=1774437134; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vIDC0MTsVuGDM11BdQ7s0Kk7HHPHUDSBTSQLzXN7hpw=;
-        b=UqiVtasaNxBXDr6XLpJMOQzEnHk5atOARZGDES8zOmz1x36DvfrdvagDxie27oySHn
-         L0xRaSwKGaxkZPk5XIcR6WAtNgDDQSGYfWkXInb9RJpmJjukTb2Q8gTAi08whyyASRQM
-         Gc5CMNcUvG2Oh5f2d5VX3uyoyP7ui5Un1UPnYL7wDiSVYqGamXdAI279RVpKcDApisFl
-         Fd9M+ifJCw03SVK3hcwrVoRn6lFHtEkRzkf0R+4aAttZ9/pRgB8VOIaq/IhY2RUlPxqS
-         xPLWhbBcNFGnwlNB8UFYbmkZgSw+AVIQ29t+m3syWlF10pbfZ5TPCCoBRbM6JI15k6rB
-         6q1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773832334; x=1774437134;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vIDC0MTsVuGDM11BdQ7s0Kk7HHPHUDSBTSQLzXN7hpw=;
-        b=ss7zBXGDUH1hODLIFR7Z0oak5YVnp8eF3NCDYNsip0jwPrqn6CEosJZKDBIxqQd8uK
-         qbcq+PEbWBXYT3ULGEblX6S9TD51IZ4Vuq9Y0iqdfnHPxmbFssh4IoCsLKqM+naa+Bm6
-         LoaKEjpn3EiB/5GFLxvt7EsJfX9NzBz4TuSN4L6zUTWKYKumGUBuh3Rl81dXbDfIKEES
-         Uhi78kVMiiq4pJj/Gal0BQ4cLtdDGPS2h/FbKu5Ebu6el2zHgAFz29lMHrfsWXXsg51z
-         rnmcmXf9dCywECo1acmAFCFTwH26XsdRaE2oac77BZ7MZEN0nSeBhX0SZ+WV6nGCfvnb
-         X4Yg==
-X-Gm-Message-State: AOJu0Yz7ammoyv16ttyzdBiVwgbk02ir+oKu7miEczxabIOcVTzDB9OP
-	Ivz/QQZ5X0tIzfWq878LNL+WsMs2ZmTOPR7gbVGiXXsd/79gSjLAJV8sxpaMpBiJQYIG4+XfBng
-	uCrFj9o3j4ifwU6U0yS96TC3U1iaa1ip7dDEstT4=
-X-Gm-Gg: ATEYQzw68miO0zgGLIcjaeqzDwdn43wogRHyFwr8BY4lGGBazoV4InPZsAe92GTAzIn
-	Eujh0Eq7KN2azXwn9RPgqe1VBZ85k8nKUmZbdMv79DOlsBacEIlmTFR8zN6bIbu9WsdtkglD0FC
-	wkFVaLhRYvhP44AKSM9S1XdThzS1mCEKPFv1a3XsFN86dvqKo41V6S+iytpODzujrksLppRVnhJ
-	UuiNWf+JEAHtUvYkAM2e7625Q1+Bnqt36KgvpxZrNu0+/BCWavJv08pn4E9nNI68lSMxrBK4SXK
-	Q/dS3Tyee8kI+X8oRcC37A2U3xUMWIabHXXWzEI=
-X-Received: by 2002:a17:902:db05:b0:2b0:5472:ac84 with SMTP id
- d9443c01a7336-2b06e3fe699mr32662465ad.35.1773832333828; Wed, 18 Mar 2026
- 04:12:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C1815C158
+	for <dash@vger.kernel.org>; Fri, 27 Mar 2026 14:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774621703; cv=none; b=p98k2JGnapQ9XhOTDobgLJ7R3ZdRvAm8wo/93314QoQglsLvslFyLQfQT92VVFJwn9oZP5FI5KRdXcMQacB7KA2XLHpy+Ty3DH7380itzkDPtQisQzI1ihHSCMPJjcZycaXU/uqv7BYA11QejbTGeVSdBYRtivzVKaXObLkr58Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774621703; c=relaxed/simple;
+	bh=nP4Xb5WHLp5FYnE7UtBCkH/7++o3nCTZHgBSZaDMuZ0=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=lEsx4azRpm9ywF5ooHRRC86oWbGXs+9Ib+im92uSeCwZg7F8MQoflgB0CHaCf5bDYlFtshTYUEBsQIqfY8O7fOwl875RXzDjikA/W5SfF+EwWys/hdF3UiWp7E0o2HDI6K97s0OZdRk3cKxx82LXQR3oVjdX+fZFVu5T4Uj9ABs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=green-communications.fr; spf=pass smtp.mailfrom=green-communications.fr; arc=none smtp.client-ip=212.227.17.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=green-communications.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=green-communications.fr
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue107
+ [212.227.17.181]) with ESMTPSA (Nemesis) id 1N7AEs-1vTarJ3bIa-00zO4n for
+ <dash@vger.kernel.org>; Fri, 27 Mar 2026 15:28:13 +0100
+Message-ID: <3e89cc83-a890-42ec-8e8c-13c5e65905d6@green-communications.fr>
+Date: Fri, 27 Mar 2026 15:28:13 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Ilia Kashintsev <ilia.kashintsev@gmail.com>
-Date: Wed, 18 Mar 2026 14:12:02 +0300
-X-Gm-Features: AaiRm51AhugvqIyQ6JUijqrua_eMu-BHNRnpqcsRS8dH6PQVqsHtm51I4WLkdrU
-Message-ID: <CAF6ebR5pJm63sQ41rvD4jP511BrnY9A84+F4c-cNt=-ejaaonA@mail.gmail.com>
-Subject: [BUG] stack-overflow in src/parser.c
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
 To: dash@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From: Nicolas Cavallari <Nicolas.Cavallari@green-communications.fr>
+Autocrypt: addr=Nicolas.Cavallari@green-communications.fr; keydata=
+ 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
+Subject: [BUG] case fails since 0.5.13.2
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:YJJ0D0nfuVKZ08CGqpX8eE/S/ZUh+YaSAP134TcfaY19a7jP83V
+ YNq2/mbOzZXlCRqnHMu3lFDrUtRUPp1b8xT1NSH8draKMSo3CpLZFPCZAP/3JfksoUJWoEr
+ RtpPT5yO5Pmj1+qFVeh4kgbt84yB3dA29XZJc31z1sp3AKHR00pPOmmftQTyo1OY6I0DkCg
+ PBQJjoDfww7oWFhYovXcg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:NFWxnY8nwsk=;kl5PgGs6gUa2NDtn1TXWXPmQocJ
+ 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
 
-Hello maintainers!
+This syntax is accepted by all shells except dash 0.5.13.2:
 
-There is a stack-overflow caused by a huge number of opening parentheses.
+case "$test" in
+in) echo input;;
+out) echo output;;
+do) echo start;;
+done) echo stop;;
+esac
 
-Sanitizer output:
+on dash 0.5.13.2, it fails with "Syntax error: "in" unexpected (expecting word)".
+Reverting e8c0324af64c("parser: Catch bogus case patterns") fixes it.
 
-# AddressSanitizer:DEADLYSIGNAL
-=================================================================
-==1393234==ERROR: AddressSanitizer: stack-overflow on address
-0x7fff8ea6fff8 (pc 0x5c982afe24b1 bp 0x7fff8ea70060 sp 0x7fff8ea6ffe0
-T0)
-    #0 0x5c982afe24b1 in __pgetc /orig_to_send/dash/src/input.c:227:14
-    #1 0x5c982afe201e in pgetc /orig_to_send/dash/src/input.c:248:9
-    #2 0x5c982aff80cc in pgetc_eatbnl /orig_to_send/dash/src/parser.c:854:14
-    #3 0x5c982aff8b39 in xxreadtoken /orig_to_send/dash/src/parser.c:810:7
-    #4 0x5c982aff82b5 in readtoken /orig_to_send/dash/src/parser.c:711:6
-    #5 0x5c982aff30cc in list /orig_to_send/dash/src/parser.c:181:9
-    #6 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #7 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #8 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #9 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #10 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #11 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #12 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #13 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #14 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #15 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #16 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #17 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #18 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #19 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #20 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #21 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #22 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #23 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #24 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #25 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #26 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #27 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #28 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #29 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #30 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #31 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #32 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #33 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #34 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #35 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #36 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #37 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #38 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #39 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #40 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #41 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #42 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #43 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #44 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #45 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #46 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #47 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #48 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #49 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #50 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #51 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #52 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #53 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #54 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #55 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #56 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #57 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #58 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #59 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #60 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #61 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #62 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #63 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #64 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #65 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #66 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #67 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #68 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #69 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #70 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #71 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #72 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #73 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #74 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #75 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #76 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #77 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #78 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #79 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #80 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #81 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #82 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #83 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #84 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #85 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #86 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #87 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #88 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #89 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #90 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #91 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #92 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #93 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #94 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #95 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #96 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #97 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #98 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #99 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #100 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #101 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #102 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #103 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #104 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #105 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #106 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #107 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #108 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #109 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #110 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #111 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #112 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #113 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #114 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #115 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #116 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #117 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #118 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #119 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #120 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #121 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #122 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #123 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #124 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #125 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #126 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #127 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #128 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #129 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #130 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #131 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #132 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #133 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #134 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #135 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #136 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #137 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #138 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #139 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #140 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #141 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #142 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #143 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #144 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #145 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #146 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #147 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #148 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #149 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #150 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #151 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #152 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #153 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #154 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #155 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #156 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #157 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #158 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #159 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #160 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #161 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #162 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #163 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #164 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #165 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #166 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #167 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #168 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #169 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #170 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #171 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #172 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #173 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #174 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #175 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #176 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #177 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #178 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #179 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #180 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #181 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #182 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #183 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #184 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #185 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #186 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #187 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #188 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #189 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #190 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #191 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #192 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #193 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #194 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #195 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #196 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #197 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #198 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #199 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #200 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #201 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #202 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #203 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #204 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #205 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #206 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #207 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #208 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #209 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #210 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #211 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #212 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #213 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #214 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #215 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #216 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #217 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #218 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #219 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #220 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #221 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #222 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #223 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #224 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #225 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #226 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #227 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #228 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #229 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #230 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #231 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #232 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #233 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #234 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #235 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #236 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #237 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #238 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #239 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #240 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #241 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #242 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
-    #243 0x5c982aff8e9c in pipeline /orig_to_send/dash/src/parser.c:289:7
-    #244 0x5c982aff881c in andor /orig_to_send/dash/src/parser.c:253:7
-    #245 0x5c982aff31c8 in list /orig_to_send/dash/src/parser.c:202:8
-    #246 0x5c982affa44d in command /orig_to_send/dash/src/parser.c:475:18
+POSIX says that only esac should be recognized as a keyword when parsing the 
+first pattern of a case.
 
-SUMMARY: AddressSanitizer: stack-overflow
-/orig_to_send/dash/src/input.c:227:14 in __pgetc
-==1393234==ABORTING
+An example of a real script broken by this change:
 
-The stacktrace itself is not always consistent, f.e. sometimes the
-crash occurs upon entering command() on line 321 or inside of
-xxreadtoken() on line 810.
-
-Steps to reproduce:
-
-export CC=clang
-export CFLAGS=" -g -fsanitize=address "
-./autogen.sh
-./configure
-make
-#80000 might be excessive, even 10000 is enough for ulimit -s 8192
-printf '%0.s(' {1..80000} > brackets.txt
-./src/dash -i brackets.txt
+https://salsa.debian.org/debian/netplug/-/blob/debian/unstable/scripts/netplug?ref_type=heads
