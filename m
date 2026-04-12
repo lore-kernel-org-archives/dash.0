@@ -1,96 +1,155 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8EB036C0C8
-	for <dash@vger.kernel.org>; Sun, 12 Apr 2026 09:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13D8258CD0
+	for <dash@vger.kernel.org>; Sun, 12 Apr 2026 10:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775987112; cv=none; b=DgvvY5KWBiR1Df8WII3J+X11ZedRoaUMxuHaHW0eDgk/ycIgCfZCfncgaur9uql/EfK3o8ksuY7AEzrB1wP/Gt8xDjH1G7Tuth2nA4WHoD7Bx4i2oAAzLzkV4SZlCeMEKQlPbJwh9tGcbxXE3I+qwe2eWqUk6LNZojSxdPSEuUU=
+	t=1775990169; cv=none; b=ZCu0V0UkqZt9OracbSSf6nxvjNnrZa3BaStVUwLM79GqKxPmZw276Wv61sxmTZAqBM56T8pKhsc4LsV6RCtY9yedtC31v50Wko6YeQ15AXEOMtgaYjuWTeyYnDcus0uE61getW5C+Y/bZSoe4MWhjP5B+1Qx9AS++zpHNtn+w18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775987112; c=relaxed/simple;
-	bh=ESoAPIXd++Yf6qK6Q2lNLAUOmZjUnTt14GNKUIfT3jg=;
+	s=arc-20240116; t=1775990169; c=relaxed/simple;
+	bh=F7jMvJKpoBxNpeoAaI8LpU7q8FeARy/A3SmHAm/i9z8=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=Dhs8+ompShfm41+mIl4Bo+sQaDefTI1z0Ubg20VMipO9xkhS4Kv1vh/gVKHJM7wx2iwbqQiqigGUY5W7uGAjIGxnw08xr9pJ3p6orZ4iTdssRlcUcxbli7zKn4EXhu72B+zJM/awBj5CYJ3A1qekdVqRhjKz0hj5Xvy95SCPVP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=TaqrSG/S; arc=none smtp.client-ip=180.181.231.80
+	 Content-Disposition:In-Reply-To; b=Cpe9S2ASjK77J1/HMle2WPulnbzFYCLQrs12rdQq7etT2TDbja7Xl52B2PE2e1CvjBRNJpXGy+0B0FA9Qqq4pFNZLe0mDO+AwNQHU5mDej7uwEx81m3ou71g+IWe4FZ06Xhs4FKN+P9OKTHVjN7BWa+iAgLuY+9SzspJ5YgtjE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=RpNxhWYH; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="TaqrSG/S"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="RpNxhWYH"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
 	content-type:references:reply-to;
-	bh=mPqqL9yO2vEpHX44dHFAI4QoWiGo4AK7hris+1HiKzc=; b=TaqrSG/S1OrUYYaHPeoYtwBhWk
-	fYpBW1KZGkZpfKJkxsDNdtB3pJVoTs6XFgPDnt0zupnkN9cIJfpadjABqwFwmUr3+fsekpJQkTAMZ
-	LzPWLyOdeDMHsOGqcD3mOuZHRdhcoTv8v9eMCTEByGoNkxaJyQqSmb+VF61R/G5nRhPDWdPWvDVCo
-	Gm5wsLa9VAdW6gtoaWVCmK7s0K9eMUynEI7/WO3VZ4iWfs85EyHRpvIjPX9dFDrr0dY5vn/na0IsB
-	X4lmiXNZyoxhcD+7Ojnsha0OWuz5Wlekb9b+6oG2HdjCHbbihhBW2jWuDTPR3BhTUyiNYdb1L6g2L
-	BzH5oA4A==;
+	bh=OuSKUzrmOtEPXijlt1pWofGd52qVSVqKhtnHNwhgcdo=; b=RpNxhWYHyciAZ3C7tx2lQHPEDx
+	k3RsijAncFAfncxhz4AR4Fz1sT78yzDta5QAhl85XQ+ITwuWH5+MpxL3eay8U3vOc+iAion7GoA4m
+	T5sHNakANFyGMEzOfrb5VnY7vTDTMQIvqn7PSHwDKprOEdAQs/Xp2ZBXE21HrIIF9Ls71foyN01Kw
+	9Yzxr55Q7sSa/5WXBtvwcOI5d9gcVdNsfvm7WD8lGpLPiLv1TAmU4kXYZ5wlwtfHTK2Vo4doEBRZu
+	9TysdVGSxj+b0yZK5lrzaYpFN1g7GCM7HktAKpBqAJug6Qq2Rb3UoSIa+tFDhHhCqAaPksdL0tvdS
+	11q4YeYw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wBqxr-005UiZ-06;
-	Sun, 12 Apr 2026 17:45:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 12 Apr 2026 17:45:05 +0800
-Date: Sun, 12 Apr 2026 17:45:05 +0800
+	id 1wBrl9-005V5i-2O;
+	Sun, 12 Apr 2026 18:36:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 12 Apr 2026 18:36:02 +0800
+Date: Sun, 12 Apr 2026 18:36:02 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Nicolas Cavallari <Nicolas.Cavallari@green-communications.fr>
+To: Ignacy =?utf-8?B?R2F3xJlkemtp?= <ignacy.gawedzki@green-communications.fr>
 Cc: dash@vger.kernel.org
-Subject: [PATCH] parser: Only reject non-word tokens in case pattern
-Message-ID: <adtpoV0A0LkTXW6X@gondor.apana.org.au>
+Subject: [v3 PATCH] input: Fix EINTR handling when reading from a pipe
+Message-ID: <adt1kl_3p0r4E7PG@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3e89cc83-a890-42ec-8e8c-13c5e65905d6@green-communications.fr>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4e543oogxlemxnvt7kfbk3s7bugimyiza34kgbq7srofw7qu5i@b6atfz2nfkht>
 X-Newsgroups: apana.lists.os.linux.dash
 
-Nicolas Cavallari <Nicolas.Cavallari@green-communications.fr> wrote:
-> This syntax is accepted by all shells except dash 0.5.13.2:
+Ignacy Gawędzki <ignacy.gawedzki@green-communications.fr> wrote:
+> When using tee to peek at stdin pipe, consider forwarding EINTR
+> without attempting to read, otherwise pending signals don't get
+> handled properly.
 > 
-> case "$test" in
-> in) echo input;;
-> out) echo output;;
-> do) echo start;;
-> done) echo stop;;
-> esac
-> 
-> on dash 0.5.13.2, it fails with "Syntax error: "in" unexpected (expecting word)".
-> Reverting e8c0324af64c("parser: Catch bogus case patterns") fixes it.
-> 
-> POSIX says that only esac should be recognized as a keyword when parsing the 
-> first pattern of a case.
-> 
-> An example of a real script broken by this change:
-> 
-> https://salsa.debian.org/debian/netplug/-/blob/debian/unstable/scripts/netplug?ref_type=heads
+> Signed-off-by: Ignacy Gawędzki <ignacy.gawedzki@green-communications.fr>
+> ---
+> src/input.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Thanks for the report.  This patch should fix the problem:
+Thanks for the patch.  I think we need to restrict the fallback
+path even further.  In fact, only EINVAL should enter the fallback
+path.
 
 ---8<---
-Allow keywords to be used as case patterns and only reject non-word
-tokens.
+Errors from tee(2) should not lead to the fallback path in every
+case.  In fact, only EINVAL should trigger an attempt to call
+read(2).
 
-Reported-by: Nicolas Cavallari <Nicolas.Cavallari@green-communications.fr>
-Fixes: e8c0324af64c ("parser: Catch bogus case patterns")
+Every other error (and zero == EOF) returned by tee(2) should be
+treated as if it came from read(2).
+
+Reported-by: Ignacy Gawędzki <ignacy.gawedzki@green-communications.fr>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/src/parser.c b/src/parser.c
-index bbee1e3..bea4148 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -442,7 +442,7 @@ next_case:
- 			cp->type = NCLIST;
- 			app = &cp->nclist.pattern;
- 			for (;;) {
--				if (lasttoken != TWORD)
-+				if (lasttoken < TWORD)
- 					synexpect(TWORD);
- 				*app = ap = (union node *)stalloc(sizeof (struct narg));
- 				ap->type = NARG;
+diff --git a/configure.ac b/configure.ac
+index c37eefe..9a55ea0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -92,7 +92,7 @@ dnl Checks for library functions.
+ AC_CHECK_FUNCS(bsearch faccessat getpwnam getrlimit isalpha killpg \
+ 	       memfd_create memrchr mempcpy \
+ 	       sigsetmask stpcpy strchrnul strsignal strtod strtoimax \
+-	       strtoumax sysconf tee wait3)
++	       strtoumax sysconf wait3)
+ 
+ dnl Check whether it's worth working around FreeBSD PR kern/125009.
+ dnl The traditional behavior of access/faccessat is crazy, but
+@@ -135,6 +135,10 @@ if test "$use_fnmatch" = yes && test "$enable_glob" = yes; then
+ fi
+ 
+ if test "$enable_tee" != no; then
++	AC_CHECK_FUNCS(tee, use_tee=yes)
++fi
++
++if test "$use_tee" = yes; then
+ 	AC_DEFINE([USE_TEE], [1], [Non-zero if tee(2) should be used])
+ else
+ 	AC_DEFINE([USE_TEE], [0], [Non-zero if tee(2) should be used])
+diff --git a/src/input.c b/src/input.c
+index 71282fb..4e30010 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -183,7 +183,12 @@ static int stdin_tee(void *buf, int nr)
+ 
+ 	flush_tee(buf, nr, stdin_state.pending);
+ 
+-	err = USE_TEE ? tee(0, stdin_state.pip[1], nr, 0) : -1;
++	if (USE_TEE)
++		err = tee(0, stdin_state.pip[1], nr, 0);
++	else {
++		errno = EINVAL;
++		err = -1;
++	}
+ 	stdin_state.pending = err;
+ 	return err;
+ }
+@@ -324,13 +329,13 @@ retry:
+ 	if (!fd && !stdin_bufferable()) {
+ 		nr = stdin_tee(buf, nr);
+ 		fd = stdin_state.pip[0];
+-		if (nr <= 0) {
++		if (nr < 0 && errno == EINVAL) {
+ 			fd = 0;
+ 			nr = 1;
+ 		}
+ 	}
+ 
+-	if (nr >= 0)
++	if (nr > 0)
+ 		nr = read(fd, buf, nr);
+ 
+ 	if (nr < 0) {
+diff --git a/src/system.h b/src/system.h
+index 8cb4726..2138989 100644
+--- a/src/system.h
++++ b/src/system.h
+@@ -119,13 +119,6 @@ long sysconf(int) __attribute__((__noreturn__));
+ int isblank(int c);
+ #endif
+ 
+-#ifndef HAVE_TEE
+-static inline ssize_t tee(int fd_in, int fd_out, size_t len, unsigned int flags)
+-{
+-	return -1;
+-}
+-#endif
+-
+ #ifndef HAVE_FNMATCH
+ static inline int fnmatch(const char *pattern, const char *string, int flags)
+ {
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
