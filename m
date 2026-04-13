@@ -1,82 +1,71 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [82.165.170.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57F31AE877
-	for <dash@vger.kernel.org>; Sun, 12 Apr 2026 23:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FB21F7569
+	for <dash@vger.kernel.org>; Mon, 13 Apr 2026 01:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.165.170.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776038244; cv=none; b=JCIwTm38LaFOECccZzOIkVsxZ0isWREGxSkJaoxi8mm0pYDVxq4w9cS2T5/RX4rvZJgxb2Vw6eVny/brdV0CDwXgbEnm8sb46O3E8mmkPT09h9wyGcScV8UJKM756hPNGQ7LkskYWLuMx0gBdKK/7dK+EXI5mLFzOLVy9fskp0M=
+	t=1776044044; cv=none; b=ZZb73HkYSWbDriH+m70s61tg3uZfgZqL9f9AqjGlq+VfnBdKs3N/GpxHrrN8BHdssUo9pqXrKiw0j0q+5mcDSmPPqBpdv78ps3wjP7IvpN9FWXHA5354lQLBvnxZ6tGLs5UGNwgh4oziHzCvu2K2lxKHfu/lG6q6VkzSBKjap0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776038244; c=relaxed/simple;
-	bh=KQLTzegI9zvVWe19FVyWXy30PI2bO20EbHxu5Gs9Ow0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=rEg4ubHyP1rOtHbiTqPQdhi1IRfR9knpCZvgbS+XuYVpQVPM/y1ekSvzPk6j130yQt1fRoMi8FU4mVpm7GhFaiJcYSM/rTRF1GmO4sClanjnI8Hqs4JfeQUjidEZ/uDo3dwGuFUqM3ks849spcLmBGvvvjy+SUH26EP03k0Icjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e//IBEBp; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776044044; c=relaxed/simple;
+	bh=eHHSdW30dMtsed+7xoUxYbRRDY90D3sjKscbX/TgsVs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=AjNhwIQVxPv1foRyhaIB8k7fhpvQk8JWNjK1tB9lpJ92Fn7Ir8/DZD2GsgJhko7GbN1Rfc1FLqH/NHX/Tc9RpP96M9qztr+7y0CuxgiiEJn03F/rxDstBWpFJ0o87+u8YjJgYEtiP/RjK1Zdl3p7JrKLZneonSx7HKFgOVDIL7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=Z6q4l0pj; arc=none smtp.client-ip=82.165.170.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e//IBEBp"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488afb0427eso48214385e9.1
-        for <dash@vger.kernel.org>; Sun, 12 Apr 2026 16:57:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776038241; x=1776643041; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KQLTzegI9zvVWe19FVyWXy30PI2bO20EbHxu5Gs9Ow0=;
-        b=e//IBEBpEH3Nkr+igGObYJdxt8Y2kE0bif+/ZMOAgSkb5EhfBgdH5ihU9vijPxsh5k
-         0DwJetwxpROldFeLXS78zhfKSCVZZhoRNLCLJ4HyMnLeLK34lTYtNdD8SZk9E0ZZTo5B
-         vOb1+h5dkJQAGZ/ErwAxBC4hQHuKPMGQA/QpPEHofuR9RCEAlP84Fvqm/FBJOOKRKR6x
-         DJei3HLYotfirDuBOtqWq15CpaGYkYh5SlFNRqh6+IhoTQvyXYFLVn7mwp2O42+B2zKE
-         nr/Ip1zLPRpU/PI2ZbQLJEXqQ68Jb8sKP+DcaKit9ZlEGJcPqAWiSu/IYGLYKrh/Ywj/
-         lUrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776038241; x=1776643041;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KQLTzegI9zvVWe19FVyWXy30PI2bO20EbHxu5Gs9Ow0=;
-        b=nwLqjjIxKQ3iOLrUvc2a0zzJ/RzMdHHuNAfU3s1mWqC9RnrjkY5ouFBHni0VjsXvpi
-         fdZwxpg5GmCm43va33hgPjVo3yMCoPc+MY/7uTnkpEs11F3nF2DtGB/fFKtnhXe0ClAw
-         ZVneqDvY++ZXVmyxgG/uaGh+FyzIHU0k5JyiM7GLUxskgLudas4u99sbb5TGAfqo51Xf
-         gr3+t9fwpH4Gb1BOO3J33L2rRtFwl9b0J8abILakrP4jzrXOys2hfJgMOjZMK6GIWryi
-         Gel/UWKZkFWUWi883Qc5uMA5cOeQ/GibHxHIjW70rud/5giehJfbv0zwW1RL9XPqquaw
-         /47w==
-X-Gm-Message-State: AOJu0YzZfdoB09Egdnjr3qJ+fTlSb10Ov3nb7WVevcnxsM5F5o3wot1T
-	SBpeDrrGaL1BTWLGQB/DbvoyVj1RWwxPeFeYf+RRg5GhNhy/xATErn8x
-X-Gm-Gg: AeBDievUlrZhoQb0rXzlIpaha5Nl1WhX4Pzzm5S3pbPU1BZHAn4Bb3rFGvtspc28PuL
-	E7mk5ixmYxN1Br2QX6bqKxy2kgMXQBmYD02waqLR1Nm7y/rQV10/rNkngJHgZ+TTFuNxzWDM8be
-	4Oo50zTFU15gDskJjiBomsXkoAuG56i6gThBW70z5lGhKKQ3ljxFg0X6Rioq5U2q7SotSWX2kvR
-	IT0ST60AGUIrmHvRk7SSqgvek1mwLPVMptTPwhdUqFpdwsimbLNUvgtkur24X9r1IDdP7B4i09/
-	QrU9OsrLKVm3qe9fjlxD81PZ76Ot1rLDZxZ+3hBKKfXFOUKZkJ0ZS9nEXTMO5SGbFLTI48O1lF1
-	n3rIrRQIQtYPyjPgCZ4bCMUI6lE9oWcBsHjSVy30gDPp+d9mM0g+kdmn21Y78qadZBD8CJ2VJnM
-	zJGsqx4hjuEoY/eEAjC+S4a54qhzxMPNu3+AkgKImu
-X-Received: by 2002:a05:600c:3ba1:b0:488:90ac:8f71 with SMTP id 5b1f17b1804b1-488d67c704amr160598215e9.5.1776038241108;
-        Sun, 12 Apr 2026 16:57:21 -0700 (PDT)
-Received: from ehlo.thunderbird.net ([86.1.69.5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d58a414bsm253424815e9.4.2026.04.12.16.57.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Apr 2026 16:57:20 -0700 (PDT)
-Date: Mon, 13 Apr 2026 00:57:21 +0100
-From: Josh Law <joshlaw48@gmail.com>
-To: samuelmarks@gmail.com
-CC: dash@vger.kernel.org
-Subject: Re: WASM + dash (again!)
-In-Reply-To: <CAMfPbcbH6C6vd8Cp-sWfpZL5ih_q=2pTMcDbZ9PidQFjzc+3hg@mail.gmail.com>
-Message-ID: <77A35247-965B-4CE7-A501-F6095D4925C1@gmail.com>
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="Z6q4l0pj"
+Authentication-Results: mail.gigawatt.nl; dmarc=fail (p=none dis=none) header.from=gigawatt.nl
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 7E1B5A01DD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1776043567;
+	bh=VoY9/7WeANp/wAteo0EZKTMt+faT+iXCpWYtAZoQBiE=; l=812;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=Z6q4l0pj/AFBsU/cxh5UByHk1ReAZOIZ0l819dZQi9xwkY1GXSn7NOx3cQffs5OaV
+	 Cs02s5lBrUrMgKkvHD2CC8W6mtXfZVTFAkYrKWqdHm/jMe+LzTOoGvYb4yGeE99H6F
+	 YUx6PZazWWD0YYLuRfcshjwF4RCa20wu3jApLyw0=
+Received: by mail.gigawatt.nl (Postfix) id 7E1B5A01DD;
+	Mon, 13 Apr 2026 01:26:07 +0000 (UTC)
+Message-ID: <a7604baa-02b5-4b26-8569-a27a806b50be@gigawatt.nl>
+Date: Mon, 13 Apr 2026 02:26:06 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: WASM + dash (again!)
+To: Samuel Marks <samuelmarks@gmail.com>, dash@vger.kernel.org
+References: <CAMfPbcbH6C6vd8Cp-sWfpZL5ih_q=2pTMcDbZ9PidQFjzc+3hg@mail.gmail.com>
+Content-Language: en-GB
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <CAMfPbcbH6C6vd8Cp-sWfpZL5ih_q=2pTMcDbZ9PidQFjzc+3hg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello Samuel!
-This looks really good!
-Keep it up!
+Hi,
 
-V/R
+I don't know enough about WASM to comment beyond just loading it up and 
+seeing that it seems to work for basic things (which is always a good 
+sign) but:
 
-Josh Law
+On 13/04/2026 00:44, Samuel Marks wrote:
+> The port successfully passes a headless Node.js adaptation of the
+> `dash` test suite.
+What test suite did you use? dash does not have one. As some basic shell 
+constructs require forking, they do not work (as I think you expect), 
+and I would have expected these to be covered by any test suite.
+
+   # echo 1 &
+   ./this.program: 0: Cannot fork
+   # echo hello | cat
+   ./this.program: 0: Cannot fork
+
+It is totally fine to say you are not looking to fix this, I'm just 
+wondering if your test suite gave you some indication of what other 
+constructs may not work either.
+
+Cheers,
+Harald van Dijk
