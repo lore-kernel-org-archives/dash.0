@@ -1,116 +1,64 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821F81624C0
-	for <dash@vger.kernel.org>; Mon, 13 Apr 2026 23:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1741C68F
+	for <dash@vger.kernel.org>; Mon, 13 Apr 2026 23:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776123923; cv=none; b=WiISMZqyBQ75Uv5dqmAXLOniyd8lK7ZJCO/SkxjFG6hSnRTGCsN591nCq0Cn2cWCNlf5lksztbcUt/BqszeuxUPj6JeKY0pltlOSeohpsWmih9+5Gu4skCqea4YwVt0IWnDPWr1zeCNGq3x6GrKBHEoYHLV0m7ZtNuznVlvnQ1o=
+	t=1776124118; cv=none; b=B9E+00zNUeVW83/4Ab5CABFKQ/gkEaY81uXcL6yhHgx0Etmui81+VR3SsXgceKZI6WNovaGnJxYocLo00mwvNTKcN1fV881BuVbIjdaAPzm2dRTn/pm/32cn6Dty/On3+lCB/dZMJX3+f7VkRtbwFhSBx+NsWYIa3ECz4PQ6Mq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776123923; c=relaxed/simple;
-	bh=EV2mWOiwi5aehCXmWJ1MhUpTub3c2Zwr7ETAd7sKXbU=;
+	s=arc-20240116; t=1776124118; c=relaxed/simple;
+	bh=Y9kKIoNRv0bRZbEFmuP27UW+zoYdI77SEbUkNSRSNSA=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=BJLV6CQGe1EFCAjjqNnR8/lKYGrQo8Et6ycwDBVl+nmDULegHLU0/Qb1+wfXBCApgxq5mQUdnm7sbNaqDdjeP0LeuXQgnMK6Edal4kE8RzmaFHGkvY1Yo/XvwYpODOgjOhhTT4ZLXy/VMnXFAlao8X/qNoEeaMTH1zMWXXkexuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=bZc8xaGC; arc=none smtp.client-ip=180.181.231.80
+	 Content-Disposition:In-Reply-To; b=tMB5djWHSoa9wR0P8BQmnSeyE/OlIW489JvsA2wW53d1bpmvL9SlEyQhIOuiASy2CeUGJhZWn3RH34EwNieXceHOgp0WAFR5PQeZwKpvI03IncEu2bMJ8yTsYk8yqNQKWY/1VNHYa1qODXxSO6FA305u2WamNfwGOTCV7ZEviNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=KjVnJkEA; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="bZc8xaGC"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="KjVnJkEA"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
 	content-type:references:reply-to;
-	bh=s5Fvb+MAJ1t6qTQ9nm9bnv7U/nQmFCfSxiM4ePooErU=; b=bZc8xaGCkxxlJyajY5ZhCcR5JH
-	HB+fk+h2xXN9E2ch4a+VdrSirME4SJX3Wx4QrLmeaSblg58tF2N6dEBRBrb+TKLsYAW+wzXa9EMKN
-	xBDU2nVKd9QPCpoS57awEaW5Yga39tt66aV1UjEWqA0i1BnTc6fDGFp+AdhF0luxh5gOHLl1TZ0we
-	9+Vfj7Gl/zKiNVmphC9ckCxxhtshkcZ/t+jWmQQ/XzrXjtQ3XJEE+sgdq2e3YJ7bMGHEuo+bmqDgI
-	4Twr902ugKG80zuRD/unxjzikm9g9iwSes6OWdNoTBRhqHF1fAOdx7ceBVBBpY96ZLskbC0C7s/8u
-	l07oJxaQ==;
+	bh=QkEdC/24pzTkF2lDTUH5sn9Gx37LFGhskw/sWvaoJg0=; b=KjVnJkEAUU5roVElXjtk5zDTI9
+	eNeKN83K6Y8o6xiK6pNHv5/CPW3kxigEWh7t5QCm9iOPRpvlqfg+ZzIG1ry22ydDZtsfQJTymFJOd
+	Ttfz/AP9GeTmjMvdr5nuccb7hhTEGYq4auau1jIAXWMas4dIcu8uVa44aheZ5Ia3ambLbLRwi5Qej
+	8hT8udnX1oJPW996YsFYF0hz7O6sHTOaRHAI+5/dT3p0TrQZJ8s6LpWh1J56R0Enli/z95ORRgVIR
+	7/9l9JzcyUYc2nuNDVp5dXqZ4eWUf9s5bT3PwNGj6LtLoBUG0+94Bw2f6i3zX67SlVoaWjbvSaa89
+	h9ChnkJQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wCQYL-005sI4-2s;
-	Tue, 14 Apr 2026 07:45:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Apr 2026 07:45:08 +0800
-Date: Tue, 14 Apr 2026 07:45:08 +0800
+	id 1wCQbZ-005sIx-0b;
+	Tue, 14 Apr 2026 07:48:29 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Apr 2026 07:48:28 +0800
+Date: Tue, 14 Apr 2026 07:48:28 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: DASH Mailing List <dash@vger.kernel.org>
-Cc: ignacy.gawedzki@green-communications.fr
-Subject: [v4 PATCH] input: Fix EINTR handling when reading from a pipe
-Message-ID: <ad2ABNCVXruuMNvQ@gondor.apana.org.au>
+To: Harald van Dijk <harald@gigawatt.nl>
+Cc: 996029583@qq.com, dash@vger.kernel.org
+Subject: Re: [v2 PATCH] arith: Fix CVE-2026-31323 INTMAX_MIN / -1 overflow
+Message-ID: <ad2AzCSwtmxQF4sd@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <adt1kl_3p0r4E7PG@gondor.apana.org.au>
+In-Reply-To: <5d0c907d-28d6-4d07-9c8d-09d5c128373a@gigawatt.nl>
 X-Newsgroups: apana.lists.os.linux.dash
 
-Restore the fallback tee definition so that it actually compiles.
+Harald van Dijk <harald@gigawatt.nl> wrote:
+>
+> This looks fine if it's a conscious decision, but it differs from what 
+> dash generally does when the result of arithmetic is not representable 
+> in intmax_t, and also differs from bash. Depending on the reason there's 
+> apparently a CVE for this, this may be an issue, see below.
 
----8<---
-Errors from tee(2) should not lead to the fallback path in every
-case.  In fact, only EINVAL should trigger an attempt to call
-read(2).
+This is not a normal overflow.  This actually raises an exception and
+kills the thread.
 
-Every other error (and zero == EOF) returned by tee(2) should be
-treated as if it came from read(2).
-
-Reported-by: Ignacy Gawędzki <ignacy.gawedzki@green-communications.fr>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/configure.ac b/configure.ac
-index c37eefe..d749440 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -135,6 +135,10 @@ if test "$use_fnmatch" = yes && test "$enable_glob" = yes; then
- fi
- 
- if test "$enable_tee" != no; then
-+	AC_CHECK_FUNCS(tee, use_tee=yes)
-+fi
-+
-+if test "$use_tee" = yes; then
- 	AC_DEFINE([USE_TEE], [1], [Non-zero if tee(2) should be used])
- else
- 	AC_DEFINE([USE_TEE], [0], [Non-zero if tee(2) should be used])
-diff --git a/src/input.c b/src/input.c
-index 71282fb..4e30010 100644
---- a/src/input.c
-+++ b/src/input.c
-@@ -183,7 +183,12 @@ static int stdin_tee(void *buf, int nr)
- 
- 	flush_tee(buf, nr, stdin_state.pending);
- 
--	err = USE_TEE ? tee(0, stdin_state.pip[1], nr, 0) : -1;
-+	if (USE_TEE)
-+		err = tee(0, stdin_state.pip[1], nr, 0);
-+	else {
-+		errno = EINVAL;
-+		err = -1;
-+	}
- 	stdin_state.pending = err;
- 	return err;
- }
-@@ -324,13 +329,13 @@ retry:
- 	if (!fd && !stdin_bufferable()) {
- 		nr = stdin_tee(buf, nr);
- 		fd = stdin_state.pip[0];
--		if (nr <= 0) {
-+		if (nr < 0 && errno == EINVAL) {
- 			fd = 0;
- 			nr = 1;
- 		}
- 	}
- 
--	if (nr >= 0)
-+	if (nr > 0)
- 		nr = read(fd, buf, nr);
- 
- 	if (nr < 0) {
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
