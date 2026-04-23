@@ -1,75 +1,105 @@
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [82.165.170.251])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB5524E4A8
-	for <dash@vger.kernel.org>; Thu, 23 Apr 2026 07:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.165.170.251
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776928490; cv=none; b=HJkg8j4B/mFGiIOe3cd133m9geH4Rh4yX0/Wz6agf+7oHqWcpvrAAikDEgZLp+PnUrbH9bp5s3IqqNGvxiy6mJs3kbYKSyaVKSixAC/uGQ07RhboIxzc/SYTpFuavL0vz6PEVoFdq2rBIqK1igm0YWJjjJzQSVKQ+o/GSxpgc4s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776928490; c=relaxed/simple;
-	bh=wHRJScZYePh6Mim1RQlL/u1hfietqBTvhlMaPgSGJuU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=gC0Lx/aMKjL4nxG+gd0LnAwYeOYKg1QHbjBYtb2gkf/kFy+p42IlLdq5T8+RW8z3IkW/4jQZ+IKugNJJgtLU+IURAmax0rjiumpd7bG6Ys9AwqMrBSqPXNIXIzkdedNnuHLvC0yGovN2lseyYTcg2wkMDssiEptVDewChOJbjDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=Y31KGfYz; arc=none smtp.client-ip=82.165.170.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F6827C162
+	for <dash@vger.kernel.org>; Thu, 23 Apr 2026 14:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776954149; cv=pass; b=kOIh25XV5MKuI0RU8UzjLUch051lLQqC0I+USFMI2aaHFzOBkevdBoz4hKM6LcFah7M168UIOgDAtWL7zo+5r04PLBtXp95EC4PEqOPaMeeamjoNaW1WU+Hc4HIX3pc81QD0d0o2UdYPM3KQW03nZP8TwF3f5wgtytc/A7WJciA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776954149; c=relaxed/simple;
+	bh=munBGMtiLbXq1qtOrjX5Nly9gqkwjZ1WaXhSUlI7L4w=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=UUYo2Fqj0gQ3Vvbu5uwrFPjSChAEps3I2vUX5HlmuePkRQl71O+EJhAm4vA8vMeuDtep7IWjF/1No86/YoZDIn3HpDaGqUlJ9ECzEVNwy9L611CMNlPl+6RdGDsy7zzzlAqyHdtBfn03Ar5t+ZPzbmksiS32NWt2LJgeTvAueFE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jBXiyRj7; arc=pass smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="Y31KGfYz"
-Authentication-Results: mail.gigawatt.nl; dmarc=fail (p=none dis=none) header.from=gigawatt.nl
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 50DB4A2CB9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1776927919;
-	bh=nuwIsXfmSwYL09s8En2H7kk03PRtq+DQ+UlGkeFY/j0=; l=1089;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=Y31KGfYzgaTPMSo+qz0gAI10GN20ciYek4lWLriiFQX3SGdC1zMHXeVYceGCHPifg
-	 BCbidQjXOa8oTO2kq54e7HExOpXXBcsLAaBPfuXNeSlMYU+BgkNJSi09EU5yl9EjeL
-	 sp+5PvubfxVbyKEh53ppjCSbbOLfBMjCEmHoOCCw=
-Received: by mail.gigawatt.nl (Postfix) id 50DB4A2CB9
-	for <dash@vger.kernel.org>; Thu, 23 Apr 2026 07:05:19 +0000 (UTC)
-Message-ID: <b7d62511-4a17-427e-ab7b-468f9896e6de@gigawatt.nl>
-Date: Thu, 23 Apr 2026 08:05:17 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jBXiyRj7"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-676e62faf2bso3922096a12.1
+        for <dash@vger.kernel.org>; Thu, 23 Apr 2026 07:22:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776954146; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Ot7BD0Zs+YkHjLju7bYbYZnhNLgvsnpZKrPWil/69nV0xdfD0bjZoks3mbixuz0N0I
+         R6+0SZPVhwuc+bY/zfRKRprQ969UAPxQpq7l1G5X0fyrGv6hGj9tnvO5R77fr8Mj4vwy
+         o1w58wWsq7o7YHuaTQNeB9mvYiYb2o8mpbq1ROdwgYWs50bl7U/4qn+34eaKF8aoQmmI
+         Yw7ESrtoPNcNAUIVB0LaCsP9YGupcCR6mFZvoV0vuEeE55kj+uwbUjC3JRRi1eCKBqur
+         UebxomoJjW8XGrEogGYrlURZ5ZkNVpeSMvxHL/3QBXqztpybX/RLGBuHro1Ztb7NwlYe
+         pNig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:dkim-signature;
+        bh=munBGMtiLbXq1qtOrjX5Nly9gqkwjZ1WaXhSUlI7L4w=;
+        fh=Q7kkUHvUpV7GF22BcVPTe0jHcVVjWF0IspJwmqq6Oh4=;
+        b=du7TBrxKkfZljZofuuhw0VnO+sqHPH5TydYS6RgIzpweyiOdzOof29YM4gIeLGeTiJ
+         MjWDm5FjJtdOX5mY9I4f2j3Lbv2iSTplOTNBsoEZ/BPlfFB8wY72jji7dY9yflsWFKmG
+         7ps/3d5TKNZeicbiKJWJFu0/R32awZd1maWsni6ZhrUs1v3zFx03D99oyVYAisZBNBtW
+         vBP44A9MMqQGs8fJNl7KvpEitmwvr47WceY3unhxjTCCfM026ZdGsdvF54KY9sy7DtE7
+         d2kQqUKUtS0lQrJvnn1bsj4l1ruc5YhbUzLOoAH/JFTUs7xA5C2mBQ3MqZ7Z6incMELn
+         5TCg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776954146; x=1777558946; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=munBGMtiLbXq1qtOrjX5Nly9gqkwjZ1WaXhSUlI7L4w=;
+        b=jBXiyRj7xctuHPgz0vOqoL46Uq8lKVZar8rDvvFu7BlkWEGILN+jHs0q6t1gCq6R1I
+         USTHxy2vrDW9dgO7aCI8+et+Cs3NqCuGV97Fh9rpzpArOaBiwtOSHkqT/wZL076J1gK9
+         OOTplH5yxdKOL+W6xO81aXF77KdIl32mx01uQTewDgoqKmrIWAXUyOSzm7Sfzwn1aOO6
+         Ehp+7tlm6Vlnlt488v7AzYwaFdKhuqAAwOsmXVVZIV1YZNO5SU4K7DZOFmESBgP+Sn+G
+         s9BSC+fVWG08ghSTo6C+tiOE4RBBd2gEfK9q1cfr33rjjaVxdHmxAzWVTR0l5x/+Tbvj
+         Uh8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776954146; x=1777558946;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=munBGMtiLbXq1qtOrjX5Nly9gqkwjZ1WaXhSUlI7L4w=;
+        b=qKqhkcADTPYp8n6ccdHLu0NFh1plGHVyqd53J9iH0IXBcjICW6RHNssJuIbNmJjisU
+         kOg04GK/M80ts7A4hUyFrYThhZQk8WAXbcLewcVIuYSyoyE75ePnTiG7SaM48czODRs9
+         7e75uS6WeA4Wil3bABzhjFHGoeEJ54WGHUPXLJoyIhwka+jUCig9wp3O58K3ubf1F4YJ
+         JNthP5cFs/AUDdYKp+I7XpnaUKqOI972CNnohPL9FhW2jpYhI7UG4szUj50MZZi/OOJa
+         9pvjVDJITW/RSCctsbM1p5u5WwYY+3RWJk/bRA7MDny0nLh5coaJ6WXvwu8O6WAhcLPG
+         7OMQ==
+X-Gm-Message-State: AOJu0YziaBPRB6j3OxcmKZ45Z0oLKEfVVwNJCQF/KErxVtuQUTCYt3te
+	1vd+RohC2/tQqI6kNHifpCTvdOB0KvjtC8wguvfb2YvWZoLXAti0F6ITIhWWBGHQYcdDrPPbIn8
+	EgbCDo/1Q5rxspkhlptw7Fa+OoA07aPcgycXFu1LrFg==
+X-Gm-Gg: AeBDievojGFmyT2Dkhb3mvxjuxqMhPcARp2feXFzU1sHwyjxtnevkizLP88d3w9vvLc
+	RG3Qx9GO0BKz1jSyoO9fdGoZjQHoI+DeAdC3PxRyh/TF1CI6pGqcAXZPOlLFf5u8/UcZK9IXLkH
+	IsroRSZ1RUh7LJqnEp95HH5Tu3fzxmMEPbuUloQs9t/Iv8QI7/vg2ZA3VtPMGssIu5qz5xHalg5
+	SWkzg7T1N7OXcHtIh6hQoy9Gk2rXtUaq+2LbNfyp6Doi419CeQ0KGIyTeDw2eIIvnT9/r4Wujl9
+	JpMRf2emsepivCsYVw6Niv0aL+tM
+X-Received: by 2002:a05:6402:a54e:10b0:669:cc03:334a with SMTP id
+ 4fb4d7f45d1cf-672bfd9db0dmr9729188a12.11.1776954146457; Thu, 23 Apr 2026
+ 07:22:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: stty -echo doesn't work?
+From: =?UTF-8?Q?Gr=C3=A9gory_Pakosz?= <gregory.pakosz@gmail.com>
+Date: Thu, 23 Apr 2026 16:22:15 +0200
+X-Gm-Features: AQROBzBQmqJ5YaSR1LicsxEDJA1QE4JmugRouterpSYriI26eU6ssTLh1OS00z8
+Message-ID: <CAC_01E1y9zYecy6ugvmwCzNm2tb2ipWqPKG6f6QUpOKU5AsK6g@mail.gmail.com>
+Subject: ${var:-default} and ${var-default} append default value instead of
+ discarding it when default contains multi-byte characters
 To: dash@vger.kernel.org
-References: <aemGV--9_pn_ABU2@HQ>
-Content-Language: en-GB
-From: Harald van Dijk <harald@gigawatt.nl>
-In-Reply-To: <aemGV--9_pn_ABU2@HQ>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 23/04/2026 03:39, Sebastien Peterson-Boudreau wrote:
-> apologies if this has been posted before.
-> 
-> I just noticed that the following command
-> 
-> 	$ stty -echo
-> 
-> does not work in an interactive dash(1) shell.
+Hello,
 
-Hi,
+It seems that Dash regressed (but I don't know when).
 
-stty is not a shell built-in command and dash has no control over what 
-it does. Running this locally, what seems to be happening is that the 
-command did work, but when dash is using libedit for command editing, it 
-immediately gets reset when prompting for the next command. This seems 
-to be intentional on the part of libedit, it resets the tty to a known 
-good state when it knows it needs it, but I am not sure whether it is 
-also intentional that that reset state persists after it has 
-successfully read the next line.
+$ dash -c 'x=3DX; printf "before: %s (%d)\n" "$x" "${#x}"; x=3D${x:-=E2=86=
+=97};
+printf "after: %s (%d)\n" "$x" "${#x}"'
+before: =E2=86=97 (1)
+after: X=E2=86=97 (2)
 
-What behaviour are you expecting here? Are you expecting echo to still 
-be turned off when entering the next command, or to be turned off again 
-after the next command has been entered successfully? Both options, as 
-well as dash/libedit's current behaviour, seem reasonable at first 
-glance to me.
+I'm using Dash 0.5.13.2 on macOS, installed via Homebrew.
+The bug seems to be locale irrelevant.
 
-Cheers,
-Harald van Dijk
+Regards,
+Gr=C3=A9gory
