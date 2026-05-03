@@ -1,42 +1,40 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065481D7E41
-	for <dash@vger.kernel.org>; Sun,  3 May 2026 04:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9085238B7C9
+	for <dash@vger.kernel.org>; Sun,  3 May 2026 04:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777781964; cv=none; b=ZywK19mblyNyKrV5f/sKKuPwuaDr+OxJW9l2iXRnBYvl/BXpYzYYjHLmL8Mg4dnPdRSkj06N1bO6LD8c1r9Fp+mOOZLZdVHx8hVLrObnWGw0ngILcH6b1CVOE/L0jw7THBayrJM5/gRh/0brgWRjLFaOwdi5Gl8jo6fMZV+i3RE=
+	t=1777782652; cv=none; b=u2QTl0K124UhmB7/Sk6PTz8p5amuuL4nnd7mVPRO7MU0fLPUv8ok+p7Th2S50v0P0WSNIX8AzaRp8JChn2DZl/H3cWx6Cv5gLJyce7LtKgA8Rypqw5/bMza7ZWcgtmyGu9kFOWqo7MIynhfna7RhrSyx0StM/QHKlmoY3V4OG1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777781964; c=relaxed/simple;
-	bh=BPx9YokJH+48LMwZ5aH/oCl1EabWhCpFt+1xQcKtAlo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=dp8ZlXHGofmch0V42DJQbHfKnpb3GMShyZzL71n5xwccBqnke+ns6l5lCxGt7Fd17AiHgsFMmrEAS42njPNTXzks9+SC3viDXJ7933ewvInbJ26guu3QvUDYJK2PUHfJYuvWYw1FaeczbnkAE+x1HRe/ea5ZEAnqTrqS3d0j/SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=BJbPsJnZ; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1777782652; c=relaxed/simple;
+	bh=6aRJWy7nI9xPKag9Ps1t8C5V1/M2Lkk2xP7pCKN06NE=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RNgrf2yGwbyTD3XR5tHx34nTOosBahQoqumg3hjrF7hB9M9BmuyvaPtGobQN62ClrLRWOhv8+AJQZW6G+tPu6B9uzjz3SzRIrUdVA7tXObUhRnXB95W2QHW4TGEq4vpAKzamcLBqW7OyfHfRMFVfTKchv5+Ou4MKUUSg1CbjHrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rlBjMkJH; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="BJbPsJnZ"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rlBjMkJH"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
-	content-type:references:reply-to;
-	bh=PAggk7vlqR7DQNIVQ/+D5mmBVAhmeS5I18tG9l7XjLA=; b=BJbPsJnZIkMsCOxCf85eKUQbk1
-	44JBlS32k3q9+cuWeidDKjWj1ULFAb3DZDPyVtw/eGzSc+h3gV1CGPU+7kwgqS/T+TzXVtnOF4aOw
-	VIqX5qE+IqEGLxfI3TftRXFYP7QEI3miFTNKPESPHGGypiI7lkAlIoh/jr2fleGEf16YWtUJ1181z
-	1oPFWeX/Ape5avZx8YhBfhRfsHyDx5g7Rx5JuFUAn2pw2pLJoBYaAiBQn2ygLycEnRx7ba+qqheIQ
-	1tqdL7fSp0mKWbV9rff9mU/xP0Ibq1zc6wTf9fzIyJh+NNLoDeuAdW4YY1fmfc583uF3Ux+fRFblV
-	+nLBlY3w==;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=gt+f148TK7m8GIioC7zxhOfz0eFBhk7i9O24xTQ8DQI=; b=rlBjM
+	kJH+KDGmDeotvifs57M+lQQD0eVkAT2UWKvAm1ZBYqL4ttpubi+N698Bi/TVupGsJuaghqcvTNVRz
+	0mjtZ3M4zXpJekWJcnbS4Svwte79ijbRKDwQvwD7tT9qs++Y9Av7gsiaARLb5h2xtzPND3F2fmeIJ
+	6rG03NL56AXjAscSqT8bKM+JdiSMB9PKl1AtOvWoBxcigCYoDnQNOzCsZFedQaH64X8i0/U+dt7ar
+	EcHqW1SUVh0nBkITx/GKGXK/NRF/ARpWGfwbVtxSmZtMBEJmJ3Nv2HM8SPv4hrLnRQWmCqKqCf8g+
+	JQWfaxChKTxGU6eYGaV1VaCl4qulA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wJOIW-00AmVU-1c;
-	Sun, 03 May 2026 12:19:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 03 May 2026 12:19:16 +0800
-Date: Sun, 3 May 2026 12:19:16 +0800
+	id 1wJOTc-00AmaC-1i;
+	Sun, 03 May 2026 12:30:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 03 May 2026 12:30:44 +0800
+Date: Sun, 3 May 2026 12:30:44 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Matt Whitlock <kernel@mattwhitlock.name>
-Cc: dash@vger.kernel.org
-Subject: [PATCH] input: Fix tee(2) error handling
-Message-ID: <afbMxGe7k033TvqA@gondor.apana.org.au>
+To: DASH Mailing List <dash@vger.kernel.org>
+Subject: [PATCH] input: Replace stdin_state.canon with bufferable
+Message-ID: <afbPdNt3CTnCJrdi@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -45,94 +43,62 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <377dcdcd-68dd-48b0-a23e-5ede49e4af02@mattwhitlock.name>
-X-Newsgroups: apana.lists.os.linux.dash
 
-Matt Whitlock <kernel@mattwhitlock.name> wrote:
-> Dash 0.5.13.3:
-> 
-> $ /bin/dash -c '{ echo 1; sleep 1; echo 2; } | while read -r line; do echo "${line}" & done'
-> 1
-> ^C
+The field canon is never used except to check whether the fd 0
+is bufferable.  Replace it with a bufferable flag instead.
 
-Thanks, this is a regression in the tee error handling code:
+Also move the termios struct onto the stack since it's never used
+again after retrieving the canon field.
 
----8<---
-The variable fd should only switch to the tee pipe if the tee(2)
-call succeeded, otherwise the retry will read the wrong file
-descriptor.
-
-Also remove the stdin_istty check in stdin_tee as the fallback
-path now requries setting errno to EINVAL.  Instead of optimising
-for the rare case of a non-canonical input tty, just let the
-tee(2) call fail instead.
-
-Finally switch from pipe to sh_pipe.  The pipe(2) call should never
-fail, and if it does, just abort the shell.
-
-Fixes: 41457be81fa7 ("input: Fix EINTR handling when reading from a pipe")
-Reported-by: Matt Whitlock <kernel@mattwhitlock.name>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/src/input.c b/src/input.c
-index 4e30010..591f28a 100644
+index 591f28a..0fb2f18 100644
 --- a/src/input.c
 +++ b/src/input.c
-@@ -166,13 +166,8 @@ static int stdin_tee(void *buf, int nr)
+@@ -64,11 +64,10 @@
+ 
+ MKINIT
+ struct stdin_state {
+-	tcflag_t canon;
+ 	off_t seekable;
+-	struct termios tios;
+ 	int pip[2];
+ 	int pending;
++	tcflag_t bufferable;
+ };
+ 
+ MKINIT struct parsefile basepf;	/* top level input file */
+@@ -133,12 +132,17 @@ POSTEXITRESET {
+ void input_init(void)
  {
- 	int err;
+ 	struct stdin_state *st = &stdin_state;
++	struct termios tios;
+ 	int istty;
  
--	if (stdin_istty)
--		return 0;
--
- 	if (!stdin_state.pip[0]) {
--		err = pipe(stdin_state.pip);
--		if (err < 0)
--			return err;
-+		sh_pipe(stdin_state.pip, 0);
- 		if (stdin_state.pip[0] < 10)
- 			stdin_state.pip[0] = savefd(stdin_state.pip[0],
- 						    stdin_state.pip[0]);
-@@ -276,6 +271,7 @@ preadfd(void)
- {
- 	char *buf = parsefile->buf;
- 	int fd = parsefile->fd;
-+	bool use_tee;
- 	int unget;
- 	int pnr;
- 	int nr;
-@@ -295,6 +291,12 @@ preadfd(void)
- 	if (!IS_DEFINED_SMALL && !nr)
- 		return nr;
+-	istty = tcgetattr(0, &st->tios) + 1;
+-	st->seekable = istty ? 0 : lseek(0, 0, SEEK_CUR) + 1;
+-	st->canon = istty ? st->tios.c_lflag & ICANON : 0;
++	istty = tcgetattr(0, &tios) + 1;
+ 	stdin_istty = istty;
++	if (istty)
++		st->bufferable = tios.c_lflag & ICANON;
++	else {
++		st->seekable = lseek(0, 0, SEEK_CUR) + 1;
++		st->bufferable = !!st->seekable;
++	}
+ }
  
-+	use_tee = likely(!fd) &&
-+#ifndef SMALL
-+		  !el &&
-+#endif
-+		  !stdin_bufferable();
-+
- 	pnr = nr;
- retry:
- 	nr = pnr;
-@@ -326,12 +328,13 @@ retry:
- 	}
- #endif
+ static bool stdin_bufferable(void)
+@@ -148,7 +152,7 @@ static bool stdin_bufferable(void)
+ 	if (stdin_istty < 0)
+ 		input_init();
  
--	if (!fd && !stdin_bufferable()) {
-+	if (likely(use_tee)) {
- 		nr = stdin_tee(buf, nr);
--		fd = stdin_state.pip[0];
--		if (nr < 0 && errno == EINVAL) {
--			fd = 0;
--			nr = 1;
-+		if (nr >= 0)
-+			fd = stdin_state.pip[0];
-+		else if (errno == EINVAL) {
-+			use_tee = false;
-+			nr = pnr = 1;
- 		}
- 	}
+-	return st->canon || st->seekable;
++	return st->bufferable;
+ }
  
+ static void flush_tee(void *buf, int nr, int pending)
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
