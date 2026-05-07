@@ -1,43 +1,41 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BD433B6F9;
-	Thu,  7 May 2026 07:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00B92DD5F6
+	for <dash@vger.kernel.org>; Thu,  7 May 2026 07:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778139462; cv=none; b=LU62lqHLulh5qWa5FNh1VHHReyiXavcV5ITUPLxa4CPMxZqzbj6iUw9zIlkP/Lr9NypssCw2nHGjQPiCi5Vd1iivH5HtRuGPzlcOXaSNvR0Mbde010Rd84nF1q/eNh4G6GxrnXfb7eZ77emyRnETUWSmmAHwJOb4MYwYP4rvqZo=
+	t=1778139962; cv=none; b=c8lTZsv7MAzHxqNVGE81DDIpb65sD7ECfmwZq9++9HwerlA7oX8LTa5SXjQVy9kOopwbA7HLgqP1kuP6Pb5p6JJQt7Vydx32ZwbQnp4Bk8QoCCLozYrLVU1JkgEGyomQVdKQLPTR2EiSvchQbuEabcrAcWHRSDj8Yv2xu3pfAAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778139462; c=relaxed/simple;
-	bh=gFo43xAM8TKoASH48wztLTGwf751dYSaheY7ISz2jfE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=szSeIZ0xWe4CsiOM4iSPKG0vz5aU6x3WSqDbjjC+n+1Q/88QY6r1xl/lQ879fwONz2yywglHY9VNkMgWicFZMcn/clOG2V9TjFoKSzZOwQQ20AqdvKMguzrmOmsH+YOb/18SaT2itpxnfywN3FMJpinmzj9qwfoVrVoWDkM9DLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=GzWSo2cY; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1778139962; c=relaxed/simple;
+	bh=64no8KZBoUOR7izKnOBI56VXPA+K6IrFT/Y/BXJpKqI=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mfen/mM0w1A/XrUewJ+aFS26s0HEVhJAfuuFOGuGdOicc64hamXFWWVgCRItavyZUK8BZxeCRu3rrYZcaFCCk26BTFOgS+mCVNW5rux76mWftlRx6p8bgtM006iQT6EeQvGA4TXd/UTWC5k/ievw8ln/ueFhYBMAJQyaDOiOj/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=VwvWY6/D; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="GzWSo2cY"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="VwvWY6/D"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=dwMhwOK8oJURIO5qw3L35xC86cY0d6QW7NA9X8zr4NU=; 
-	b=GzWSo2cYbUM88NmbI4t+XEQH6TdoednU+ySeeqxPSgPAPl5fSx6iGwNRBNVXY1lWXt80+Di9K0t
-	7GH+hScETZjOuugCdCf0bGe6o/U5a8YRPhUWRi2BtfbLaLp68770IhtcwWNShQAr9oflDMtUzZ7bQ
-	0cspDf8RCMy35rZ2Nkib4QCi0AC3dKSeTMw+SxhKQlmGaBVTqnpO1w0ALCZJe0Nggl9PU4E0dnxh5
-	WyzVpAT9RZHGgQYcwuRdTYkf0PhzO+DW/pn8YWhOuav97DsINgDa7eItAEicLzAJVspGckRV+HPw/
-	WUQ5QwMbfYOqy8lt5ShDRy693x5719ZPd5LA==;
+	References:Message-ID:Subject:To:From:Date:cc:to:subject:message-id:date:from
+	:content-type:reply-to; bh=9hnueKIGpr50XSw5W+74+vYvdd7Hab2TpOrBwk2IjNI=; b=Vw
+	vWY6/DFuYDQsROHAOkeiIje9xW/FTvHl8rn60y2vAZ7bjHn12zVavsIRe34tV1h0GWJdFOKa/aJ+q
+	gDJ1vzAazmEMFpDE3Q53viksbL8XBEtr8PU3yd+AszawMFfYWtDJor//G6jdMg/tSHoiQ9Luz3+Io
+	bx0J/hbw23/MgplrU7XTowzIfmzYQ1WfP/DoYgvskSUTwC8Ow5jy5/UqJLTMXfjqlqR7beFs8tmO9
+	Mq7yyYWrplUBMTJHv/qTT3I0aG72HNaTCvPdCQA1hohdsfKtA/8BQEo4uezIuGpL22yO7GdJUVuGz
+	tfuYm6YVBioU062jDTJbiobpB1yOtrWA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wKtIW-00C0NL-1n;
-	Thu, 07 May 2026 15:37:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 07 May 2026 15:37:28 +0800
-Date: Thu, 7 May 2026 15:37:28 +0800
+	id 1wKtQh-00C0Wp-1F;
+	Thu, 07 May 2026 15:45:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 07 May 2026 15:45:55 +0800
+Date: Thu, 7 May 2026 15:45:55 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Patrick Steinhardt <ps@pks.im>
-Cc: git@vger.kernel.org, Eric Sunshine <sunshine@sunshineco.com>,
-	DASH Mailing List <dash@vger.kernel.org>
-Subject: Re: [PATCH] parser: Fix multi-byte output in here-doc with quoted
+To: DASH Mailing List <dash@vger.kernel.org>
+Subject: [PATCH] parser: Fix multi-byte output in here-doc with quoted
  delimiter
-Message-ID: <afxBOHhvXC7VxG3G@gondor.apana.org.au>
+Message-ID: <afxDM2AmON2ASbfT@gondor.apana.org.au>
 References: <20260402-pks-tests-with-dash-v2-0-cd7ab11dabc0@pks.im>
  <20260402-pks-tests-with-dash-v2-1-cd7ab11dabc0@pks.im>
  <afwpyiK9mh23c-JV@gondor.apana.org.au>
@@ -75,7 +73,7 @@ On Thu, May 07, 2026 at 01:57:30PM +0800, Herbert Xu wrote:
 > This patch should fix the problem.  Please let me know if there are
 > any more oustanding issues.
 
-Oops, I forgot to cc the mailing list.  Sorry for the resend.
+Resending again to dash mailing list with a fixed Subject line.
 
 ---8<---
 For a here-document with a quoted delimiter, multi-byte characters
