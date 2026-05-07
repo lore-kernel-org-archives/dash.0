@@ -1,104 +1,132 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9085238B7C9
-	for <dash@vger.kernel.org>; Sun,  3 May 2026 04:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BD433B6F9;
+	Thu,  7 May 2026 07:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777782652; cv=none; b=u2QTl0K124UhmB7/Sk6PTz8p5amuuL4nnd7mVPRO7MU0fLPUv8ok+p7Th2S50v0P0WSNIX8AzaRp8JChn2DZl/H3cWx6Cv5gLJyce7LtKgA8Rypqw5/bMza7ZWcgtmyGu9kFOWqo7MIynhfna7RhrSyx0StM/QHKlmoY3V4OG1g=
+	t=1778139462; cv=none; b=LU62lqHLulh5qWa5FNh1VHHReyiXavcV5ITUPLxa4CPMxZqzbj6iUw9zIlkP/Lr9NypssCw2nHGjQPiCi5Vd1iivH5HtRuGPzlcOXaSNvR0Mbde010Rd84nF1q/eNh4G6GxrnXfb7eZ77emyRnETUWSmmAHwJOb4MYwYP4rvqZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777782652; c=relaxed/simple;
-	bh=6aRJWy7nI9xPKag9Ps1t8C5V1/M2Lkk2xP7pCKN06NE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=RNgrf2yGwbyTD3XR5tHx34nTOosBahQoqumg3hjrF7hB9M9BmuyvaPtGobQN62ClrLRWOhv8+AJQZW6G+tPu6B9uzjz3SzRIrUdVA7tXObUhRnXB95W2QHW4TGEq4vpAKzamcLBqW7OyfHfRMFVfTKchv5+Ou4MKUUSg1CbjHrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rlBjMkJH; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1778139462; c=relaxed/simple;
+	bh=gFo43xAM8TKoASH48wztLTGwf751dYSaheY7ISz2jfE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=szSeIZ0xWe4CsiOM4iSPKG0vz5aU6x3WSqDbjjC+n+1Q/88QY6r1xl/lQ879fwONz2yywglHY9VNkMgWicFZMcn/clOG2V9TjFoKSzZOwQQ20AqdvKMguzrmOmsH+YOb/18SaT2itpxnfywN3FMJpinmzj9qwfoVrVoWDkM9DLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=GzWSo2cY; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rlBjMkJH"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="GzWSo2cY"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
-	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
-	references:reply-to; bh=gt+f148TK7m8GIioC7zxhOfz0eFBhk7i9O24xTQ8DQI=; b=rlBjM
-	kJH+KDGmDeotvifs57M+lQQD0eVkAT2UWKvAm1ZBYqL4ttpubi+N698Bi/TVupGsJuaghqcvTNVRz
-	0mjtZ3M4zXpJekWJcnbS4Svwte79ijbRKDwQvwD7tT9qs++Y9Av7gsiaARLb5h2xtzPND3F2fmeIJ
-	6rG03NL56AXjAscSqT8bKM+JdiSMB9PKl1AtOvWoBxcigCYoDnQNOzCsZFedQaH64X8i0/U+dt7ar
-	EcHqW1SUVh0nBkITx/GKGXK/NRF/ARpWGfwbVtxSmZtMBEJmJ3Nv2HM8SPv4hrLnRQWmCqKqCf8g+
-	JQWfaxChKTxGU6eYGaV1VaCl4qulA==;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=dwMhwOK8oJURIO5qw3L35xC86cY0d6QW7NA9X8zr4NU=; 
+	b=GzWSo2cYbUM88NmbI4t+XEQH6TdoednU+ySeeqxPSgPAPl5fSx6iGwNRBNVXY1lWXt80+Di9K0t
+	7GH+hScETZjOuugCdCf0bGe6o/U5a8YRPhUWRi2BtfbLaLp68770IhtcwWNShQAr9oflDMtUzZ7bQ
+	0cspDf8RCMy35rZ2Nkib4QCi0AC3dKSeTMw+SxhKQlmGaBVTqnpO1w0ALCZJe0Nggl9PU4E0dnxh5
+	WyzVpAT9RZHGgQYcwuRdTYkf0PhzO+DW/pn8YWhOuav97DsINgDa7eItAEicLzAJVspGckRV+HPw/
+	WUQ5QwMbfYOqy8lt5ShDRy693x5719ZPd5LA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wJOTc-00AmaC-1i;
-	Sun, 03 May 2026 12:30:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 03 May 2026 12:30:44 +0800
-Date: Sun, 3 May 2026 12:30:44 +0800
+	id 1wKtIW-00C0NL-1n;
+	Thu, 07 May 2026 15:37:29 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 07 May 2026 15:37:28 +0800
+Date: Thu, 7 May 2026 15:37:28 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: DASH Mailing List <dash@vger.kernel.org>
-Subject: [PATCH] input: Replace stdin_state.canon with bufferable
-Message-ID: <afbPdNt3CTnCJrdi@gondor.apana.org.au>
+To: Patrick Steinhardt <ps@pks.im>
+Cc: git@vger.kernel.org, Eric Sunshine <sunshine@sunshineco.com>,
+	DASH Mailing List <dash@vger.kernel.org>
+Subject: Re: [PATCH] parser: Fix multi-byte output in here-doc with quoted
+ delimiter
+Message-ID: <afxBOHhvXC7VxG3G@gondor.apana.org.au>
+References: <20260402-pks-tests-with-dash-v2-0-cd7ab11dabc0@pks.im>
+ <20260402-pks-tests-with-dash-v2-1-cd7ab11dabc0@pks.im>
+ <afwpyiK9mh23c-JV@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <afwpyiK9mh23c-JV@gondor.apana.org.au>
 
-The field canon is never used except to check whether the fd 0
-is bufferable.  Replace it with a bufferable flag instead.
+On Thu, May 07, 2026 at 01:57:30PM +0800, Herbert Xu wrote:
+> On Thu, Apr 02, 2026 at 08:51:18AM +0200, Patrick Steinhardt wrote:
+> > When executing our test suite with Dash v0.5.13.2 one can observe
+> > several test failures that all have the same symptoms: we have a quoted
+> > heredoc that contains multibyte characters, but the final data does not
+> > match what we actually wanted to write. One such example is in t0300,
+> > where we see the diffs like the following:
+> > 
+> >   --- expect-stdout	2026-04-01 07:25:45.249919440 +0000
+> >   +++ stdout	2026-04-01 07:25:45.254919509 +0000
+> >   @@ -1,5 +1,5 @@
+> >    protocol=https
+> >    host=example.com
+> >   -path=perú.git
+> >   +path=perú.git
+> >    username=foo
+> >    password=bar
+> 
+> Thanks for the report.
+> 
+> This patch should fix the problem.  Please let me know if there are
+> any more oustanding issues.
 
-Also move the termios struct onto the stack since it's never used
-again after retrieving the canon field.
+Oops, I forgot to cc the mailing list.  Sorry for the resend.
 
+---8<---
+For a here-document with a quoted delimiter, multi-byte characters
+should be written out as is with no escaping.  Fix this by checking
+for syntax == SQSYNTAX (the only time readtoken1 gets called with
+SQSYNTAX is for such a here-document) before calling getmbc in
+readtoken1.
+
+Reported-by: Patrick Steinhardt <ps@pks.im>
+Fixes: b12f136cc704 ("builtin: Process multi-byte characters in read(1)")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/src/input.c b/src/input.c
-index 591f28a..0fb2f18 100644
---- a/src/input.c
-+++ b/src/input.c
-@@ -64,11 +64,10 @@
- 
- MKINIT
- struct stdin_state {
--	tcflag_t canon;
- 	off_t seekable;
--	struct termios tios;
- 	int pip[2];
- 	int pending;
-+	tcflag_t bufferable;
- };
- 
- MKINIT struct parsefile basepf;	/* top level input file */
-@@ -133,12 +132,17 @@ POSTEXITRESET {
- void input_init(void)
+diff --git a/src/parser.c b/src/parser.c
+index bea4148..412e876 100644
+--- a/src/parser.c
++++ b/src/parser.c
+@@ -998,9 +998,13 @@ static char *dollarsq_escape(char *out)
+ STATIC int
+ readtoken1(int firstc, char const *syntax, char *eofmark, int striptabs)
  {
- 	struct stdin_state *st = &stdin_state;
-+	struct termios tios;
- 	int istty;
+-	struct synstack synbase = { .syntax = syntax };
++	struct synstack synbase = {
++		.dblquote = syntax == DQSYNTAX,
++		.syntax = syntax,
++	};
+ 	int chkeofmark = checkkwd & CHKEOFMARK;
+ 	struct synstack *synstack = &synbase;
++	bool sqheredoc = syntax == SQSYNTAX;
+ 	struct nodelist *bqlist = NULL;
+ 	int dollarsq = 0;
+ 	int c = firstc;
+@@ -1009,9 +1013,6 @@ readtoken1(int firstc, char const *syntax, char *eofmark, int striptabs)
+ 	size_t len;
+ 	char *out;
  
--	istty = tcgetattr(0, &st->tios) + 1;
--	st->seekable = istty ? 0 : lseek(0, 0, SEEK_CUR) + 1;
--	st->canon = istty ? st->tios.c_lflag & ICANON : 0;
-+	istty = tcgetattr(0, &tios) + 1;
- 	stdin_istty = istty;
-+	if (istty)
-+		st->bufferable = tios.c_lflag & ICANON;
-+	else {
-+		st->seekable = lseek(0, 0, SEEK_CUR) + 1;
-+		st->bufferable = !!st->seekable;
-+	}
- }
- 
- static bool stdin_bufferable(void)
-@@ -148,7 +152,7 @@ static bool stdin_bufferable(void)
- 	if (stdin_istty < 0)
- 		input_init();
- 
--	return st->canon || st->seekable;
-+	return st->bufferable;
- }
- 
- static void flush_tee(void *buf, int nr, int pending)
+-	if (syntax == DQSYNTAX)
+-		synstack->dblquote = 1;
+-
+ 	STARTSTACKSTR(out);
+ 	loop: {	/* for each line, until end of word */
+ #if ATTY
+@@ -1035,7 +1036,8 @@ readtoken1(int firstc, char const *syntax, char *eofmark, int striptabs)
+ 				      out);
+ 			fieldsplitting = synstack->syntax == BASESYNTAX &&
+ 					 !synstack->varnest ? 4 : 0;
+-			ml = getmbc(c, out, fieldsplitting);
++			ml = getmbc(c, out, fieldsplitting |
++					    (sqheredoc ? 2 : 0));
+ 			if (ml == 1) {
+ 				if (out == stackblock())
+ 					return TBLANK;
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
