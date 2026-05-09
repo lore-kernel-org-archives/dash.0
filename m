@@ -1,105 +1,91 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114A68003D
-	for <dash@vger.kernel.org>; Sat,  9 May 2026 18:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E395515746F
+	for <dash@vger.kernel.org>; Sat,  9 May 2026 18:23:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778350840; cv=none; b=uX61MAzU4LYWXaqOn+WelXVZ5T1NTf0RfOqyZYnnqsDtEY7f4Jqh7TPkkrUZERFCFM6vLZ1YUptC4Y0ba+R22CurW0toxWgaqLWWxJziXQwffNXcxI7zF0QbsqUyVJpkxXohqGZV+3ipJKpv+ly4eJWYUzutu+MflRYqRxTnISw=
+	t=1778350986; cv=none; b=iNxg/mvy5Bx9juYnq5y4eRpyT6TCFcxpDdUvHTsn6ZcdBQb9wy5gfyXwIur3rlTigHN59N6U1dGdMAVv5vJ/P58FWCJn3PA3oKZljXETovJwu3t6DKfdMj957/c1xkzagLIyVxAQFzPq3uAgeLSKWrZ88HqgHrClHpqIKPwDgZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778350840; c=relaxed/simple;
-	bh=wPuACwiqVEkMBx9EDMcpKvnAZPhOhLXKkVYRWdAyWFE=;
+	s=arc-20240116; t=1778350986; c=relaxed/simple;
+	bh=ijITICyEqXzKDCfkOzzm+o40tej6U30N5kWWpYrMWRI=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZLtnh42tfYhs90BL079XdM9KdLBU+6zVUYD0xdvx18z+Zxb6yNsQFOMXKwM576kNmM9b3YyKSMGJTTonOSw8Sn0uQI6scLkNsZpmcUMB7pS934SLyFlz9WFpJ1ZNNugdHEQF2jPFXp+8HfSh46i8XC134onG9v0fleUksYWr84Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QqZc2b6J; arc=none smtp.client-ip=209.85.219.49
+	 Content-Type:Content-Disposition:In-Reply-To; b=QncfR+VVFZ9GWxDsNQy/0hgiTRZvjwLlIk4u8wXD0Ygu8HHYW3Ik/p9CMfXYvOiHwKgFdrwbcB1B3uF1uUHcqc1CGWdAYXIssO9lDUi3Nol3Ox8OQSo2xUw1w9m9Bc47eKJb//liuNURrq+ITQ9cqxZLFCBmJYk5LAFlz3Xg9Ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XVlzpL5b; arc=none smtp.client-ip=209.85.219.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QqZc2b6J"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8b4000e51fdso31444156d6.1
-        for <dash@vger.kernel.org>; Sat, 09 May 2026 11:20:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XVlzpL5b"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8b7ec7bedcbso13866186d6.2
+        for <dash@vger.kernel.org>; Sat, 09 May 2026 11:23:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778350838; x=1778955638; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tsrdNwgZXYAEpbGRYjnPk6H/FcWsN6SZN5LuJol7trU=;
-        b=QqZc2b6JLBpAptyflfjd3YJGGeFKH8SU9S2ZBfJ9/hUhlARn+y2jVfm8DWmUY8xHa/
-         WASiMOjuIEvi7OB3GqSiVn/TV4jXWIsjQ8oyq+vPJKgDC1Lid56AgY/EJ8JJn6RBvdfD
-         Q7fY4seLi82298lzRJ7S68+9DAYpdgsHj+ByKydjen0Tuu1KBEpZo4dUgcGhKYXiUUOn
-         HGI/djb6kx1cWPxWPjWikmq80K80qWJ6/91rbmgqshAPij9jiLIZIqVJm4nBjVKW3LJR
-         OVnNj6cpVA0sbvyY/YMl6as+fr6/4YEv4x1YtBjI3qC2HLmpp/6iNbFbGb7oRw+ttZKz
-         l3Ww==
+        d=gmail.com; s=20251104; t=1778350984; x=1778955784; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1uEUzVKaN3X+9ZS9OL2SjHdI6WTnGXisDqNyhBoJXzE=;
+        b=XVlzpL5bIY2LjSsklecvmQbncYmq9czBcrOhW+UGT/swd2m2ghPv9SZ19I/QFv12Ya
+         df3rdoqQcVAP21adhBDQe5hmC9HxGMkpkAh9IDCuNV18975RpbFITRaGt/YHF7cnFQsb
+         bXJUqcFytbC0/7mjnpY3m/FVpZk8QSop3FwA9xbaLbp8EtPTnvdeOJLqpnj5dMQzRYk7
+         fzlyYt1MZmOTDWjPOZjuvQAkFcteipUQZOSrm77CdkHMU2/HhV+QUUm9MVbycf+KT8/m
+         H6KwSXQu7TyP/uQKDlxk8kcA+D/E7fSrsfCvxyVfvW+eZnhfZzesQsUuOus/GYFdMMFz
+         lLfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778350838; x=1778955638;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tsrdNwgZXYAEpbGRYjnPk6H/FcWsN6SZN5LuJol7trU=;
-        b=gMDG1sGemJlgszDK6f+2e3Wq2uxqhFBc0DlNlRkTa0CNLcyGHKIZU7GV4o7Lhbt0ao
-         ilbmXPt8xS3/8E8OZVqxlLEKskv/1EeYUmaBlgxo4hGyLHwM6vrwx5vRVxNgG7KvC4yV
-         prUWb7204tB/ekVmT92ffypnir2nZCfDmFe80Q+N47XOM9Cq2kEckIPlPV+vgkw/L7d8
-         7foVGPDLuqL1lmjFbZli3e1DhGBx1zqzVtjvz1W+4EVhGOm+Ky0iWnQUCYpPJGETw1/R
-         reGDWle+3dVrfiuvWV8vvfe+hL8lFefq5ScdtstfraSkt8M3LKLbN/Bzk2d21WUhBQbo
-         SAqw==
-X-Gm-Message-State: AOJu0YyJv4kegpoVUBwQPj8/sgUMDF5TGO2lnZQDdylhOqxenntkUM9R
-	WSBYNfFKl9qJIlMsJjF22UdTqAQiKk9+TMt4WD3XuquTOABQ2QyURECVRsHtGg==
-X-Gm-Gg: Acq92OEeSD+WC4iAIvsR6g+wr7KdB53B9btRKZ4cZXDrGlznTWvgM5X7HNznKISsvMZ
-	gBV+Wpgt4GDvOH3srCD5XeAbAgGQpeO4OsQzR841anCJ69utY+HlzQ+oB5oNhwSUKjH8Dzka3oZ
-	jUqtv31UyBgFL3n66ilZGI7mOy0yZKuYVaFjS9K0cErhZw+S7gMk8HOh8Y/3qRbBzhROaOovMvf
-	ywHWM3hZciP1ujGumyUE34yTHovpAXVQinHWbyG8it9XaS22V/+zGtyMOpMfFsuavptxWrVS1Cq
-	M8+0ILuCtG+2efm9Igx4rNYsvar783bhtgB/hFce5avwNJIReSFZMzLv6cRfD0Bq4R1b+HP11vx
-	9P7sXafnWf2onTNCUJiouItNoOv7pq85yW78SZXur5r25Tdk6yu4pawUaTH47UonC4maeWLG8jM
-	DTclJknt9IgpZSp73IoJJ029lgpQz9D0AIT8njfyhaTUkng5DNQSb3cjl5UY72q26hHEccO1Kzm
-	PWOnuQBzek6FtLzdJPG/mcgVZJDNNBRXuR6dVpn/TegFA==
-X-Received: by 2002:a05:6214:1c09:b0:8ac:b4d5:50db with SMTP id 6a1803df08f44-8c1af2f057fmr51399846d6.28.1778350837989;
-        Sat, 09 May 2026 11:20:37 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778350984; x=1778955784;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1uEUzVKaN3X+9ZS9OL2SjHdI6WTnGXisDqNyhBoJXzE=;
+        b=RqBODPdi5DBe0XOppl8C5iAi0ffuyE/0g8DtxLHC+KP6P2e0FhIgbgtIAxfoitpxp4
+         yBdHwT1eZHRHb4yQguPllCvQ7SlpQXz3d+uzh4eAc7J0FNKlte4qqsiayYpt8cgO+3ns
+         hFUIU+BM8T7hWx1JaL9K9LWaS6tFZgmyKP0Z/U1ABeXUWFsvieD4u/wyt0NxPuQTXT2U
+         NlOjXVQ4ZTt11dFf5MJCAT/V3JN4H1IRUjgC5u4O/7wG0GFsx6GK4l0b6xCG2BnQXPb2
+         14clA6rt2BpGTeNkdGFl1P1MH6yKTPBp4Mbil4q/Hykp1BYnhvWMFHhC3PgZsIfx0+Dt
+         2LCQ==
+X-Gm-Message-State: AOJu0YxGD224Vq4ZJ4WMqer7GkGicL2rMAO3KkyRAQPmIHDNVXeMdI+9
+	1jB2Z0tfveNjXwq+5vZB/yftOOSDZvYGHkyZYlKsaVttrz/LNsD1yQ4k1s0P9Q==
+X-Gm-Gg: Acq92OHhnNNUHSILtzhRmrZNSOqgDrzPX9VH5pPrRXbbQ7+apjorV1KLu0J6jHjZqDb
+	7a0/7ticLCoyI5IZ1tjkWR8aBdfVhBbf+0MxDM3lXjxZdXxVi4YTEhexh6kL2hA+KgtlcxWxcfz
+	dGxtmbIM8vf/XwxbEspw/wKdZ7vmYenlwXLXWUgIXFu9GX/5IN3i7OjNFoA9rkklWmZYI1UCevN
+	iCnvxP8DNYUReX4SZTpcYwaKOXE1L0/7UBoN7hzKIPNn0siMcNwbOn39usuffqBSFfy6zTv0Ism
+	nIH5PwHExUJbd8qC8+DQ8OMF3vpCcmzKsKz0F3IJFYCZVquRlViyqD/QMkpEdyLfchnyO+SLBXr
+	4AHOye6HZ354EOiAF0y2UNBfO+QSmym0B07vX31oaIICVxDSExuw/pIdLswpkAbXTekLounL6nf
+	IGoqXcISCyTW5lUqBYDV8EQh2EbIQRnm20fs/Z6hbg0cBvZumtyTyl5h84hJxqPHoA3vXNPrVXx
+	LU9GOr7rBsmSlEzobYwuLRh/nQ45NedVTOkZ69HmoFUdbG6W5cIgJOBugCvOuPN1xs=
+X-Received: by 2002:a05:6214:5189:b0:8bd:6f62:5713 with SMTP id 6a1803df08f44-8bd6f80f70dmr197337016d6.13.1778350983810;
+        Sat, 09 May 2026 11:23:03 -0700 (PDT)
 Received: from HQ ([2607:fea8:ea1f:9fea:8a14:df76:3915:ffe1])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8bf3aed2920sm50064406d6.7.2026.05.09.11.20.37
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8bf3a43665fsm49311596d6.20.2026.05.09.11.23.03
         for <dash@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 May 2026 11:20:37 -0700 (PDT)
-Date: Sat, 9 May 2026 15:20:35 -0300
+        Sat, 09 May 2026 11:23:03 -0700 (PDT)
+Date: Sat, 9 May 2026 15:23:01 -0300
 From: Sebastien Peterson-Boudreau <sebastien.peterson.boudreau@gmail.com>
 To: dash@vger.kernel.org
-Subject: Re: [PATCH] Use proper grave accent character
-Message-ID: <af9681mqftmoCPdK@HQ>
+Subject: Re: [PATCH] Don't use groff(1) specific string syntax
+Message-ID: <af97hfhK_nFKtQFY@HQ>
 Mail-Followup-To: dash@vger.kernel.org
-References: <20260418185528.29367-1-sebastien.peterson.boudreau@gmail.com>
- <af6hpLV8IFrTd3G6@gondor.apana.org.au>
+References: <20260418185421.28841-1-sebastien.peterson.boudreau@gmail.com>
+ <af6gLe2f_jlMCofg@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <af6hpLV8IFrTd3G6@gondor.apana.org.au>
+In-Reply-To: <af6gLe2f_jlMCofg@gondor.apana.org.au>
 
-> Sorry could you please explain why this makes any difference because
-> they look identical to my untrained eye.
+> I checked the NetBSD code and they replaced these with literals
+> instead.  Any reason why we can't do the same thing?
 
-No worries! In the troff(7)* language, the character ` becomes a left
-quotation on typesetters supporting it, and ' becomes a right quotation.
+As I mentioned, those are listed as "preferred" alternatives in
+groff_mdoc(7); I wasn't sure if that document was specific to groff --
+other "preferred" suggestions are strings that are unique to groff and
+not portable -- therefore my concern was portability, but if NetBSD uses
+them, it should be fine (and more readable!)
 
-IOW, if your terminal supports unicode (along with a few other variables),
-
-	`command`
-
-in the input code can end up being displayed as
-
-	‘command‘
-
-which is not the input the shell expects!
-The way to typeset the ` character is with either the \` escape sequence
-or the \(ga character -- both should be portable across different
-*roff's according to groff_char(7), so I opted for the latter.
-
-Hope this clarifies :)
----
-* manual page might be groff(7) on your system.
+Thanks,
 -- 
 S.
