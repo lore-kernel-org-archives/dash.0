@@ -1,91 +1,79 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E395515746F
-	for <dash@vger.kernel.org>; Sat,  9 May 2026 18:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E7814F70
+	for <dash@vger.kernel.org>; Sun, 10 May 2026 09:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778350986; cv=none; b=iNxg/mvy5Bx9juYnq5y4eRpyT6TCFcxpDdUvHTsn6ZcdBQb9wy5gfyXwIur3rlTigHN59N6U1dGdMAVv5vJ/P58FWCJn3PA3oKZljXETovJwu3t6DKfdMj957/c1xkzagLIyVxAQFzPq3uAgeLSKWrZ88HqgHrClHpqIKPwDgZY=
+	t=1778406072; cv=none; b=iXLLIMPaKmXZef9jfaZwlRYUmjMWqpJGJuOXZWypAP418g/aogCDNQLpvHn9cDQU+mSvNAHFifzJZ40OvlIWzCTxgiWJBfCy78zz2X30XpBWg+wRri2B8cZw5uldQ+2SNkWDjQf0YU0+H6EaYJFU+C2s47y0uIMOH6/JmDd/EqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778350986; c=relaxed/simple;
-	bh=ijITICyEqXzKDCfkOzzm+o40tej6U30N5kWWpYrMWRI=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QncfR+VVFZ9GWxDsNQy/0hgiTRZvjwLlIk4u8wXD0Ygu8HHYW3Ik/p9CMfXYvOiHwKgFdrwbcB1B3uF1uUHcqc1CGWdAYXIssO9lDUi3Nol3Ox8OQSo2xUw1w9m9Bc47eKJb//liuNURrq+ITQ9cqxZLFCBmJYk5LAFlz3Xg9Ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XVlzpL5b; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778406072; c=relaxed/simple;
+	bh=EHdpzJ3hIREYrHlPrDIQMk8vdFOs3YVIKyIS1Mzro+E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=aUA7eUP6RnobkJ9z5zcPZ7bdFXoV2a9CBkGPL85JcQNFq4J3jqbjXynqUc6oKuU3Lqyf31D7erL0wwcmc74Tp2rav6VTCY1jYCN3n42ibvWiAUYtFh+jODaC1wX9n8XWC4iWJvQJa9OCDInwZhJkDbcPeesf/C4C8mzq6TI71P0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=lHNnajJy; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XVlzpL5b"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8b7ec7bedcbso13866186d6.2
-        for <dash@vger.kernel.org>; Sat, 09 May 2026 11:23:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778350984; x=1778955784; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1uEUzVKaN3X+9ZS9OL2SjHdI6WTnGXisDqNyhBoJXzE=;
-        b=XVlzpL5bIY2LjSsklecvmQbncYmq9czBcrOhW+UGT/swd2m2ghPv9SZ19I/QFv12Ya
-         df3rdoqQcVAP21adhBDQe5hmC9HxGMkpkAh9IDCuNV18975RpbFITRaGt/YHF7cnFQsb
-         bXJUqcFytbC0/7mjnpY3m/FVpZk8QSop3FwA9xbaLbp8EtPTnvdeOJLqpnj5dMQzRYk7
-         fzlyYt1MZmOTDWjPOZjuvQAkFcteipUQZOSrm77CdkHMU2/HhV+QUUm9MVbycf+KT8/m
-         H6KwSXQu7TyP/uQKDlxk8kcA+D/E7fSrsfCvxyVfvW+eZnhfZzesQsUuOus/GYFdMMFz
-         lLfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778350984; x=1778955784;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1uEUzVKaN3X+9ZS9OL2SjHdI6WTnGXisDqNyhBoJXzE=;
-        b=RqBODPdi5DBe0XOppl8C5iAi0ffuyE/0g8DtxLHC+KP6P2e0FhIgbgtIAxfoitpxp4
-         yBdHwT1eZHRHb4yQguPllCvQ7SlpQXz3d+uzh4eAc7J0FNKlte4qqsiayYpt8cgO+3ns
-         hFUIU+BM8T7hWx1JaL9K9LWaS6tFZgmyKP0Z/U1ABeXUWFsvieD4u/wyt0NxPuQTXT2U
-         NlOjXVQ4ZTt11dFf5MJCAT/V3JN4H1IRUjgC5u4O/7wG0GFsx6GK4l0b6xCG2BnQXPb2
-         14clA6rt2BpGTeNkdGFl1P1MH6yKTPBp4Mbil4q/Hykp1BYnhvWMFHhC3PgZsIfx0+Dt
-         2LCQ==
-X-Gm-Message-State: AOJu0YxGD224Vq4ZJ4WMqer7GkGicL2rMAO3KkyRAQPmIHDNVXeMdI+9
-	1jB2Z0tfveNjXwq+5vZB/yftOOSDZvYGHkyZYlKsaVttrz/LNsD1yQ4k1s0P9Q==
-X-Gm-Gg: Acq92OHhnNNUHSILtzhRmrZNSOqgDrzPX9VH5pPrRXbbQ7+apjorV1KLu0J6jHjZqDb
-	7a0/7ticLCoyI5IZ1tjkWR8aBdfVhBbf+0MxDM3lXjxZdXxVi4YTEhexh6kL2hA+KgtlcxWxcfz
-	dGxtmbIM8vf/XwxbEspw/wKdZ7vmYenlwXLXWUgIXFu9GX/5IN3i7OjNFoA9rkklWmZYI1UCevN
-	iCnvxP8DNYUReX4SZTpcYwaKOXE1L0/7UBoN7hzKIPNn0siMcNwbOn39usuffqBSFfy6zTv0Ism
-	nIH5PwHExUJbd8qC8+DQ8OMF3vpCcmzKsKz0F3IJFYCZVquRlViyqD/QMkpEdyLfchnyO+SLBXr
-	4AHOye6HZ354EOiAF0y2UNBfO+QSmym0B07vX31oaIICVxDSExuw/pIdLswpkAbXTekLounL6nf
-	IGoqXcISCyTW5lUqBYDV8EQh2EbIQRnm20fs/Z6hbg0cBvZumtyTyl5h84hJxqPHoA3vXNPrVXx
-	LU9GOr7rBsmSlEzobYwuLRh/nQ45NedVTOkZ69HmoFUdbG6W5cIgJOBugCvOuPN1xs=
-X-Received: by 2002:a05:6214:5189:b0:8bd:6f62:5713 with SMTP id 6a1803df08f44-8bd6f80f70dmr197337016d6.13.1778350983810;
-        Sat, 09 May 2026 11:23:03 -0700 (PDT)
-Received: from HQ ([2607:fea8:ea1f:9fea:8a14:df76:3915:ffe1])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8bf3a43665fsm49311596d6.20.2026.05.09.11.23.03
-        for <dash@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 May 2026 11:23:03 -0700 (PDT)
-Date: Sat, 9 May 2026 15:23:01 -0300
-From: Sebastien Peterson-Boudreau <sebastien.peterson.boudreau@gmail.com>
-To: dash@vger.kernel.org
-Subject: Re: [PATCH] Don't use groff(1) specific string syntax
-Message-ID: <af97hfhK_nFKtQFY@HQ>
-Mail-Followup-To: dash@vger.kernel.org
-References: <20260418185421.28841-1-sebastien.peterson.boudreau@gmail.com>
- <af6gLe2f_jlMCofg@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="lHNnajJy"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
+	content-type:references:reply-to;
+	bh=yHKGnq7gkwsae96dDu8dIbFgQ7LWX16IzOmZB99cHg8=; b=lHNnajJyQiUI5AIcWdluXVpM5c
+	MQUSexfV//Cc83pjf9sWCUZT/r3tbOpT4duOcePmYBg1IucS/vUkRK3BNLgF7Emx8TNmK2Q3p86dz
+	aA8Mtv8nMfgJvtzF4Frlzoq/B6u3QDsjl/ayJ2wNMIT2KOblqYU+QTqmVXXPbHuLJzXJskzhNHMVm
+	skkXCJvvcbz01AjsqclQm5B8+kYNmkgu41inOotgwv0KEIUiy8gjvyptYe2yF642NWZRcPqEUu6MV
+	OM/TR/M6jdZVNCVLnk3RB428uqWEzXocgm5X5poLOhtGfN87FdGy2FZIPvNRTq6lmxU0xjKjOw22x
+	otHHhezg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wM0eg-00CoXV-2g;
+	Sun, 10 May 2026 17:40:59 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 10 May 2026 17:40:58 +0800
+Date: Sun, 10 May 2026 17:40:58 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Sebastien Peterson-Boudreau <sebastien.peterson.boudreau@gmail.com>
+Cc: dash@vger.kernel.org
+Subject: Re: [PATCH] Use proper grave accent character
+Message-ID: <agBSqlE8ZkrKmnIo@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <af6gLe2f_jlMCofg@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <af9681mqftmoCPdK@HQ>
+X-Newsgroups: apana.lists.os.linux.dash
 
-> I checked the NetBSD code and they replaced these with literals
-> instead.  Any reason why we can't do the same thing?
+Sebastien Peterson-Boudreau <sebastien.peterson.boudreau@gmail.com> wrote:
+>> Sorry could you please explain why this makes any difference because
+>> they look identical to my untrained eye.
+> 
+> No worries! In the troff(7)* language, the character ` becomes a left
+> quotation on typesetters supporting it, and ' becomes a right quotation.
+> 
+> IOW, if your terminal supports unicode (along with a few other variables),
+> 
+>        `command`
+> 
+> in the input code can end up being displayed as
+> 
+>        ‘command‘
+> 
+> which is not the input the shell expects!
+> The way to typeset the ` character is with either the \` escape sequence
+> or the \(ga character -- both should be portable across different
+> *roff's according to groff_char(7), so I opted for the latter.
 
-As I mentioned, those are listed as "preferred" alternatives in
-groff_mdoc(7); I wasn't sure if that document was specific to groff --
-other "preferred" suggestions are strings that are unique to groff and
-not portable -- therefore my concern was portability, but if NetBSD uses
-them, it should be fine (and more readable!)
+Thanks for the explanation.  Please repost the patch with this
+explanation included in the description.
 
-Thanks,
+Cheers,
 -- 
-S.
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
