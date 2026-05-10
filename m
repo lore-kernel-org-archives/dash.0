@@ -1,102 +1,63 @@
-Received: from mekboy.ru (mekboy.ru [45.135.135.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1343D1FD4
-	for <dash@vger.kernel.org>; Sun, 10 May 2026 12:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.135.135.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C033542E5
+	for <dash@vger.kernel.org>; Sun, 10 May 2026 12:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778414827; cv=none; b=NhxgXYcDZAeV3tSgFNKnipJ8uUgprYa676ZkpghErj9KqdN8ePTjEAake2ClPpkd3jiDeQLhkrPAF25qsvtcis+soLQiXDIbpD5IiH6hGIGKPBE7nnNl2BNEJow5glN1r6XAdpk0exEzWds+cpINHZalV+TjgLhZyzmy7gYm+yI=
+	t=1778415530; cv=none; b=TNP6FqmDhXiUXy2TR5KVcckeHo/un/t8O6pWz18HuX298JkMvVxj0UWN4AStTobzT4rdwH9sPmOrpgDG+REBdB8GK93Y3SHNuxre3tkjUKzK63ESfdtPQoW8KsDE/hcSbydeCsnjl9Cf8JyALlvj/3A7TlUTf0/DzBEmsPMlkQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778414827; c=relaxed/simple;
-	bh=tJapTL105LrQuYnEJKTWZ+/T/cFSCXukO+eVUISpEiM=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=B6pziUwuBNLDq0gQ7UzEn3fXtBLDul8xj4kSFf1Vkrz4s9SGozq/VcUai42xQurtDkojkxJZhshahysAyQU2WUlQhV3swrlt0wvx4n+fUj1JGPdIxsZPlnEPQeQuN+1IFgcixASFnzC9AFGyjTVYbODWJvfEIa13qPi21ZMbxQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mekboy.ru; spf=pass smtp.mailfrom=mekboy.ru; dkim=pass (2048-bit key) header.d=mekboy.ru header.i=@mekboy.ru header.b=GOYqClbA; arc=none smtp.client-ip=45.135.135.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mekboy.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mekboy.ru
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mekboy.ru header.i=@mekboy.ru header.b="GOYqClbA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mekboy.ru; s=mail;
-	t=1778414822; bh=tJapTL105LrQuYnEJKTWZ+/T/cFSCXukO+eVUISpEiM=;
-	h=Date:From:To:Subject:From;
-	b=GOYqClbArcLzplinEd0cM17eJXFk8X4rCMuRzKm8AZI3A55NmkJje7YOLBXwQjyhy
-	 g3jxICj0L+um+Ctgfze/v2cgWl8chYbqtKGysE4uLGX3WtZMAcK3Tzva+qaVYdtan9
-	 H5Pjvv8NAlAgwAjHTJEuovrVSqIlxAX9veLzQG086p/XRwHSost6JX5XpNEGdDh8ar
-	 UoT7yWpDGHrbgz8+HgUrbQ8dkIiArpz+sHZEKEpUoAWl4G56Dmlwwi6X+dytI+M7H7
-	 TvdxcB/RUs1wYSOGRFOY5YyteYygzg30IIXA0ovrD5cpaV1ivWjYet7hx7MS5kD23h
-	 ir4Ch2PNfEy0g==
-Date: Sun, 10 May 2026 15:07:01 +0300
-From: dash-shell-80d677ffb5cf@mekboy.ru
-To: dash@vger.kernel.org
-Subject: Can't build with GCC 16.1.0 - libatomic problem
-Message-ID: <agBwF7x-EtgAZMXy@micropc>
+	s=arc-20240116; t=1778415530; c=relaxed/simple;
+	bh=LIbCJaiPPrJjSeAs4okzUFL1hJsM4kCROJTBmBVMBrY=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:MIME-Version:
+	 Content-Type; b=UML1C1fNWjAIA5olIA+fytmbaudd4iC0QQR9TpGme4w+75v8vCf0HHdQsaSTwOLFg0pEpLOY9Wt0TMGfMeD9aoOmOYblRButV2m3OSR4EJE0fqFzvRzf+1Tcwxx6IgmHTUQ2XrGavj+NET9+KWmBKp9WSQEk6ActYyfHOx9Yu14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+Received: from mop.sam.mop (1.5.5.2.4.d.e.f.f.f.5.f.9.d.6.0.a.5.c.d.c.d.9.1.0.b.8.0.1.0.0.2.ip6.arpa [IPv6:2001:8b0:19dc:dc5a:6d9:f5ff:fed4:2551])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sam)
+	by smtp.gentoo.org (Postfix) with ESMTPSA id 77DEA341F60;
+	Sun, 10 May 2026 12:18:47 +0000 (UTC)
+From: Sam James <sam@gentoo.org>
+To: dash-shell-80d677ffb5cf@mekboy.ru
+Cc: dash@vger.kernel.org
+Subject: Re: Can't build with GCC 16.1.0 - libatomic problem
+In-Reply-To: <agBwF7x-EtgAZMXy@micropc>
+Organization: Gentoo
+User-Agent: mu4e 1.14.1; emacs 31.0.60
+Date: Sun, 10 May 2026 13:18:44 +0100
+Message-ID: <87y0hrqwyj.fsf@gentoo.org>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Hi,
-Doing a static build on a system where static version of libatomic is
-not available system-wide.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Attempt 1:
+This is a bug in the `musl-gcc` wrapper (other than possibly some
+concern about the dash build system wrt flags):=20
+https://gcc.gnu.org/PR125235
 
-export CC="musl-gcc"
-./configure --enable-static
-# FAIL, from config.log:
-configure:4037: checking whether the C compiler works
-configure:4059: musl-gcc    conftest.c  >&5
-/usr/bin/ld: cannot find -latomic_asneeded: No such file or directory
-collect2: error: ld returned 1 exit status
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Attempt 2 (telling build system not to use libatomic):
+-----BEGIN PGP SIGNATURE-----
 
-export CC="musl-gcc"
-export LDFLAGS="-fno-link-libatomic"
-./configure --enable-static
-# OK, but:
-make  all-recursive
-make[1]: Entering directory '/home/me/media/930_GiB/dash-0.5.13.4'
-Making all in src
-make[2]: Entering directory '/home/me/media/930_GiB/dash-0.5.13.4/src'
-   CC       builtins.def
-   GEN      builtins.h
-   CC       mknodes
-/usr/bin/ld: cannot find -latomic_asneeded: No such file or directory
-collect2: error: ld returned 1 exit status
-make[2]: *** [Makefile:831: mknodes] Error 1
-make[2]: Leaving directory '/home/me/media/930_GiB/dash-0.5.13.4/src'
-make[1]: *** [Makefile:357: all-recursive] Error 1
-make[1]: Leaving directory '/home/me/media/930_GiB/dash-0.5.13.4'
-make: *** [Makefile:298: all] Error 2
-
-Attempt 3 (built libatomic.a separately, trying to use it):
-
-export CC="musl-gcc"
-export CFLAGS="-Os -I/home/me/media/930_GiB/gcc-build/gcc/include"
-export LDFLAGS="-L/home/me/media/930_GiB/gcc-build/gcc"
-./configure --enable-static
-# OK, but:
-make
-make  all-recursive
-make[1]: Entering directory '/home/me/media/930_GiB/dash-0.5.13.4'
-Making all in src
-make[2]: Entering directory '/home/me/media/930_GiB/dash-0.5.13.4/src'
-   CC       builtins.def
-   GEN      builtins.h
-   CC       mknodes
-/usr/bin/ld: cannot find -latomic_asneeded: No such file or directory
-collect2: error: ld returned 1 exit status
-make[2]: *** [Makefile:831: mknodes] Error 1
-make[2]: Leaving directory '/home/me/media/930_GiB/dash-0.5.13.4/src'
-make[1]: *** [Makefile:357: all-recursive] Error 1
-make[1]: Leaving directory '/home/me/media/930_GiB/dash-0.5.13.4'
-make: *** [Makefile:298: all] Error 2
-
-Looks like "mknodes" step ignores CFLAGS/LDFLAGS.
-
-/Regards, Aleksej
+iQEBBAEWCgCpFiEEJaa7iN2bdkxrVUHCc4QJ9SDfkZAFAmoAd6QbFIAAAAAABAAO
+bWFudTIsMi41KzEuMTIsMiwyXxSAAAAAAC4AKGlzc3Vlci1mcHJAbm90YXRpb25z
+Lm9wZW5wZ3AuZmlmdGhob3JzZW1hbi5uZXQyNUE2QkI4OEREOUI3NjRDNkI1NTQx
+QzI3Mzg0MDlGNTIwREY5MTkwDxxzYW1AZ2VudG9vLm9yZwAKCRBzhAn1IN+RkK+k
+AP48HoEL8+qkKoUPp0Ace3zQ9Kz33PYosfDWIxerq3nZowD/VNly+E8NCY6SiX2L
++H5VOqCM8aVVHN+ys9cEorHsoQM=
+=UXx8
+-----END PGP SIGNATURE-----
+--=-=-=--
