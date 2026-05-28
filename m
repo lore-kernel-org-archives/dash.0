@@ -1,231 +1,136 @@
-Received: from mx.sdf.org (mx.sdf.org [205.166.94.24])
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EAF3B4E83
-	for <dash@vger.kernel.org>; Tue, 26 May 2026 21:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.166.94.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8261B317142
+	for <dash@vger.kernel.org>; Thu, 28 May 2026 23:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779832319; cv=none; b=WA/qV0XqrcmUnlRxpztBgW7CElt4kuK7FTH0Xu7WBgFe0y5byI7fMoX+HjFwgeIgj+WDwyxeMq6uZzcZ15F20HBF2PGrZdI3yghRfrdYo39cD8d6OCdnfbri7tFvNr+soQ22F7lS0LeRsr9Ojg/Gxceb5AZ/+xTzSXGB0LKePhY=
+	t=1780011990; cv=none; b=A/tobJQ8WnfJsBOH/OoKqiWTpFtgCHn5F4gff6nSW03cZfYsmLtqnswnY6KqFSbhKtLRWGcSD256y+mFcKIavdomit5E2onADpA+GNF+yydX7Kce63xudOha1LLPFXm8Rm3oqL7zP4SLiUqSEPturSUGjkLvXR/JbF4Yt1ylNKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779832319; c=relaxed/simple;
-	bh=HJ7yR2i8AMFwOWxLxXJ2p+s8I4gddc9wNa4FV1Icj7c=;
-	h=Date:From:To:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=tTZEOcQkXgOuiuIq6TzFRSeEvAv9bRux3l23H0prsNBBNoCt2ld6PE1AO35ItNjNiGrGto3GoZgFyeBjaiRjCqduysHOs4Dat3xh8A2kd9UmueY4NX4UUbq8au1mD3FRxGiC5XWR+kzzXW2QlN1kTOSXqCaoMjH8aZdavtBhhLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stien.dev; spf=none smtp.mailfrom=stien.dev; arc=none smtp.client-ip=205.166.94.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stien.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=stien.dev
-Received: from HQ (pool-99-244-140-233.cpe.net.cable.rogers.com [99.244.140.233])
-	(authenticated (0 bits))
-	by mx.sdf.org (8.18.1/8.14.3) with ESMTPSA id 64QLp7Vh006924
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits) verified NO);
-	Tue, 26 May 2026 21:51:10 GMT
-Date: Tue, 26 May 2026 18:51:07 -0300
-From: Sebastien Peterson-Boudreau <seb@stien.dev>
-To: dash@vger.kernel.org, seb@stien.dev
-Message-ID: <ahYVy6WxQoNnb7ym@HQ>
-Mail-Followup-To: dash@vger.kernel.org
+	s=arc-20240116; t=1780011990; c=relaxed/simple;
+	bh=asplaDL5P5WvmUPlb4RdwldJYGpyOC3V+iF5R64FHH0=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:Subject:Content-Type; b=NGU37tVpa613aQ0p3GiSD+sxK0hhK1JwBhdf1xrwsn5Kyq8zI5n8I908FJZwo9GvIGX2hZdYN4nSR9YDnCfP+mUSO5wa4MAUaWocr9r0JJqE7juAhKv+UEq0F5AtWK2/FQEbjHDcyYQfwnlmpnLZAG4dzpTC2n6Ztsi0I58GDdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plushkava.net; spf=pass smtp.mailfrom=plushkava.net; dkim=pass (2048-bit key) header.d=plushkava.net header.i=@plushkava.net header.b=kEvJsPL6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SpFcH6SR; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plushkava.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=plushkava.net
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=plushkava.net header.i=@plushkava.net header.b="kEvJsPL6";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SpFcH6SR"
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id B9D4F1D00125;
+	Thu, 28 May 2026 19:46:27 -0400 (EDT)
+Received: from phl-imap-10 ([10.202.2.85])
+  by phl-compute-01.internal (MEProxy); Thu, 28 May 2026 19:46:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=plushkava.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1780011987; x=1780098387; bh=ZtM6VAvIGR2jgl3IqAZTk
+	5hlNhkLIVouO9jDi7+EMe4=; b=kEvJsPL62OGACFDNvh0SaW2e4x7XLS+dtH0hK
+	xLle1h9wfMVH0CqKpZ5Id3a2Ok+S5cQR6899J46rSc7dFjLyAuZnxN108neN26uf
+	Prcm36iDeiDrj3uCh8xM3J8u0Bek5Hd3ctGWwoAFDtyTbIIxDFn27R1zqHywc/lm
+	0pWy9FBj6zpWr+6DzzmFYsbKNE1jsxb9Pl000wtze0QuOexbEqHDAPa72Wpg0OJL
+	gqjwDtzetqE6N4xWN3wlRiAmO5VaJr1FjOcfsd/4IOseuUS1xxet7Oarvg+gqw9w
+	jEGZPaBDSsgdGUfU5IcPmeAUu1p1puHnUMBG1P8y40A7XqHrQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:message-id
+	:mime-version:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1780011987; x=
+	1780098387; bh=ZtM6VAvIGR2jgl3IqAZTk5hlNhkLIVouO9jDi7+EMe4=; b=S
+	pFcH6SRxPiRHgHFrH5cD4s2r5l5QanzKyTkhkuwvmV0KgZ7d2vX5t92h3GdZTJYw
+	QCGn9cw6VTENbRzJkT6yiO5LTmy7jJljWI5uEsUr2IBKo5fBZ20gupyWcmNAeco3
+	Q/X2VHpBXAsl8XrAx9bqLeDueUVX0XK2hTUPxFXherfjHESnUdCuhspmPFbrG+0N
+	HLBPC9IshwJ/tjOVfg9oRAqJHIUdMVgTlMzOI+Ef7nTcnkHqmZYsUjrSdvxbBCZ4
+	IxlX//ZnNbE0Em7FEpF6RjEzEf2N3lGn/ZEtGhUM+EMhwBixm0Vjk0ocBPVp+3L9
+	JTY0A8Na+6tsykS7PVRgQ==
+X-ME-Sender: <xms:09MYajrRDz10GDIaES_jfFomoxddMuWjx0WkZSoIHSJb-9_r-UqRmQ>
+    <xme:09MYaocFvT6t4HGEPS6m-rqkzkD6MsyyOni74gupDOUpgqokPgPLl_2QwM0wrKhKQ
+    5qz9W07NX6XX0VbIhlT0PFdINm3bckFPhDbu8hOdIcOJxIvyOk>
+X-ME-Proxy-Cause: dmFkZTFnXqDDIdF6SHp26OKz+700mKdT/VPqn9Y9jwhIxK6yoJEjESrmKFaOJ+HJ8yyd49
+    CFAmQzVXulIQnpA1MFD8qjErwvEym5RHOnFVsmB2AFnL105+AF6iN77nP/YnRdQ5EIgEN4
+    yMx4UtOgwXvUpgbSbRQPXHflTJlRt2lcHMCwIn5c3euh8aLH+CLQjSH9MxPPqCLZMWlOCh
+    uHmptZk6hJZFDnluUBfWXWV3d545FtXd8CTMmPlE18TSKFn/sXSEhMAEn8t3ksxKvNom9I
+    gV6mskYjkf0wyTIKzDSPbuoU05pX2DMMkYsl2K3TSGhd1LKEuEmceY0Bg8TmptCaiNboh5
+    LvlvtcWv8n5VLT0yvlA3blf4Ba+sipcvnIR+AlPKA9VqcnUGgfTB2rlH4SowGhYd222XK9
+    eU4p+rpOyKWmK0xThANE5k1JSNULRHoWXfpkATA+MlP2K5mfiWUe56OR4P25aR976SzHUb
+    LSd++t/gEJpRo0MoaGBSYSyJR4PXi2jwEj/ZvmKUMFuwje7UYcNuwkEvYrE1UpiKbTj+su
+    dhc/gRYy19Ws6Tsvni3Kru6fCfor6ssMkeO8JrMfs25gDstcYaNCn/VC6dRlWJwPUnsfB6
+    AuXeKQ2VSAWj6b0obYSReCkYZ0fdetEGMlf+/HgBYmTjU96ecpwJn7xnK7zQ
+X-ME-Proxy: <xmx:09MYauX6OCpJwECf-Gr9sAZNhXXhprAnbfpZ1w7tO2SZyLBxI6LAWQ>
+    <xmx:09MYaojaojR4u5IRnr4jV_Ke2bGt1kmfzt4kv0WNSxGlLOoiF1b6HQ>
+    <xmx:09MYap-50whqLib8lDs8E6SJxFNO3aTsstlFP_7p7tw4Elu9fbUTow>
+    <xmx:09MYaiDOFpmDPq1pPBzcYTJnnGb-ShjqSs_mMVmcC53IcHz94gy3sg>
+    <xmx:09MYat5HOl3tgAzBH4Kthw2ZRRllxIXsOgxyTLJ3lFh2kSlBgiYj4GXY>
+Feedback-ID: i2431475f:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 1E1E8216008B; Thu, 28 May 2026 19:46:27 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-From: Sebastien Peterson-Boudreau <seb@stien.dev>
+X-ThreadId: AJ0hmDZD3yyk
+Date: Fri, 29 May 2026 00:46:06 +0100
+From: "Kerin Millar" <kfm@plushkava.net>
 To: dash@vger.kernel.org
-Cc: Sebastien Peterson-Boudreau <seb@stien.dev>
-Subject: [PATCH] Use literal > and < characters
-Date: Tue, 26 May 2026 18:48:09 -0300
-Message-ID: <20260526214815.29877-2-seb@stien.dev>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <af6gLe2f_jlMCofg@gondor.apana.org.au>
-References: <af6gLe2f_jlMCofg@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Cc: "Sam James" <sam@gentoo.org>
+Message-Id: <b08b2521-82a6-4b23-a5fc-f1922979222e@app.fastmail.com>
+Subject: [PATCH] builtin: Fix octal escapes in dollar-single-quotes
+Content-Type: multipart/mixed;
+ boundary=3e618f2908bbfdec4a5b444bdd1662151c03ff99
 
-\*[...] is groff(1) specific syntax, whereas \*(XX is the standard
-troff(1) syntax.  Furthermore, groff_mdoc(1) lists the literal
-characters `>' and `<' as preferred over the Gt and Lt strings,
-which are only defined for compatibility with legacy documents.
-NetBSD also uses the literal characters for their sh(1) manual
-page (changed in commit 30b9dfc8813e15031a13fc2fc85094b81c71e2b7).
----
-Let me know if there is an issue with signing -- as you can see, I'm
-using a new email.
- src/dash.1 | 58 +++++++++++++++++++++++++++---------------------------
- 1 file changed, 29 insertions(+), 29 deletions(-)
+--3e618f2908bbfdec4a5b444bdd1662151c03ff99
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-diff --git a/src/dash.1 b/src/dash.1
-index dbc34c9..8e1306f 100644
---- a/src/dash.1
-+++ b/src/dash.1
-@@ -197,7 +197,7 @@ operand and the positional parameters ($1, $2, etc.)
- set from the remaining argument operands.
- .It Fl C Em noclobber
- Don't overwrite existing files with
--.Dq \*[Gt] .
-+.Dq > .
- .It Fl e Em errexit
- If not interactive, exit immediately if any untested command fails.
- The exit status of a command is considered to be
-@@ -268,9 +268,9 @@ operators (their meaning is discussed later).
- Following is a list of operators:
- .Bl -ohang -offset indent
- .It "Control operators:"
--.Dl &  &&  \&(  \&)  \&;  ;; | || \*[Lt]newline\*[Gt]
-+.Dl &  &&  \&(  \&)  \&;  ;; | || <newline>
- .It "Redirection operators:"
--.Dl \*[Lt]  \*[Gt]  \*[Gt]|  \*[Lt]\*[Lt]  \*[Gt]\*[Gt]  \*[Lt]&  \*[Gt]&  \*[Lt]\*[Lt]-  \*[Lt]\*[Gt]
-+.Dl <  >  >|  <<  >>  <&  >&  <<-  <>
- .El
- .Ss Quoting
- Quoting is used to remove the special meaning of certain characters or
-@@ -298,7 +298,7 @@ and backslash
- .Pq \e .
- The backslash inside double quotes is historically weird, and serves to
- quote only the following characters:
--.Dl $  `  \*q  \e  \*[Lt]newline\*[Gt] .
-+.Dl $  `  \*q  \e  <newline> .
- Otherwise it remains literal.
- .Ss Reserved Words
- Reserved words are words that have special meaning to the
-@@ -391,25 +391,25 @@ is an optional number between 0 and 9, as in
- .Sq Bq 3 ) ,
- that refers to a file descriptor.
- .Bl -tag -width aaabsfiles -offset indent
--.It [n] Ns \*[Gt] file
-+.It [n] Ns > file
- Redirect standard output (or n) to file.
--.It [n] Ns \*[Gt]| file
-+.It [n] Ns >| file
- Same, but override the
- .Fl C
- option.
--.It [n] Ns \*[Gt]\*[Gt] file
-+.It [n] Ns >> file
- Append standard output (or n) to file.
--.It [n] Ns \*[Lt] file
-+.It [n] Ns < file
- Redirect standard input (or n) from file.
--.It [n1] Ns \*[Lt]& Ns n2
-+.It [n1] Ns <& Ns n2
- Copy file descriptor n2 as stdin (or fd n1).
--.It [n] Ns \*[Lt]&-
-+.It [n] Ns <&-
- Close standard input (or n).
--.It [n1] Ns \*[Gt]& Ns n2
-+.It [n1] Ns >& Ns n2
- Copy file descriptor n2 as stdout (or fd n1).
--.It [n] Ns \*[Gt]&-
-+.It [n] Ns >&-
- Close standard output (or n).
--.It [n] Ns \*[Lt]\*[Gt] file
-+.It [n] Ns <> file
- Open file for reading and writing on standard input (or n).
- .El
- .Pp
-@@ -417,7 +417,7 @@ The following redirection is often called a
- .Dq here-document .
- .Bl -item -offset indent
- .It
--.Li [n]\*[Lt]\*[Lt] delimiter
-+.Li [n]<< delimiter
- .Dl here-doc-text ...
- .Li delimiter
- .El
-@@ -431,9 +431,9 @@ subjected to parameter expansion, command substitution, and arithmetic
- expansion (as described in the section on
- .Dq Expansions ) .
- If the operator is
--.Dq \*[Lt]\*[Lt]-
-+.Dq <<-
- instead of
--.Dq \*[Lt]\*[Lt] ,
-+.Dq << ,
- then leading tabs in the here-doc-text are stripped.
- .Ss Search and Execution
- There are three types of commands: shell functions, builtin commands, and
-@@ -567,7 +567,7 @@ Because pipeline assignment of standard input or standard output or both
- takes place before redirection, it can be modified by redirection.
- For example:
- .Pp
--.Dl $ command1 2\*[Gt]&1 | command2
-+.Dl $ command1 2>&1 | command2
- .Pp
- sends both the standard output and standard error of command1
- to the standard input of command2.
-@@ -698,7 +698,7 @@ Grouping commands together this way allows you to redirect
- their output as though they were one program:
- .\".Pp
- .Bd -literal -offset indent
--{ printf \*q hello \*q ; printf \*q world\\n" ; } \*[Gt] greeting
-+{ printf \*q hello \*q ; printf \*q world\\n" ; } > greeting
- .Ed
- .Pp
- Note that
-@@ -764,7 +764,7 @@ numeric.
- A parameter can also be denoted by a number or a special
- character as explained below.
- .Ss Positional Parameters
--A positional parameter is a parameter denoted by a number (n \*[Gt] 0).
-+A positional parameter is a parameter denoted by a number (n > 0).
- The shell sets these initially to the values of its command line arguments
- that follow the name of the shell script.
- The
-@@ -1627,19 +1627,19 @@ Character escape sequences are in backslash notation as defined in
- The characters and their meanings are as follows:
- .Bl -tag -width Ds -offset indent
- .It Cm \ea
--Write a \*[Lt]bell\*[Gt] character.
-+Write a <bell> character.
- .It Cm \eb
--Write a \*[Lt]backspace\*[Gt] character.
-+Write a <backspace> character.
- .It Cm \ef
--Write a \*[Lt]form-feed\*[Gt] character.
-+Write a <form-feed> character.
- .It Cm \en
--Write a \*[Lt]new-line\*[Gt] character.
-+Write a <new-line> character.
- .It Cm \er
--Write a \*[Lt]carriage return\*[Gt] character.
-+Write a <carriage return> character.
- .It Cm \et
--Write a \*[Lt]tab\*[Gt] character.
-+Write a <tab> character.
- .It Cm \ev
--Write a \*[Lt]vertical tab\*[Gt] character.
-+Write a <vertical tab> character.
- .It Cm \e\e
- Write a backslash character.
- .It Cm \e Ns Ar num
-@@ -2062,13 +2062,13 @@ True if the strings
- and
- .Ar \&s\&2
- are not identical.
--.It Ar \&s\&1 Cm \&\*[Lt] Ar \&s\&2
-+.It Ar \&s\&1 Cm \&< Ar \&s\&2
- True if string
- .Ar \&s\&1
- comes before
- .Ar \&s\&2
- based on the ASCII value of their characters.
--.It Ar \&s\&1 Cm \&\*[Gt] Ar \&s\&2
-+.It Ar \&s\&1 Cm \&> Ar \&s\&2
- True if string
- .Ar \&s\&1
- comes after
-@@ -2380,7 +2380,7 @@ unless you are the superuser, in which case it defaults to
- .Dq #\  .
- .It Ev PS2
- The secondary prompt string, which defaults to
--.Dq \*[Gt]\  .
-+.Dq >\  .
- .It Ev PS4
- Output before each line when execution trace (set -x) is enabled,
- defaults to
+Hi,
+
+The test suite of the gentoo-functions project recently uncovered a bug whereby octal sequences within dollar-single-quotes are evaluated as internal control characters, resulting in faulty decoding at best, and segmentation faults at worse. The attached patch rectifies this bug.
+
 -- 
-2.54.0
+Kerin Millar
+--3e618f2908bbfdec4a5b444bdd1662151c03ff99
+Content-Disposition: attachment;
+	filename*0="dash-0.5.13.4-fix-octal-escapes-in-dollar-single-quotes.patch"
+Content-Type: text/x-patch;
+	name="=?UTF-8?Q?dash-0.5.13.4-fix-octal-escapes-in-dollar-single-quotes.patch?="
+Content-Transfer-Encoding: base64
 
+RnJvbSA1OWE1YjFkOGMzZjRiNTc2NTY5NTQyNjc3ZDU5N2FlZDQ0ZWM2ZWQzIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBLZXJpbiBNaWxsYXIgPGtmbUBwbHVzaGthdmEubmV0
+PgpEYXRlOiBUaHUsIDI4IE1heSAyMDI2IDE2OjU2OjQyICswMjAwClN1YmplY3Q6IFtQQVRD
+SF0gYnVpbHRpbjogRml4IG9jdGFsIGVzY2FwZXMgaW4gZG9sbGFyLXNpbmdsZS1xdW90ZXMK
+ClRoZSB0ZXN0IHN1aXRlIG9mIGdlbnRvby1mdW5jdGlvbnMgcmVjZW50bHkgdW5jb3ZlcmVk
+IGEgYnVnIGNvbmNlcm5pbmcKdGhlIGhhbmRsaW5nIG9mIG9jdGFsIGVzY2FwZSBzZXF1ZW5j
+ZXMgd2l0aGluIGRvbGxhci1zaW5nbGUtcXVvdGVzLgpIZXJlIGlzIGEgcmVwcm9kdWNlcjoK
+CiAgICAkIGRhc2ggLWMgIng9XCQnXFwyMDEnOyBwcmludGYgJyVzJyBcIlwkeFwiIiB8IG9k
+IC1BbiAtdHgxCiAgICA4OAoKVGhhdCBpcywgZGVzcGl0ZSB0aGUgaW5wdXQgYmVpbmcgMHg4
+MSwgdGhlIG91dHB1dCBpcyAweDg4LiBJbmRlZWQsIGFueQppbnB1dCBiZXR3ZWVuIDB4ODEu
+LjB4ODggaXMgYWR2ZXJzZWx5IGFmZmVjdGVkIGFuZCBzb21lIC0gc3VjaCBhcyAweDgyIC0K
+aW5kdWNlIGEgc2VnZmF1bHQuCgpJIG5vdGljZWQgdGhlIGZvbGxvd2luZyBtYWNyb3MgaW4g
+c3JjL3BhcnNlci5oOgoKICAgICNkZWZpbmUgQ1RMX0ZJUlNUIC0xMjcgLyogZmlyc3QgJ3Nw
+ZWNpYWwnIGNoYXJhY3RlciAqLwogICAgI2RlZmluZSBDVExFU0MgICAgLTEyNyAvKiBlc2Nh
+cGUgbmV4dCBjaGFyYWN0ZXIgKi8KICAgICNkZWZpbmUgQ1RMX0xBU1QgIC0xMjAgLyogbGFz
+dCAnc3BlY2lhbCcgY2hhcmFjdGVyICovCgpSZWludGVycHJldGVkIGFzIHVuc2lnbmVkIGNo
+YXIsIHRoZSBDVExfRklSU1QuLkNUTF9MQVNUIHJhbmdlIG1hcHMKZXhhY3RseSB0byAweDgx
+Li4weDg4OgoKICAgICQgcGVybCAtZSAncHJpbnRmICIleFwwIiwgJF8gJiAweEZGIGZvciAt
+MTI3Li4tMTIwJyB8IHhhcmdzIC0wCiAgICA4MSA4MiA4MyA4NCA4NSA4NiA4NyA4OAoKRnJv
+bSB0aGlzLCBJIHdhcyBhYmxlIHRvIGRlZHVjZSB0aGF0IGFsbCBvZiB0aGVzZSBieXRlcyBt
+dXN0IGJlIHByZWNlZGVkCmJ5IENUTEVTQyBpbiBvcmRlciB0byBiZSB0YWtlbiBsaXRlcmFs
+bHkuIE1ha2UgaXQgc28uCgpMaW5rOiBodHRwczovL2dpdHdlYi5nZW50b28ub3JnL3Byb2ov
+Z2VudG9vLWZ1bmN0aW9ucy5naXQvY29tbWl0Lz9pZD05NDcwOTBmYjc3MDQKU2lnbmVkLW9m
+Zi1ieTogS2VyaW4gTWlsbGFyIDxrZm1AcGx1c2hrYXZhLm5ldD4KLS0tCiBzcmMvYmx0aW4v
+cHJpbnRmLmMgfCAzICsrKwogMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKQoKZGlm
+ZiAtLWdpdCBhL3NyYy9ibHRpbi9wcmludGYuYyBiL3NyYy9ibHRpbi9wcmludGYuYwppbmRl
+eCAxMDZhZWNkLi5lYmU4MWI2IDEwMDY0NAotLS0gYS9zcmMvYmx0aW4vcHJpbnRmLmMKKysr
+IGIvc3JjL2JsdGluL3ByaW50Zi5jCkBAIC0zNTYsNiArMzU2LDkgQEAgdW5zaWduZWQgY29u
+dl9lc2NhcGUoY2hhciAqc3RyMCwgY2hhciAqb3V0MCwgYm9vbCBtYmNoYXIpCiAJCQkJdmFs
+dWUgPDw9IDM7CiAJCQkJdmFsdWUgKz0gb2N0dG9iaW4oKnN0cisrKTsKIAkJCX0gd2hpbGUg
+KC0tY2ggJiYgaXNvZGlnaXQoKnN0cikpOworCQkJaWYgKG1iY2hhciAmJiAoc2lnbmVkIGNo
+YXIpdmFsdWUgPj0gQ1RMX0ZJUlNUICYmCisJCQkgICAgKHNpZ25lZCBjaGFyKXZhbHVlIDw9
+IENUTF9MQVNUKQorCQkJCVVTVFBVVEMoQ1RMRVNDLCBvdXQpOwogCQl9CiAKIAkJc3RyLS07
+Ci0tIAoyLjUzLjAKCg==
+
+--3e618f2908bbfdec4a5b444bdd1662151c03ff99--
