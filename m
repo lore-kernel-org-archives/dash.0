@@ -1,32 +1,32 @@
 Received: from mx.sdf.org (mx.sdf.org [205.166.94.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309AE2264D3
-	for <dash@vger.kernel.org>; Mon,  1 Jun 2026 04:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6AE27BF79
+	for <dash@vger.kernel.org>; Mon,  1 Jun 2026 04:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.166.94.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780288943; cv=none; b=bjaOPiI4NoAUnEQdIhOA9nitAZ3J+oih0tazdpyCizaBNpjCnPzKOTd/umyQieQZfXuZMTvdH2dGw4l+kx7BnTLpFkCVjr68KTvog5vFq9/raCCnHr8G3CgH+xMCt21Bk/naYKl3qwyFrCYmdbrZ2RKxzDl0ovkFXl/+afd+o6M=
+	t=1780289426; cv=none; b=UYFZCP8EMDgjRVPwis67gxzMJucNBQnSAhgD40DaC6kVxrzB9gxARzON8CS//P5UE87kCtc86ogcyKfrtd9IqYx12xrlQ4Zk9sAvVmCyEM/1CI5z1DndSJjEIfZfunmLc61Vyn6w/wV9lALo2EJ+E9JTMZ+eTFa1cqxR6oR+ZmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780288943; c=relaxed/simple;
+	s=arc-20240116; t=1780289426; c=relaxed/simple;
 	bh=R19FJ6AVoesGd5EpaDTKqPuSt8QvQu3zk2XuR8Wxq3E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NY4u/M+yPTDeKe8jGOn8ODGUDSDomOAB+RZ5bbiMLaoxL7sHrhq9yuO8Em0iEzeTFqGBqohA1XpLYm8rUji8SYoaJWB8P5V7f+eDwPQYlql3yelhsyBjm0Mvp79alX1LK++fTlLA+0zSTTTPQvgYfdOL5qVHaIIvPSIINH6kmK8=
+	 Content-Type:Content-Disposition:In-Reply-To; b=PpTKFO8T5xwPZHkqa/GIrVvoxtnJSjd/fh6R3ni2wI32tiDwzeR8l13Ph/4+1P0iE1pEJB8GsthkXmcZPD60udl8dUgJhke3cFPlxbUXq+AsX984GxtLjqZw+KKv1/ske3VZS3iQtNwqrtGUhakjncwslh7CSgQngX/woke6mwA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stien.dev; spf=none smtp.mailfrom=stien.dev; arc=none smtp.client-ip=205.166.94.24
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stien.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=stien.dev
 Received: from HQ (pool-99-244-140-233.cpe.net.cable.rogers.com [99.244.140.233])
 	(authenticated (0 bits))
-	by mx.sdf.org (8.18.1/8.14.3) with ESMTPSA id 6514g9fm002994
+	by mx.sdf.org (8.18.1/8.14.3) with ESMTPSA id 6514oLH4017946
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits) verified NO);
-	Mon, 1 Jun 2026 04:42:11 GMT
-Date: Mon, 1 Jun 2026 01:42:09 -0300
+	Mon, 1 Jun 2026 04:50:23 GMT
+Date: Mon, 1 Jun 2026 01:50:21 -0300
 From: =?iso-8859-1?Q?S=E9bastien?= Peterson-Boudreau <seb@stien.dev>
 To: dash@vger.kernel.org
 Cc: =?iso-8859-1?Q?S=E9bastien?= Peterson-Boudreau <seb@stien.dev>
 Subject: [PATCH] Use literal > and < characters
-Message-ID: <20260601044038.11541-2-seb@stien.dev>
+Message-ID: <20260601045020.13133-1-seb@stien.dev>
 Mail-Followup-To: dash@vger.kernel.org
-References: <ahupIBR6nSoPOtJ0@gondor.apana.org.au>
+References: <agBSqlE8ZkrKmnIo@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ahupIBR6nSoPOtJ0@gondor.apana.org.au>
+In-Reply-To: <agBSqlE8ZkrKmnIo@gondor.apana.org.au>
 X-Mailer: git-send-email 2.54.0
 
 \*[...] is groff(1) specific syntax, whereas \*(XX is the standard
