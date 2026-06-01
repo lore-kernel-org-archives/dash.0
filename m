@@ -1,189 +1,226 @@
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from mx.sdf.org (mx.sdf.org [205.166.94.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847E331B838
-	for <dash@vger.kernel.org>; Sun, 31 May 2026 06:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309AE2264D3
+	for <dash@vger.kernel.org>; Mon,  1 Jun 2026 04:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.166.94.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780207756; cv=none; b=MSY0qP7BbSU3d2rUxgFpE3txDexA6qxBIdsKZ2ZK5dYWju2jceQEo7vXEnognk932O73xCHKZEQL52o62k+K98NHWm/z3jLQmOZezV4EgvYXsLXcq69jI4jy/NiCa9L+C5KdLlxp0EN36SIamFhtOleS/Q9AMUn6uHVrjhqimQ4=
+	t=1780288943; cv=none; b=bjaOPiI4NoAUnEQdIhOA9nitAZ3J+oih0tazdpyCizaBNpjCnPzKOTd/umyQieQZfXuZMTvdH2dGw4l+kx7BnTLpFkCVjr68KTvog5vFq9/raCCnHr8G3CgH+xMCt21Bk/naYKl3qwyFrCYmdbrZ2RKxzDl0ovkFXl/+afd+o6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780207756; c=relaxed/simple;
-	bh=uIZjr34uHzLQI/3Z8YYRUag89ySDiIVNPEAZWLhM3u8=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=CC39sDDUq0mqzOBuAB7NfkUopIFQNdJsy5MTtZxtPt2DIZkmB64BLKJNRbGfbvIsKortpSK8CDK4zkMEUkRNJblKFtmCFMbKyWE+s6t31sHm3YIiVroWPpkn3t1FllmVTAPqbFUg00SSbZhkBBUe065GROvBDqD7iTFaCa6mIVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plushkava.net; spf=pass smtp.mailfrom=plushkava.net; dkim=pass (2048-bit key) header.d=plushkava.net header.i=@plushkava.net header.b=B5zd2Gek; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YdtefTuq; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plushkava.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=plushkava.net
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=plushkava.net header.i=@plushkava.net header.b="B5zd2Gek";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YdtefTuq"
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id B2A981D00041;
-	Sun, 31 May 2026 02:09:13 -0400 (EDT)
-Received: from phl-imap-10 ([10.202.2.85])
-  by phl-compute-01.internal (MEProxy); Sun, 31 May 2026 02:09:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=plushkava.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1780207753; x=1780294153; bh=ZWGaQ+MbZ4ZBAvE+3K8FBI8B6XfNCH1N
-	walgTSvHCgc=; b=B5zd2Gekh7lr/SvTCfZAVgn0UA7BFfFuXvAQ8pI1T/4JFTFk
-	Eobt6vvbQ9/hEl+W47TlF8xPUkCZwux729NL3vCcehF5c5kJe/q+sqeaBKRQ/EVo
-	6tufK0+olPQZEckw2K8Uy5TeFFALxls7Ztfy3i0d/MZZS67OrxyL7H4ZlQ0ZgJos
-	aOo8TDOhJH1XDxPa0rotRX5EoJ0VUCAWwKI1khiH4MV5JT839mMGWc28qRYOUX0x
-	167ej6ITnI+zqadbtS1nEgBEj1ivErKOnrtPwnE+FilBR0v7tgYnN0HibDlgs1Qw
-	irn2mKUkobZ+pSm045e6nH9coMpUb80/jwQbMg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1780207753; x=
-	1780294153; bh=ZWGaQ+MbZ4ZBAvE+3K8FBI8B6XfNCH1NwalgTSvHCgc=; b=Y
-	dtefTuqL9cZUYNrNaVpjPzrrgilb5w0GQzd0LLV8j6XdjIFGeVeOFtrPEolKvfex
-	nbdqNNev5d2ypi4Qr4kXjbfpV4CvaJz8JTLBR5UItKypvJsxTw5c5rFuhDKQ2WLp
-	YuD03u/PbVxUz6z3nscZTiG0RO4H21rWPcFbgYP3k+Qio8Z0oB0igpF3/rEqZ8VS
-	S32azjOhUzJnu7wI/T4il7agZrK/1YvFf4WSzxLg+DFbFJpySJ//1rPXq9RgM7ra
-	ef27G76Q7mPVwVnVVwfQfnOlHrb4zy7hnMCvR21QvTFiSovj4Qljc3n9EBAjNOFK
-	7bJngkpZNDkUYEFb36MwA==
-X-ME-Sender: <xms:idAbakaNZvnLAnTSHUcNauv_H1x8F5CnsE1Pt7UfhX6yMmzh0jTSOg>
-    <xme:idAbaqPerR9VByTAh_4hQTsl3ShKyZzVSPXqf0Ob3MepuAgIvtbofQgzzHxgauNI-
-    3GbLvZOh-lOPEMjboO9gY89V-dDZ_Rt9OcrbNROpnev5rpTuTMB>
-X-ME-Proxy-Cause: dmFkZTEPZCjCm6tnmUl/Qfyy5AxstKk6Ww/31dzJkFoTP6ueWMjr9TiKXLBVlIyPa6u8aQ
-    jCZ5OKAtbwrLwL9tUa48ukinMkU7l7nOESEpYAt8GgEAPhaEtIvmK902YsRWOLAi/EG6nt
-    k8cbAtaJUU4YaK34p+pEymFuQGFjyJ5tSMYq4VRmJ+NcLA0r9jiA7gZx62UmPYeTwccS+T
-    v6vU7w8/7WQVG6ECqsd8VPeJj3n2Md0eSF9ZsgoQ0Fzlc/iPHIsuOHevOPc3Gr6zpJ6nRP
-    z6QnNX90kf+wuCT/QDfzv5sw+6dDhIjj/mpRnCr0tc+AQv8GiQf5Vvmw+jn8+dSJ5jS0kz
-    rHRNhWy21uJU/cGilDefh9JlLTIcRgYmSTr3rsngvAWmUDF3pnwvrlBbeMu8aEtPuLY6IS
-    EBq7gX9PZsg5AfQlANm/3KqoISplAnvMXOZyqSX7EVcOSUChXM+pVnvS8zNeRDX4PAK5i7
-    2iX0gDg6B1eb9FggN7TMwr7CUlLAnT9xBENC7j+rstKLLApuT5UdugjRaRcs8kTLiIrpxZ
-    iExLgOopcMC9//9cKP1RSlUFuF+BH5Q7PSQ89iHBpbimDBewx+jFcVihGuRbdbx/TrSeK0
-    apyqjks9+3sSwxQ63tRmCtptVO0VDH4RBOio8V5sk/hNEAddCtQ0lBHq9L7w
-X-ME-Proxy: <xmx:idAbau93OigMsc8d98bnNamcJ3WbsZTnO2R6vw2cjHkCOLWKrXvYBQ>
-    <xmx:idAbaluLKN7ujvm2wDC4Du6gsUjsUUuOkAVXBnGzMsSgqCpYx7xD6w>
-    <xmx:idAbapAlRdS4J8QlAX0eXu2lskmrhwpwkd0hZWMNdJifkAV2aAq4-A>
-    <xmx:idAbalVsENvWf7apADShqrGPTN3iYb9LOeqqLvJX9n6qckagkxnXNg>
-    <xmx:idAbas77TYtQAlpi-3MPYFDJ1aN3F8shTVHsnkKAJVQHLFqPQK4HEFci>
-Feedback-ID: i2431475f:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 3852E216008A; Sun, 31 May 2026 02:09:13 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1780288943; c=relaxed/simple;
+	bh=R19FJ6AVoesGd5EpaDTKqPuSt8QvQu3zk2XuR8Wxq3E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NY4u/M+yPTDeKe8jGOn8ODGUDSDomOAB+RZ5bbiMLaoxL7sHrhq9yuO8Em0iEzeTFqGBqohA1XpLYm8rUji8SYoaJWB8P5V7f+eDwPQYlql3yelhsyBjm0Mvp79alX1LK++fTlLA+0zSTTTPQvgYfdOL5qVHaIIvPSIINH6kmK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stien.dev; spf=none smtp.mailfrom=stien.dev; arc=none smtp.client-ip=205.166.94.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stien.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=stien.dev
+Received: from HQ (pool-99-244-140-233.cpe.net.cable.rogers.com [99.244.140.233])
+	(authenticated (0 bits))
+	by mx.sdf.org (8.18.1/8.14.3) with ESMTPSA id 6514g9fm002994
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits) verified NO);
+	Mon, 1 Jun 2026 04:42:11 GMT
+Date: Mon, 1 Jun 2026 01:42:09 -0300
+From: =?iso-8859-1?Q?S=E9bastien?= Peterson-Boudreau <seb@stien.dev>
+To: dash@vger.kernel.org
+Cc: =?iso-8859-1?Q?S=E9bastien?= Peterson-Boudreau <seb@stien.dev>
+Subject: [PATCH] Use literal > and < characters
+Message-ID: <20260601044038.11541-2-seb@stien.dev>
+Mail-Followup-To: dash@vger.kernel.org
+References: <ahupIBR6nSoPOtJ0@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AJ0hmDZD3yyk
-Date: Sun, 31 May 2026 07:08:51 +0100
-From: "Kerin Millar" <kfm@plushkava.net>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
-Cc: dash@vger.kernel.org, "Sam James" <sam@gentoo.org>
-Message-Id: <c0440c70-87ee-4ac1-9c1a-52afa8530985@app.fastmail.com>
-In-Reply-To: <ahvIyXWD_5RQk0eT@gondor.apana.org.au>
-References: <ahvIyXWD_5RQk0eT@gondor.apana.org.au>
-Subject: Re: [v2 PATCH] builtin: Fix octal escapes in dollar-single-quotes
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ahupIBR6nSoPOtJ0@gondor.apana.org.au>
+X-Mailer: git-send-email 2.54.0
 
-On Sun, 31 May 2026, at 6:36 AM, Herbert Xu wrote:
-> Kerin Millar <kfm@plushkava.net> wrote:
->> 
->> The test suite of the gentoo-functions project recently uncovered a bug whereby octal sequences within dollar-single-quotes are evaluated as internal control characters, resulting in faulty decoding at best, and segmentation faults at worse. The attached patch rectifies this bug.
->
-> Thanks for the patch.
->
-> While looking at this I found out that the logic for \x is broken
-> as it always produces a multi-byte character even for the value of
-> \x81.
->
-> So here is a rolled-up patch which fixes both problems.
->
-> ---8<---
-> From: Kerin Millar <kfm@plushkava.net>
->
-> The test suite of gentoo-functions recently uncovered a bug concerning
-> the handling of octal escape sequences within dollar-single-quotes.
-> Here is a reproducer:
->
->     $ dash -c "x=\$'\\201'; printf '%s' \"\$x\"" | od -An -tx1
->     88
->
-> That is, despite the input being 0x81, the output is 0x88. Indeed, any
-> input between 0x81..0x88 is adversely affected and some - such as 0x82 -
-> induce a segfault.
->
-> I noticed the following macros in src/parser.h:
->
->     #define CTL_FIRST -127 /* first 'special' character */
->     #define CTLESC    -127 /* escape next character */
->     #define CTL_LAST  -120 /* last 'special' character */
->
-> Reinterpreted as unsigned char, the CTL_FIRST..CTL_LAST range maps
-> exactly to 0x81..0x88:
->
->     $ perl -e 'printf "%x\0", $_ & 0xFF for -127..-120' | xargs -0
->     81 82 83 84 85 86 87 88
->
-> From this, I was able to deduce that all of these bytes must be preceded
-> by CTLESC in order to be taken literally. Make it so.
->
-> Link: 
-> https://gitweb.gentoo.org/proj/gentoo-functions.git/commit/?id=947090fb7704
-> Signed-off-by: Kerin Millar <kfm@plushkava.net>
->
-> The escape should also be applied to \x sequences.  In fact \x81
-> was totally broken as it produced a multi-byte character.  Fix this
-> by merging these two code paths.
->
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/src/bltin/printf.c b/src/bltin/printf.c
-> index 106aecd..671e781 100644
-> --- a/src/bltin/printf.c
-> +++ b/src/bltin/printf.c
-> @@ -332,6 +332,7 @@ unsigned conv_escape(char *str0, char *out0, bool mbchar)
->  	char *out = out0;
->  	char *str = str0;
->  	unsigned value;
-> +	int och;
->  	int ch;
-> 
->  	ch = *str;
-> @@ -359,12 +360,18 @@ unsigned conv_escape(char *str0, char *out0, bool mbchar)
->  		}
-> 
->  		str--;
-> +
-> +check_value:
-> +		if (mbchar && (signed char)value >= CTL_FIRST &&
-> +		    (signed char)value <= CTL_LAST)
-> +			USTPUTC(CTLESC, out);
->  		break;
-> 
->  	case 'x':
->  		ch = 2;
-> 
->  hex:
-> +		och = ch;
->  		value = 0;
->  		do {
->  			int c = *++str;
-> @@ -391,6 +398,9 @@ hex:
->  		if (value < 0x80)
->  			break;
-> 
-> +		if (och <= 2)
-> +			goto check_value;
-> +
->  		if (value < 0x110000) {
->  			int mboff = (mbchar - 1) * 2;
->  			unsigned uni = value;
+\*[...] is groff(1) specific syntax, whereas \*(XX is the standard
+troff(1) syntax.  Furthermore, groff_mdoc(1) lists the literal
+characters `>' and `<' as preferred over the Gt and Lt strings,
+which are only defined for compatibility with legacy documents.
+NetBSD also uses the literal characters for their sh(1) manual
+page (changed in commit 30b9dfc8813e15031a13fc2fc85094b81c71e2b7).
+---
+> Everything looks good except that your emails has no Subject and
+> so it's been discarded by patchwork:
+Oops! Seems like I handled my gpg key fine, but goobered mail client config.
+Crossing my fingers this time...
+ src/dash.1 | 58 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 29 insertions(+), 29 deletions(-)
 
-Thank you, that looks great. It occurs to me that I should be able to incorporate some sort of test case for this because, without the revised patch, this happens:
-
-$ printf %s $'\x81' | wc -c
-2
-
+diff --git a/src/dash.1 b/src/dash.1
+index dbc34c9..8e1306f 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -197,7 +197,7 @@ operand and the positional parameters ($1, $2, etc.)
+ set from the remaining argument operands.
+ .It Fl C Em noclobber
+ Don't overwrite existing files with
+-.Dq \*[Gt] .
++.Dq > .
+ .It Fl e Em errexit
+ If not interactive, exit immediately if any untested command fails.
+ The exit status of a command is considered to be
+@@ -268,9 +268,9 @@ operators (their meaning is discussed later).
+ Following is a list of operators:
+ .Bl -ohang -offset indent
+ .It "Control operators:"
+-.Dl &  &&  \&(  \&)  \&;  ;; | || \*[Lt]newline\*[Gt]
++.Dl &  &&  \&(  \&)  \&;  ;; | || <newline>
+ .It "Redirection operators:"
+-.Dl \*[Lt]  \*[Gt]  \*[Gt]|  \*[Lt]\*[Lt]  \*[Gt]\*[Gt]  \*[Lt]&  \*[Gt]&  \*[Lt]\*[Lt]-  \*[Lt]\*[Gt]
++.Dl <  >  >|  <<  >>  <&  >&  <<-  <>
+ .El
+ .Ss Quoting
+ Quoting is used to remove the special meaning of certain characters or
+@@ -298,7 +298,7 @@ and backslash
+ .Pq \e .
+ The backslash inside double quotes is historically weird, and serves to
+ quote only the following characters:
+-.Dl $  `  \*q  \e  \*[Lt]newline\*[Gt] .
++.Dl $  `  \*q  \e  <newline> .
+ Otherwise it remains literal.
+ .Ss Reserved Words
+ Reserved words are words that have special meaning to the
+@@ -391,25 +391,25 @@ is an optional number between 0 and 9, as in
+ .Sq Bq 3 ) ,
+ that refers to a file descriptor.
+ .Bl -tag -width aaabsfiles -offset indent
+-.It [n] Ns \*[Gt] file
++.It [n] Ns > file
+ Redirect standard output (or n) to file.
+-.It [n] Ns \*[Gt]| file
++.It [n] Ns >| file
+ Same, but override the
+ .Fl C
+ option.
+-.It [n] Ns \*[Gt]\*[Gt] file
++.It [n] Ns >> file
+ Append standard output (or n) to file.
+-.It [n] Ns \*[Lt] file
++.It [n] Ns < file
+ Redirect standard input (or n) from file.
+-.It [n1] Ns \*[Lt]& Ns n2
++.It [n1] Ns <& Ns n2
+ Copy file descriptor n2 as stdin (or fd n1).
+-.It [n] Ns \*[Lt]&-
++.It [n] Ns <&-
+ Close standard input (or n).
+-.It [n1] Ns \*[Gt]& Ns n2
++.It [n1] Ns >& Ns n2
+ Copy file descriptor n2 as stdout (or fd n1).
+-.It [n] Ns \*[Gt]&-
++.It [n] Ns >&-
+ Close standard output (or n).
+-.It [n] Ns \*[Lt]\*[Gt] file
++.It [n] Ns <> file
+ Open file for reading and writing on standard input (or n).
+ .El
+ .Pp
+@@ -417,7 +417,7 @@ The following redirection is often called a
+ .Dq here-document .
+ .Bl -item -offset indent
+ .It
+-.Li [n]\*[Lt]\*[Lt] delimiter
++.Li [n]<< delimiter
+ .Dl here-doc-text ...
+ .Li delimiter
+ .El
+@@ -431,9 +431,9 @@ subjected to parameter expansion, command substitution, and arithmetic
+ expansion (as described in the section on
+ .Dq Expansions ) .
+ If the operator is
+-.Dq \*[Lt]\*[Lt]-
++.Dq <<-
+ instead of
+-.Dq \*[Lt]\*[Lt] ,
++.Dq << ,
+ then leading tabs in the here-doc-text are stripped.
+ .Ss Search and Execution
+ There are three types of commands: shell functions, builtin commands, and
+@@ -567,7 +567,7 @@ Because pipeline assignment of standard input or standard output or both
+ takes place before redirection, it can be modified by redirection.
+ For example:
+ .Pp
+-.Dl $ command1 2\*[Gt]&1 | command2
++.Dl $ command1 2>&1 | command2
+ .Pp
+ sends both the standard output and standard error of command1
+ to the standard input of command2.
+@@ -698,7 +698,7 @@ Grouping commands together this way allows you to redirect
+ their output as though they were one program:
+ .\".Pp
+ .Bd -literal -offset indent
+-{ printf \*q hello \*q ; printf \*q world\\n" ; } \*[Gt] greeting
++{ printf \*q hello \*q ; printf \*q world\\n" ; } > greeting
+ .Ed
+ .Pp
+ Note that
+@@ -764,7 +764,7 @@ numeric.
+ A parameter can also be denoted by a number or a special
+ character as explained below.
+ .Ss Positional Parameters
+-A positional parameter is a parameter denoted by a number (n \*[Gt] 0).
++A positional parameter is a parameter denoted by a number (n > 0).
+ The shell sets these initially to the values of its command line arguments
+ that follow the name of the shell script.
+ The
+@@ -1627,19 +1627,19 @@ Character escape sequences are in backslash notation as defined in
+ The characters and their meanings are as follows:
+ .Bl -tag -width Ds -offset indent
+ .It Cm \ea
+-Write a \*[Lt]bell\*[Gt] character.
++Write a <bell> character.
+ .It Cm \eb
+-Write a \*[Lt]backspace\*[Gt] character.
++Write a <backspace> character.
+ .It Cm \ef
+-Write a \*[Lt]form-feed\*[Gt] character.
++Write a <form-feed> character.
+ .It Cm \en
+-Write a \*[Lt]new-line\*[Gt] character.
++Write a <new-line> character.
+ .It Cm \er
+-Write a \*[Lt]carriage return\*[Gt] character.
++Write a <carriage return> character.
+ .It Cm \et
+-Write a \*[Lt]tab\*[Gt] character.
++Write a <tab> character.
+ .It Cm \ev
+-Write a \*[Lt]vertical tab\*[Gt] character.
++Write a <vertical tab> character.
+ .It Cm \e\e
+ Write a backslash character.
+ .It Cm \e Ns Ar num
+@@ -2062,13 +2062,13 @@ True if the strings
+ and
+ .Ar \&s\&2
+ are not identical.
+-.It Ar \&s\&1 Cm \&\*[Lt] Ar \&s\&2
++.It Ar \&s\&1 Cm \&< Ar \&s\&2
+ True if string
+ .Ar \&s\&1
+ comes before
+ .Ar \&s\&2
+ based on the ASCII value of their characters.
+-.It Ar \&s\&1 Cm \&\*[Gt] Ar \&s\&2
++.It Ar \&s\&1 Cm \&> Ar \&s\&2
+ True if string
+ .Ar \&s\&1
+ comes after
+@@ -2380,7 +2380,7 @@ unless you are the superuser, in which case it defaults to
+ .Dq #\  .
+ .It Ev PS2
+ The secondary prompt string, which defaults to
+-.Dq \*[Gt]\  .
++.Dq >\  .
+ .It Ev PS4
+ Output before each line when execution trace (set -x) is enabled,
+ defaults to
 -- 
-Kerin Millar
+2.54.0
+
