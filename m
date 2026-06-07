@@ -1,68 +1,78 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A11A1A08AF
-	for <dash@vger.kernel.org>; Sun,  7 Jun 2026 05:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB0B1A6813
+	for <dash@vger.kernel.org>; Sun,  7 Jun 2026 05:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780809928; cv=none; b=lWyayWDkEOdLis+1j6P61cgPSWTYpP5VNqasvG/DVo16eROmSfKQ09sXRzrSw82iy3+aEnyDepqx2ABVIQP43Hcury7AgxIO5TcXcCn8FXKf4TsL/NB5HUV40so7mpdawy9ACQxwSquSZrgiBljn+MpKBlCfxOLwLglR/Bm0oDE=
+	t=1780809948; cv=none; b=CmgY5JPhWbensQ+RTBNVWIzg7axm5KMO6RRXlOCnNktCapA7XSTsHtEkK1ktZzvy8yh8xhUPrKC1RH5/ehe8OPffCn5H0L4KxCjptsm70CG7Y3mNS67JEhRAgKq3XJ/HrzfxXllbkWYFuk44YlN3/JgXhyxX5VFvbJPcE3ak2gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780809928; c=relaxed/simple;
-	bh=uZHNqulLNGT+rUGoPg8V6pjmLNxF1+qGl8EMfeyETco=;
+	s=arc-20240116; t=1780809948; c=relaxed/simple;
+	bh=ZZpP/l+CiKxGaowaBcS3CLjcQzoclBTvyu2u6k7zxaA=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=KM/uVRratSQxv8K4lU78pV1ZwzV0iQb3AAx4+T0HQqazQ8/1byX0tkionQQEiHcymjCoX9uJlg5V4Gn1+vDowG8Pa+BTMKPUpLrhyBG8rTWBXOQsBD08Cbuz+tqXr1mBqYKgxK8yFfi++26ID14bxvWELGW4sqll2Km+ATo1/5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=hsLXgb12; arc=none smtp.client-ip=180.181.231.80
+	 Content-Disposition:In-Reply-To; b=IIN9FQ2ybVVEdSAB6moIsoop/lef8U7bY8+E5Gs0SgO54Npuxbfw4w00LDtvdKdQ7mki1mozkd9t4gb/nLDCsnkGazsJ5nq7sYOZ70dlp0JXO3quXDn68yoit3BMasIlLSKUe1yOHytSVyxNIvHjNoKAtOSTrhh+TtXr/WMnrmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rgRuXXzm; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="hsLXgb12"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rgRuXXzm"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
 	content-type:references:reply-to;
-	bh=h3rBD1SHzskcVUaa0MG7uKnOfT9GWZfE3uSgafCtmcU=; b=hsLXgb12QnWgHVO/wdJxQ0a7Bk
-	pL0B8B50khuxpVYb3B5L9kFGg/MZq2JPq5kdRfLXbZ4JUVvX7R4ndX+e97aSrvWiv9I6ot2T3zRY3
-	iO5CX0lPfpuY+BYKHrJiUn6T/rHhvWOP1i5HL7D9G/e2jHVSSTdypAuTBUy40SNfYyWXq+mgDz8pY
-	jNPFFQhUAZw67j8GakSUFQ3SpaTI6kCxz1JMWKoiRnw2OtO9J3od+9WGOyhedH562RG/wyDFNYyTn
-	x6juTD89ry/h17jXIqxz04HyKViCqq8bAecaOob2MLp8WYNO2ngy77QGjhjjyxrrDk6ij0aLwxZrt
-	dVaGQCWg==;
+	bh=FmJI46j2B88iihbFh1mATTSKx4zXzzRwpK92BEfvYE4=; b=rgRuXXzmR3W0QNEOik4LPgVCCC
+	5wusugvXPX4dUoFrF9DUm+8JmFDvUFQfpzzQGyGYVeyI4t/RfaFvXnMXRAXpi9BSA1merYJ3VqYgj
+	G3fd+Mbpwuh9HwL4Sfwf5MQIRk/vo15Id1H0F5LyptxH848RRZZy8Y9RPO1ghfw0KE24eGZZJpwJE
+	WXeflu00pbR1Ez2UTKxnylszBuIYt9u6XJ2lkyVBCetUdKvMlaRuii7dTud2WReLnzVZAtPDtAnUR
+	xMahLmZv2RcnYlfgY1C/xdpyOiCN+wK5X5KuMht0entfY0RjVEmr3C5eOCt4SDUcgNbpga2Wny+Am
+	kaRr9sbg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wW60Y-003CJl-02;
-	Sun, 07 Jun 2026 13:25:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 07 Jun 2026 13:25:14 +0800
-Date: Sun, 7 Jun 2026 13:25:14 +0800
+	id 1wW611-003CKG-0b;
+	Sun, 07 Jun 2026 13:25:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 07 Jun 2026 13:25:43 +0800
+Date: Sun, 7 Jun 2026 13:25:43 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: =?iso-8859-1?Q?S=E9bastien?= Peterson-Boudreau <seb@stien.dev>
 Cc: dash@vger.kernel.org, seb@stien.dev
-Subject: Re: [PATCH] Use literal > and < characters
-Message-ID: <aiUAuoeHSXuqPH05@gondor.apana.org.au>
+Subject: Re: [PATCH] Use proper grave accent character
+Message-ID: <aiUA190Dn3FWwWcw@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260601044038.11541-2-seb@stien.dev>
+In-Reply-To: <20260601045303.13750-1-seb@stien.dev>
 X-Newsgroups: apana.lists.os.linux.dash
 
-S�bastien Peterson-Boudreau <seb@stien.dev> wrote:
-> \*[...] is groff(1) specific syntax, whereas \*(XX is the standard
-> troff(1) syntax.  Furthermore, groff_mdoc(1) lists the literal
-> characters `>' and `<' as preferred over the Gt and Lt strings,
-> which are only defined for compatibility with legacy documents.
-> NetBSD also uses the literal characters for their sh(1) manual
-> page (changed in commit 30b9dfc8813e15031a13fc2fc85094b81c71e2b7).
+Sébastien Peterson-Boudreau <seb@stien.dev> wrote:
+> In the troff(7) (may be groff(7) on your system) input language, the
+> ascii grave accent (backtick) character is interpreted as a left
+> typographers quotation on output devices that support it. Likewise, a '
+> is interpreted as a right quotation.
+> 
+> IOW, if your terminal supports unicode (along with some other
+> variables..),
+> 
+>        `command`
+> 
+> in dash.1 can end up being displayed as
+> 
+>        ‘command‘
+> 
+> which is not the input the shell expects, and so a user following
+> examples in the manual will be very confused.
+> 
+> The way to typeset the grave accent character as it most likely
+> appears on your keyboard, the character the shell expects for command
+> expansion, you must use the troff character \(ga
 > ---
->> Everything looks good except that your emails has no Subject and
->> so it's been discarded by patchwork:
-> Oops! Seems like I handled my gpg key fine, but goobered mail client config.
-> Crossing my fingers this time...
-> src/dash.1 | 58 +++++++++++++++++++++++++++---------------------------
-> 1 file changed, 29 insertions(+), 29 deletions(-)
+> src/dash.1 | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
