@@ -1,106 +1,103 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2472C11CA
-	for <dash@vger.kernel.org>; Wed, 10 Jun 2026 03:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFA639B497
+	for <dash@vger.kernel.org>; Fri, 12 Jun 2026 21:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781062885; cv=none; b=c44RhyaH4n8G6r2ZxJwQweMsY/OSqbFKPnnVDna1aFSIvcvgevalGlY8H+6v38lSLpuLstanBq+UjtqA1E01siuwt7qJxHDP7x/iu6fm6Jx1u1j46ggKIaQ0gBIdJHUpV1/HBzGYx4Mw708GIWoBM4X0TPxr996ZM5skBrRdFc8=
+	t=1781301412; cv=none; b=XRu0Tcr1K6npqaxPMrZavG4lKlFXXLHuRcSDePha7s2REkXIBYzyHWHpRsG3TGDIDVR9Pg4zhfUqG37FzNri639f478QltIWVz7ca5i8HkCSPUGpxvg3n6FFxVIuH5FS3SRLo/7AbnTCChY4FdXDMl4FWxsLR5fz//37bEF0N2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781062885; c=relaxed/simple;
-	bh=h+4QSCcZoua585ng0kdjjbFpyJNT6FPaJZwhd3rvjYc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LonMVg4X0q8LAnInfEBwNzsOc0qfjHhoI31EnZbMbU8haclhZa+ff3wnlOmZA7Mc1KTWQzByIySmsoUPeBJOCe07rYk5LmyTvyv7ZLIyZbeXPVxT6fiYiI7/JS6h8ZH3/ka9gHxWEhDBmjERTvdVoMTv7E/jSb+TyfjNJmNcwXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=dfwbjDjY; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1781301412; c=relaxed/simple;
+	bh=YDiBAJmqRGgybCjvMXr3ChMZnDtbi7dZ1Om0FC2UY4o=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=ukkIyAc1SwAU0CRTs9IqrebCYlO3kMfcb1Vam+ONM0x6kr5++tRAwUGo3CpaiV0EHzGkJglyFiMdbY/+n2GFGiamofHzj0abzhIQ13uT3ePYR393lUjC8fSs9IuuNhBb+f8MrswN+CmHqJclNrlxCTz1kw1Gddf6Qx9gNUBgmBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bvL274vC; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="dfwbjDjY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=IKHq1R8iCF4ZoOrdW6OglmdNXTl8vXgnIzIeV4Gm99Q=; 
-	b=dfwbjDjYxoXi7VC8YZ9JOA4aO5S4e/dAbF6g6AD3b5qbZPTbj5bW24dfKuKEMSvdIcOz0IRNa3l
-	m8849BKUIW4mMAcq0BZ1G6LVh6D+B203XfhcgwSWZGV8r+FXFlKIfynLa4+uKibtUSsfX+Fag/ib4
-	RmF2DKPHrrXIrpo6jy2F/FzXiI9pLH0so85HWeJTUxk2CakusQ3w0hrAy9yPDa3pkIoBeuChnEcPS
-	PbF8JK6hjeVWe1eF3L+oCUAQA48G7tzks4BWMvbnvz6+kfVUK928tBkDffyR3k7ilGRyqhnqQSBH+
-	5biiXEVxqrNurPL3z6dWDXTfqvUNzvez+jBA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wX9oa-000000049mP-3dlq;
-	Wed, 10 Jun 2026 11:41:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Jun 2026 11:41:16 +0800
-Date: Wed, 10 Jun 2026 11:41:16 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Jilles Tjoelker <jilles@stack.nl>
-Cc: 733852@bugs.debian.org, Vincent Lefevre <vincent@vinc17.net>,
-	DASH Mailing List <dash@vger.kernel.org>
-Subject: [PATCH] parser: Do not print prompt if input buffer is not empty
-Message-ID: <aijc3HAfGgzoVPqT@gondor.apana.org.au>
-References: <20140301144245.GA34436@stack.nl>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvL274vC"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5aa68d7d757so1403579e87.0
+        for <dash@vger.kernel.org>; Fri, 12 Jun 2026 14:56:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781301409; x=1781906209; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tA0PPxPMqnJBg45l7NYPW6xspHRCJeIfGYMlEJKyaOU=;
+        b=bvL274vCYDaUPI4fBu/5mnCH1h4nnxydID+t6R7Pmb2/LvIP5zT+UOAJ6k56jbY7Ub
+         FQADFECDfmB/slubZTgu41nUe6DhuDSAdPNTL6szdOnNMmOLKjwBaEtB6bMhGioN0yaP
+         H/Svbh7N9K7Sl0jq44v9GeMjboPXRIZpNkf7LIxIpFV/RdYnrMlbZSgf0kKRZF7hV76i
+         7gvgAhFJFXozFVTPFOLkdSNTsjsPFCrSXRdegurxf1Xe9iiasMxaoRZgVMfPI14gnKdR
+         gAN2f6alJ5jGVzOnXPrj7NAzTuRGEYY0lOxpVgHFpBWRJ5QdsVOfimMqnBivHJqg06dQ
+         gDCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781301409; x=1781906209;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tA0PPxPMqnJBg45l7NYPW6xspHRCJeIfGYMlEJKyaOU=;
+        b=QIKNvRwV/UrjTRdpBcIY+ollfB0SvRr+GqQYfnYOWL/W2Z939s/NR+86JqzprC0K1/
+         ohklfvp6r0zAPauITNTne9DQx0VLFQmndmoOymoheyVuYTAb67eL3GER0vCFkY837d3t
+         czYtWlTil0F5fW1V0nRyCQ7lxOyq8oBTC2m2Bs3y66PE8vy6OytkZ7QOZUGCTrNLmi/F
+         FYMd3rF2KBvhU5EEScMfTfUpiIjs425Q+NIsYpvXedb9qdCx5tcKAnuxAIgoCTjvF1+6
+         w5Ay0hUr5NLiJkRI/IUdS+CaGoXUCsFEXmrav6SWW/L0vq+UKJJjCdRt5/582YmhrPL9
+         2aCQ==
+X-Gm-Message-State: AOJu0YzOWJcDheSF/IdlhZQ29JwJLKKTJjmfYh5LDzsb/mzCAQTxj9kB
+	LqrDuQ+YHkKIhzK7tKQq8CHlwJRK6zUXBEqNVFWyIaCn9pZgEu3rG3/5rhWpSA==
+X-Gm-Gg: Acq92OFuWPF0yxzmjkjTcuBn3gmpYuJddeBZEU0aaN2Q2J3DJidE82btwZ7F6/nIkaF
+	FmMqY4vR1N/DqE/wxgfPKjGUXPEK0KcFfR51lH1u6fpazI8zCJfBf64QP7EtLjjvDoGxDFeGI3s
+	18PDgAMsWeK3V0I6gtkKuZ/eGsWWOEu71yNxhp/8nCtOukBKav5Sz7UMNKJteRX53GcMCQaqy5z
+	oHeNpIDHrWj4GSgmt/zdZRj9LL2Tuj2weIUg5TWyzsLnqUIDEnaJISqhAVuwZafVhQLfRA6MUMK
+	mmLz924GBuRXkRg6a6J36bSz598MxStArqvETK4XhkisnXChgwXcPJl2IgKKVwzKGlQ/QH1pUQy
+	niQuWXGeY5kHQPHGHN7nU2wyWFIQ9cvoDVxeXTa5cDnpjoCcsaCdtiGGSDD5LKIwtBqRyLJdoxV
+	Xhe2V9DJfI6xoi1Ry2XTs8UDCunVgTHYiv
+X-Received: by 2002:ac2:53b9:0:b0:5a8:8222:7fc9 with SMTP id 2adb3069b0e04-5ad30da28d2mr202356e87.13.1781301409173;
+        Fri, 12 Jun 2026 14:56:49 -0700 (PDT)
+Received: from [192.168.42.30] ([92.243.181.142])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad2e1a730esm827587e87.41.2026.06.12.14.56.46
+        for <dash@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Jun 2026 14:56:47 -0700 (PDT)
+Message-ID: <b5b51fec-6647-4c61-9986-5fc539c438d5@gmail.com>
+Date: Sat, 13 Jun 2026 00:56:46 +0300
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140301144245.GA34436@stack.nl>
+User-Agent: Mozilla Thunderbird
+Content-Language: ru-RU
+To: dash@vger.kernel.org
+From: Vladimir Kudrya <vladimir.csp@gmail.com>
+Subject: Single-byte operations on vars broken
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sat, Mar 01, 2014 at 03:42:45PM +0100, Jilles Tjoelker wrote:
->
-> I expect that the extra ugliness caused by this incomplete check will
-> not be worth it. It would be better to enable libedit or to use a
-> version of linenoise (link it statically to avoid the impact on fork()
-> performance).
+Hi!
+It seems that this commit c5bf9702 changed behavior of ${var#?} under 
+LC_ALL=C, which should consider characters to be one byte long and cut 
+accordingly.
 
-I'm feeling generous so this patch works for me.
+This code:
 
-> By the way, you can also have a "spurious" "$ ":
-> $ echo a^Jecho b
-> a
-> $ b
-> $ 
+	var=联;
+	LC_ALL=C
+	while [ -n "$var" ]; do
+		cut_var=${var#?}
+		byte=${var%"$cut_var"}
+		printf '>%02x<\n' "'$byte"
+		var=$cut_var
+	done
+	unset LC_ALL
 
-It fixes this problem too.
+should output:
 
-Thanks,
+ >e8<
+ >81<
+ >94<
 
----8<---
-Do not print a prompt if there is still input left over in the
-input buffer.
+It works reliably in sh 0.5.12, also ash, bash, zsh (both in POSIX and 
+native modes), but is broken in dash 0.5.13.
 
-Add a noinline attribute to setprompt while doing this as otherwise
-gcc will produce horrendous output.
-
-Reported-by: Vincent Lefevre <vincent@vinc17.net>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/src/parser.c b/src/parser.c
-index 412e876..4e8daf7 100644
---- a/src/parser.c
-+++ b/src/parser.c
-@@ -1705,8 +1705,7 @@ synerror(const char *msg)
- 	/* NOTREACHED */
- }
- 
--STATIC void
--setprompt(int which)
-+static void __attribute__((noinline)) setprompt(int which)
- {
- 	struct stackmark smark;
- 	int show;
-@@ -1719,7 +1718,7 @@ setprompt(int which)
- #else
- 	show = !el;
- #endif
--	if (show) {
-+	if (show && !parsefile->nleft) {
- 		pushstackmark(&smark, stackblocksize());
- 		out2str(getprompt(NULL));
- 		popstackmark(&smark);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+More context can be found at:
+https://github.com/Vladimir-csp/app2unit/issues/17
