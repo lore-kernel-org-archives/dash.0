@@ -1,42 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718FC2264AB
-	for <dash@vger.kernel.org>; Sat, 13 Jun 2026 00:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F203C1DFFD
+	for <dash@vger.kernel.org>; Sat, 13 Jun 2026 01:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781312168; cv=none; b=P3GqxoEcQBBwWxsCNArwBAWIGpnUA3eGgsWEw0fG6FEsGXz/KZ068HBJyvEAaJSCFzWMJsKh+vBFvi0cPf4Ge2Y9ty6qrs5FIZiDiHOoxLquSI2FCIGihOxkLyO5aB3eUmxvfw9TlU9UEjV6+7dVXta1nFWvUfRET1I8DcOFfhM=
+	t=1781315277; cv=none; b=bfQSg6GAoqY+HXLpARpnY1bvmHe8pXo1upgR4umqcnR+UmyRxyB34GDPGJsNF+/XyRbeZuOtsFgcLLXeTu+j1Be5P9i1KXCZvdvIVo6UpFyaLxUgfFA1uN19ptbPw+NmDREOr9Mn+rmSXl8UQHVASIPt/X4kS37m0GVD36GMwc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781312168; c=relaxed/simple;
-	bh=QDutRx0Jwd4Irz3kVUuEtRGpoLK7CfGE25vxLN3BUdU=;
+	s=arc-20240116; t=1781315277; c=relaxed/simple;
+	bh=Fx6S7y/KfUSDS3wTY+h5npAqebi6W1YVBKNuQfL1LG8=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=e/ughrnip8Ilzwux28BaRTb+UdxkXzK0g7WhMHgpsSJXeLALoWEZsGzutaATKMOkIrVg5BRn5C2LAkfWncY/wXziCYFILgPhI2+cgaI5zm8Z3U5OnxX125p1AzmqwJlOVhmOfxR6wZ6ogTczYJSo5AMUqlKctJV9XjL8u9upMJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=g4kafqI9; arc=none smtp.client-ip=180.181.231.80
+	 Content-Disposition:In-Reply-To; b=k7lv60jQWyrwt6r6pIfqjnl6EOlJQHcvGFn3+EoT5o7THmmHfQ9ZQxy/LxeRm6YafM73450/v6ynANpRKzodoGOHeHH/pHD8XfktCPnKlYZ9x+gTezftLIl9I6qzoA8do6wrQHIbqGy+ebcrVrhDWqITNuKgEB0t22MgVnSRypg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=SW9JNyT+; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="g4kafqI9"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="SW9JNyT+"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
 	content-type:references:reply-to;
-	bh=wekWbPHEWsVBdlkI9hSsCC/5KkSq0GrMGJYn+5Xa0Fw=; b=g4kafqI9fWY5u+A5c01HrXqQsZ
-	n6JZvzXCvqgo/KuyifaoRbKITpVKzE22pgzdWjCN9iKWA3g5TbXRMtHfAJKZ/DATc9Mw/R7fnPXZR
-	7EoBVk8WKd6dwBqbyoXyLGjgJfP+OcK4qIJzBjrrJTW0zkuebZI1nXlWgm5lY1Qtoc6IUtHB2I4e8
-	VETbZDWqZR9OhE3QzciUub02cn2u7YXQ/1G0mzYBTalqs7ayOuOghqst9XlZgs/JXZdXlkMwOvaor
-	LOq6BI0+TAzYj2/6hoNdnb5530FwWCMwBfE+WwFOU5ql6PwlP+Nj41Pr2jmZTNdpwWI5U3SYi1j6L
-	e5cOPAuQ==;
+	bh=1uIpzpZjnZqpVRyEVYlERaeylMgLgDQnLpPWKMYnCLM=; b=SW9JNyT+e2AgGIUFtWTBNvKLjd
+	74riKUYYbaZPH88vd+cEAZXdZYN/pAm+d4j7kVvoBeVQy77nAnfUHLUHErNFXxw7UH9CviaRUKShh
+	ZdMkeUftGP7lNJm1D9jS8Z57WRNlgasxedMp/yYJTmKo3sJQr2uG4CXwoDwgRyU716Z+Cy0HsgUUA
+	1aMcWNlUvk7MxKAXm4lEq+PR/1TML6Q6c73Z/tjz9DvIPqMK/rSGzfSTNDT4C+UzYX+7c2X1+tHC3
+	0Eeh9eoln4BoXdZGmUCCXIctd8/UfWh1tW43IB02NO5jj288FYj17FWUehrYnXXLczA48YuzUNaBv
+	oeMTjhhg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wYCfJ-0000000549F-0kjw;
-	Sat, 13 Jun 2026 08:56:02 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Jun 2026 08:56:01 +0800
-Date: Sat, 13 Jun 2026 08:56:01 +0800
+	id 1wYDTT-000000054YT-1FWG;
+	Sat, 13 Jun 2026 09:47:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Jun 2026 09:47:51 +0800
+Date: Sat, 13 Jun 2026 09:47:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Shivang Upadhyay <shivangu@linux.ibm.com>
-Cc: shivangu@linux.ibm.com, dash@vger.kernel.org, ilia.kashintsev@gmail.com
-Subject: Re: [PATCH] parser: set recursion deapth limit for parens
-Message-ID: <aiyqobCssQOO-s7V@gondor.apana.org.au>
+To: Kerin Millar <kfm@plushkava.net>
+Cc: harald@gigawatt.nl, calestyo@scientia.org, dash@vger.kernel.org,
+	kfm@plushkava.net
+Subject: Re: [PATCH v2] exec: Print absolute paths for command location
+ queries
+Message-ID: <aiy2x_l6g42HktZh@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
@@ -45,34 +47,40 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260601140258.89135-1-shivangu@linux.ibm.com>
+In-Reply-To: <20260607001326.8561-1-kfm@plushkava.net>
 X-Newsgroups: apana.lists.os.linux.dash
 
-Shivang Upadhyay <shivangu@linux.ibm.com> wrote:
-> Setting 5000 as limit for recursive parenthesis '()'
-> or braces '{}'.
+Kerin Millar <kfm@plushkava.net> wrote:
+> POSIX requires that, when reporting the location of a utility found by
+> searching PATH (or one named with a slash), the pathname written by
+> type, command -v and command -V be absolute:
 > 
-> Signed-off-by: Shivang Upadhyay <shivangu@linux.ibm.com>
+>    Executable utilities, regular built-in utilities, command_names
+>    including a <slash> character, and any implementation-provided
+>    functions that are found using the PATH variable [...] shall be
+>    written as absolute pathnames.
+> 
+> Presently, dash fails to conform in this regard. Address this issue by
+> prefixing relative pathnames with the logical current working directory,
+> provided that it still resolves to the current directory, and with the
+> physical current working directory otherwise. If the current working
+> directory cannot be determined, print the relative pathname instead.
+> 
+> Link: https://lore.kernel.org/dash/2d20377774340d1612d4f3a9243bfefd36afff60.camel@scientia.org/
+> Reported-by: Christoph Anton Mitterer <calestyo@scientia.org>
+> Suggested-by: Harald van Dijk <harald@gigawatt.nl>
+> Signed-off-by: Kerin Millar <kfm@plushkava.net>
 > ---
-> src/parser.c | 9 +++++++++
-> 1 file changed, 9 insertions(+)
-> 
-> diff --git a/src/parser.c b/src/parser.c
-> index 412e876..5198dc4 100644
-> --- a/src/parser.c
-> +++ b/src/parser.c
-> @@ -110,7 +110,9 @@ struct nodelist *backquotelist;
-> union node *redirnode;
-> struct heredoc *heredoc;
-> int quoteflag;                 /* set if (part of) last token was quoted */
-> +static int paren_depth;                /* track parenthesis nesting depth */
-> 
-> +#define MAX_PAREN_DEPTH 5000
+> src/cd.c   | 40 ++++++++++++++++++++++++++++++++++++----
+> src/cd.h   |  1 +
+> src/exec.c | 30 ++++++++++++++++++++++++++----
+> 3 files changed, 63 insertions(+), 8 deletions(-)
 
-This is a completely arbitrary limit and removes the ability to
-increase recursion by setting ulimit -s.
+Even bash doesn't do this:
 
-I'm not taking this.
+$ bash -o posix -c 'cd /; command -v bin/bash'
+bin/bash
+$ 
 
 Thanks,
 -- 
