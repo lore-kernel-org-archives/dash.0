@@ -1,71 +1,76 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.gigawatt.nl (mail.gigawatt.nl [82.165.170.251])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD36390C81
-	for <dash@vger.kernel.org>; Sat, 13 Jun 2026 01:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586E531D757
+	for <dash@vger.kernel.org>; Sat, 13 Jun 2026 02:09:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.165.170.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781315802; cv=none; b=eINr5kVauhh+svqKzpYirDtODODboTj1ptJC+krzwuHsozYL3083Dq6oDvp/5RbOhfonBg8/6IByd1E1cDHexwfcHQKSzM4GUBesuHjwu3Uf8slx7VP9s7Fsa2+IQdnOYGIhoyUdk+do62GgJauT/Ldi/yDW2bJ4BzvMjdqG03I=
+	t=1781316593; cv=none; b=VzA1kVYjBsKEEWzY8Wk9ZqjAkDikmAl0Bvvu9dHlkLTuF0Q5fgi4bvYzJX+s0pAT1fDZ3/fuTQ1wkb7F2DEfDy/iDBwXqH4wVYS6Bc9o11zEdxMEOXozopHZCPGrg4pc06gzxou55VUZXySyQGdncLAeBv0BPfNl9vaSoUhkGU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781315802; c=relaxed/simple;
-	bh=RZ5els9Y+E7AdSGozw+ZhEA+fRwddjG54KTh19lkyZY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OkZD7rJjVkPK4oOfOuM6Hw3I3xqEwv273+Tqp+0zPjxes0AWzZyxsB396Hf2qhcdhePrAN6RNtotlUestDxjXsjA99fQIK0xvbA4SYWCooZlzpzm5Wdig2cFNIWeCIVlRhLYEpHHyCZKEoepbji4qFFS5exKQxDEtLIICuUeN9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ZH+kBdJD; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1781316593; c=relaxed/simple;
+	bh=ObV/34nM8+NOhbUl9HDRy9vRPxB/RxXT+VOvVzjjy5w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JYabCw/RsbqCy6CsQfAr73V4CQKHf+EfFfPwC87gojvtQnwDqlZv50go33FFXViBfVaditHryKwemvgbzjBJGPpuqQhgPAJcEktXOWLqKHN5IlpfTjjjYLqQI9XGvlftKriwIh/vKFM4QQwQsxfWcVmiTXJ4LMpVKYX8bysxUi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl; spf=pass smtp.mailfrom=gigawatt.nl; dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b=XKEVdMOB; arc=none smtp.client-ip=82.165.170.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ZH+kBdJD"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=Y5kLPN6fAGn6T1C+OUnPP0PPFwzAPOiIei4XJp/6C8A=; 
-	b=ZH+kBdJDAlxRb3X6Pc8RTbRFaOoSnJF2nI8LsB+IHKVnBNabvdLpDonhVynma0UO+f2uUhADBKA
-	EZcmm+Oc/sruRkqi3hWDgZchRGAhIdlyzUkJerLvVysgIlRWy7PZKtRtWNvWgeNHCJy0psB0fFsQI
-	yLmFY85ucr6ZtoZw96TDhov/J2Evu8fH8d7dUyqhsQ7lxfRwzyoXvIlSghEmP4LuYQ2yukkg7CoKN
-	51RGN2N4X7xish4hPGrNvfuvoKbBUwWVoGU63gu42NTw9euifr5WcSql5Dt5deX+Bhj6+0kf/jqGV
-	WT75BbB01z7WfylF/50e/pdUO0ZR/Ccucdvw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wYDbv-000000054dL-1ihF;
-	Sat, 13 Jun 2026 09:56:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Jun 2026 09:56:35 +0800
-Date: Sat, 13 Jun 2026 09:56:35 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald van Dijk <harald@gigawatt.nl>
-Cc: Kerin Millar <kfm@plushkava.net>, calestyo@scientia.org,
-	dash@vger.kernel.org
-Subject: Re: [PATCH v2] exec: Print absolute paths for command location
- queries
-Message-ID: <aiy40wo-3GTRyJ6A@gondor.apana.org.au>
-References: <aiy2x_l6g42HktZh@gondor.apana.org.au>
- <2896088e-bd54-4ea1-a0ed-537ba78bf548@gigawatt.nl>
+	dkim=pass (1024-bit key) header.d=gigawatt.nl header.i=@gigawatt.nl header.b="XKEVdMOB"
+Authentication-Results: mail.gigawatt.nl; dmarc=fail (p=none dis=none) header.from=gigawatt.nl
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 88F8DA0A74
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
+	s=default; t=1781316590;
+	bh=Y3bK50y80Wt5e+Gm9CJuf/T3UOYxwhF2oLcg0NZtn4o=; l=961;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XKEVdMOBWYi5bPMvX9dKR0+hc+TwmVKX+7XOxMZJCq7owhkjRYQDa6w9MfoyVPpcF
+	 AhenivxyXEVYpK2D+cmPjgXMaYwJCZOItebeS1YjCQ5RzdXN+iaRhSKAMuZ1ch9Ea4
+	 0bD+U8h76RuIXsiyg6CHhm9xZfRDppJzd9C5ejo0=
+Received: by mail.gigawatt.nl (Postfix) id 88F8DA0A74;
+	Sat, 13 Jun 2026 02:09:50 +0000 (UTC)
+Message-ID: <d039d9e3-811e-4484-8107-7b0da7eb0827@gigawatt.nl>
+Date: Sat, 13 Jun 2026 03:09:49 +0100
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2896088e-bd54-4ea1-a0ed-537ba78bf548@gigawatt.nl>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] exec: Print absolute paths for command location
+ queries
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kerin Millar <kfm@plushkava.net>, calestyo@scientia.org,
+ dash@vger.kernel.org
+References: <aiy2x_l6g42HktZh@gondor.apana.org.au>
+ <2896088e-bd54-4ea1-a0ed-537ba78bf548@gigawatt.nl>
+ <aiy40wo-3GTRyJ6A@gondor.apana.org.au>
+Content-Language: en-US
+From: Harald van Dijk <harald@gigawatt.nl>
+In-Reply-To: <aiy40wo-3GTRyJ6A@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jun 13, 2026 at 02:52:29AM +0100, Harald van Dijk wrote:
->
-> You're overlooking the "that are found using the PATH variable" from the
-> spec. Because you included a / in the command, it is not looked up from
-> PATH. Modifying your test to make sure PATH is used, we can see that bash
-> does do this in POSIX mode:
+On 6/13/26 02:56, Herbert Xu wrote:
+> On Sat, Jun 13, 2026 at 02:52:29AM +0100, Harald van Dijk wrote:
+>>
+>> You're overlooking the "that are found using the PATH variable" from the
+>> spec. Because you included a / in the command, it is not looked up from
+>> PATH. Modifying your test to make sure PATH is used, we can see that bash
+>> does do this in POSIX mode:
+>>
+>> $ bash -c 'cd /; PATH=bin command -v bash'
+>> bin/bash
+>> $ bash -o posix -c 'cd /; PATH=bin command -v bash'
+>> /bin/bash
 > 
-> $ bash -c 'cd /; PATH=bin command -v bash'
-> bin/bash
-> $ bash -o posix -c 'cd /; PATH=bin command -v bash'
-> /bin/bash
+> But that's not what this patch does, is it?
 
-But that's not what this patch does, is it?
+Oh, I see. Currently, dash never converts paths to absolute. The patch 
+changes it to do so whenever possible, both for the case where commands 
+are looked up from PATH (which is required by POSIX) and the case where 
+they aren't (where I think POSIX is ambiguous). Other shells (ksh, yash) 
+do print an absolute path in all cases, but matching bash sounds 
+reasonable too.
 
 Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Harald van Dijk
