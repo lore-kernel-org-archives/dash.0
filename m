@@ -1,70 +1,143 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4122F3A5452
-	for <dash@vger.kernel.org>; Sat, 13 Jun 2026 05:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C461333AD88
+	for <dash@vger.kernel.org>; Sat, 13 Jun 2026 08:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781327718; cv=none; b=Uiz2gOT33OG5krvtkl1xMWqRCEgmVJ4xk0FmYZTBxRu8qjaCbgiK2n9nOUAGeXTasdub/R3+qPtYaHTEgbRUaWz6Rn251EZpKhRnIz+jlDAwc9MT5SoTlZQJDgYW7I1fqqUApZxzUKpRkpee3gB3zWAeu0ON7v/RE+E+2qzdkPU=
+	t=1781339810; cv=none; b=qDLmQwTKaZhaQTDtv1RFsY9wF55tBnJ0C0oYawetztz6Hxb+7iYnlF6Md58KJYiS5/Y1+G6wBrZhryacidB9B9Swfbxrg0XRSLEdKh+o0Ls7DXQtcFNoKnO8er6Ti62Pj3K5EqjT1vfVBg5Msl/BwyZGCGueElr8M8RdCP4vRsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781327718; c=relaxed/simple;
-	bh=ncXEj07dVk4Q8QzbyGs+l2+6Y+xYdCfhdPwxYUHebiE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=tsFrY6ucd0Tx0R23NUZj+M9dNIR7K2xU6XH850lVQQ5mNJvgJ0iEMrocmGU+kPbqrvaL4DNhHHzUwfAeG4Mm3poCbZzqiRsVWRDkaEf1OQ5lQpDStJZrLnTgDEMwW0/pYYvyp3opwxaB0LaysrbxGXulv/ZG0NB7nQkfTpKQdUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=iN6AWNac; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1781339810; c=relaxed/simple;
+	bh=3hcnfd+ivy/G8N99ubk/SjROKc0pD6YBb/czcjqokvM=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=j+47TOP73NG67G18eVXOLnloyNlKap+Pz2DdaZLfZmyTZtmTd2W7mj3mT1h4AA50EiD3MdRWHFuSc08qjxAEuyEVrZJq0CULgqdHmvfpPRcRF4jcORFLBiMVkKAjHLpzeoeYjKKppOa4ISgISRn3CdMkJPchmVXi/EekfO9LWa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plushkava.net; spf=pass smtp.mailfrom=plushkava.net; dkim=pass (2048-bit key) header.d=plushkava.net header.i=@plushkava.net header.b=AGf3XfED; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UoR18T2W; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plushkava.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=plushkava.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="iN6AWNac"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
-	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
-	references:reply-to; bh=CiuexPC356bU3Ftq2tkIkKySw3bs6DTKffnxwoiKhU0=; b=iN6AW
-	Nacsd9L+OtWgPqcg1/ijCcZHFU3wGDrVdM7bZxSGIvbhlUN0JNhoHtuUEHBXHOMEFN4U0Cv1nijSZ
-	rRpCV16hAyiTNxy09N4RrqOKdZxiWVFKKx4fNVLPB1/qGF8QV6QpVHRLuASrSjrv5iOzxs230WSnb
-	xf+L2LLEfrq0Xu0w0UlrCNpGf1JVaqyCiDEFRG15un7HPL9l037PF5kdtD23oyeUV/XGy3ltKqNRT
-	Vx2IHXd45Fc0u+MBbM0g4EYjLJcVtn0gyiG+P4NtRpdzGlLhmJ/LvGMzwsv+LRkCYAYTb++MYeWNz
-	ZnYc6XyYKHyFfiHY0/OlkvKuz9ROQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wYGi1-000000055r0-33rp;
-	Sat, 13 Jun 2026 13:15:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Jun 2026 13:15:05 +0800
-Date: Sat, 13 Jun 2026 13:15:05 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: DASH Mailing List <dash@vger.kernel.org>
-Subject: [PATCH] var: Remove unset check in varnull
-Message-ID: <aiznWbJC12AWyVXe@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=plushkava.net header.i=@plushkava.net header.b="AGf3XfED";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UoR18T2W"
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 9B5BC1D000D7;
+	Sat, 13 Jun 2026 04:36:46 -0400 (EDT)
+Received: from phl-imap-10 ([10.202.2.85])
+  by phl-compute-01.internal (MEProxy); Sat, 13 Jun 2026 04:36:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=plushkava.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1781339806; x=1781426206; bh=K6kpX6UwXWMujj3FBcPq6ytP01J3QhfG
+	sqo1D+pMqdY=; b=AGf3XfEDLGIC1VGk8HPswZ1s1xADidfwS5ntMqQBPK0fCnzi
+	k1NAtyubSSnL9Qgn1OSnG0wxyNHxanhAyC9+Ar2QuBt6De3Kzp+QarHorRkfMBdB
+	b3xXBuhPjdJgJp9UsVt+fDroKJfx0L7QBnz1msAQcLNBt3k1xFrcnFVlENeREZhP
+	OtiXN/uguZuMk82A3VoobS7pWj7g2wnc4bm++Be9NYGicTOCgwqZrizUNaZBrOdp
+	KylKjH6ECWOu9vE43Jv1Hsir1Da0A29lHiMBWxcD5de4dewbDUNrKDdqO0Ev7Nz0
+	a/lU6NKLSwTCe1BYWP858uvJeCBfoLwa7RNB/A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1781339806; x=
+	1781426206; bh=K6kpX6UwXWMujj3FBcPq6ytP01J3QhfGsqo1D+pMqdY=; b=U
+	oR18T2W1noHAdumso1SwKD8Bi29WvjRSuHi/5k0PzaCrNrFoQlAw5qqPmdYBUS8/
+	kb6UG1u/cW2zUeKf+oMuJM5AcGFE7SV4Wc87xMPGUMZft75q02TenXBgkuOLT8Ci
+	EwFy8CQObXTPW+DufZlyZRUJvhViivnPTgceY5OuFppSE0/o27kgFTygudbINIZB
+	w7AManiWzFn6K6GmK9PT+jd8+giyZAC1sXzmmOSjlviWSRK4IGessSYXvYVFbeAr
+	aBAZm613kBAc8rJZRktzdlIoQdl0t34ex39fe11fzulfPG7lYOsazULh266IJRhd
+	qmWARa1QNj7evHTE2Tltg==
+X-ME-Sender: <xms:nRYtaq8qoY5glWEJgPvd49zMT6yEyClzGzkkbB93g2oiwZb-TVFBRg>
+    <xme:nRYtalg6233gPJF6tiShrnkEtmcMY9BsntIjR0OOQRG8la1kfiogS_CnCHQ71LmB-
+    m141JlTbcOOdhEqGZUgG1p9RdpcnesPPTteiWO5JpI5_foNV4FV>
+X-ME-Proxy-Cause: dmFkZTER99Qy73iA/mZm1G7h4RakCBAGd+3twH1i+xnKB0Wo5k8nkSCeprbjpBoF98xMKa
+    68v4Sy5rcvgYDCwurqAW1tWZKnMbqihUBrKzaldoRq/61K0fvnEUiMx6CQsjekhioc2chv
+    qN0xJdUsnzZwZYjgDn1kFU/YInzxSOJlkkB0U5hpjH3zsXh39R/q7EC4Z1Cs8ehIFPgdek
+    wc1da5/NnXju8f513O9Hen9y+r4DXG5PpPzd3R5dWiEQI2F8eg1ng3Suqe/GZ8zfb+X5AY
+    2DvLNrVPYgfTGymFXcensnfJPGhB4CvctumuBO/tT0ioce0gniOtAihpDBb4m3hIKlNapW
+    3HNL7lQXGTiXrbPu4d8ufI/Ea2wAs+FAy0pWDWKsZkF6U3iG/KPC8YwRJCjBSlx5G69B1v
+    WVLMaaU7PoNadVGK8DGE8ZdZ1DulpOevy5MX5jFWDsfH+VAHPDWucl2sZEcrojZf/fYCjA
+    Mq5yY0Ge2oyjOhpEUrzsgbUQZH18ukaQgXyuz6VY4p4ZYGXoFl0l9YHM/O7kAudBkc00+e
+    SUpyS8GYwHS+/Uvz/BVK9ENfMipDT0+MJFnixnFx6dhjYRLzjVu9nrjJ9RTXPIER1Pqhfa
+    1HJUh/TRMglOTdzayo+fqn3XBaP+Zr3SDx3qJvd+skuVDFwqo8zdb6EMO10Q
+X-ME-Proxy: <xmx:nRYtaspI1w9y-lXAFNIPAUIcT9v_bFJdavYIpETkLJw1XbePp3ua6A>
+    <xmx:nRYtaphgdIuktvhAdPNenfpQ-HZJ3EZ3mlzkbJHoc8gTDAh5hDK_1g>
+    <xmx:nRYtaphDiG6de73eZhe7vNgaf85LxNUzilzpvdEkr5gxpdpGtZQo8A>
+    <xmx:nRYtaviBgCIzwn5C5LLtn-mMxlI7Z3mgbYiBnQdElVbG8jUb85RogA>
+    <xmx:nhYtakL2SRiheDU63ztEimhKQc2EkYNgSmeJS8wP_-pzd1TBvFIHwweD>
+Feedback-ID: i2431475f:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 69F73216008A; Sat, 13 Jun 2026 04:36:45 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-ThreadId: AKuBAax-c3uF
+Date: Sat, 13 Jun 2026 09:35:51 +0100
+From: "Kerin Millar" <kfm@plushkava.net>
+To: "Harald van Dijk" <harald@gigawatt.nl>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>
+Cc: "Christoph Anton Mitterer" <calestyo@scientia.org>, dash@vger.kernel.org
+Message-Id: <58a10adf-6642-430b-af4b-63f2643fccf9@app.fastmail.com>
+In-Reply-To: <2896088e-bd54-4ea1-a0ed-537ba78bf548@gigawatt.nl>
+References: <aiy2x_l6g42HktZh@gondor.apana.org.au>
+ <2896088e-bd54-4ea1-a0ed-537ba78bf548@gigawatt.nl>
+Subject: Re: [PATCH v2] exec: Print absolute paths for command location queries
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Unset variables always carry two NUL characters at the end so it's
-safe to call strchrnul in varnull uncondtionally and step past the
-first NUL character.
+On Sat, 13 Jun 2026, at 2:52 AM, Harald van Dijk wrote:
+> On 6/13/26 02:47, Herbert Xu wrote:
+>> Kerin Millar <kfm@plushkava.net> wrote:
+>>> POSIX requires that, when reporting the location of a utility found by
+>>> searching PATH (or one named with a slash), the pathname written by
+>>> type, command -v and command -V be absolute:
+>>>
+>>>     Executable utilities, regular built-in utilities, command_names
+>>>     including a <slash> character, and any implementation-provided
+>>>     functions that are found using the PATH variable [...] shall be
+>>>     written as absolute pathnames.
+>>>
+>>> Presently, dash fails to conform in this regard. Address this issue by
+>>> prefixing relative pathnames with the logical current working directory,
+>>> provided that it still resolves to the current directory, and with the
+>>> physical current working directory otherwise. If the current working
+>>> directory cannot be determined, print the relative pathname instead.
+>>>
+>>> Link: https://lore.kernel.org/dash/2d20377774340d1612d4f3a9243bfefd36afff60.camel@scientia.org/
+>>> Reported-by: Christoph Anton Mitterer <calestyo@scientia.org>
+>>> Suggested-by: Harald van Dijk <harald@gigawatt.nl>
+>>> Signed-off-by: Kerin Millar <kfm@plushkava.net>
+>>> ---
+>>> src/cd.c   | 40 ++++++++++++++++++++++++++++++++++++----
+>>> src/cd.h   |  1 +
+>>> src/exec.c | 30 ++++++++++++++++++++++++++----
+>>> 3 files changed, 63 insertions(+), 8 deletions(-)
+>> 
+>> Even bash doesn't do this:
+>> 
+>> $ bash -o posix -c 'cd /; command -v bin/bash'
+>> bin/bash
+>> $
+>
+> You're overlooking the "that are found using the PATH variable" from the 
+> spec. Because you included a / in the command, it is not looked up from 
+> PATH. Modifying your test to make sure PATH is used, we can see that 
+> bash does do this in POSIX mode:
+>
+> $ bash -c 'cd /; PATH=bin command -v bash'
+> bin/bash
+> $ bash -o posix -c 'cd /; PATH=bin command -v bash'
+> /bin/bash
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Adjacently, bash willfully supports / in function names.
 
-diff --git a/src/var.c b/src/var.c
-index 6e0671a..90fc896 100644
---- a/src/var.c
-+++ b/src/var.c
-@@ -156,7 +156,8 @@ RESET {
- 
- static char *varnull(const char *s)
- {
--	return (strchr(s, '=') ?: nullstr - 1) + 1;
-+	/* Unset variables always end with two NUL chars. */
-+	return strchrnul(s, '=') + 1;
- }
- 
- /*
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+$ bash -c 'bin/bash() { echo 1; }; bin/bash'
+1
+$ bash --posix -c 'bin/bash() { echo 1; }; bin/bash'
+bash: line 1: bin/bash: No such file or directory
+
+--
+Kerin Millar
