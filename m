@@ -1,97 +1,113 @@
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCA61DF980
-	for <dash@vger.kernel.org>; Fri, 19 Jun 2026 05:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7AB4A32
+	for <dash@vger.kernel.org>; Sat, 20 Jun 2026 01:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781845492; cv=none; b=KprUIiQ3XMEQRAx/hDNmEJJOKLZeTHEtQL8xnGr3yxOrtM0L+TdSW+hbyxx+tKg8GReKI1TsE3Adu0I8njgL5WV7h00qUSU/aoPY+e4xlKOcHTfSl1JDZ71aNjqBZ69cWG4Lt70Rt3r/b3yEcgq/DtfybcoVE2OlbzLsyBfCwso=
+	t=1781920375; cv=none; b=NpHKvdApMzvZJr9b1TTopH/5zYr7xms4DGlSir9C3WNgAOBz9qV51eERrWFzs0/WNlxpZRHR/mXf0wGfSwnu8GM9p7W2eRUBV1RKgW/KW2zne+TdSjavn3+J9WokyaOfH3nyl2T+TJZpe5dj125VSZsx9B0+bA5uNzziYnoadnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781845492; c=relaxed/simple;
-	bh=UfxsmTarbscX1dNOEeEgtP/z2/8yXHX/mFESk1X+030=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:Subject:Content-Type; b=gYi0frqd2/XMxvlaK2WylslcmZKYFW3CobeFgFmFIoL9F6AYxpMquj3zZtiiKNH7H9jTwLkZQ7dlT/5KrFWZ9O+N/7LFpgw62U0rxixQ25vsdEAKHPmkgwrdh5b1s7kIFdqqBKd4O7cKFesbB6gxrKdIm646L/aSyCAsDjRUL+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plushkava.net; spf=pass smtp.mailfrom=plushkava.net; dkim=pass (2048-bit key) header.d=plushkava.net header.i=@plushkava.net header.b=JzJtTQtP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NDRcC+K7; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=plushkava.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=plushkava.net
+	s=arc-20240116; t=1781920375; c=relaxed/simple;
+	bh=O/jEx8LqdsZnih+bQs0X7WzBBDhnv/gmNvUhMLVxSCk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mDKVdOovOzwk5JrxbBcGR+B6TEqqxT1pQrP8ecGlaDtT5k72yuExC00x7k4fJjmCd1Ad0ZfIaEr680cK4RGJa8a9x/wPY10PETV5RBhz8ferGwsT1jtdmWthcYJ90eZlcVYgzQsI4xlPtbFctF+ZnjcwQoXJQ++Nsi4wF+7I4k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+Z1j25r; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=plushkava.net header.i=@plushkava.net header.b="JzJtTQtP";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NDRcC+K7"
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id 252D41D0016E;
-	Fri, 19 Jun 2026 01:04:49 -0400 (EDT)
-Received: from phl-imap-10 ([10.202.2.85])
-  by phl-compute-01.internal (MEProxy); Fri, 19 Jun 2026 01:04:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=plushkava.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:message-id:mime-version
-	:reply-to:subject:subject:to:to; s=fm2; t=1781845488; x=
-	1781931888; bh=81LIhzhJ/w31NMvotnBHQOIUKOzvYCwZ8yoP9PAu4cY=; b=J
-	zJtTQtPFKjYrVubZdNOEizEOJaj46WJFgPlrG6/t0QXUhYccsHvdZ0YKPoXnSn7z
-	KpQq4N35Pvss2j4HpIXWlQa0QNeYHMOYKyK33K5dXBrg0QtpE1BX9fDig/CaaKFP
-	W3MQq4JgpNaz2K9lm/J5S6Mpqq/6LiZNFSj17tWcHWKxt7YYOsHPSMKrH5cEcjLy
-	lGBaVnX8EbbD6db6Sq5TAc0Cx8HwnpJ1riiwI0XGdYHHINWoEOgKcuqCrFyQBRXs
-	7UicD491O0OAdyf7l8i9Aq9bow3HmH5FrqyRahfIkXNQY+CedlT4WVqaHO0Jp0jp
-	8fGPrSynAJnSc3KV/Uiqw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1781845488; x=1781931888; bh=81LIhzhJ/w31NMvotnBHQOIUKOzv
-	YCwZ8yoP9PAu4cY=; b=NDRcC+K7ozEYHRUckkIWjrYwu8fzbu8222XvSZnbDOsx
-	UfeO4M5Er0XDPRcEsdzGMX3ZUkFDXFLpgfN8AqHpDrX7VwAJe3iZl0fvR5/djrkH
-	SZPrLrGPbnhWSmfI0ZSM3FCRfw/FPf8bCB9Ycl3IOvBlH/7KtG1scm0BlzHUM7RT
-	64DD2vwo1ojBXl/2wbyBPazIIua3Zjf+w5bIjhChcWsHGLs7u6pxCEfZCqkKHsCt
-	HzmPJmW4DMienx8SfNzbIL+BLFgEK8Ya8cCnSfj9ZD8hs5pZ2XnCSgI21ZTXaAoS
-	joVtI72wogml7S5yIGCXW962lP+EiA+vJzRqwhee3Q==
-X-ME-Sender: <xms:8M00aj_I0ENWqvWTI5b9g-B3QE0AzAeKNbNKT4ytCBcZ_4WCY9zOvQ>
-    <xme:8M00aqiwcItNZXNuovzcnxI4nyAGRUmLSiErkq_n1_L8aYd_iHgL7OYcfusO2AP4r
-    KsoXg5zL_GNvWgPMNhuxxpGIsJ1Ax7PLz_-jj6Fm0Fx0SQM6KVgVw>
-X-ME-Proxy-Cause: dmFkZTFuMakakcs9j/+FOzYv71W+hbeJldrTw04xrJ6mZEpA65PzjwZIhF6oOOJcp0zO8k
-    HnI88TgA8HQFY2VdmWK94aeobYunimIxCFPYrqu0xqy0MUlB3MgP4FdmbgxQLumrKmqdxt
-    ITaxy0eGlBeJ9SdDgGCwnt5ONFIF0H8iISZxt0fjaF3jt/2zYNfussRBA1q9JZOsfi2eW8
-    0wJRsMt3XckvHmbkD8xoGeqM90yoaZO4G8wp/hzGv2pcZaaUjpOQlr45Ly9mMfFAZVJbBW
-    Rm5nMQTqWT/ag3Z4AXPbKVZgpLLLLG5xB/mHzaD6oeMTR+2CI3TjhPjk/coGr8QE9Bx5PQ
-    egtar++lcHLlNF06X8QmAlXxkJK4zM8qjxuv4YvHidRC+4JjIykDXcJd5CiiJ2wqa79qFD
-    OMaPAsWeoveUBTTkBQOYIzf3Bs8MnK3mtjFOXftV28EBiZLysnAGiFr6NQYwMpPqDHq9H0
-    0j6+fyeM3IDgjMxQvAr5a8u3e9LTB8c6aF7P/XT8ACKd5NQDx7mUfCAQW/FHcZvxMGoj6i
-    kklJzD2pLUZgfxOmIRwi4wiksgUyMozgnMdOOdUvrnIlBa9+FMDwtNTjqg2zM+LraPTj19
-    RB151/VmPXGP6mZvCz6+Pklerhlf4/8dovVP9OIkt9D0/w9BT/8YxupoZSjw
-X-ME-Proxy: <xmx:8M00aiq9aTF8L-WVq1I25WKXFkot99o4DChX6N6qwbBRCU9i3JAfcQ>
-    <xmx:8M00aumPiwANL9gMUAm21CXWzMpBeuZMpT6Q1tj0hzkL1DFFTrLAdQ>
-    <xmx:8M00auwZSkF6lJjUcZJv6V9434WZ_Zbz8pbBokWtyhkiJ6sBa3lxxg>
-    <xmx:8M00aun8_oqKHuU0H2FJOEz-lJTagdAoHgJ_gNCODoX9O67UBIxgyw>
-    <xmx:8M00andCM73o5wp1l8HZCngaxvyFNcVRAo0fjukoFPUFfu-f9qMR6D9w>
-Feedback-ID: i2431475f:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id ADB16216008A; Fri, 19 Jun 2026 01:04:48 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+Z1j25r"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2c40397e746so16143155ad.3
+        for <dash@vger.kernel.org>; Fri, 19 Jun 2026 18:52:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781920373; x=1782525173; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8p5ZdcwYJjbcTBcA1HpW5X5VLtyfN0o6Ej8SpOD+b9U=;
+        b=C+Z1j25r0jAydtSbUsfydGGchRKc/bhVVtdsGTe1EaN+pmEUNcvkOoS1tzoRJUgG0G
+         Ey4ocgrFi3NmctmmP9rW49q3zTqhE7gP/nv7ZNTzWfPO0OS+MKhIhphcrVc857Vycr6G
+         1vdSYwxwpGVpchAlD7oXg6FOsWVj+lH5W/CLNlCZ+Cm22suPt57SGVNNxmeFDxXMC5As
+         5Y5Nn9gfkw9raFpMCO1MbmqnvyapdOhQtUgPTC0ABLRmRZZl5TVzbTpEtDovwZjOcWid
+         Knz+xsrXiaKoDGgYvEmeMkbnT5DqkruWqR2b5P6Xx7OjzSdALq3WE0RttKxSTcMs6hoL
+         2mtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781920373; x=1782525173;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8p5ZdcwYJjbcTBcA1HpW5X5VLtyfN0o6Ej8SpOD+b9U=;
+        b=Kp1iVYKJe3pnfv6sBEj3U/nDlFPMoKsQb/o7FitWsBiC/YgMvCIRLb3u2a18LMTvVK
+         9nAmXjOW41JES1eAGJflYbVeF7USYfHup9TWZAI7Rs+3AatU9A/vdgExkAYpGwokvtfT
+         JfBCJuOB8wrGljJZrtJbroFRrJUdZFAFzWTZlFobxdaZqnxAaPw6PMhEUepuxNHKseKO
+         /VWhPYAK8f/lecpRFCzTT8D/k8g2ratvXVPUsEng6kVZB/GGgWqR6jSEVNIlk2sj1Fw0
+         Zbv1xkVwYPsS+L/5p6I3NTzO/jFRRRhOHC9bW/yH9SvIr3lLHlr5NH2f6kOt6MEi1vJN
+         j0vQ==
+X-Gm-Message-State: AOJu0YxW/zgKa4+Bm0Jtb/mDqX3rafgVtN4XRnigy+ZiF0l1nNdwIaWJ
+	2wTOK/UV2oZZJmpNA5j/A++sLsRtdxEFlP8bIKGOlHm51xJQfQ8DkQf2TAHxfSkF
+X-Gm-Gg: AfdE7clWzCGLZpn0gB2I1DS6PIGVFtwcQqHeCZZNEbeppQwAU43NN8SPYU6+psmMNCK
+	hBNz5XLdHyifwCUeQN75Fbf2sc4WL+kTlV9n4plpacZq6fR3jfmlo5XToPxADNRxMzoQyrqGksQ
+	fOEL1cXCNdFBG/5lGEV50UZbdsYAE71jfJT0OxzHL6eKwZiCXKsucDsTnSrRgbsJxffxiRfwckQ
+	ObK+RB5QkhraoRmJjEpzAqYD4OgLVcxkT6+dAzhbUTGCgBgTRdDu4NcSF5rg46uu0jn8k2rQCor
+	lge5f1tYkgWsuB+r5vH7btKylzACPZwPX8vnUfm/IoUC6HoyR7Nch285LQwlsYiwZ5ohyKl1MWE
+	OIHwsBzikRuQW6i9fhmTpKeuDoVjjeXdZrhfu6BX5boe8cZp1f5oA7/FF4hiySUfvhMTMFEOdPm
+	MnsRu9ep/WUvw7GDFEL3T6bp6a82DdzWmNxR1BzrVP0zDp
+X-Received: by 2002:a17:903:32d2:b0:2b2:ec46:dfed with SMTP id d9443c01a7336-2c742b5ae34mr13531935ad.31.1781920373467;
+        Fri, 19 Jun 2026 18:52:53 -0700 (PDT)
+Received: from localhost (14-201-157-35.static.tpgi.com.au. [14.201.157.35])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c743bfe4fasm6771605ad.59.2026.06.19.18.52.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jun 2026 18:52:53 -0700 (PDT)
+From: Alexis <flexibeast@gmail.com>
+To: dash@vger.kernel.org
+Cc: "Sam James" <sam@gentoo.org>
+Subject: Re: The read builtin erroneously consumes null bytes
+In-Reply-To: <bf5516e9-e59f-444a-81c6-7b112b71563a@app.fastmail.com> (Kerin
+	Millar's message of "Fri, 19 Jun 2026 06:04:27 +0100")
+References: <bf5516e9-e59f-444a-81c6-7b112b71563a@app.fastmail.com>
+User-Agent: mu4e 1.14.1; emacs 30.2
+Date: Sat, 20 Jun 2026 11:52:49 +1000
+Message-ID: <87h5myx9ji.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 19 Jun 2026 06:04:27 +0100
-From: "Kerin Millar" <kfm@plushkava.net>
-To: dash@vger.kernel.org
-Cc: "Sam James" <sam@gentoo.org>
-Message-Id: <bf5516e9-e59f-444a-81c6-7b112b71563a@app.fastmail.com>
-Subject: The read builtin erroneously consumes null bytes
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; format=flowed
 
-Hi,
+"Kerin Millar" <kfm@plushkava.net> writes:
 
-Consider the following test case. It demonstrates NUL being consumed by the read builtin, rather than by cat(1) as it should have been.
+> Consider the following test case. It demonstrates NUL being 
+> consumed by the read builtin, rather than by cat(1) as it should 
+> have been.
+>
+> $ printf 'a\n\0bc' | dash -c 'read x; cat' | od -An -t x1 -c
+>   62  63
+>    b   c
 
-$ printf 'a\n\0bc' | dash -c 'read x; cat' | od -An -t x1 -c
-  62  63
-   b   c
+POSIX doesn't require a `read` _builtin_, but for the `read` 
+_utility_, it says:
 
-This defect may be attributable to https://git.kernel.org/pub/scm/utils/dash/dash.git/tree/src/input.c?h=v0.5.13.4#n411.
-
-Incidentally, it results in tests #5510, #5558 and #6020 failing for git v2.54.0.
-
+> STDIN
+>
+> If the -d delim option is not specified, or if it is specified 
+> and
+> delim is not the null string, the standard input shall contain 
+> zero or
+> more bytes (which need not form valid characters) and shall not
+> contain any null bytes.
+>
+> If the -d delim option is specified and delim is the null 
+> string, the
+> standard input shall contain zero or more bytes (which need not 
+> form
+> valid characters).
 -- 
-Kerin Millar
+   https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html#tag_20_100
+
+dash's `read` builtin doesn't have an `-d delim` option, and it 
+seems to me that in such a context, it's reasonable to regard `-d 
+delim` as "not specified", such that stdin isn't allowed to 
+contain any null bytes.
+
+
+Alexis.
