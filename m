@@ -1,77 +1,139 @@
-Received: from pmg.in-ulm.de (pmg.in-ulm.de [217.10.8.27])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307513E559B
-	for <dash@vger.kernel.org>; Wed, 24 Jun 2026 21:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.10.8.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A07F268690
+	for <dash@vger.kernel.org>; Sat,  4 Jul 2026 04:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782336571; cv=none; b=mZEMnKSQDGuWhTQSHtuVcZ9Y4ZOI2a+5fna5MivhCVi/9pUaWbi9ITiu6d7PSmdluGPSWhjWWkmH7hiuoo+8VxUscqL/zWi79jZelNwQX/TQcnainz4whnCYRyd/EnKYVFlkSuVTL61La5vhKsoi/f73qF4Buc3kEh18ea6pkXc=
+	t=1783138687; cv=none; b=OzkYuiERuYg5Yco+iz5b7xT6+hEjTnuu4DXtsytJWJ9Y3BtF9A61UZjrkgQAH2AX1YMmo9l+NG2+h5Ir9o612iEzRjMaDkPKc+YnQP2tipBYPRYNRqCSdWkBPVjPnsytD7JNiJoKat9XSkAz6aywZ3N4v9eAAsT8P/QKy8OuMO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782336571; c=relaxed/simple;
-	bh=Kp/dmwhqXyBp6vyQqWLRdRrg+imuJJmgZ95bPz5yYs4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=AxvjiKBLyNK5lHcEryglk7kjUY5Ts9t62JK/mM9iCxTkCeqDIVDx4WKRvx0neQlKj3qBPmbHohrZzu/X+VztgO3O84BG23JwQ3uc+rJSWeuqPs3yaZetjSzk8If1/68DA/+T0Fi7jusvvCdUevq17Piz5pNuVgTuI3oLJUVtwgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=in-ulm.de; spf=pass smtp.mailfrom=in-ulm.de; dkim=pass (1024-bit key) header.d=in-ulm.de header.i=@in-ulm.de header.b=btRFkpd+; arc=none smtp.client-ip=217.10.8.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=in-ulm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=in-ulm.de
+	s=arc-20240116; t=1783138687; c=relaxed/simple;
+	bh=NQjXxy7VeSAbfKskO9iuP/Xs1m2WVax683ddCgavuzk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=k3XicSzEp5zvGE31E7VXg+CTYg16EEmZZLLXYcSLhU3it6ftzzIhQYImGZLXcdEUA+c3TZEZa8iQ0+BY+BCzMgViZ4FpbWPU+tqG99pltP+65LsFWfF7Xz6KgEBxNRblQA5YWEoqxMPtnhwcCw4E51CNXqk3YzjyVFbPTnnmNLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Qj7UTeAL; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=in-ulm.de header.i=@in-ulm.de header.b="btRFkpd+"
-Received: from pmg.in-ulm.de (localhost.localdomain [127.0.0.1])
-	by pmg.in-ulm.de (Proxmox) with ESMTP id 028A72197F
-	for <dash@vger.kernel.org>; Wed, 24 Jun 2026 23:29:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=in-ulm.de; h=cc
-	:content-transfer-encoding:content-type:content-type:date:from
-	:from:in-reply-to:message-id:mime-version:references:reply-to
-	:subject:subject:to:to; s=pmg; bh=Za6Ut5o0/wCyMmQC4xaFDL6WDKXB2/
-	53BSTzbOkZZ68=; b=btRFkpd+ljsd9dH3RQ4hjOuoOdYAXIPSPxCBSqHove69r2
-	me3x2sRoYgwyUlb86f5gdD2aPAC4b2BcpWPiI8vytj5MxrXlT6QA2Jabrh898IhZ
-	V/x4ZfkW5LqCBc0R2jCzBWix1sIq569UAG8Ji7aD0F8Q8vstwFspjA6AsmyT4=
-Received: from email.in-ulm.de (email.in-ulm.de [217.10.8.14])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by pmg.in-ulm.de (Proxmox) with ESMTPS
-	for <dash@vger.kernel.org>; Wed, 24 Jun 2026 23:29:26 +0200 (CEST)
-Message-ID: <c2dce0bc-9ee9-4b09-a3ae-7a5f167911f9@in-ulm.de>
-Date: Wed, 24 Jun 2026 23:29:25 +0200
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Qj7UTeAL"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
+	content-type:references:reply-to;
+	bh=tRTcz3y9yc66lSByH1XN1VCcvMVff0C0SFshQG+LanA=; b=Qj7UTeAL7lrF4LaWjNr9ImTe7d
+	sl9tMBu8kGDi8FSNB0MW2gTiAuDi9uUbaRK9OEZiIovSZjphmKxVpMGVx7dmfkLIu+igKasMwpDuj
+	xNvaTQBW8r9yqazNp2hvprecyOAVdwTmMGkX/lYh+3PzZrwEK94Y1Ax6/3j8eLnkWzHM03EhxSkET
+	4K9ZJEH+rUbbJyQ4DBbBc5/CbNXT2oTEt0yoL7DwtV8Y/gTSAXVTTsre58QEjRF3TwTPKT5GgGan1
+	mJVPFQadGIE5k3lxr3Vx2VjaTOuGc8gDvbmWHVupWssghz7BsCJSWPWIgkPwz1UEWDXQ3QhI2xjjZ
+	muS/rQmQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1wfrp3-0000000AYAp-1Jmd;
+	Sat, 04 Jul 2026 12:17:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 04 Jul 2026 12:17:45 +0800
+Date: Sat, 4 Jul 2026 12:17:45 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Martijn Dekker <martijn@inlv.org>
+Cc: dash@vger.kernel.org
+Subject: [PATCH] builtin: Add CTLESC before all CCTLs in dollar single quote
+Message-ID: <akiJaZ9FJZeO9DNZ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: The read builtin erroneously consumes null bytes
-To: dash@vger.kernel.org
-References: <bf5516e9-e59f-444a-81c6-7b112b71563a@app.fastmail.com>
- <87h5myx9ji.fsf@gmail.com> <5a68f305-572f-4691-9984-2a502e468b9c@gigawatt.nl>
-From: Sven Mascheck <mascheck@in-ulm.de>
-In-Reply-To: <5a68f305-572f-4691-9984-2a502e468b9c@gigawatt.nl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c125cdad-746f-4b21-a486-8df226c275b6@inlv.org>
+X-Newsgroups: apana.lists.os.linux.dash
 
-Am 20.06.2026 um 04:51 schrieb Harald van Dijk:
- > On 6/20/26 02:52, Alexis wrote:
+Martijn Dekker <martijn@inlv.org> wrote:
+> The quoted strings '\\' and $'\\\\' are identical, but the 'case' statement in 
+> the current git version of dash does not match them as such.
+> 
+> Reproducer:
+> 
+> case '\\' in
+> ( $'\\\\' )     echo ok ;;
+> ( * )           echo WRONG ;;
+> esac
 
- >> POSIX doesn't require a `read` _builtin_,
+Thanks for the report.  This patch should fix the problem:
 
- > It is not possible to implement the read utility as an external
- > utility because the read utility is required to modify shell
- > variables,
+---8<---
+If a backslash that comes from dollar-single quote escape sequence
+is used as a pattern, it should be escaped automatically so that
+it's interpreted as a literal backslash, rather than as a quoting
+character.
 
-Offtopic, but what a nice memory:  One of Ken Thompson's aha-moments
-(original: https://www.tuhs.org/pipermail/tuhs/2019-October/019167.html)
+Reported-by: Martijn Dekker <martijn@inlv.org>
+Fixes: 776424a8f915 ("parser: Add dollar single quote")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
----- forwarded ----
-i was writing the small utilities for the first
-pdp-11 unix. (rm ls date ....)
-
-so, cd was next.
-
-% pwd
-/usr/ken
-% cd /tmp
-% pwd
-/usr/ken
-
-Aha!
-
+diff --git a/src/bltin/printf.c b/src/bltin/printf.c
+index c2c3615..5355f5d 100644
+--- a/src/bltin/printf.c
++++ b/src/bltin/printf.c
+@@ -56,6 +56,7 @@ static char  **gargv;
+ 
+ #include "bltin.h"
+ #include "parser.h"
++#include "syntax.h"
+ #include "system.h"
+ 
+ #define PF(f, func) { \
+@@ -350,7 +351,7 @@ unsigned conv_escape(char *str0, char *out0, bool mbchar)
+ 
+ 		value = '\\';
+ 
+-		if (isodigit(ch)) {
++		if (unlikely(isodigit(ch))) {
+ 			ch = 3;
+ 			value = 0;
+ 			do {
+@@ -362,8 +363,12 @@ unsigned conv_escape(char *str0, char *out0, bool mbchar)
+ 		str--;
+ 
+ check_value:
+-		if (mbchar && (signed char)value >= CTL_FIRST &&
+-		    (signed char)value <= CTL_LAST)
++		if (SQSYNTAX[(signed char)value] != CCTL)
++			break;
++		/* fall through */
++
++	case '\\':
++		if (mbchar)
+ 			USTPUTC(CTLESC, out);
+ 		break;
+ 
+@@ -395,12 +400,12 @@ hex:
+ 			value += d;
+ 		} while (--ch);
+ 
+-		if (value < 0x80)
+-			break;
+-
+ 		if (och <= 2)
+ 			goto check_value;
+ 
++		if (value < 0x80)
++			goto check_value;
++
+ 		if (value < 0x110000) {
+ 			int mboff = (mbchar - 1) * 2;
+ 			unsigned uni = value;
+@@ -442,9 +447,6 @@ hex:
+ 		ch = 4;
+ 		goto hex;
+ 
+-	case '\\':
+-		break;
+-
+ 	case 'a':				/* alert */
+ 	case 'b':				/* backspace */
+ 	case 'f':				/* form-feed */
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
