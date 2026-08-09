@@ -1,97 +1,120 @@
-Received: from freekahlil.inlv.org (freekahlil.inlv.org [46.19.33.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CC93FF1AE
-	for <dash@vger.kernel.org>; Mon, 27 Jul 2026 16:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.19.33.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785170400; cv=none; b=goH/wiuyHka6VOCHlqvJwkWKvTrJOQh104hZdrcNoN0jpKwJzL9yZU25G5+dBYor40yD+FhY3Kub6XcQystON+id6r0AXB+1ygA39RyfyMj+3ltn5MkENxAtaBuAsfw+kwh0EEMtISJCpM8ZycuPWNnheiz6idR4tLZe8eG8E3c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785170400; c=relaxed/simple;
-	bh=blR8mGQxpOk5ecZeGfqKU6GootNj27g4V1oC4sLgsHs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=lZpNqsKd8zvGVCQ0mDaR72O5NvKDimx8nJMJXhWA0V0U6Vrf58P0oi7gSQWNIdlXtB3iaxV6raHka0bvNaLh7Poi6uoqGl2/9fKJFA/NY5eqkfmPMGKHZBcA2U+xgP8q5BOooQtljuw7oAxgzHagOvqEAmiFD27yD2/lzLlrpO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inlv.org; spf=pass smtp.mailfrom=inlv.org; dkim=pass (1024-bit key) header.d=inlv.org header.i=@inlv.org header.b=LuJRIxtF; arc=none smtp.client-ip=46.19.33.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inlv.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inlv.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A648A4B0493
+	for <dash@vger.kernel.org>; Sun,  9 Aug 2026 19:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786304980; cv=pass; b=inJvswlRaDgwHV8dsMnI0tgHLMXB1V6Xz5pO/jk9EpKR+/F04O8RFD1f/P2Jvr3ntN7IFInZk9zI/QU6SWUiSIl8SD9hxp8npG67x5RJ3XkRsUfn0JNOPSRD9wxA0kcAilkdupF8Z2tYFe/Rb2+5kCvnXWTYKHSZUZhiUR98W6Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786304980; c=relaxed/simple;
+	bh=MzOKuiNb+Iqw3iniYHB31LSJ4qVlnTYICZ9dAjlkQDk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=BS4dDgcEvo5pU8+rikaoKbr+AG4xAPaRv2/gp4b5hv4/eHr8VKCxsib2JxLTqGS6EVevQK+H6dnhgxTOPdRSHZ5mjsEhVY6kxUi+w7LbcWpOrZ18dYZyzQ+pqAa1Y5w69nH/KaAl+/WPYC+m2ctwzILn5Y3z6CjNCFJzOQJWoHw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kIU9SXhd; arc=pass smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inlv.org header.i=@inlv.org header.b="LuJRIxtF"
-Received: from [192.168.1.218] (host81-133-56-137.in-addr.btopenworld.com [81.133.56.137])
-	(authenticated bits=0)
-	by freekahlil.inlv.org (8.18.1/8.18.1) with ESMTPSA id 66RGdsmR094501
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO)
-	for <dash@vger.kernel.org>; Mon, 27 Jul 2026 18:39:54 +0200 (CEST)
-	(envelope-from martijn@inlv.org)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=inlv.org; s=inlv;
-	t=1785170394; bh=blR8mGQxpOk5ecZeGfqKU6GootNj27g4V1oC4sLgsHs=;
-	h=From:From;
-	b=LuJRIxtFMHVRwyNhN06HQp5KDCQ6j9ge4kjsHwp0EdlDShcqJDuOCXmn++Xv0ViYG
-	 ZyY64pW8GiJkAkBOPibygByUSKYKE2o5WH+b/C2qakvz6Gt0bCOhUvvgPC0EsGIPIn
-	 +gCLstkQveEzurodwHxpMKmVIxf2ivpJjNaiwbz0=
-Message-ID: <a0afa62b-f2fb-423e-94bc-e84dd182cf4d@inlv.org>
-Date: Mon, 27 Jul 2026 17:39:54 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kIU9SXhd"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c981c2c37cbso801229a12.0
+        for <dash@vger.kernel.org>; Sun, 09 Aug 2026 12:49:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1786304979; cv=none;
+        d=google.com; s=arc-20260327;
+        b=gtGzntC3Ys8ct3bNt3Dx13pAWOJCLRQeZe2yNXIGHyutO1IcSt2wLO8xqzJL1SIsna
+         etMaTDpV5qejL2N5dpowh6Ri8gyKjgHL3FcDSpa27E0A5MNOJ2OLTVTSsoL3FU6ey8VL
+         rbNronIm2A3vWGoT2SMrft9QnUn7YpiLGRuQXO6bU1WJiQ75PRlFDJcw5x7GxofwZ+1s
+         vbFHz3J+dXtbQMpshlae5ydy3JDrbIQZZ2azdiZAhd7XdyjpyMGshki5zXEuHwRJ7W98
+         N95ItwqfethQFF1RIbLGDOrsKveGkxcQAMLOwBHplqApSB70QwvauMMdC5BAMk6fu2by
+         dPJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=MzOKuiNb+Iqw3iniYHB31LSJ4qVlnTYICZ9dAjlkQDk=;
+        fh=IQlwNzxyN571D6yOtzBJlpdgqqQzXYli08Mb2hM/RcM=;
+        b=jhWZVuqtZ+oaVl0zagy4ooa2oxlxP60mxu6iGeBHYcGww8dt60UBA7vdiXjJVjabqq
+         1boAII9EGmH75KepPrjxqo6QipLQkAx7WlCuR+RKh3cwXcvDU9NM3ohe1PZDClmQ9ETw
+         lc2QxZUMpNlRHV1O4KZV9PRwED6AYu2ICZqQHwab1f5QKm43RA9fvKaNJuFFBlvIGClq
+         4lZ2OxV8tZkX9iXdz0/Hl9srqftWyN61SHCAMVdFTb2YMJDgLzsSO/HxvBhWktnworOK
+         LP3428+do2uV/gGL2kXn8BPYxFryiu0MTZtS8kNCW8wySiREwVj8rBPaMsCOiSMDZDdU
+         e8vA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786304979; x=1786909779; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=MzOKuiNb+Iqw3iniYHB31LSJ4qVlnTYICZ9dAjlkQDk=;
+        b=kIU9SXhdSGUuoP1vUPSDnq/7a+clGLiAn7QQYWukub4JbpZ9jrleAgaMqPlKiNX/Ej
+         qdfbG///REzrCNZ2uWMIm9nbXrcAsnKFe7b1ArU01s2P361Skmvm3ghuhlqnIXsjOH3P
+         +d+A3vWIxcEqXa4VzPwhqaYtItAe7tKXCNLaz8boStK08wjTPO9q0GxPa4oXNBrGYATk
+         KdSd7YcZVWec5E4RQfqbTk3+WvT4skZuquBcyVg6rUlGUOkNNabC9I4ec+4EsWTVDqnz
+         0auJH2SiPl9kAQeVy6Sb6psNrd0Mn426CdI6XHFoHt7qFzhQz/BnOMRLvp92c+kQD4OT
+         8aEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786304979; x=1786909779;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=MzOKuiNb+Iqw3iniYHB31LSJ4qVlnTYICZ9dAjlkQDk=;
+        b=OmkJK76nHL5dYcro8L6f/IzieZtKEfAL3SgF2X6r4RcsvjEghIZgFZOZZJtq6DNCmd
+         169GMVBH1itTpfxPJnqlbuneQ+xgC9qwm5ap3tPyhsoPtO/l0nLrTrAWxJCPL3rBJAzZ
+         vlEdqh+DDCSNaJ4/E+VslXeL2r24YQ86vlrcdlDyxbzCizgKAR01cMiKhaePg2qANDBe
+         YYapJ/yLARzoGKmNE/+BXiea8WvScHW8LNHGvEQsqma+74qqP4fHlGnCAbG1hx1JJGPO
+         gVNeOOixL6s4tSbD6i+BLDjJIukmUlEejZrv/Csd67iDQECQzyJUxqMVTtJbkMUeEIYT
+         oPjQ==
+X-Gm-Message-State: AOJu0Yy8CCkI8gNi2uxXNOkM6baXjSh7HDy+fHelSd30vEMZPVI3dz5C
+	kBMNQ4JM6DwQqwKqpfMODMpU/tuuZbastxt1ObsxdvScHc5oTy/gGxB9bZbNzz28NqCVzChRGyc
+	JzRI8iJhxfPOO56VlO+kr/95Yo1NmHwREKh6N
+X-Gm-Gg: AR+sD13yTrp1o1kfzjAn8TvUY66qg/YbTgI4Rz/zviDE6JJi1U/LcGKEY0OfZnusNyk
+	3c0RhA56fB2uN+lZOHN5cYrKFpW9aTCtKwq9uYG6Bz8LWTBDMdhCrYiRlHkiDNme7Q0lfZHjOBa
+	TRJVEtdMR9gybBCjI/1oUUZspqAc1Ou34ie8nzPO1opA1gFQSUGlVcO3mVSDKHuQUPO1G8j3LSD
+	sLpyuqrRnlNyjkaCdBeXGN5B09Z0SFFxZIsQpQUZeVSqs2PFjI/D6lyZ1UbnVDBBJ7siByVhJFo
+	fdP2oWbWKl1WcTdjVQAEHgjXkAt8i9JD+Y6R1kbriRuc
+X-Received: by 2002:a05:6a21:3392:b0:3c3:9595:57ef with SMTP id
+ adf61e73a8af0-3cb85ffd1cemr42870002637.31.1786304978883; Sun, 09 Aug 2026
+ 12:49:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Subscribe: <mailto:dash+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: ASan crash on failed eval with redirection in subshell
-From: Martijn Dekker <martijn@inlv.org>
-To: DASH shell mailing list <dash@vger.kernel.org>
-References: <80abf283-bcaa-4cfe-b70f-a8f762b7da1d@inlv.org>
-Content-Language: en-GB
-In-Reply-To: <80abf283-bcaa-4cfe-b70f-a8f762b7da1d@inlv.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Nathan Royce <nroycea+kernel@gmail.com>
+Date: Sun, 9 Aug 2026 14:49:01 -0500
+X-Gm-Features: AUfX_mwevTLZL_EgtrL7P-PUOnZ4q5wgPaJhWiaoEmim84N5wn9uql3WIe8IXpg
+Message-ID: <CALaQ_hrYRcp1_+1KPx9UXMtMb8UgRRJCRj9Y6JBCc73ogO7jmw@mail.gmail.com>
+Subject: `command -p` Not Searching Path
+To: mail@anselmschueler.com
+Cc: DASH Mailing List <dash@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Op 27-07-2026 om 17:28 schreef Martijn Dekker:
-> I've compiled dash (current master branch, commit 037bbdfd) on an M1 (arm64) 
-> machine with macOS 15.7.4 with Apple's clang 17.0.0 and CFLAGS='-O0 -g - 
-> fsanitize=address'.
-> 
-> Looks like there are multiple crashes when running the shellspec[*1] and 
-> modernish[*2] regression tests. I will try to derive some concrete reproducers.
+This might relate to, or be in a similar vain as "Why does the command
+builtin not circumvent invocation of builtins?"
+(https://lore.kernel.org/dash/9098f57c-66f1-40fc-a714-b73d208c81d6@anselmschueler.com/)
 
+I had thoughts about how aliases, functions, built-ins, executables
+behave in a shell, and came across
+https://stackoverflow.com/a/64028240 which I thought was great.
 
-Here's another reproducer, derived from the modernish feature test for 
-arithmetic for loops. The subshell, the eval and the redirection are all 
-necessary to trigger the crash. It can be any redirection.
+I tested the concept in dash, and did not get the expected results
+(specifically relating to `command -p`)...
+Setup:
+1) $ echo () { printf "%s\n" "hey function"; } //first, otherwise 1)
+and 2) swapped will fail at 2)
+2) $ alias echo='printf "%s\n" "hey alias"'
+3) $ mv /usr/bin/echo /usr/bin/echo.bak
+4) $ cp /usr/bin/ls /usr/bin/echo
 
-	(eval 'for ((;0;)) do :; done' 2>&2)
+Tests:
+1) $ echo //from alias
+2) $ \echo //from function
+3) $ "echo" //from function. Just thought to test that just now
+4) $ command echo //Presumably from built-in
+***5) $ command -p echo //SHOULD have been from PATH, which we made to
+be a copy of `ls`
+6) $ which echo ///usr/bin/echo
+7) $ ls -l /usr/bin/echo /usr/bin/ls //both size 166640
 
-$ src/dash asan_crash.sh
-asan_crash.sh: 1: eval: Syntax error: Bad for loop variable
-AddressSanitizer: CHECK failed: asan_poisoning.cpp:40 "((AddrIsInMem(addr + 
-size - (1ULL << 3)))) != (0)" (0x0, 0x0) (tid=16319841)
-     #0 0x0001016031cc in __asan::CheckUnwind()+0x24 
-(libclang_rt.asan_osx_dynamic.dylib:arm64e+0x471cc)
-     #1 0x00010161d048 in __sanitizer::CheckFailed(char const*, int, char 
-const*, unsigned long long, unsigned long long)+0x94 
-(libclang_rt.asan_osx_dynamic.dylib:arm64e+0x61048)
-     #2 0x000101641f34 in __asan::PoisonShadow(unsigned long, unsigned long, 
-unsigned char) (.cold.4)+0x20 (libclang_rt.asan_osx_dynamic.dylib:arm64e+0x85f34)
-     #3 0x0001015fafb0 in __asan::PoisonShadow(unsigned long, unsigned long, 
-unsigned char)+0x1c8 (libclang_rt.asan_osx_dynamic.dylib:arm64e+0x3efb0)
-     #4 0x0001015fc8c0 in __asan::PlatformUnpoisonStacks()+0x54 
-(libclang_rt.asan_osx_dynamic.dylib:arm64e+0x408c0)
-     #5 0x000101602e68 in __asan_handle_no_return+0x2c 
-(libclang_rt.asan_osx_dynamic.dylib:arm64e+0x46e68)
-     #6 0x000100d509e4 in evalcommand eval.c:926
-     #7 0x000100d4ed44 in evaltree eval.c:305
-     #8 0x000100d52de8 in evaltreenr eval.c:352
-     #9 0x000100d51a34 in evalsubshell eval.c:512
-     #10 0x000100d4ed44 in evaltree eval.c:305
-     #11 0x000100d76894 in cmdloop main.c:244
-     #12 0x000100d7638c in main main.c:178
-     #13 0x00019e60ab94  (<unknown module>)
-
-Abort trap: 6
-
--- 
-||	modernish -- harness the shell
-||	https://github.com/modernish/modernish
-||
-||	KornShell lives!
-||	https://github.com/ksh93/ksh
+I don't know why 5) behaves that way for echo.
+I already have `ls` as a function (for coloring), and went ahead and
+added it as an alias as "echo alias", and `command -p ls` properly
+used the executable in PATH (non-colored output). That was done in a
+clean environment ($ exec dash) after the prior tests.
