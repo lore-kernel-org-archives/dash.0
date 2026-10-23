@@ -1,52 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=82.165.170.251
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792656497;
-	b=fa7ZckguqVA7Bovbwbmzp8V1glGOpbuCGzBYs4iKt+KPljIwoHJK8VSeoEV5CFmNyet9
-	 qWtg6QHyBvr3y/SfK7BuNdoISEExsRyf+sfwhA8yRFnwbwDGtnrwe5c6SXN/JJ3P2W4O2
-	 okvyScVF9PV3Nyflh8uTzil/NqhfaaIMIHjjrJAuZOU3hsQrJyrhcsycUyVv22c0OdIzK
-	 s/3WeOkqP069X0l7T3PIhDH0Nge3T7esWmRE2T5bYvKKTyRrUA1yjefKea6bTRXOHAEkl
-	 vIjU6SOOMM6eEbq5pj7jMEMKIp0lmTcSgt9FxmU8Gtf887kJzAAQOg15E73PLien29Q==
+	t=1792735308;
+	b=DTh5xHh5IvVLwut9XVxf+qHb8UNOYYlD6ai+U6t+dIUDAbqDKnStIbM9SLSpF0OMXL6K
+	 D5l98inqQQE9ecIpIY/TR/GOHXdx+dyCb41a7VuR6AdAmhQ8bR9Pw1XnuJOYUrtq3areD
+	 ZNRsPIxynS9Sh9inev7EVHk2T8XXvASMq5occBsAu1CPVYc6J2VYZPJWAFDdCN1vefqj+
+	 63kFh4Z8BjfpC12OTr2AXQzAcxwR5qRGju7Sk19SUzPDkkvrYLf6qB8I9QPEwCDQ7gZZG
+	 41VBF0Gdt+rZNp39G35kLE4gn5R6GFDEvYCZLkS1T6riFb2fKb7jRs23FuTk9J5hHwQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792656497;
-	h=DMARC-Filter:DKIM-Filter:DKIM-Signature:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:References:Content-Language:From:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Spam-Status:
-	 X-Spam-Checker-Version;
-	bh=8D2N80HTNGDchfgzg+9udJNtwkVYsBZAzFP6hy1d4VU=;
-	b=R2LRyk/UVeU8evLoDDcuj+b8UmYM1tYdcwI2aNI7Sl8Bx3DRuxvqNf7dhtlWMuJU+/hD
-	 ZDzS8KiYrPGP2KPFHj7u6M70A7W9gdo29ZuYivARp0YtnN5xlMtK9SFbPQWPawA6Si2yO
-	 Ttcz4rZE1yZ+BiUr+I7lejQUNGzYoNY5sszytafPOuPdEK1Fb02+Vp8xkG1uWxsm6tRJA
-	 fBGXPnqXJWGf/sjp3QoJOa0ekalo2l7ETLFbc5oOGHojQssXLR3/1ZADrd4TztOR1nvF7
-	 CLZQI048QQwk0sIgUNXeCc40HjcUq5n0EvVeXoc0biggfaQZTIhGPUT3wuyl8kwx69w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792735308;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-Newsgroups;
+	bh=mIzMe+9++/Ce2X/XZ0oBAcNeNEuF4QCcc3B44RUNFhk=;
+	b=G9V8jOjLRvnrHkcJrSwxu58qWYq5VqwoSDkkcpEXeW54kg0/EecoY4noUqupkfU0XfCP
+	 6d9pom+bS4t1/Gb7WzYq7Vv/w9rSj8hfrfkryZZped8XfDeZM6zrkOaWyVzA8S//5VQSv
+	 XxL23Q+APxx7TM4Vr/pT+aJw6jXX4vAnGmelWkWLT0WVeO4J2icoAwwmUaX7ChxbCaCCg
+	 apALwdxSw/RPHebh989stB/enmWOOUw4BMqCNLLhBDoDJ3J5mrD7vDEvNFzUKsgmtRaRf
+	 6sm+fIbZWkuKEZx0dz6k+ORvRut802ZH556DFon8ikdg2M942It5UTL22q8r5iyInfQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gigawatt.nl;
-	spf=pass smtp.mailfrom=gigawatt.nl;
-	dkim=pass header.d=gigawatt.nl header.i=@gigawatt.nl header.a=rsa-sha256 header.s=default header.b=eBR7dmoZ;
-	arc=none smtp.remote-ip=82.165.170.251
-Received: from mail.gigawatt.nl (mail.gigawatt.nl [82.165.170.251])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=XO8DNE1T;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84140606A319
-	for <dash@vger.kernel.org>; Thu, 22 Oct 2026 08:08:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 84140606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gigawatt.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gigawatt.nl
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090C2606A31A
+	for <dash@vger.kernel.org>; Fri, 23 Oct 2026 06:01:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 090C2606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=gigawatt.nl header.i=@gigawatt.nl header.a=rsa-sha256 header.s=default header.b=eBR7dmoZ
-Authentication-Results: mail.gigawatt.nl; dmarc=fail (p=none dis=none) header.from=gigawatt.nl
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.gigawatt.nl 74471A24DF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gigawatt.nl;
-	s=default; t=1792656488;
-	bh=8D2N80HTNGDchfgzg+9udJNtwkVYsBZAzFP6hy1d4VU=; l=957;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=eBR7dmoZYMzPgLio6o/f+5eWB6x4xIaSy4j5YrTwjFGm1Fyd7m2iJ/BVQYh3+e+LM
-	 PwKrXig3ziAwyowETLxh/6bExVRTrnsno2ZKG1aNqRBfzk5icgDNR5zNwfaQtjnOAC
-	 ydgYq9SN8DQzFvpvz3gy9VeLvQybqGnItVOypFNo=
-Received: by mail.gigawatt.nl (Postfix) id 74471A24DF;
-	Thu, 22 Oct 2026 08:08:08 +0000 (UTC)
-Message-ID: <5cd15b5d-f99d-429c-a2d2-96e1a991f379@gigawatt.nl>
-Date: Thu, 22 Oct 2026 09:07:13 +0100
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=XO8DNE1T
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
+	content-type:references:reply-to;
+	bh=mIzMe+9++/Ce2X/XZ0oBAcNeNEuF4QCcc3B44RUNFhk=; b=XO8DNE1TxlEIwuFtgDVsh7j5uD
+	cZUoR6OZf2ffiEyH2ZFUAn9/ZFmY6CmhFcb+DErhSjQk8t3oznCSAm++mGQKKPRZiUQ42WVXEy2bR
+	UrRKuUZCul7ZYQpQK/0CjUOO47jTHp6R2a5i2LPrC6V9IrzJM/5cdkcaqgcy0hb5MlmvwOWS4D6mq
+	k5w3W1eG4XGcQZ6R281ixu1KO86or82A7OAKRQ3C82jYXPBYbPZxDXPUlVqLayIg+3a1Yk3ZiGmOL
+	Tc6IxcqJS5HHoGYJq0F9zz9K/SDtXOfAY/8HTPmlCsM29sVX1FiAbLlSQ0pN89knqASzlkCs2LSYx
+	bhIxQIng==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xK8LW-00000006lwV-11vM;
+	Fri, 23 Oct 2026 14:01:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Oct 2026 14:01:42 +0800
+Date: Fri, 23 Oct 2026 14:01:42 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Denys Vlasenko <vda.linux@googlemail.com>
+Cc: dash@vger.kernel.org
+Subject: Re: struct var::flags never has VSTACK bit?`
+Message-ID: <atr4RqkdrX3TGjjY@gondor.apana.org.au>
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Post: <mailto:dash@vger.kernel.org>
@@ -56,37 +63,29 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:dash+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: struct var::flags never has VSTACK bit?`
-To: dash@vger.kernel.org, Denys Vlasenko <vda.linux@googlemail.com>
-References: <CAK1hOcMy+=6SAKRA02z_DWtLG8OkyDLO3udzrnKdpfuq+C=d-g@mail.gmail.com>
-Content-Language: en-US
-From: Harald van Dijk <harald@gigawatt.nl>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <CAK1hOcMy+=6SAKRA02z_DWtLG8OkyDLO3udzrnKdpfuq+C=d-g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Newsgroups: apana.lists.os.linux.dash
 
-On 22/10/2026 06:06, Denys Vlasenko wrote:
+Denys Vlasenko <vda.linux@googlemail.com> wrote:
 > Good day,
 > 
 > I can't find where VSTACK bit is ever set.
 > Is it unused?
 
-Hi,
+Yes, it's been unused since:
 
-Yes, as far as I can tell this is unused. In original ash, this was used 
-for the setvareq() in evalcommand(): this was called after forking, in 
-the child process which would never return(*), and avoided setvareq() 
-calling savestr() to duplicate the strings. As setvareq() is now called 
-earlier, before we know whether the variables need to possibly persist 
-after evalcommand() returns, it's not possible to use VSTACK the same way.
+commit 811a36120aef848cd308d56e06bf62e721be853c
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Sat May 19 02:39:55 2018 +0800
 
-It might be interesting to check whether it is possible to reintroduce 
-the use of VSTACK for this in a different way and whether it would 
-result in any measurable performance improvements in any real script, 
-but I suspect it will not be worth it and VSTACK could just be removed.
+    eval: Replace with listsetvar with mklocal/setvareq
 
-Cheers,
-Harald van Dijk
+Feel free to remove it.
 
-(*) ignoring the whole EXSHELLPROC logic, which had special treatment
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
