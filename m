@@ -1,59 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=18.9.28.11
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794386029;
-	b=xwDFbyWRNsfs+7D8qWjOVMEnhTkMsp8DZnhtAxD9/PJ7mD63NR56DpM8kh41g28fekP2
-	 MzH72VnbrR2QsiKRR7q16fRtJNL4eXKp4kX5bC7zmqKmHoaKiNluc+NSkZTCwcBoZYRXv
-	 RIl37iEDosZxM2dKvW0ZO5KdueWF5IEOYe+yYSNjaM+Z1F3clVc/hOM+VHiaJMwX5AQfH
-	 2gWHd3XTCcTGI9tAwZitF+/ua0HYgYlS17u5RDlHdRcDoZhaLCe/eKciiJSifeHd+8L62
-	 r0GCHZWQbI7uljCMuOk16rm8Fquf+18g0CHJ6DMoAsmooswSzG0pMG2GP+AV9GOFkng==
+	t=1794386192;
+	b=s6RaaUvDoVThby7KOlrlf8JEeWDDw2xDa7vgWF31vcHtI4yu87bPuKDXooOQhgDZLTgm
+	 fjE2X95h6kiNuji7vJQ+ag64cNPYBvMxzUVft7YEelyg3ODkuB3WFQ67nYK8gBt2j488z
+	 EbQO9/qgOxNrQktNbkylmXsIhHYSBnNr3SxqIeW5iSoZZlBtzqXzgPaa1tIjPuEma3yq5
+	 e4yRdwvOMgrtsxU4e0aezAyVNSSffuIDs4S6W5cYZYQo/drqt2xWES5y4s5CPdX/wuw1z
+	 C0u0m3VrFxduU57XWF/vGEZGxFncx433S42SeKMi+pwPmtcgs9pKpnyup5tWjUFBVyg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794386029;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=hv/X2qR3EjY7GWbzHJ70Gr59EnAKclHuzD53ozAmAwo=;
-	b=wXD5g5eutk1s2nkfeqpzgmDm1QEAcBUsjHNPB3a4W58BRFo3a+eeoWSHzMbquffcmOQu
-	 /47yU0nTEHsCYNYhg+3Q9Lm0psCUVReZPS2F4O1jujiJOBRa/7KJ4u9cKBJEiliBnfLE4
-	 Kk71wexoMH49lBfTuLYgcV/F2Q2GzRtiJ9gqoboNLETLAI3TE/m+RO1ZDodzwUNP6T2xV
-	 9Uaj5exy/IU253n5+Dm7Osb7ALg6OKmiX3LDr/j4VMczKZhoA3CyLJMDolm51FxIMSKl1
-	 l+Ar+g7OmqXGaxKXk4CjhhxBQNwP2PtMSxB62dMCrkF77l60C+OHOEazw5eEomIGFmg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794386192;
+	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=UBNn+LYXzouI7nfjml3zrM+59Ynj+wIAIyABAQ+dTaA=;
+	b=liRyTshLMy2hgakDK6nDxfpJ3fgKeSiYYGnNAZ+xg6oyg4+8CfBojFWQ6E21rINkBx44
+	 cugriGK0/wJUOF4u88nja5S4/gX3EFuNG2rOnpsmDxDA+JXBMsAEPfX1E5iuvvf39MmkW
+	 UpYlQKxT3ckSijRbgindB/08ZTSjgvjxujsSn+hKqzEJ3+3Hcee4dvACyWhY5JwGKm6Om
+	 dhuqC5VbKJ3z9TOr2Q0ks0EjljWjSFQOJ/e3h0nOiRgqYQTjDIlSKyw2qIs/rNseobSSz
+	 1//95rxikFOXQVAgdTCszaFTkqC7pTcvutER1HdYYlCz1BBeqBex6XldQjo131uY7Ow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gondor.apana.org.au;
-	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=iPCsFRfz;
-	arc=none smtp.remote-ip=180.181.231.80
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=mit.edu;
+	spf=pass smtp.mailfrom=mit.edu;
+	dkim=pass header.d=mit.edu header.i=@mit.edu header.a=rsa-sha256 header.s=outgoing header.b=Fo5lSTk9;
+	arc=none smtp.remote-ip=18.9.28.11
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47988606A31C
-	for <dash@vger.kernel.org>; Wed, 11 Nov 2026 08:33:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 47988606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A545F606A31C
+	for <dash@vger.kernel.org>; Wed, 11 Nov 2026 08:36:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A545F606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=iPCsFRfz
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=hv/X2qR3EjY7GWbzHJ70Gr59EnAKclHuzD53ozAmAwo=; 
-	b=iPCsFRfz0w31Hcq4dFMh5cF1NiSFAbjSLO4CSa9+8YFpObZp8hXgfZJl7M5ygZKYz05sHorknnx
-	i0r3EXwaBW1sallkUcHArloj7F0VASKf4bfUeoIS64Ydw4Nz0FrFTVRv/uipheehHeZzeYtq1bu1z
-	Ey9uHaAP5qBu+WuX251z1DdMQ27+e1vidkLaV8lh7CSkWF+Le8yAkT8iWO5MTfUmbpP8p8oQ9uoKn
-	Qr6VkkTDqpEAk0YBwJrkDO++RiNa7yAbBzjPSvuyWdts6/rxArlPOEVjQLVNhKqOpy5epJ3D0vEPZ
-	ZTatToQma4BjhUl942T3xEURvMeEJVaeN6sA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xR3m4-0000000DinH-0nvW;
-	Wed, 11 Nov 2026 16:33:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Nov 2026 16:33:44 +0800
-Date: Wed, 11 Nov 2026 16:33:44 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ayesha Shafique <ayeshashafique123@gmail.com>
-Cc: dash@vger.kernel.org
-Subject: Re: [PATCH] expand: Fix out-of-bounds syntax table access
-Message-ID: <avQoaJdeFdDypoOU@gondor.apana.org.au>
-References: <20260817202007.93924-1-ayeshashafique123@gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=mit.edu header.i=@mit.edu header.a=rsa-sha256 header.s=outgoing header.b=Fo5lSTk9
+Received: from [192.168.9.110] (198-27-206-187.fiber.dynamic.sonic.net [198.27.206.187])
+	(authenticated bits=0)
+        (User authenticated as andersk@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 6AB8aPFs004328
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 11 Nov 2026 03:36:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1794386187; bh=UBNn+LYXzouI7nfjml3zrM+59Ynj+wIAIyABAQ+dTaA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:Content-Type;
+	b=Fo5lSTk9KLK/4/CQgd+1yyYIEYSWWTRh+Bf2cRtj2k+dGYfkyPKnCF4pFEhikVanu
+	 RojXy9lL6JXiXc4GSvTEvs/3IRkgS/gQ3r9DOO64DoVgfqLk6QJU1U05i6EfAtRvVV
+	 YwA/HG08OaitukSWAeb7WKkRYH8RTQNpU/ezHlEJIznE6e6yn9JQJ9/zaxUA+7KSK0
+	 qM2Nu2AEB8jAMNel5qDaeteZZ4QzrdFh1H3AAc+kWQlEMCH6mnLNzFm96rKoGCvXjQ
+	 97PRssxMBOBr1GrzrJnnn1WDSMHGLi6amqzUnaoY3A2fVP1BmZiRkSNga3vlm1V2u5
+	 6RbWM5l+V///g==
+Message-ID: <6e24ef04-bdbe-4d7c-9ed4-993735c2439e@mit.edu>
+Date: Wed, 11 Nov 2026 00:36:25 -0800
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Post: <mailto:dash@vger.kernel.org>
@@ -63,81 +58,70 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:dash+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260817202007.93924-1-ayeshashafique123@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] var: Call setlocale when LC variables are set
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Vladimir Kudrya <vladimir.csp@gmail.com>
+Cc: dash@vger.kernel.org
+References: <ai1MN3hk3ihI7FBf@gondor.apana.org.au>
+Content-Language: en-US
+From: "Anders Kaseorg" <andersk@mit.edu>
+In-Reply-To: <ai1MN3hk3ihI7FBf@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 17, 2026 at 03:20:07PM -0500, Ayesha Shafique wrote:
-> mbtodest passes a signed byte to chtodest. Bytes with the high bit set
-> can therefore be negative. The syntax tables are based at SYNBASE so
-> that signed character values can be used as indices. However, the
-> is_type path did not apply this offset, causing chtodest and mbtodest
-> to read before the array:
-> 
->   $ printf 'v=\377\nw=$v\n' | src/dash
->   AddressSanitizer: global-buffer-overflow in chtodest
-> 
-> Apply SYNBASE to is_type, as is already done by the is_special macro.
-> 
-> Fixes: c0c860df08c9 ("expand: Count multi-byte characters for VSLENGTH")
-> Signed-off-by: Ayesha Shafique <ayeshashafique123@gmail.com>
-> ---
-> 
-> Hi,
-> 
-> I found this while working on a research project, testing against
-> commit 037bbdf ("Release 0.5.13.5"). Here is the relevant GDB and
-> AddressSanitizer trace:
-> 
->   $ printf 'v=\xff\nw=$v\n' > /tmp/s.sh
->   $ gdb -q --args ./dash /tmp/s.sh
->   Reading symbols from ./dash...
->   (gdb) b expand.c:895
->   Breakpoint 1 at 0x8c028: file expand.c, line 895.
->   (gdb) run
->   Starting program: /home/aysha/dash/src/dash /tmp/s.sh
-> 
->   Breakpoint 1, chtodest (c=-1,
->       syntax=0x55555562d680 <is_type> "",
->       out=0x5555556bea42 <stackbase+98> "\377") at expand.c:895
->   895     {
->   (gdb) info args
->   c = -1
->   syntax = 0x55555562d680 <is_type> ""
->   out = 0x5555556bea42 <stackbase+98> "\377"
->   (gdb) n
->   896             if (syntax[c] == CCTL)
->   (gdb) p c
->   $1 = -1
->   (gdb) n
->   =================================================================
->   ERROR: AddressSanitizer: global-buffer-overflow on address
->   0x55555562d67f
->   READ of size 1 at 0x55555562d67f thread T0
->       #0 in chtodest /home/aysha/dash/src/expand.c:896
->       #1 in mbtodest /home/aysha/dash/src/expand.c:918
->       #2 in memtodest /home/aysha/dash/src/expand.c:996
->       #3 in strtodest /home/aysha/dash/src/expand.c:1017
->       #4 in varvalue /home/aysha/dash/src/expand.c:1140
->       #5 in evalvar /home/aysha/dash/src/expand.c:811
->       #6 in argstr /home/aysha/dash/src/expand.c:391
->       #7 in expandarg /home/aysha/dash/src/expand.c:232
->   0x55555562d67f is located 1 bytes before global variable 'is_type'
->   defined in 'syntax.c:285:12' (0x55555562d680) of size 257
->   SUMMARY: AddressSanitizer: global-buffer-overflow
->   /home/aysha/dash/src/expand.c:896 in chtodest
-> 
-> This is my first patch to dash, so apologies for any mistakes I might
-> have made. I'm happy to fix anything you point out.
-> 
-> Thanks!
-> Ayesha
-> 
->  src/expand.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 6/13/26 05:25, Herbert Xu wrote:
+> @@ -101,6 +108,11 @@ struct var varinit[] = {
+>   	{ 0,	VSTRFIXED|VTEXTFIXED|VUNSET,	"TERM\0",	0 },
+>   	{ 0,	VSTRFIXED|VTEXTFIXED|VUNSET,	"HISTSIZE\0",	sethistsize },
+>   #endif
+> +	{ 0,	VSTRFIXED|VTEXTFIXED|VFULL|VUNSET, "LC_ALL\0",	changelocale },
+> +	{ 0,	VSTRFIXED|VTEXTFIXED|VFULL|VUNSET, "LC_COLLATE\0", changelocale },
+> +	{ 0,	VSTRFIXED|VTEXTFIXED|VFULL|VUNSET, "LC_CTYPE\0", changelocale },
+> +	{ 0,	VSTRFIXED|VTEXTFIXED|VFULL|VUNSET, "LC_NUMERIC\0", changelocale },
+> +	{ 0,	VSTRFIXED|VTEXTFIXED|VFULL|VUNSET, "LANG\0",	changelocale },
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+When one of these variables is unset, setvareq() drops VFULL from the 
+flags here:
+
+		else if ((vp->flags & VSTRFIXED))
+			bits = VSTRFIXED;
+
+So the setlocale() call is unexpectedly skipped.
+
+> @@ -299,8 +324,8 @@ out_free:
+>   	vp->text = s;
+>   	vp->flags = flags;
+>   
+> -	if (vp->func && (flags & VNOFUNC) == 0)
+> -		(*vp->func)(varnull(s));
+> +	if (!(flags & VNOFUNC))
+> +		varfunc(vp);
+
+Since vp->text was already freed above, this leads to a use-after-free.
+
+> @@ -536,8 +561,8 @@ poplocalvars(void)
+>   				ckfree(vp->text);
+>   			vp->flags = lvp->flags;
+>   			vp->text = lvp->text;
+> -			if (vp->func && !(vp->flags & VNOFUNC))
+> -				(*vp->func)(varnull(vp->text));
+> +			if (!(vp->flags & VNOFUNC))
+> +				varfunc(vp);
+
+Here as well: since vp->text was already freed above, this leads to a 
+use-after-free.
+
+Reproduction:
+
+   $ export LANG=C.UTF-8
+   $ dash -c 'x=ëë; LC_ALL=C; echo ${#x}; unset LC_ALL; echo ${#x}; 
+LC_ALL=C; echo ${#x}'
+   4
+   2
+   2
+
+(Expected 4 2 4.)
+
+Anders
+
