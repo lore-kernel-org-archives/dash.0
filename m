@@ -1,54 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794362363;
-	b=tm8WFy8AtweS4REjXLHZDMNx8hCAFAQhcZzjS1joVVO/1H1RQnb68FaWVPE0ugjlQEYa
-	 LbJo7oUVO3z9sl9Jr1PxidNWP1pwCkxWkkoDmBVTq9s3j+8ARo2R6DStTHoGH0zAgDQef
-	 okdSve8Tyvo5CEEyuQkUj7+fvwG/lVnOktkVSM/1Kdc2ScORa+SZZahNAaQMwJt3tsuwt
-	 +v6I6zBKMW8q2ZwWFKXgwC2FsT5t4umhNbI0V5aGFNpVcanQMCsF2/xlvECvbbNTa7iGa
-	 3noJpNkmE3qoDUvEKhtfpjqo4KAFc2JecvCuBtiWD5QBJJwn7B5ssJQJJnJLF2h0I4Q==
+	t=1794385442;
+	b=JXI8FBgDICFLrmWl6oWGQJyQ80TVS3z7xCep/iSsETlaToyTT8OvhXCyehoeT/93hNL1
+	 pTzM21AIu65hohpBE9XUMCHSBeqGz2DA3rSIxM2/mGx5qZvSrylcZco/y0Au1MdtlPzc+
+	 eFHywn2IGEm2bnt6vVxm8mxSNM9hONVKtzD1J9OD5fnrMM7CH+TsGr0E4hCGtWGG5/I4u
+	 kdWJzPuj6VQId6tjrL6kYWcw45IJL/Ou020Qo076fcR2Szl6UNRdPgts4ql2flZeWo+QR
+	 p5sHC1+CkTf/+LuCE7YXxuzHFapHJbSRpddP8eaUm7UDtKy2Ple/f+zhifzVVxX3BYg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794362363;
-	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=9DaBZ6joCorCCROF3rxzhVVozrlB1IFRrQWl3eSBeFE=;
-	b=X6P0Dr8FmywxhQbE79fWwRvxmidLFOKB0vZdSDR1P/o8fXOblj5/OdV5JpHI5rsZ+NtH
-	 Tnx6m7tq+QYgYezz+qHevTz0ZnRv7Hx3e/iMlDoJY6f1dzbnpWknB10sHxkYXb5XjgBM3
-	 ekIn47l1137YfMK7SgMomfJgDNeg4sn7HQZGpwxkkHhzyFl7zWwE+HozH3H3aRW7BkopD
-	 XeEnMMtfyA7e7sfX7WU7I8i9h/jg4hI7muNRB/8FMKLxsQB9coEd0VDI7AcRKoruv56R/
-	 USazoO4pIGHTLLoUeISL9Tk93CATb6Nu2ThQEHIAxfQ+bxJRe3LFtVlcVJ0nGBo/UJw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794385442;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=ID2HD4aOMZseiZv6oW9qk6w9QBwu7Y4+BmhO4vGNQJ0=;
+	b=iax9+1TJ4o5R9trZXsk4p2c3PuXXmL7tb8gcnQJv6SKpt2PxBZJRLsSbErhiM/5VCC/e
+	 4L/E1cJDCh2bsF4cp5YgwjAXAy9EvArLP2KXDFkE0YSSqos2m0tAvlh4IxGrzeIRu2Jym
+	 I36wUz0dRXQNa7caLOJ5gMYtHNVyTAjqk7YsWkMAmWjAP6mFztmpyG9vsRKPJkDTLs6a8
+	 jyL125ug+W57dSGdakvzAb2/cqb51GrR2d5CkOvd2l96x1671EtwLDQG8MscLyDfpfc5c
+	 zOp4eyYFI0jL941PDNqlnqUrrt8jI9WxHP4VwGbBjFMurtA+Y63KBxWW62YQ+b5FHyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=mit.edu;
-	spf=pass smtp.mailfrom=mit.edu;
-	dkim=pass header.d=mit.edu header.i=@mit.edu header.a=rsa-sha256 header.s=outgoing header.b=XOFueDM8;
-	arc=none smtp.remote-ip=18.9.28.11
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=Je5egoOr;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0256A606A320
-	for <dash@vger.kernel.org>; Wed, 11 Nov 2026 01:59:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0256A606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DBAC606A31C
+	for <dash@vger.kernel.org>; Wed, 11 Nov 2026 08:24:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8DBAC606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=mit.edu header.i=@mit.edu header.a=rsa-sha256 header.s=outgoing header.b=XOFueDM8
-Received: from [192.168.9.110] (198-27-206-187.fiber.dynamic.sonic.net [198.27.206.187])
-	(authenticated bits=0)
-        (User authenticated as andersk@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 6AB1x3VY023375
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 10 Nov 2026 20:59:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1794362352; bh=9DaBZ6joCorCCROF3rxzhVVozrlB1IFRrQWl3eSBeFE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:Content-Type;
-	b=XOFueDM8K2RBYqZtKKi0UfwjhPbjO2etBPyBSHFkjn4Aytv8vHC+8XSBjaVbV72Qf
-	 SdA7h97T7VUsQjyId1xVg+MRw2S2A9SLRx5Gp3Hv6CWGKi4w2sE9tmPF+f5xQ6zY+C
-	 WdOlHWyBB96PJ1RI7LS+LkdpS4GvOD+Qp1eEmSX5dlZ/XBYA5Ol17j/0yZ+Z+LZQco
-	 CaG1em8w8VCQiBKt51D9uebO7YwOGQaY5DhM55ymwL+xHJZllftpZcJuTjG6Gf2tzE
-	 3an8o9wIPlsBfp2WQdonVM/qau7LpUk+ik9eWxavHbLbnZh6hZsbaodoY0n5dbGszk
-	 l7zBjll2RzDAA==
-Message-ID: <257e0d54-d007-458f-8acd-faf2519a9e63@mit.edu>
-Date: Tue, 10 Nov 2026 17:59:03 -0800
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=Je5egoOr
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=ID2HD4aOMZseiZv6oW9qk6w9QBwu7Y4+BmhO4vGNQJ0=; 
+	b=Je5egoOr/NEwR9Zx7oUuyCf4IDKhjBWQVlgR44KKFX/3kNCjR/Gart26LWS8IxU3LcDdzVzwNkZ
+	LS2fMdIwyikMpW4GLN3ZxAyWhRmeTxjXg/uGlcBNbESKA1+0halQ9jFXy1fFfF+yG7TSdrpbMl7x6
+	uWfiXt+C2JH5m3dmNqXSZUPxiD+jYM8zCCKMVUOpsFnC4zB6A2OzTYT/zIB3fzZFH4/unvtPVr5UA
+	KDkpWm6dhX12fQoOXq4ekOJ3xWOefgifRu8fQulb0yybMeYElWt4acPyc8RTLHpvHEIfCpWanWhA6
+	aF5lYxL7Q8lRfrJ9aSwV1tUlqoBH6FCyyvcw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xR3cU-0000000DiZo-3yqW;
+	Wed, 11 Nov 2026 16:23:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Nov 2026 16:23:50 +0800
+Date: Wed, 11 Nov 2026 16:23:50 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: vvkj <lueqit@gmail.com>
+Cc: dash@vger.kernel.org
+Subject: Re: [BUG] dash: command substitution leaks 0x81 (CTLESC) across
+ 128-byte boundaries
+Message-ID: <avQmFhHfN3ijdQKZ@gondor.apana.org.au>
+References: <CALwy4xJPUYmHJkBvwAr02zp9HfMp0h2upeRxc4NnyXT5ELn4CA@mail.gmail.com>
 X-Mailing-List: dash@vger.kernel.org
 List-Id: <dash.vger.kernel.org>
 List-Post: <mailto:dash@vger.kernel.org>
@@ -58,47 +64,20 @@ List-Unsubscribe: <mailto:dash+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:dash+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] expand: Fix out-of-bounds syntax table access
-To: Ayesha Shafique <ayeshashafique123@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, dash@vger.kernel.org
-References: <20260817202007.93924-1-ayeshashafique123@gmail.com>
-Content-Language: en-US
-From: "Anders Kaseorg" <andersk@mit.edu>
-In-Reply-To: <20260817202007.93924-1-ayeshashafique123@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALwy4xJPUYmHJkBvwAr02zp9HfMp0h2upeRxc4NnyXT5ELn4CA@mail.gmail.com>
 
-On 8/17/26 13:20, Ayesha Shafique wrote:
-> mbtodest passes a signed byte to chtodest. Bytes with the high bit set
-> can therefore be negative. The syntax tables are based at SYNBASE so
-> that signed character values can be used as indices. However, the
-> is_type path did not apply this offset, causing chtodest and mbtodest
-> to read before the array:
+On Tue, Nov 10, 2026 at 07:34:31AM +0800, vvkj wrote:
+> Command substitution in dash corrupts multi-byte UTF-8 strings by
+> injecting an uncleaned 0x81 (CTLESC) byte across 128-byte boundaries.
 > 
->    $ printf 'v=\377\nw=$v\n' | src/dash
->    AddressSanitizer: global-buffer-overflow in chtodest
-> 
-> Apply SYNBASE to is_type, as is already done by the is_special macro.
-> 
-> Fixes: c0c860df08c9 ("expand: Count multi-byte characters for VSLENGTH")
-> Signed-off-by: Ayesha Shafique <ayeshashafique123@gmail.com>
-Tested-by: Anders Kaseorg <andersk@mit.edu>
+> Tested on dash 0.5.13.4-1 (Arch Linux x86_64, LANG=en_US.UTF-8).
 
-This out-of-bounds read is also the cause of the stray 0x81 bytes 
-reported separately at
-
-https://lore.kernel.org/dash/CALwy4xJPUYmHJkBvwAr02zp9HfMp0h2upeRxc4NnyXT5ELn4CA@mail.gmail.com/
-
-and it is breaking Git's test suite on Ubuntu 27.04 (dash 
-0.5.13.5-1ubuntu1) on arm64, ppc64el, and s390x.
-
-https://launchpad.net/~git-core/+archive/ubuntu/candidate/+build/33960211
-https://launchpad.net/~git-core/+archive/ubuntu/candidate/+build/33960214
-https://launchpad.net/~git-core/+archive/ubuntu/candidate/+build/33960216
-
-Please include this fix in 0.5.13.6.
+I cannot reproduce this on 0.5.13.5.  Please try that version.
 
 Thanks,
-Anders
-
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
